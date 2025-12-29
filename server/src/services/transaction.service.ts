@@ -2,7 +2,7 @@ import { Types } from "mongoose";
 import { Wallet } from "../models/Wallet";
 import { WalletTransaction } from "../models/WalletTransaction";
 import { WalletType, TxnStatus } from "../models/types";
-import { AppError } from "../utills/AppError";
+import { AppError } from "../utils/AppError";
 
 /**
  * Create a wallet transaction record

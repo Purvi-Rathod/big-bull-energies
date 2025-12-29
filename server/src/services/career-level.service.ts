@@ -4,7 +4,7 @@ import { UserCareerProgress } from "../models/UserCareerProgress";
 import { BinaryTree } from "../models/BinaryTree";
 import { Wallet } from "../models/Wallet";
 import { WalletType } from "../models/types";
-import { AppError } from "../utills/AppError";
+import { AppError } from "../utils/AppError";
 import { updateWallet } from "./investment.service";
 import { createWalletTransaction } from "./transaction.service";
 

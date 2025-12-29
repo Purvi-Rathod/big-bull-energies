@@ -5,7 +5,7 @@ import { Investment } from "../models/Investment";
 import { Wallet } from "../models/Wallet";
 import { Package } from "../models/Package";
 import { WalletType } from "../models/types";
-import { AppError } from "../utills/AppError";
+import { AppError } from "../utils/AppError";
 import {
   createInvestmentTransaction,
   createReferralTransaction,

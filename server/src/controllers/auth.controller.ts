@@ -1,6 +1,6 @@
-import { asyncHandler } from "../utills/asyncHandler";
-import { AppError } from "../utills/AppError";
-import { signAuthToken } from "../utills/jwt";
+import { asyncHandler } from "../utils/asyncHandler";
+import { AppError } from "../utils/AppError";
+import { signAuthToken } from "../utils/jwt";
 import { User } from "../models/User";
 import { initializeUser } from "../services/userInit.service";
 import { generateNextUserId, findUserByUserId } from "../services/userId.service";

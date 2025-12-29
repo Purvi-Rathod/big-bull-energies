@@ -3,7 +3,7 @@ import { User } from "../models/User";
 import { BinaryTree } from "../models/BinaryTree";
 import { Wallet } from "../models/Wallet";
 import { WalletType } from "../models/types";
-import { AppError } from "../utills/AppError";
+import { AppError } from "../utils/AppError";
 import { findUserByUserId } from "./userId.service";
 
 /**

@@ -3,7 +3,7 @@ import { Package } from "../models/Package";
 import { Wallet } from "../models/Wallet";
 import { WalletType } from "../models/types";
 import { Types } from "mongoose";
-import { AppError } from "../utills/AppError";
+import { AppError } from "../utils/AppError";
 import { createROITransaction } from "./transaction.service";
 
 /**

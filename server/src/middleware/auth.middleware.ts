@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
-import { verifyAuthToken } from "../utills/jwt";
-import { AppError } from "../utills/AppError";
+import { verifyAuthToken } from "../utils/jwt";
+import { AppError } from "../utils/AppError";
 
 declare global {
   namespace Express {

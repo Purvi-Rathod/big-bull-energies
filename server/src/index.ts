@@ -1,7 +1,7 @@
 import dotenv from 'dotenv';
 import { execSync } from 'child_process';
 import  app  from './app';
-import verifyEnvVariables from './utills/checkURI';
+import verifyEnvVariables from './utils/checkURI';
 import connectdb from "./db/index";
 import { setupROICron } from './cron/roi-cron';
 import chalk from 'chalk'

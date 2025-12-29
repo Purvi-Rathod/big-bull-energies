@@ -1,6 +1,6 @@
-import { asyncHandler } from "../utills/asyncHandler";
-import { AppError } from "../utills/AppError";
-import { signAdminToken, signAuthToken } from "../utills/jwt";
+import { asyncHandler } from "../utils/asyncHandler";
+import { AppError } from "../utils/AppError";
+import { signAdminToken, signAuthToken } from "../utils/jwt";
 import { Admin } from "../models/Admin";
 import { AdminRole } from "../models/Admin";
 import { triggerROICalculation } from "../cron/roi-cron";

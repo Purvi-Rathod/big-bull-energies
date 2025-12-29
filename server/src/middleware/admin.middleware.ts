@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
-import { verifyAdminToken, verifyAuthToken } from "../utills/jwt";
-import { AppError } from "../utills/AppError";
+import { verifyAdminToken, verifyAuthToken } from "../utils/jwt";
+import { AppError } from "../utils/AppError";
 import { User } from "../models/User";
 
 declare global {

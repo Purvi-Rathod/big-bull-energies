@@ -1,5 +1,5 @@
-import { asyncHandler } from "../utills/asyncHandler";
-import { AppError } from "../utills/AppError";
+import { asyncHandler } from "../utils/asyncHandler";
+import { AppError } from "../utils/AppError";
 import { User } from "../models/User";
 import { BinaryTree } from "../models/BinaryTree";
 import { Investment } from "../models/Investment";

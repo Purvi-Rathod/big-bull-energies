@@ -1,5 +1,5 @@
-import { asyncHandler } from "../utills/asyncHandler";
-import { AppError } from "../utills/AppError";
+import { asyncHandler } from "../utils/asyncHandler";
+import { AppError } from "../utils/AppError";
 import { Package } from "../models/Package";
 import { Types } from "mongoose";
 

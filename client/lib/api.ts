@@ -401,17 +401,18 @@ class ApiClient {
     });
   }
 
-  async exchangeWalletFunds(data: { fromWalletType: string; toWalletType: string; amount: number; exchangeRate?: number }) {
-    return this.request<{
-      exchangeId: string;
-      fromWallet: { type: string; balanceBefore: number; balanceAfter: number; amountDebited: number };
-      toWallet: { type: string; balanceBefore: number; balanceAfter: number; amountCredited: number };
-      exchangeRate: number;
-    }>('/user/wallet-exchange', {
-      method: 'POST',
-      body: JSON.stringify(data),
-    });
-  }
+  // Wallet Exchange feature has been removed - users should use vouchers for reinvestment
+  // async exchangeWalletFunds(data: { fromWalletType: string; toWalletType: string; amount: number; exchangeRate?: number }) {
+  //   return this.request<{
+  //     exchangeId: string;
+  //     fromWallet: { type: string; balanceBefore: number; balanceAfter: number; amountDebited: number };
+  //     toWallet: { type: string; balanceBefore: number; balanceAfter: number; amountCredited: number };
+  //     exchangeRate: number;
+  //   }>('/user/wallet-exchange', {
+  //     method: 'POST',
+  //     body: JSON.stringify(data),
+  //   });
+  // }
 
   async getUserReports() {
     return this.request<{ roi: any[]; binary: any[]; referral: any[]; careerLevel: any[]; investment: any[]; withdrawals: any[] }>('/user/reports', {

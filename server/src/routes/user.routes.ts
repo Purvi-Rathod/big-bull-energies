@@ -15,7 +15,6 @@ import {
   updateUserProfile,
   getUserReferralLinks,
   getUserDirectReferrals,
-  exchangeWalletFunds,
   getUserCareerProgressController,
   createTicket,
   getUserTickets,
@@ -40,7 +39,8 @@ router.put("/wallet-address", requireAuth, updateWalletAddress);
 router.put("/profile", requireAuth, updateUserProfile);
 router.get("/referral-links", requireAuth, getUserReferralLinks);
 router.get("/direct-referrals", requireAuth, getUserDirectReferrals);
-router.post("/wallet-exchange", requireAuth, exchangeWalletFunds);
+// Wallet Exchange feature has been removed - users should use vouchers for reinvestment
+// router.post("/wallet-exchange", requireAuth, exchangeWalletFunds);
 router.get("/career-progress", requireAuth, getUserCareerProgressController);
 router.post("/tickets", requireAuth, createTicket);
 router.get("/tickets", requireAuth, getUserTickets);

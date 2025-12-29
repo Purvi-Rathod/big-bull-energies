@@ -3,6 +3,8 @@
 import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
+import Image from 'next/image';
+import CneoLoader from '@/components/CneoLoader';
 
 function LoginContent() {
   const [emailOrPhoneOrUserId, setEmailOrPhoneOrUserId] = useState('');
@@ -60,10 +62,22 @@ function LoginContent() {
   // Show loading state while checking authentication
   if (authLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100">
-        <div className="text-center">
-          <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
-          <p className="mt-4 text-gray-600">Loading...</p>
+      <div className="min-h-screen flex items-center justify-center relative">
+        {/* Background Image */}
+        <div className="fixed inset-0 z-0">
+          <Image
+            src="/signinbg.png"
+            alt="Background"
+            fill
+            className="object-cover"
+            priority
+            quality={90}
+          />
+          <div className="absolute inset-0 bg-black/50"></div>
+        </div>
+        <div className="relative z-10 text-center">
+          <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-yellow-500"></div>
+          <p className="mt-4 text-white">Loading...</p>
         </div>
       </div>
     );
@@ -75,34 +89,61 @@ function LoginContent() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8 bg-white rounded-2xl shadow-xl p-8 border border-gray-200">
+    <div className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 relative">
+      {/* Background Image */}
+      <div className="fixed inset-0 z-0">
+        <Image
+          src="/signinbg.png"
+          alt="Background"
+          fill
+          className="object-cover"
+          priority
+          quality={90}
+        />
+        {/* Overlay for better readability */}
+        <div className="absolute inset-0 bg-black/50"></div>
+      </div>
+      
+      {/* Content */}
+      <div className="relative z-10 max-w-md w-full space-y-8 bg-gradient-to-br from-gray-900/95 via-gray-800/95 to-gray-900/95 backdrop-blur-sm rounded-2xl shadow-2xl p-8 border border-yellow-500/30">
         <div>
-          <h2 className="text-center text-3xl font-bold text-black mb-2">
-            Sign in to your account
+          <div className="flex justify-center mb-6">
+            <Image
+              src="/logo1.png"
+              alt="CNEOX Logo"
+              width={180}
+              height={60}
+              className="h-14 w-auto"
+              priority
+            />
+          </div>
+          <h2 className="text-center text-3xl font-extrabold mb-2">
+            <span className="bg-gradient-to-r from-yellow-300 via-yellow-400 to-yellow-600 bg-clip-text text-transparent">
+              Sign in to your account
+            </span>
           </h2>
-          <p className="mt-2 text-center text-sm text-black/70">
+          <p className="mt-2 text-center text-sm text-gray-300">
             Don't have an account?{' '}
-            <a href="/signup" className="font-semibold text-indigo-600 hover:text-indigo-700 transition-colors">
+            <a href="/signup" className="font-semibold text-yellow-400 hover:text-yellow-300 transition-colors">
               Create a new account
             </a>
           </p>
         </div>
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           {successMessage && (
-            <div className="bg-green-50 border-2 border-green-300 text-black px-4 py-3 rounded-lg">
-              <p className="font-medium text-green-700">{successMessage}</p>
+            <div className="bg-gradient-to-r from-yellow-500/20 via-yellow-600/15 to-yellow-500/20 border-2 border-yellow-500/40 text-white px-4 py-3 rounded-xl">
+              <p className="font-bold text-yellow-300">{successMessage}</p>
             </div>
           )}
           {error && (
-            <div className="bg-red-50 border-2 border-red-300 text-black px-4 py-3 rounded-lg">
-              <p className="font-medium text-red-700">{error}</p>
+            <div className="bg-red-900/30 border-2 border-red-500/50 text-red-400 px-4 py-3 rounded-xl">
+              <p className="font-bold">{error}</p>
             </div>
           )}
           
           <div className="space-y-4">
             <div>
-              <label htmlFor="email-phone-userid" className="block text-sm font-semibold text-black mb-2">
+              <label htmlFor="email-phone-userid" className="block text-sm font-bold text-yellow-400 mb-2">
                 {isAdmin ? "Email Address" : "Email, Phone, or User ID"}
               </label>
               <input
@@ -110,14 +151,14 @@ function LoginContent() {
                 name="email-phone-userid"
                 type="text"
                 required
-                className="appearance-none relative block w-full px-4 py-3 border-2 border-gray-300 placeholder-gray-400 text-black bg-white rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all sm:text-sm"
+                className="appearance-none relative block w-full px-4 py-3 border-2 border-yellow-500/40 placeholder-gray-500 text-white bg-gray-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-yellow-500/50 focus:border-yellow-500/70 transition-all sm:text-sm font-semibold"
                 placeholder={isAdmin ? "Enter your email" : "Email, phone, or User ID (CROWN-XXXXXX)"}
                 value={emailOrPhoneOrUserId}
                 onChange={(e) => setEmailOrPhoneOrUserId(e.target.value)}
               />
             </div>
             <div>
-              <label htmlFor="password" className="block text-sm font-semibold text-black mb-2">
+              <label htmlFor="password" className="block text-sm font-bold text-yellow-400 mb-2">
                 Password
               </label>
               <div className="relative">
@@ -126,14 +167,14 @@ function LoginContent() {
                 name="password"
                   type={showPassword ? "text" : "password"}
                 required
-                  className="appearance-none relative block w-full px-4 py-3 pr-12 border-2 border-gray-300 placeholder-gray-400 text-black bg-white rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all sm:text-sm"
+                  className="appearance-none relative block w-full px-4 py-3 pr-12 border-2 border-yellow-500/40 placeholder-gray-500 text-white bg-gray-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-yellow-500/50 focus:border-yellow-500/70 transition-all sm:text-sm font-semibold"
                   placeholder="Enter your password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
               />
                 <button
                   type="button"
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-600 hover:text-black focus:outline-none transition-colors"
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-yellow-400 focus:outline-none transition-colors"
                   onClick={() => setShowPassword(!showPassword)}
                   tabIndex={-1}
                 >
@@ -157,7 +198,7 @@ function LoginContent() {
               <div className="text-sm">
                 <a
                   href="/forgot-password"
-                  className="font-semibold text-indigo-600 hover:text-indigo-700 transition-colors"
+                  className="font-semibold text-yellow-400 hover:text-yellow-300 transition-colors"
                 >
                   Forgot password?
                 </a>
@@ -183,11 +224,11 @@ function LoginContent() {
             <button
               type="submit"
               disabled={loading}
-              className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-semibold rounded-lg text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-md hover:shadow-lg"
+              className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-bold rounded-xl text-black bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-400 hover:to-yellow-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg shadow-yellow-500/30 hover:shadow-yellow-500/50 hover:scale-105 active:scale-95"
             >
               {loading ? (
                 <span className="flex items-center">
-                  <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-black" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                   </svg>
@@ -206,14 +247,7 @@ function LoginContent() {
 
 export default function LoginPage() {
   return (
-    <Suspense fallback={
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100">
-        <div className="text-center">
-          <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
-          <p className="mt-4 text-gray-600">Loading...</p>
-        </div>
-      </div>
-    }>
+    <Suspense fallback={<CneoLoader fullScreen />}>
       <LoginContent />
     </Suspense>
   );

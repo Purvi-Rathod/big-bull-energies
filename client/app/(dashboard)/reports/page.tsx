@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { api } from '@/lib/api';
+import CneoLoader from '@/components/CneoLoader';
 
 interface Transaction {
   id: string;
@@ -170,36 +171,36 @@ export default function ReportsPage() {
   };
 
   const renderTransactionTable = (transactions: Transaction[], title: string, showExport: boolean = true, isReferral: boolean = false) => (
-    <div className="bg-white rounded-lg shadow overflow-hidden">
-      <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
-        <h3 className="text-lg font-semibold text-gray-900">{title}</h3>
+    <div className="bg-gradient-to-br from-gray-900/95 via-gray-800/95 to-gray-900/95 backdrop-blur-sm rounded-2xl shadow-2xl border border-yellow-500/30 overflow-hidden">
+      <div className="px-6 py-5 border-b border-yellow-500/20 bg-gradient-to-r from-gray-800 via-gray-800/90 to-gray-800 flex justify-between items-center">
+        <h3 className="text-xl font-extrabold text-white">{title}</h3>
         {showExport && transactions.length > 0 && (
           <button
             onClick={() => exportTransactions(transactions, title)}
-            className="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            className="px-6 py-2.5 bg-gradient-to-r from-yellow-500 to-yellow-600 text-black text-sm font-bold rounded-xl hover:from-yellow-400 hover:to-yellow-500 focus:outline-none focus:ring-2 focus:ring-yellow-500/50 transition-all shadow-lg shadow-yellow-500/30 hover:shadow-yellow-500/50 hover:scale-105 active:scale-95"
           >
             Export CSV
           </button>
         )}
       </div>
       <div className="overflow-x-auto">
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
+        <table className="min-w-full divide-y divide-yellow-500/10">
+          <thead className="bg-gradient-to-r from-gray-800 via-gray-800/90 to-gray-800">
             <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date & Time</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Type</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Amount</th>
+              <th className="px-6 py-5 text-left text-xs font-bold text-yellow-400 uppercase tracking-wider">Date & Time</th>
+              <th className="px-6 py-5 text-left text-xs font-bold text-yellow-400 uppercase tracking-wider">Type</th>
+              <th className="px-6 py-5 text-left text-xs font-bold text-yellow-400 uppercase tracking-wider">Amount</th>
               {isReferral && (
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Source</th>
+                <th className="px-6 py-5 text-left text-xs font-bold text-yellow-400 uppercase tracking-wider">Source</th>
               )}
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Transaction ID</th>
+              <th className="px-6 py-5 text-left text-xs font-bold text-yellow-400 uppercase tracking-wider">Status</th>
+              <th className="px-6 py-5 text-left text-xs font-bold text-yellow-400 uppercase tracking-wider">Transaction ID</th>
             </tr>
           </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
+          <tbody className="bg-gray-900/50 divide-y divide-yellow-500/10">
             {transactions.length === 0 ? (
               <tr>
-                <td colSpan={isReferral ? 6 : 5} className="px-6 py-4 text-center text-gray-500">
+                <td colSpan={isReferral ? 6 : 5} className="px-6 py-12 text-center text-gray-400 text-lg">
                   No transactions found
                 </td>
               </tr>
@@ -207,50 +208,54 @@ export default function ReportsPage() {
               transactions.map((tx) => {
                 const { date, time } = formatDateTime(tx.createdAt);
                 return (
-                  <tr key={tx.id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 whitespace-nowrap text-sm">
-                      <div className="text-gray-900 font-medium">{date}</div>
-                      <div className="text-gray-500 text-xs">{time}</div>
+                  <tr key={tx.id} className="hover:bg-gradient-to-r hover:from-yellow-500/5 hover:via-yellow-500/10 hover:to-transparent transition-all duration-300 group">
+                    <td className="px-6 py-5 whitespace-nowrap text-sm">
+                      <div className="text-white font-bold group-hover:text-yellow-100 transition-colors">{date}</div>
+                      <div className="text-gray-400 text-xs mt-1">{time}</div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm">
-                      <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                        tx.type === 'credit' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                    <td className="px-6 py-5 whitespace-nowrap text-sm">
+                      <span className={`px-4 py-1.5 inline-flex text-xs leading-5 font-bold rounded-full shadow-lg ${
+                        tx.type === 'credit' 
+                          ? 'bg-gradient-to-r from-yellow-500/30 to-yellow-600/20 text-yellow-300 border border-yellow-500/50 shadow-yellow-500/20' 
+                          : 'bg-red-900/40 text-red-400 border border-red-500/40'
                       }`}>
                         {tx.type.toUpperCase()}
                       </span>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                    <td className="px-6 py-5 whitespace-nowrap text-sm font-extrabold text-yellow-400 group-hover:text-yellow-300 transition-colors">
                       ${tx.amount.toFixed(2)}
                     </td>
                     {isReferral && (
-                      <td className="px-6 py-4 text-sm text-gray-600">
+                      <td className="px-6 py-5 text-sm">
                         {tx.referralSource && tx.packageInfo ? (
-                          <div className="space-y-1">
-                            <div className="font-medium text-gray-900">
-                              {tx.referralSource.name} ({tx.referralSource.userId})
+                          <div className="space-y-2">
+                            <div className="font-bold text-white">
+                              {tx.referralSource.name} <span className="text-yellow-400 font-mono">({tx.referralSource.userId})</span>
                             </div>
-                            <div className="text-xs text-gray-500">
-                              activated ${tx.packageInfo.investedAmount.toFixed(2)} package
+                            <div className="text-xs text-gray-400">
+                              activated <span className="text-yellow-400 font-semibold">${tx.packageInfo.investedAmount.toFixed(2)}</span> package
                             </div>
-                            <div className="text-xs text-gray-500">
-                              You got ${tx.amount.toFixed(2)} referral income ({tx.referralPercentage?.toFixed(1) || tx.packageInfo.referralPct?.toFixed(1) || 'N/A'}%)
+                            <div className="text-xs text-gray-300">
+                              You got <span className="text-yellow-400 font-bold">${tx.amount.toFixed(2)}</span> referral income <span className="text-yellow-300">({tx.referralPercentage?.toFixed(1) || tx.packageInfo.referralPct?.toFixed(1) || 'N/A'}%)</span>
                             </div>
                           </div>
                         ) : (
-                          <span className="text-gray-400 italic">Source information unavailable</span>
+                          <span className="text-gray-500 italic">Source information unavailable</span>
                         )}
                       </td>
                     )}
-                    <td className="px-6 py-4 whitespace-nowrap text-sm">
-                      <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                        tx.status === 'completed' ? 'bg-green-100 text-green-800' :
-                        tx.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
-                        'bg-red-100 text-red-800'
+                    <td className="px-6 py-5 whitespace-nowrap text-sm">
+                      <span className={`px-4 py-1.5 inline-flex text-xs leading-5 font-bold rounded-full shadow-lg ${
+                        tx.status === 'completed' 
+                          ? 'bg-gradient-to-r from-yellow-500/30 to-yellow-600/20 text-yellow-300 border border-yellow-500/50 shadow-yellow-500/20'
+                          : tx.status === 'pending' 
+                          ? 'bg-gray-700/50 text-yellow-200 border border-yellow-500/30'
+                          : 'bg-red-900/40 text-red-400 border border-red-500/40'
                       }`}>
                         {tx.status}
                       </span>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-mono text-gray-600">
+                    <td className="px-6 py-5 whitespace-nowrap text-sm font-mono text-yellow-400 font-semibold">
                       {tx.txRef || tx.id.substring(0, 8) || 'N/A'}
                     </td>
                   </tr>
@@ -264,37 +269,37 @@ export default function ReportsPage() {
   );
 
   const renderInvestmentTable = () => (
-    <div className="bg-white rounded-lg shadow overflow-hidden">
-      <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
-        <h3 className="text-lg font-semibold text-gray-900">Investment Transactions</h3>
+    <div className="bg-gradient-to-br from-gray-900/95 via-gray-800/95 to-gray-900/95 backdrop-blur-sm rounded-2xl shadow-2xl border border-yellow-500/30 overflow-hidden">
+      <div className="px-6 py-5 border-b border-yellow-500/20 bg-gradient-to-r from-gray-800 via-gray-800/90 to-gray-800 flex justify-between items-center">
+        <h3 className="text-xl font-extrabold text-white">Investment Transactions</h3>
         {investmentTransactions.length > 0 && (
           <button
             onClick={() => exportInvestmentTransactions(investmentTransactions)}
-            className="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            className="px-6 py-2.5 bg-gradient-to-r from-yellow-500 to-yellow-600 text-black text-sm font-bold rounded-xl hover:from-yellow-400 hover:to-yellow-500 focus:outline-none focus:ring-2 focus:ring-yellow-500/50 transition-all shadow-lg shadow-yellow-500/30 hover:shadow-yellow-500/50 hover:scale-105 active:scale-95"
           >
             Export CSV
           </button>
         )}
       </div>
       <div className="overflow-x-auto">
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
+        <table className="min-w-full divide-y divide-yellow-500/10">
+          <thead className="bg-gradient-to-r from-gray-800 via-gray-800/90 to-gray-800">
             <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date & Time</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Type</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Amount</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Package</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">ROI %</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Invested Amount</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Duration</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Transaction ID</th>
+              <th className="px-6 py-5 text-left text-xs font-bold text-yellow-400 uppercase tracking-wider">Date & Time</th>
+              <th className="px-6 py-5 text-left text-xs font-bold text-yellow-400 uppercase tracking-wider">Type</th>
+              <th className="px-6 py-5 text-left text-xs font-bold text-yellow-400 uppercase tracking-wider">Amount</th>
+              <th className="px-6 py-5 text-left text-xs font-bold text-yellow-400 uppercase tracking-wider">Package</th>
+              <th className="px-6 py-5 text-left text-xs font-bold text-yellow-400 uppercase tracking-wider">ROI %</th>
+              <th className="px-6 py-5 text-left text-xs font-bold text-yellow-400 uppercase tracking-wider">Invested Amount</th>
+              <th className="px-6 py-5 text-left text-xs font-bold text-yellow-400 uppercase tracking-wider">Duration</th>
+              <th className="px-6 py-5 text-left text-xs font-bold text-yellow-400 uppercase tracking-wider">Status</th>
+              <th className="px-6 py-5 text-left text-xs font-bold text-yellow-400 uppercase tracking-wider">Transaction ID</th>
             </tr>
           </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
+          <tbody className="bg-gray-900/50 divide-y divide-yellow-500/10">
             {investmentTransactions.length === 0 ? (
               <tr>
-                <td colSpan={9} className="px-6 py-4 text-center text-gray-500">
+                <td colSpan={9} className="px-6 py-12 text-center text-gray-400 text-lg">
                   No investment transactions found
                 </td>
               </tr>
@@ -302,43 +307,47 @@ export default function ReportsPage() {
               investmentTransactions.map((tx) => {
                 const { date, time } = formatDateTime(tx.createdAt);
                 return (
-                  <tr key={tx.id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 whitespace-nowrap text-sm">
-                      <div className="text-gray-900 font-medium">{date}</div>
-                      <div className="text-gray-500 text-xs">{time}</div>
+                  <tr key={tx.id} className="hover:bg-gradient-to-r hover:from-yellow-500/5 hover:via-yellow-500/10 hover:to-transparent transition-all duration-300 group">
+                    <td className="px-6 py-5 whitespace-nowrap text-sm">
+                      <div className="text-white font-bold group-hover:text-yellow-100 transition-colors">{date}</div>
+                      <div className="text-gray-400 text-xs mt-1">{time}</div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm">
-                      <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                        tx.type === 'credit' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                    <td className="px-6 py-5 whitespace-nowrap text-sm">
+                      <span className={`px-4 py-1.5 inline-flex text-xs leading-5 font-bold rounded-full shadow-lg ${
+                        tx.type === 'credit' 
+                          ? 'bg-gradient-to-r from-yellow-500/30 to-yellow-600/20 text-yellow-300 border border-yellow-500/50 shadow-yellow-500/20' 
+                          : 'bg-red-900/40 text-red-400 border border-red-500/40'
                       }`}>
                         {tx.type.toUpperCase()}
                       </span>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                    <td className="px-6 py-5 whitespace-nowrap text-sm font-extrabold text-yellow-400 group-hover:text-yellow-300 transition-colors">
                       ${tx.amount.toFixed(2)}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-medium">
+                    <td className="px-6 py-5 whitespace-nowrap text-sm text-white font-bold group-hover:text-yellow-100 transition-colors">
                       {tx.investment?.packageName || 'N/A'}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    <td className="px-6 py-5 whitespace-nowrap text-sm text-gray-300 font-semibold">
                       {tx.investment?.roi || 0}%
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                    <td className="px-6 py-5 whitespace-nowrap text-sm font-bold text-white">
                       ${tx.investment?.investedAmount.toFixed(2) || '0.00'}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    <td className="px-6 py-5 whitespace-nowrap text-sm text-gray-300 font-semibold">
                       {tx.investment?.duration || 0} days
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm">
-                      <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                        tx.status === 'completed' ? 'bg-green-100 text-green-800' :
-                        tx.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
-                        'bg-red-100 text-red-800'
+                    <td className="px-6 py-5 whitespace-nowrap text-sm">
+                      <span className={`px-4 py-1.5 inline-flex text-xs leading-5 font-bold rounded-full shadow-lg ${
+                        tx.status === 'completed' 
+                          ? 'bg-gradient-to-r from-yellow-500/30 to-yellow-600/20 text-yellow-300 border border-yellow-500/50 shadow-yellow-500/20'
+                          : tx.status === 'pending' 
+                          ? 'bg-gray-700/50 text-yellow-200 border border-yellow-500/30'
+                          : 'bg-red-900/40 text-red-400 border border-red-500/40'
                       }`}>
                         {tx.status}
                       </span>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-mono text-gray-600">
+                    <td className="px-6 py-5 whitespace-nowrap text-sm font-mono text-yellow-400 font-semibold">
                       {tx.txRef || tx.id.substring(0, 8) || 'N/A'}
                     </td>
                   </tr>
@@ -352,36 +361,36 @@ export default function ReportsPage() {
   );
 
   const renderWithdrawalTable = () => (
-    <div className="bg-white rounded-lg shadow overflow-hidden">
-      <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
-        <h3 className="text-lg font-semibold text-gray-900">Withdrawal History</h3>
+    <div className="bg-gradient-to-br from-gray-900/95 via-gray-800/95 to-gray-900/95 backdrop-blur-sm rounded-2xl shadow-2xl border border-yellow-500/30 overflow-hidden">
+      <div className="px-6 py-5 border-b border-yellow-500/20 bg-gradient-to-r from-gray-800 via-gray-800/90 to-gray-800 flex justify-between items-center">
+        <h3 className="text-xl font-extrabold text-white">Withdrawal History</h3>
         {withdrawals.length > 0 && (
           <button
             onClick={() => exportWithdrawals(withdrawals)}
-            className="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            className="px-6 py-2.5 bg-gradient-to-r from-yellow-500 to-yellow-600 text-black text-sm font-bold rounded-xl hover:from-yellow-400 hover:to-yellow-500 focus:outline-none focus:ring-2 focus:ring-yellow-500/50 transition-all shadow-lg shadow-yellow-500/30 hover:shadow-yellow-500/50 hover:scale-105 active:scale-95"
           >
             Export CSV
           </button>
         )}
       </div>
       <div className="overflow-x-auto">
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
+        <table className="min-w-full divide-y divide-yellow-500/10">
+          <thead className="bg-gradient-to-r from-gray-800 via-gray-800/90 to-gray-800">
             <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date & Time</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Withdrawal ID</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Amount</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Charges</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Final Amount</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Wallet Type</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Method</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+              <th className="px-6 py-5 text-left text-xs font-bold text-yellow-400 uppercase tracking-wider">Date & Time</th>
+              <th className="px-6 py-5 text-left text-xs font-bold text-yellow-400 uppercase tracking-wider">Withdrawal ID</th>
+              <th className="px-6 py-5 text-left text-xs font-bold text-yellow-400 uppercase tracking-wider">Amount</th>
+              <th className="px-6 py-5 text-left text-xs font-bold text-yellow-400 uppercase tracking-wider">Charges</th>
+              <th className="px-6 py-5 text-left text-xs font-bold text-yellow-400 uppercase tracking-wider">Final Amount</th>
+              <th className="px-6 py-5 text-left text-xs font-bold text-yellow-400 uppercase tracking-wider">Wallet Type</th>
+              <th className="px-6 py-5 text-left text-xs font-bold text-yellow-400 uppercase tracking-wider">Method</th>
+              <th className="px-6 py-5 text-left text-xs font-bold text-yellow-400 uppercase tracking-wider">Status</th>
             </tr>
           </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
+          <tbody className="bg-gray-900/50 divide-y divide-yellow-500/10">
             {withdrawals.length === 0 ? (
               <tr>
-                <td colSpan={8} className="px-6 py-4 text-center text-gray-500">
+                <td colSpan={8} className="px-6 py-12 text-center text-gray-400 text-lg">
                   No withdrawals found
                 </td>
               </tr>
@@ -389,34 +398,36 @@ export default function ReportsPage() {
               withdrawals.map((wd) => {
                 const { date, time } = formatDateTime(wd.createdAt);
                 return (
-                  <tr key={wd.id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 whitespace-nowrap text-sm">
-                      <div className="text-gray-900 font-medium">{date}</div>
-                      <div className="text-gray-500 text-xs">{time}</div>
+                  <tr key={wd.id} className="hover:bg-gradient-to-r hover:from-yellow-500/5 hover:via-yellow-500/10 hover:to-transparent transition-all duration-300 group">
+                    <td className="px-6 py-5 whitespace-nowrap text-sm">
+                      <div className="text-white font-bold group-hover:text-yellow-100 transition-colors">{date}</div>
+                      <div className="text-gray-400 text-xs mt-1">{time}</div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-mono text-gray-600">
+                    <td className="px-6 py-5 whitespace-nowrap text-sm font-mono text-yellow-400 font-semibold">
                       {wd.withdrawalId || wd.id.substring(0, 8)}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                    <td className="px-6 py-5 whitespace-nowrap text-sm font-bold text-white">
                       ${wd.amount.toFixed(2)}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    <td className="px-6 py-5 whitespace-nowrap text-sm text-gray-400 font-semibold">
                       ${wd.charges.toFixed(2)}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-green-600">
+                    <td className="px-6 py-5 whitespace-nowrap text-sm font-extrabold text-yellow-400 group-hover:text-yellow-300 transition-colors">
                       ${wd.finalAmount.toFixed(2)}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 capitalize">
+                    <td className="px-6 py-5 whitespace-nowrap text-sm text-gray-300 capitalize font-semibold">
                       {wd.walletType}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 capitalize">
+                    <td className="px-6 py-5 whitespace-nowrap text-sm text-gray-300 capitalize font-semibold">
                       {wd.method || 'crypto'}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm">
-                      <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                        wd.status === 'approved' ? 'bg-green-100 text-green-800' :
-                        wd.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
-                        'bg-red-100 text-red-800'
+                    <td className="px-6 py-5 whitespace-nowrap text-sm">
+                      <span className={`px-4 py-1.5 inline-flex text-xs leading-5 font-bold rounded-full shadow-lg ${
+                        wd.status === 'approved' 
+                          ? 'bg-gradient-to-r from-yellow-500/30 to-yellow-600/20 text-yellow-300 border border-yellow-500/50 shadow-yellow-500/20'
+                          : wd.status === 'pending' 
+                          ? 'bg-gray-700/50 text-yellow-200 border border-yellow-500/30'
+                          : 'bg-red-900/40 text-red-400 border border-red-500/40'
                       }`}>
                         {wd.status}
                       </span>
@@ -432,41 +443,43 @@ export default function ReportsPage() {
   );
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center py-12">
-          <div className="text-center">
-          <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-slate-600"></div>
-            <p className="mt-4 text-gray-600">Loading reports...</p>
-          </div>
-        </div>
-    );
+    return <CneoLoader fullScreen />;
   }
 
   return (
-    <div className="w-full">
-      <div className="mb-6">
-        <h1 className="text-3xl font-bold text-gray-900">Reports</h1>
+    <div className="w-full bg-gradient-to-br from-black via-gray-900 to-black min-h-screen py-8 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+      {/* Decorative background elements */}
+      <div className="fixed inset-0 pointer-events-none opacity-20">
+        <div className="absolute top-0 right-1/4 w-96 h-96 bg-yellow-500/10 rounded-full blur-3xl"></div>
+        <div className="absolute bottom-0 left-1/4 w-96 h-96 bg-yellow-600/10 rounded-full blur-3xl"></div>
+      </div>
+
+      <div className="relative z-10">
+      <div className="mb-8">
+        <h1 className="text-3xl font-extrabold mb-2 text-white flex items-center gap-3">
+          <span className="bg-gradient-to-r from-yellow-300 via-yellow-400 to-yellow-600 bg-clip-text text-transparent drop-shadow-lg">Reports</span>
+        </h1>
           </div>
           {error && (
-            <div className="mb-4 bg-red-50 border border-red-400 text-red-700 px-4 py-3 rounded">
+            <div className="mb-6 bg-red-900/30 border border-red-500/50 text-red-400 px-4 py-3 rounded-lg backdrop-blur-sm">
               {error}
             </div>
           )}
 
       <div>
           {/* Tabs */}
-          <div className="mb-6">
-            <div className="border-b border-gray-200">
-              <nav className="-mb-px flex space-x-8">
+          <div className="mb-8">
+            <div className="border-b border-yellow-500/20">
+              <nav className="-mb-px flex space-x-8 overflow-x-auto">
                   {(['roi', 'binary', 'referral', 'careerLevel', 'investment', 'withdrawal'] as const).map((tab) => (
                   <button
                     key={tab}
                       onClick={() => setActiveTab(tab)}
                     className={`${
                       activeTab === tab
-                        ? 'border-indigo-500 text-indigo-600'
-                        : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                    } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm capitalize`}
+                        ? 'border-yellow-500 text-yellow-400'
+                        : 'border-transparent text-gray-400 hover:text-yellow-300 hover:border-yellow-500/50'
+                    } whitespace-nowrap py-4 px-1 border-b-2 font-bold text-sm capitalize transition-all duration-200`}
                   >
                       {tab === 'careerLevel' ? 'Career Level' : tab} {tab === 'roi' && `(${roiTransactions.length})`}
                       {tab === 'binary' && `(${binaryTransactions.length})`}
@@ -487,6 +500,7 @@ export default function ReportsPage() {
             {activeTab === 'careerLevel' && renderTransactionTable(careerLevelTransactions, 'Career Level Transactions')}
             {activeTab === 'investment' && renderInvestmentTable()}
             {activeTab === 'withdrawal' && renderWithdrawalTable()}
+          </div>
           </div>
         </div>
   );

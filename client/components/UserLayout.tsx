@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import Link from 'next/link';
+import Image from 'next/image';
+import CneoLoader from './CneoLoader';
 
 export default function UserLayout({
   children,
@@ -103,22 +105,15 @@ export default function UserLayout({
   };
 
   if (authLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-slate-600"></div>
-          <p className="mt-4 text-gray-600">Loading...</p>
-        </div>
-      </div>
-    );
+    return <CneoLoader fullScreen />;
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex">
+    <div className="min-h-screen bg-black flex">
       {/* Mobile Overlay */}
       {sidebarOpen && (
         <div
-          className="fixed inset-0 bg-gray-600 bg-opacity-50 z-20 md:hidden"
+          className="fixed inset-0 bg-black/80 backdrop-blur-sm z-20 md:hidden"
           onClick={() => setSidebarOpen(false)}
         />
       )}
@@ -129,16 +124,34 @@ export default function UserLayout({
           sidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
         } ${
           sidebarOpen ? 'w-64' : 'md:w-20'
-        } bg-white border-r border-gray-200 transition-all duration-300 ease-in-out flex flex-col fixed h-screen z-30`}
+        } bg-gradient-to-b from-gray-900 via-gray-900 to-black border-r border-yellow-500/30 shadow-2xl transition-all duration-300 ease-in-out flex flex-col fixed h-screen z-30`}
       >
         {/* Logo/Header */}
-        <div className="h-16 flex items-center justify-between px-4 border-b border-gray-200">
-          {sidebarOpen && (
-            <h1 className="text-xl font-bold text-gray-800">Dashboard</h1>
+        <div className="h-16 flex items-center justify-between px-4 border-b border-yellow-500/20 bg-gray-900/50 backdrop-blur-sm">
+          {sidebarOpen ? (
+            <Link href="/dashboard" className="flex items-center gap-2">
+              <Image
+                src="/logo1.png"
+                alt="CNEOX Logo"
+                width={120}
+                height={40}
+                className="h-8 w-auto"
+              />
+            </Link>
+          ) : (
+            <Link href="/dashboard" className="flex items-center justify-center">
+              <Image
+                src="/logo1.png"
+                alt="CNEOX"
+                width={40}
+                height={40}
+                className="h-8 w-8 object-contain"
+              />
+            </Link>
           )}
           <button
             onClick={() => setSidebarOpen(!sidebarOpen)}
-            className="p-2 rounded-md hover:bg-gray-100 text-gray-600 hover:text-gray-900 transition-colors"
+            className="p-2 rounded-lg hover:bg-yellow-500/20 text-gray-400 hover:text-yellow-400 transition-all duration-200 border border-transparent hover:border-yellow-500/30"
             aria-label="Toggle sidebar"
           >
             <svg
@@ -157,41 +170,45 @@ export default function UserLayout({
         </div>
 
         {/* Navigation */}
-        <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
+        <nav className="flex-1 px-3 py-4 space-y-2 overflow-y-auto">
           {navigation.map((item) => {
             const active = isActive(item.href);
             return (
               <Link
                 key={item.name}
                 href={item.href}
-                className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+                className={`group flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-semibold transition-all duration-200 relative ${
                   active
-                    ? 'bg-slate-100 text-slate-700'
-                    : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                    ? 'bg-gradient-to-r from-yellow-500/30 via-yellow-500/20 to-yellow-500/10 text-yellow-400 border border-yellow-500/40 shadow-lg shadow-yellow-500/10'
+                    : 'text-gray-400 hover:bg-yellow-500/10 hover:text-yellow-300 hover:border-yellow-500/20 border border-transparent'
                 }`}
                 title={!sidebarOpen ? item.name : undefined}
               >
-                <span className={`flex-shrink-0 ${active ? 'text-slate-600' : 'text-gray-400'}`}>
+                {/* Active indicator */}
+                {active && (
+                  <span className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-gradient-to-b from-yellow-400 to-yellow-600 rounded-r-full"></span>
+                )}
+                <span className={`flex-shrink-0 transition-colors ${active ? 'text-yellow-400' : 'text-gray-500 group-hover:text-yellow-400'}`}>
                   {item.icon}
                 </span>
-                {sidebarOpen && <span>{item.name}</span>}
+                {sidebarOpen && <span className="transition-colors">{item.name}</span>}
               </Link>
             );
           })}
         </nav>
 
         {/* User Info & Logout */}
-        <div className="border-t border-gray-200 p-4">
+        <div className="border-t border-yellow-500/20 p-4 bg-gray-900/30 backdrop-blur-sm">
           {sidebarOpen && user && (
-            <div className="mb-3 px-3 py-2 bg-gray-50 rounded-lg">
-              <p className="text-xs text-gray-500 mb-1">Logged in as</p>
-              <p className="text-sm font-medium text-gray-800 truncate">{user.name || user.email}</p>
-              <p className="text-xs text-gray-500 truncate">{user.userId}</p>
+            <div className="mb-3 px-4 py-3 bg-gradient-to-r from-yellow-500/10 to-yellow-600/5 rounded-xl border border-yellow-500/20">
+              <p className="text-xs text-gray-400 mb-1 font-medium">Logged in as</p>
+              <p className="text-sm font-bold text-white truncate">{user.name || user.email}</p>
+              <p className="text-xs text-yellow-400 font-mono truncate mt-1">{user.userId}</p>
             </div>
           )}
           <button
             onClick={handleLogout}
-            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50 transition-colors"
+            className="w-full flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-semibold text-gray-400 hover:bg-red-900/20 hover:text-red-400 hover:border-red-500/30 border border-transparent transition-all duration-200"
             title={!sidebarOpen ? 'Logout' : undefined}
           >
             <svg className="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -208,7 +225,7 @@ export default function UserLayout({
         <div className="md:hidden fixed top-4 left-4 z-10">
           <button
             onClick={() => setSidebarOpen(!sidebarOpen)}
-            className="p-2 bg-white rounded-md shadow-md hover:bg-gray-100 text-gray-600"
+            className="p-2 bg-gray-900 rounded-xl shadow-2xl border border-yellow-500/30 hover:bg-gray-800 hover:border-yellow-500/50 text-yellow-400 transition-all duration-200"
             aria-label="Toggle sidebar"
           >
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -216,7 +233,7 @@ export default function UserLayout({
             </svg>
           </button>
         </div>
-        <main className="p-2 md:p-4 pt-16 md:pt-4">
+        <main className="p-0">
           {children}
         </main>
       </div>

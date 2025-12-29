@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { api } from '@/lib/api';
+import CneoLoader from '@/components/CneoLoader';
 
 interface Package {
   id: string;
@@ -218,38 +219,43 @@ export default function PlansPage() {
 
 
   if (loading) {
-    return (
-          <div className="flex items-center justify-center py-12">
-            <div className="text-center">
-              <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-slate-600"></div>
-              <p className="mt-4 text-gray-600">Loading packages...</p>
-            </div>
-          </div>
-    );
+    return <CneoLoader fullScreen />;
   }
 
   return (
-        <div className="w-full">
+        <div className="w-full bg-gradient-to-br from-black via-gray-900 to-black min-h-screen py-8 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+          {/* Decorative background elements */}
+          <div className="fixed inset-0 pointer-events-none opacity-20">
+            <div className="absolute top-0 right-1/4 w-96 h-96 bg-yellow-500/10 rounded-full blur-3xl"></div>
+            <div className="absolute bottom-0 left-1/4 w-96 h-96 bg-yellow-600/10 rounded-full blur-3xl"></div>
+          </div>
+
+          <div className="relative z-10">
           {error && (
-            <div className="mb-4 bg-red-50 border border-red-400 text-red-700 px-4 py-3 rounded">
+            <div className="mb-6 bg-red-900/30 border border-red-500/50 text-red-400 px-4 py-3 rounded-lg backdrop-blur-sm">
               {error}
             </div>
           )}
 
           {packages.length === 0 && !loading && (
             <div className="px-4 py-6 sm:px-0">
-              <div className="text-center py-12 bg-white rounded-lg shadow">
-                <p className="text-gray-500 text-lg">No active packages available at the moment.</p>
+              <div className="text-center py-12 bg-gradient-to-br from-gray-900/95 to-gray-800/95 backdrop-blur-sm rounded-2xl shadow-2xl border border-yellow-500/30">
+                <p className="text-gray-400 text-lg">No active packages available at the moment.</p>
               </div>
             </div>
           )}
 
           {packages.length > 0 && (
             <div className="px-4 py-6 sm:px-0">
-              <div className="mb-4 text-sm text-gray-600">
-                Showing {packages.length} active package{packages.length !== 1 ? 's' : ''}
+              <div className="mb-8">
+                <h1 className="text-3xl font-extrabold text-white mb-2 flex items-center gap-3">
+                  <span className="bg-gradient-to-r from-yellow-300 via-yellow-400 to-yellow-600 bg-clip-text text-transparent drop-shadow-lg">Investment Packages</span>
+                </h1>
+                <p className="text-gray-400 text-sm">
+                  Showing {packages.length} active package{packages.length !== 1 ? 's' : ''}
+                </p>
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 {packages.map((pkg) => {
                 // Calculate daily ROI rate from totalOutputPct or use legacy roi
                 const totalOutputPct = pkg.totalOutputPct || (pkg.roi ? pkg.roi * pkg.duration : 225);
@@ -261,84 +267,85 @@ export default function PlansPage() {
                 const status = pkg.status || 'Active';
 
                 return (
-                  <div key={pkg.id} className="bg-white rounded-lg shadow-lg p-6 border-2 border-indigo-100 hover:border-indigo-300 transition-all">
-                    <div className="flex justify-between items-start mb-4">
-                      <h3 className="text-xl font-bold text-gray-800">{pkg.packageName}</h3>
-                      <span className={`px-3 py-1 text-xs font-semibold rounded-full ${
-                        status === 'Active' 
-                          ? 'bg-green-100 text-green-800' 
-                          : 'bg-red-100 text-red-800'
-                      }`}>
-                        {status}
-                      </span>
+                  <div key={pkg.id} className="group relative bg-gradient-to-br from-gray-900/95 via-gray-800/95 to-gray-900/95 backdrop-blur-sm rounded-2xl shadow-2xl border border-yellow-500/30 hover:border-yellow-500/60 hover:shadow-yellow-500/20 transition-all duration-300 overflow-hidden p-6">
+                    {/* Animated gradient overlay on hover */}
+                    <div className="absolute inset-0 bg-gradient-to-br from-yellow-500/0 via-yellow-500/0 to-yellow-500/0 group-hover:from-yellow-500/5 group-hover:via-yellow-500/10 group-hover:to-yellow-500/5 transition-all duration-500"></div>
+                    
+                    <div className="relative z-10">
+                      <div className="flex justify-between items-start mb-6">
+                        <h3 className="text-2xl font-extrabold bg-gradient-to-r from-white via-yellow-100 to-white bg-clip-text text-transparent">{pkg.packageName}</h3>
+                        <span className={`px-4 py-1.5 text-xs font-bold rounded-full shadow-lg ${
+                          status === 'Active' 
+                            ? 'bg-gradient-to-r from-yellow-500/30 to-yellow-600/20 text-yellow-300 border border-yellow-500/50 shadow-yellow-500/20' 
+                            : 'bg-red-900/40 text-red-400 border border-red-500/40'
+                        }`}>
+                          {status}
+                        </span>
+                      </div>
+                      
+                      <div className="space-y-4 mb-6">
+                        {/* Investment Amount Range */}
+                        <div className="p-4 bg-gradient-to-r from-yellow-500/20 via-yellow-600/15 to-yellow-500/20 rounded-xl border-2 border-yellow-500/40 shadow-lg shadow-yellow-500/10">
+                          <p className="text-xs text-gray-400 mb-2 uppercase tracking-wider font-semibold">Investment Range</p>
+                          <p className="text-2xl font-extrabold bg-gradient-to-r from-yellow-400 to-yellow-600 bg-clip-text text-transparent">
+                            ${pkg.minAmount.toLocaleString()} - ${pkg.maxAmount.toLocaleString()}
+                          </p>
+                        </div>
+
+                        {/* Duration */}
+                        <div className="flex justify-between items-center py-3 border-b border-yellow-500/20">
+                          <span className="text-sm font-semibold text-gray-300">Duration:</span>
+                          <span className="text-sm font-bold text-white">{pkg.duration} days</span>
+                        </div>
+
+                        {/* Total Output Percentage */}
+                        <div className="flex justify-between items-center py-3 border-b border-yellow-500/20">
+                          <span className="text-sm font-semibold text-gray-300">Total Output:</span>
+                          <span className="text-lg font-extrabold text-yellow-400">{totalOutputPct}%</span>
+                        </div>
+
+                        {/* Daily ROI Rate */}
+                        <div className="flex justify-between items-center py-3 border-b border-yellow-500/20">
+                          <span className="text-sm font-semibold text-gray-300">Daily ROI Rate:</span>
+                          <span className="text-sm font-bold text-yellow-300">{(dailyRoiRate * 100).toFixed(4)}%</span>
+                        </div>
+
+                        {/* Renewable Principle */}
+                        <div className="flex justify-between items-center py-3 border-b border-yellow-500/20">
+                          <span className="text-sm font-semibold text-gray-300">Renewable Principle:</span>
+                          <span className="text-sm font-bold text-yellow-400">{renewablePrinciplePct}%</span>
+                        </div>
+
+                        {/* Referral Bonus */}
+                        <div className="flex justify-between items-center py-3 border-b border-yellow-500/20">
+                          <span className="text-sm font-semibold text-gray-300">Referral Bonus:</span>
+                          <span className="text-sm font-bold text-yellow-400">{referralPct}%</span>
+                        </div>
+
+                        {/* Binary Bonus */}
+                        <div className="flex justify-between items-center py-3 border-b border-yellow-500/20">
+                          <span className="text-sm font-semibold text-gray-300">Binary Bonus:</span>
+                          <span className="text-sm font-bold text-yellow-400">{binaryPct}%</span>
+                        </div>
+
+                        {/* Power Capacity / Capping Limit */}
+                        <div className="flex justify-between items-center py-3">
+                          <span className="text-sm font-semibold text-gray-300">Power Capacity:</span>
+                          <span className="text-sm font-bold text-white">${powerCapacity.toLocaleString()}</span>
+                        </div>
+                      </div>
+
+                      <button
+                        onClick={() => handleInvestNow(pkg)}
+                        disabled={status !== 'Active'}
+                        className="w-full px-6 py-4 bg-gradient-to-r from-yellow-500 to-yellow-600 text-black rounded-xl hover:from-yellow-400 hover:to-yellow-500 disabled:opacity-50 disabled:cursor-not-allowed font-extrabold text-lg transition-all shadow-lg shadow-yellow-500/30 hover:shadow-yellow-500/50 hover:scale-105 active:scale-95 disabled:hover:scale-100"
+                      >
+                        {status === 'Active' ? 'Invest Now' : 'Package Inactive'}
+                      </button>
                     </div>
                     
-                    <div className="space-y-3 mb-4">
-                      {/* Investment Amount Range */}
-                      <div className="p-3 bg-gradient-to-r from-indigo-50 to-purple-50 rounded-lg">
-                        <p className="text-xs text-gray-500 mb-1">Investment Range</p>
-                        <p className="text-lg font-bold text-indigo-700">
-                          ${pkg.minAmount.toLocaleString()} - ${pkg.maxAmount.toLocaleString()}
-                        </p>
-                      </div>
-
-                      {/* Duration */}
-                      <div className="flex justify-between items-center py-2 border-b border-gray-200">
-                        <span className="text-sm font-medium text-gray-600">Duration:</span>
-                        <span className="text-sm font-semibold text-gray-800">{pkg.duration} days</span>
-                      </div>
-
-                      {/* Total Output Percentage */}
-                      <div className="flex justify-between items-center py-2 border-b border-gray-200">
-                        <span className="text-sm font-medium text-gray-600">Total Output:</span>
-                        <span className="text-sm font-semibold text-green-600">{totalOutputPct}%</span>
-                      </div>
-
-                      {/* Daily ROI Rate */}
-                      <div className="flex justify-between items-center py-2 border-b border-gray-200">
-                        <span className="text-sm font-medium text-gray-600">Daily ROI Rate:</span>
-                        <span className="text-sm font-semibold text-blue-600">{(dailyRoiRate * 100).toFixed(4)}%</span>
-                      </div>
-
-                      {/* Renewable Principle */}
-                      <div className="flex justify-between items-center py-2 border-b border-gray-200">
-                        <span className="text-sm font-medium text-gray-600">Renewable Principle:</span>
-                        <span className="text-sm font-semibold text-purple-600">{renewablePrinciplePct}%</span>
-                      </div>
-
-                      {/* Referral Bonus */}
-                      <div className="flex justify-between items-center py-2 border-b border-gray-200">
-                        <span className="text-sm font-medium text-gray-600">Referral Bonus:</span>
-                        <span className="text-sm font-semibold text-orange-600">{referralPct}%</span>
-                      </div>
-
-                      {/* Binary Bonus */}
-                      <div className="flex justify-between items-center py-2 border-b border-gray-200">
-                        <span className="text-sm font-medium text-gray-600">Binary Bonus:</span>
-                        <span className="text-sm font-semibold text-pink-600">{binaryPct}%</span>
-                      </div>
-
-                      {/* Power Capacity / Capping Limit */}
-                      <div className="flex justify-between items-center py-2">
-                        <span className="text-sm font-medium text-gray-600">Power Capacity:</span>
-                        <span className="text-sm font-semibold text-gray-800">${powerCapacity.toLocaleString()}</span>
-                      </div>
-                    </div>
-
-                    {/* Legacy ROI (if different from calculated) */}
-                    {/* {pkg.roi && pkg.roi !== dailyRoiRate * 100 && (
-                      <div className="mb-4 p-2 bg-yellow-50 border border-yellow-200 rounded text-xs text-yellow-800">
-                        <span className="font-medium">Legacy ROI:</span> {pkg.roi}%
-                      </div>
-                    )} */}
-
-                    <button
-                      onClick={() => handleInvestNow(pkg)}
-                      disabled={status !== 'Active'}
-                      className="w-full px-4 py-3 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed font-semibold transition-all"
-                    >
-                      {status === 'Active' ? 'Invest Now' : 'Package Inactive'}
-                    </button>
+                    {/* Shine effect */}
+                    <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 bg-gradient-to-r from-transparent via-white/5 to-transparent"></div>
                   </div>
                 );
               })}
@@ -348,46 +355,48 @@ export default function PlansPage() {
 
         {/* Investment Modal */}
         {showInvestModal && selectedPackage && (
-          <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-            <div className="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+          <div className="fixed inset-0 bg-black/80 backdrop-blur-sm overflow-y-auto h-full w-full z-50">
+            <div className="relative top-20 mx-auto p-6 border border-yellow-500/30 w-full max-w-md shadow-2xl rounded-2xl bg-gradient-to-br from-gray-900/95 via-gray-800/95 to-gray-900/95 backdrop-blur-sm">
               <div className="mt-3">
-                <h3 className="text-lg font-medium text-gray-900 mb-4">Make Investment</h3>
+                <h3 className="text-2xl font-extrabold text-white mb-6 flex items-center gap-2">
+                  <span className="bg-gradient-to-r from-yellow-300 via-yellow-400 to-yellow-600 bg-clip-text text-transparent">Make Investment</span>
+                </h3>
                 
-                <div className="mb-4 p-4 bg-indigo-50 rounded-lg border border-indigo-200">
-                  <h4 className="font-semibold text-gray-800 mb-2">{selectedPackage.packageName}</h4>
-                  <div className="text-sm text-gray-600 space-y-1">
+                <div className="mb-6 p-5 bg-gradient-to-r from-yellow-500/20 via-yellow-600/15 to-yellow-500/20 rounded-xl border-2 border-yellow-500/40 shadow-lg shadow-yellow-500/10">
+                  <h4 className="font-extrabold text-white mb-3 text-lg">{selectedPackage.packageName}</h4>
+                  <div className="text-sm space-y-2">
                     <div className="flex justify-between">
-                      <span>Amount Range:</span>
-                      <span className="font-medium">${selectedPackage.minAmount.toLocaleString()} - ${selectedPackage.maxAmount.toLocaleString()}</span>
+                      <span className="text-gray-300 font-semibold">Amount Range:</span>
+                      <span className="font-bold text-yellow-400">${selectedPackage.minAmount.toLocaleString()} - ${selectedPackage.maxAmount.toLocaleString()}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span>Duration:</span>
-                      <span className="font-medium">{selectedPackage.duration} days</span>
+                      <span className="text-gray-300 font-semibold">Duration:</span>
+                      <span className="font-bold text-white">{selectedPackage.duration} days</span>
                     </div>
                     <div className="flex justify-between">
-                      <span>Total Output:</span>
-                      <span className="font-medium text-green-600">{(selectedPackage.totalOutputPct || 225)}%</span>
+                      <span className="text-gray-300 font-semibold">Total Output:</span>
+                      <span className="font-bold text-yellow-400">{(selectedPackage.totalOutputPct || 225)}%</span>
                     </div>
                   </div>
                 </div>
 
                 {/* Voucher Selection */}
                 {loadingVouchers ? (
-                  <div className="mb-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
-                    <p className="text-sm text-gray-600">Loading vouchers...</p>
+                  <div className="mb-6 p-4 bg-gray-800/50 rounded-xl border border-gray-700">
+                    <p className="text-sm text-gray-400">Loading vouchers...</p>
                   </div>
                 ) : availableVouchers.length > 0 ? (
-                  <div className="mb-4 p-4 bg-green-50 rounded-lg border border-green-200">
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <div className="mb-6 p-5 bg-gradient-to-br from-yellow-500/10 to-yellow-600/5 rounded-xl border border-yellow-500/30">
+                    <label className="block text-sm font-bold text-yellow-400 mb-3">
                       Use Voucher (Optional)
                     </label>
-                    <p className="text-xs text-gray-500 mb-2">
+                    <p className="text-xs text-gray-400 mb-3">
                       💡 Tip: To use a voucher, you must invest at least 2x the voucher purchase amount. A $100 voucher requires a minimum investment of $200.
                     </p>
                     <select
                       value={selectedVoucherId || ''}
                       onChange={(e) => setSelectedVoucherId(e.target.value || null)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md text-black bg-white focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 mb-2"
+                      className="w-full px-4 py-3 border border-yellow-500/40 rounded-xl text-white bg-gray-800 focus:outline-none focus:ring-2 focus:ring-yellow-500/50 focus:border-yellow-500/70 mb-3 font-semibold"
                     >
                       <option value="">No voucher</option>
                       {availableVouchers.map((voucher: any) => {
@@ -411,50 +420,50 @@ export default function PlansPage() {
                         const remainingAmount = Math.max(0, investmentAmount - voucherInvestmentValue);
                         
                         return (
-                          <div className="text-sm text-gray-600 space-y-2">
-                            <div className="flex justify-between">
-                              <span>Voucher Purchase Amount:</span>
-                              <span className="font-semibold text-gray-900">${voucherPurchaseAmount.toLocaleString()}</span>
+                          <div className="text-sm space-y-3">
+                            <div className="flex justify-between p-2 bg-gray-800/50 rounded-lg">
+                              <span className="text-gray-300 font-semibold">Voucher Purchase Amount:</span>
+                              <span className="font-bold text-white">${voucherPurchaseAmount.toLocaleString()}</span>
                             </div>
-                            <div className="flex justify-between">
-                              <span>Voucher Investment Value:</span>
-                              <span className="font-semibold text-green-600">${voucherInvestmentValue.toLocaleString()}</span>
+                            <div className="flex justify-between p-2 bg-gray-800/50 rounded-lg">
+                              <span className="text-gray-300 font-semibold">Voucher Investment Value:</span>
+                              <span className="font-bold text-yellow-400">${voucherInvestmentValue.toLocaleString()}</span>
                             </div>
-                            <div className="flex justify-between">
-                              <span>Your Investment Amount:</span>
-                              <span className="font-semibold text-gray-900">${investmentAmount.toLocaleString()}</span>
+                            <div className="flex justify-between p-2 bg-gray-800/50 rounded-lg">
+                              <span className="text-gray-300 font-semibold">Your Investment Amount:</span>
+                              <span className="font-bold text-white">${investmentAmount.toLocaleString()}</span>
                             </div>
                             {!meetsMinimumRequirement && investmentAmount > 0 ? (
-                              <div className="p-3 bg-red-50 border border-red-200 rounded">
-                                <div className="text-red-700 font-semibold flex items-center">
-                                  <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                              <div className="p-4 bg-red-900/30 border border-red-500/50 rounded-xl">
+                                <div className="text-red-400 font-bold flex items-center mb-2">
+                                  <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
                                     <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
                                   </svg>
                                   ⚠️ Minimum Investment Required
                                 </div>
-                                <div className="text-xs text-red-600 mt-1">
-                                  To use this voucher, you must invest at least <strong>${minimumInvestmentRequired.toLocaleString()}</strong> (2x the voucher purchase amount of ${voucherPurchaseAmount.toLocaleString()}).
+                                <div className="text-xs text-red-300">
+                                  To use this voucher, you must invest at least <strong className="text-red-400">${minimumInvestmentRequired.toLocaleString()}</strong> (2x the voucher purchase amount of ${voucherPurchaseAmount.toLocaleString()}).
                                 </div>
                               </div>
                             ) : meetsMinimumRequirement && investmentAmount > 0 && voucherInvestmentValue >= investmentAmount ? (
-                              <div className="p-2 bg-green-50 border border-green-200 rounded">
-                                <div className="text-green-700 font-semibold flex items-center">
-                                  <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                              <div className="p-4 bg-gradient-to-r from-yellow-500/20 to-yellow-600/15 border border-yellow-500/40 rounded-xl">
+                                <div className="text-yellow-400 font-bold flex items-center mb-2">
+                                  <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
                                     <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                                   </svg>
                                   ✓ Voucher covers your investment!
                                 </div>
-                                <div className="text-xs text-green-600 mt-1">
+                                <div className="text-xs text-yellow-300">
                                   Your ${investmentAmount.toLocaleString()} investment is fully covered. No additional payment required.
                                 </div>
                               </div>
                             ) : meetsMinimumRequirement && investmentAmount > voucherInvestmentValue ? (
-                              <div className="space-y-1">
+                              <div className="space-y-2 p-3 bg-gray-800/50 rounded-lg">
                                 <div className="flex justify-between">
-                                  <span>Remaining to Pay:</span>
-                                  <span className="font-semibold text-orange-600">${remainingAmount.toLocaleString()}</span>
+                                  <span className="text-gray-300 font-semibold">Remaining to Pay:</span>
+                                  <span className="font-bold text-yellow-400">${remainingAmount.toLocaleString()}</span>
                                 </div>
-                                <div className="text-xs text-gray-500">
+                                <div className="text-xs text-gray-400">
                                   Voucher covers ${voucherInvestmentValue.toLocaleString()}, pay remaining ${remainingAmount.toLocaleString()} via payment gateway
                                 </div>
                               </div>
@@ -466,13 +475,13 @@ export default function PlansPage() {
                     })()}
                   </div>
                 ) : (
-                  <div className="mb-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
-                    <p className="text-sm text-gray-600">No active vouchers available. <a href="/vouchers" className="text-indigo-600 hover:underline">Create one?</a></p>
+                  <div className="mb-6 p-4 bg-gray-800/50 rounded-xl border border-gray-700">
+                    <p className="text-sm text-gray-400">No active vouchers available. <a href="/vouchers" className="text-yellow-400 hover:text-yellow-300 hover:underline font-semibold">Create one?</a></p>
                   </div>
                 )}
 
-                <div className="mb-4">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                <div className="mb-6">
+                  <label className="block text-sm font-bold text-white mb-3">
                     Investment Amount (USD)
                   </label>
                   <input
@@ -482,13 +491,13 @@ export default function PlansPage() {
                     min={selectedPackage.minAmount}
                     max={selectedPackage.maxAmount}
                     step="0.01"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md text-black bg-white focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                    className="w-full px-4 py-3 border border-yellow-500/40 rounded-xl text-white bg-gray-800 focus:outline-none focus:ring-2 focus:ring-yellow-500/50 focus:border-yellow-500/70 font-semibold"
                     placeholder={`Enter amount (${selectedPackage.minAmount} - ${selectedPackage.maxAmount})`}
                   />
                 </div>
 
                 {error && (
-                  <div className="mb-4 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded text-sm">
+                  <div className="mb-6 bg-red-900/30 border border-red-500/50 text-red-400 px-4 py-3 rounded-xl text-sm backdrop-blur-sm">
                     {error}
                   </div>
                 )}
@@ -504,15 +513,15 @@ export default function PlansPage() {
                     
                     if (!meetsMinimumRequirement && investmentAmount > 0) {
                       return (
-                        <div className="mb-4 p-3 bg-yellow-50 border border-yellow-200 rounded">
-                          <div className="text-yellow-800 text-sm font-semibold flex items-center">
-                            <svg className="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                        <div className="mb-6 p-4 bg-yellow-500/10 border border-yellow-500/40 rounded-xl">
+                          <div className="text-yellow-400 text-sm font-bold flex items-center mb-2">
+                            <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
                               <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
                             </svg>
                             Warning: Minimum Investment Required
                           </div>
-                          <div className="text-xs text-yellow-700 mt-1">
-                            To use this ${voucherPurchaseAmount.toLocaleString()} voucher, you must invest at least <strong>${minimumInvestmentRequired.toLocaleString()}</strong> (2x the voucher purchase amount).
+                          <div className="text-xs text-yellow-300 mt-1">
+                            To use this ${voucherPurchaseAmount.toLocaleString()} voucher, you must invest at least <strong className="text-yellow-400">${minimumInvestmentRequired.toLocaleString()}</strong> (2x the voucher purchase amount).
                           </div>
                         </div>
                       );
@@ -530,7 +539,7 @@ export default function PlansPage() {
                       setSelectedVoucherId(null);
                       setError('');
                     }}
-                    className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300"
+                    className="px-6 py-3 text-sm font-semibold text-gray-300 bg-gray-700 rounded-xl hover:bg-gray-600 transition-colors"
                   >
                     Cancel
                   </button>
@@ -549,7 +558,7 @@ export default function PlansPage() {
                       }
                       return false;
                     })()}
-                    className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="px-6 py-3 text-sm font-bold text-black bg-gradient-to-r from-yellow-500 to-yellow-600 rounded-xl hover:from-yellow-400 hover:to-yellow-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg shadow-yellow-500/30 hover:shadow-yellow-500/50 hover:scale-105 active:scale-95 disabled:hover:scale-100"
                   >
                     {creatingPayment ? 'Creating Payment...' : 'Proceed to Payment'}
                   </button>
@@ -558,7 +567,8 @@ export default function PlansPage() {
             </div>
           </div>
         )}
-    </div>
+          </div>
+        </div>
   );
 }
 

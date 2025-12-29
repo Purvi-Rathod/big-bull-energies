@@ -15,6 +15,7 @@ import ReactFlow, {
 } from 'reactflow';
 import 'reactflow/dist/style.css';
 import { api } from '@/lib/api';
+import CneoLoader from '@/components/CneoLoader';
 
 interface TreeUser {
   id: string;
@@ -409,11 +410,7 @@ export default function MyTreePage() {
   }, []);
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center py-12">
-          <div className="text-xl">Loading tree data...</div>
-        </div>
-    );
+    return <CneoLoader fullScreen />;
   }
 
   if (error) {

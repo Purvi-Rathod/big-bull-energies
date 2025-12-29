@@ -5,6 +5,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { api } from '@/lib/api';
 import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
+import CneoLoader from '@/components/CneoLoader';
 interface Wallet {
   type: string;
   balance: number;
@@ -215,47 +216,49 @@ export default function WithdrawPage() {
     : 0;
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center py-12">
-          <div className="text-center">
-          <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-slate-600"></div>
-            <p className="mt-4 text-gray-600">Loading...</p>
-          </div>
-        </div>
-    );
+    return <CneoLoader fullScreen />;
   }
 
   return (
-    <div className="w-full">
-      <div className="mb-6">
-        <h1 className="text-3xl font-bold text-gray-900">Withdraw Funds</h1>
+    <div className="w-full bg-gradient-to-br from-black via-gray-900 to-black min-h-screen py-8 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+      {/* Decorative background elements */}
+      <div className="fixed inset-0 pointer-events-none opacity-20">
+        <div className="absolute top-0 left-1/4 w-96 h-96 bg-yellow-500/10 rounded-full blur-3xl"></div>
+        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-yellow-600/10 rounded-full blur-3xl"></div>
+      </div>
+
+      <div className="relative z-10">
+      <div className="mb-8">
+        <h1 className="text-3xl font-extrabold mb-2 text-white">
+          <span className="bg-gradient-to-r from-yellow-300 via-yellow-400 to-yellow-600 bg-clip-text text-transparent drop-shadow-lg">Withdraw Funds</span>
+        </h1>
           </div>
           {error && (
-            <div className="mb-4 bg-red-50 border border-red-400 text-red-700 px-4 py-3 rounded">
+            <div className="mb-6 bg-red-900/30 border border-red-500/50 text-red-400 px-4 py-3 rounded-lg backdrop-blur-sm">
               {error}
             </div>
           )}
 
 
           <div className="px-4 py-6 sm:px-0">
-            <div className="bg-white rounded-lg shadow p-6">
+            <div className="bg-gradient-to-br from-gray-900/95 via-gray-800/95 to-gray-900/95 backdrop-blur-sm rounded-2xl shadow-2xl border border-yellow-500/30 p-8">
               {binaryTree && binaryTree.cappingLimit > 0 && (
-                <div className="mb-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-                  <p className="text-sm text-yellow-800">
-                    <strong>Capping Limit:</strong> ${binaryTree.cappingLimit.toFixed(2)} per withdrawal
+                <div className="mb-6 p-4 bg-gradient-to-r from-yellow-500/20 via-yellow-600/15 to-yellow-500/20 border-2 border-yellow-500/40 rounded-xl">
+                  <p className="text-sm text-yellow-300 font-bold">
+                    <strong className="text-yellow-400">Capping Limit:</strong> <span className="text-white">${binaryTree.cappingLimit.toFixed(2)}</span> per withdrawal
                   </p>
                 </div>
               )}
 
               <div className="space-y-6">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-bold text-yellow-400 mb-3">
                     Select Wallet
                   </label>
                   <select
                     value={selectedWalletType}
                     onChange={(e) => setSelectedWalletType(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                    className="w-full px-4 py-3 border border-yellow-500/40 rounded-xl bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-yellow-500/50 focus:border-yellow-500/70 font-semibold"
                   >
                     <option value="">Select a wallet</option>
                     {wallets
@@ -288,25 +291,25 @@ export default function WithdrawPage() {
 
                 {selectedWallet && (
                   <>
-                    <div className="p-4 bg-gray-50 rounded-lg">
-                      <div className="flex justify-between items-center mb-2">
-                        <span className="text-sm text-gray-600">Total Balance:</span>
-                        <span className="font-semibold">${selectedWallet.balance.toFixed(2)}</span>
+                    <div className="p-5 bg-gray-800/80 border border-yellow-500/30 rounded-xl">
+                      <div className="flex justify-between items-center mb-3">
+                        <span className="text-sm text-gray-300 font-semibold">Total Balance:</span>
+                        <span className="font-extrabold text-white">${selectedWallet.balance.toFixed(2)}</span>
                       </div>
-                      <div className="flex justify-between items-center mb-2">
-                        <span className="text-sm text-gray-600">Reserved:</span>
-                        <span className="font-semibold">${selectedWallet.reserved.toFixed(2)}</span>
+                      <div className="flex justify-between items-center mb-3">
+                        <span className="text-sm text-gray-300 font-semibold">Reserved:</span>
+                        <span className="font-extrabold text-gray-400">${selectedWallet.reserved.toFixed(2)}</span>
                       </div>
-                      <div className="flex justify-between items-center pt-2 border-t border-gray-200">
-                        <span className="text-sm font-medium text-gray-700">Available:</span>
-                        <span className="text-lg font-bold text-green-600">
+                      <div className="flex justify-between items-center pt-3 border-t border-yellow-500/20">
+                        <span className="text-sm font-bold text-yellow-400">Available:</span>
+                        <span className="text-xl font-extrabold text-yellow-400">
                           ${availableBalance.toFixed(2)}
                         </span>
                       </div>
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label className="block text-sm font-bold text-yellow-400 mb-3">
                         Withdrawal Amount (USD)
                       </label>
                       <input
@@ -316,34 +319,34 @@ export default function WithdrawPage() {
                         min="0.01"
                         max={availableBalance}
                         step="0.01"
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md text-black bg-white focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                        className="w-full px-4 py-3 border border-yellow-500/40 rounded-xl bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-yellow-500/50 focus:border-yellow-500/70 font-semibold"
                         placeholder="Enter amount"
                       />
-                      <p className="mt-1 text-xs text-gray-500">
-                        Maximum: ${availableBalance.toFixed(2)}
+                      <p className="mt-2 text-xs text-gray-400 font-semibold">
+                        Maximum: <span className="text-yellow-400">${availableBalance.toFixed(2)}</span>
                         {binaryTree && binaryTree.cappingLimit > 0 && (
-                          <> | Capping Limit: ${binaryTree.cappingLimit.toFixed(2)}</>
+                          <> | Capping Limit: <span className="text-yellow-400">${binaryTree.cappingLimit.toFixed(2)}</span></>
                         )}
                       </p>
                     </div>
 
                     {withdrawAmount && parseFloat(withdrawAmount) > 0 && (
-                      <div className="p-4 bg-blue-50 rounded-lg">
-                        <h4 className="font-medium text-gray-900 mb-2">Withdrawal Summary</h4>
-                        <div className="space-y-1 text-sm">
+                      <div className="p-5 bg-gradient-to-r from-yellow-500/20 via-yellow-600/15 to-yellow-500/20 border-2 border-yellow-500/40 rounded-xl">
+                        <h4 className="font-extrabold text-white mb-4">Withdrawal Summary</h4>
+                        <div className="space-y-2 text-sm">
                           <div className="flex justify-between">
-                            <span className="text-gray-600">Amount:</span>
-                            <span className="font-semibold">${parseFloat(withdrawAmount).toFixed(2)}</span>
+                            <span className="text-gray-300 font-semibold">Amount:</span>
+                            <span className="font-extrabold text-white">${parseFloat(withdrawAmount).toFixed(2)}</span>
                           </div>
                           <div className="flex justify-between">
-                            <span className="text-gray-600">Charges (5%):</span>
-                            <span className="font-semibold">
+                            <span className="text-gray-300 font-semibold">Charges (5%):</span>
+                            <span className="font-extrabold text-red-400">
                               -${(parseFloat(withdrawAmount) * 0.05).toFixed(2)}
                             </span>
                           </div>
-                          <div className="flex justify-between pt-2 border-t border-blue-200">
-                            <span className="font-medium text-gray-900">Final Amount:</span>
-                            <span className="text-lg font-bold text-blue-600">
+                          <div className="flex justify-between pt-3 border-t border-yellow-500/30">
+                            <span className="font-bold text-yellow-400">Final Amount:</span>
+                            <span className="text-xl font-extrabold text-yellow-400">
                               ${(parseFloat(withdrawAmount) * 0.95).toFixed(2)}
                             </span>
                           </div>
@@ -354,12 +357,12 @@ export default function WithdrawPage() {
                     <button
                       onClick={handleWithdraw}
                       disabled={withdrawing || !withdrawAmount || parseFloat(withdrawAmount) <= 0 || !walletAddress}
-                      className="w-full px-6 py-3 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed font-semibold"
+                      className="w-full px-6 py-4 bg-gradient-to-r from-yellow-500 to-yellow-600 text-black rounded-xl hover:from-yellow-400 hover:to-yellow-500 font-bold transition-all shadow-lg shadow-yellow-500/30 hover:shadow-yellow-500/50 hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       {withdrawing ? 'Processing...' : 'Submit Withdrawal Request'}
                     </button>
                     {!walletAddress && (
-                      <p className="mt-2 text-sm text-red-600 text-center">
+                      <p className="mt-3 text-sm text-red-400 text-center font-semibold">
                         Please set your USDT TRC20 wallet address to proceed
                       </p>
                     )}
@@ -371,48 +374,51 @@ export default function WithdrawPage() {
 
           {/* Wallet Address Section */}
           <div className="mb-8">
-            <div className="bg-white rounded-lg shadow p-6">
-              <div className="flex justify-between items-center mb-4">
-                <h2 className="text-xl font-bold text-gray-900">Payment Information</h2>
+            <div className="bg-gradient-to-br from-gray-900/95 via-gray-800/95 to-gray-900/95 backdrop-blur-sm rounded-2xl shadow-2xl border border-yellow-500/30 p-8">
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-2xl font-extrabold text-white flex items-center gap-2">
+                  <span className="w-1 h-6 bg-gradient-to-b from-yellow-400 to-yellow-600 rounded"></span>
+                  Payment Information
+                </h2>
                 {!userWalletAddress && (
                   <button
                     onClick={() => {
                       setModalWalletAddress(''); // Reset modal input when opening modal
                       setShowWalletModal(true);
                     }}
-                    className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700"
+                    className="px-6 py-3 bg-gradient-to-r from-yellow-500 to-yellow-600 text-black rounded-xl hover:from-yellow-400 hover:to-yellow-500 font-bold transition-all shadow-lg shadow-yellow-500/30 hover:shadow-yellow-500/50 hover:scale-105 active:scale-95"
                   >
                     Setup Payment Info
                   </button>
                 )}
               </div>
               <div>
-                <h3 className="text-sm font-medium text-gray-700 mb-2">USDT TRC20 Wallet Address</h3>
+                <h3 className="text-sm font-bold text-yellow-400 mb-3">USDT TRC20 Wallet Address</h3>
                 {walletAddress ? (
-                  <div className="p-3 bg-green-50 border border-green-200 rounded-md">
-                    <p className="text-sm font-mono text-gray-800 break-all">{walletAddress}</p>
-                    <p className="text-xs text-green-600 mt-1">✓ Wallet address configured</p>
-                    <p className="text-xs text-gray-500 mt-1">
+                  <div className="p-4 bg-gradient-to-r from-yellow-500/20 via-yellow-600/15 to-yellow-500/20 border-2 border-yellow-500/40 rounded-xl">
+                    <p className="text-sm font-mono text-white break-all font-semibold">{walletAddress}</p>
+                    <p className="text-xs text-yellow-300 mt-2 font-bold">✓ Wallet address configured</p>
+                    <p className="text-xs text-gray-400 mt-2 font-semibold">
                       Wallet address cannot be changed. Contact admin support if you need to update it.
                     </p>
                   </div>
                 ) : (
-                  <div className="p-3 bg-yellow-50 border border-yellow-200 rounded-md">
-                    <p className="text-sm text-yellow-800">No wallet address set</p>
-                    <p className="text-xs text-yellow-600 mt-1">Required for withdrawals</p>
-                    <p className="text-xs text-gray-600 mt-2">
+                  <div className="p-4 bg-gray-800/80 border border-yellow-500/30 rounded-xl">
+                    <p className="text-sm text-gray-300 font-semibold">No wallet address set</p>
+                    <p className="text-xs text-yellow-400 mt-2 font-bold">Required for withdrawals</p>
+                    <p className="text-xs text-gray-400 mt-2 font-semibold">
                       Supported: USDT TRC20 only
                     </p>
                   </div>
                 )}
               </div>
               {!walletAddress && (
-                <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-md">
-                  <p className="text-sm font-semibold text-red-800 mb-1">⚠️ Payment Information Required</p>
-                  <p className="text-xs text-red-700">
+                <div className="mt-6 p-5 bg-red-900/30 border border-red-500/50 rounded-xl">
+                  <p className="text-sm font-extrabold text-red-400 mb-2">⚠️ Payment Information Required</p>
+                  <p className="text-xs text-red-300 font-semibold">
                     You need to set a USDT TRC20 wallet address to request withdrawals.
                   </p>
-                  <p className="text-xs text-gray-600 mt-2">
+                  <p className="text-xs text-gray-400 mt-2 font-semibold">
                     Only USDT TRC20 wallet addresses are accepted for withdrawals
                   </p>
                 </div>
@@ -421,53 +427,57 @@ export default function WithdrawPage() {
           </div>
 
           {/* Withdrawal History Section */}
-          <div className="mb-8">
-            <div className="bg-white rounded-lg shadow p-6">
-              <h2 className="text-xl font-bold text-gray-900 mb-4">Withdrawal History</h2>
+          <div className="mb-10">
+            <div className="bg-gradient-to-br from-gray-900/95 via-gray-800/95 to-gray-900/95 backdrop-blur-sm rounded-2xl shadow-2xl border border-yellow-500/30 p-8">
+              <h2 className="text-2xl font-extrabold mb-6 text-white flex items-center gap-2">
+                <span className="bg-gradient-to-r from-yellow-300 via-yellow-400 to-yellow-600 bg-clip-text text-transparent">Withdrawal History</span>
+              </h2>
               {withdrawals.length === 0 ? (
-                <div className="text-center py-8 text-gray-500">
+                <div className="text-center py-12 text-gray-400 text-lg">
                   <p>No withdrawal history found</p>
                 </div>
               ) : (
                 <div className="overflow-x-auto">
-                  <table className="min-w-full divide-y divide-gray-200">
-                    <thead className="bg-gray-50">
+                  <table className="min-w-full divide-y divide-yellow-500/10">
+                    <thead className="bg-gradient-to-r from-gray-800 via-gray-800/90 to-gray-800">
                       <tr>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Withdrawal ID</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Amount</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Charges</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Final Amount</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Wallet Type</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                        <th className="px-6 py-5 text-left text-xs font-bold text-yellow-400 uppercase tracking-wider">Date</th>
+                        <th className="px-6 py-5 text-left text-xs font-bold text-yellow-400 uppercase tracking-wider">Withdrawal ID</th>
+                        <th className="px-6 py-5 text-left text-xs font-bold text-yellow-400 uppercase tracking-wider">Amount</th>
+                        <th className="px-6 py-5 text-left text-xs font-bold text-yellow-400 uppercase tracking-wider">Charges</th>
+                        <th className="px-6 py-5 text-left text-xs font-bold text-yellow-400 uppercase tracking-wider">Final Amount</th>
+                        <th className="px-6 py-5 text-left text-xs font-bold text-yellow-400 uppercase tracking-wider">Wallet Type</th>
+                        <th className="px-6 py-5 text-left text-xs font-bold text-yellow-400 uppercase tracking-wider">Status</th>
                       </tr>
                     </thead>
-                    <tbody className="bg-white divide-y divide-gray-200">
+                    <tbody className="bg-gray-900/50 divide-y divide-yellow-500/10">
                       {withdrawals.map((wd) => (
-                        <tr key={wd.id} className="hover:bg-gray-50">
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        <tr key={wd.id} className="hover:bg-gradient-to-r hover:from-yellow-500/5 hover:via-yellow-500/10 hover:to-transparent transition-all duration-300 group">
+                          <td className="px-6 py-5 whitespace-nowrap text-sm text-gray-400">
                             {new Date(wd.createdAt).toLocaleString()}
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm font-mono text-gray-600">
+                          <td className="px-6 py-5 whitespace-nowrap text-sm font-mono text-yellow-400 font-semibold">
                             {wd.withdrawalId || wd.id.substring(0, 8)}
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                          <td className="px-6 py-5 whitespace-nowrap text-sm font-bold text-white">
                             ${wd.amount.toFixed(2)}
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          <td className="px-6 py-5 whitespace-nowrap text-sm text-gray-400 font-semibold">
                             ${wd.charges.toFixed(2)}
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-green-600">
+                          <td className="px-6 py-5 whitespace-nowrap text-sm font-extrabold text-yellow-400 group-hover:text-yellow-300 transition-colors">
                             ${wd.finalAmount.toFixed(2)}
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 capitalize">
+                          <td className="px-6 py-5 whitespace-nowrap text-sm text-gray-300 capitalize font-semibold">
                             {wd.walletType}
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm">
-                            <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                              wd.status === 'approved' ? 'bg-green-100 text-green-800' :
-                              wd.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
-                              'bg-red-100 text-red-800'
+                          <td className="px-6 py-5 whitespace-nowrap text-sm">
+                            <span className={`px-4 py-1.5 inline-flex text-xs leading-5 font-bold rounded-full shadow-lg ${
+                              wd.status === 'approved' 
+                                ? 'bg-gradient-to-r from-yellow-500/30 to-yellow-600/20 text-yellow-300 border border-yellow-500/50 shadow-yellow-500/20'
+                                : wd.status === 'pending' 
+                                ? 'bg-gray-700/50 text-yellow-200 border border-yellow-500/30'
+                                : 'bg-red-900/40 text-red-400 border border-red-500/40'
                             }`}>
                               {wd.status}
                             </span>
@@ -483,28 +493,30 @@ export default function WithdrawPage() {
 
           {/* Wallet Address Modal */}
           {showWalletModal && (
-            <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-              <div className="relative top-10 mx-auto p-5 border w-full max-w-2xl shadow-lg rounded-md bg-white">
+            <div className="fixed inset-0 bg-black/80 backdrop-blur-sm overflow-y-auto h-full w-full z-50">
+              <div className="relative top-10 mx-auto p-6 border border-yellow-500/30 w-full max-w-2xl shadow-2xl rounded-2xl bg-gradient-to-br from-gray-900/95 via-gray-800/95 to-gray-900/95 backdrop-blur-sm">
                 <div className="mt-3">
-                  <h3 className="text-lg font-medium text-gray-900 mb-4">Setup Payment Information</h3>
-                  <p className="text-sm text-gray-600 mb-4">
+                  <h3 className="text-xl font-extrabold text-white mb-6 flex items-center gap-2">
+                    <span className="bg-gradient-to-r from-yellow-300 via-yellow-400 to-yellow-600 bg-clip-text text-transparent">Setup Payment Information</span>
+                  </h3>
+                  <p className="text-sm text-gray-300 mb-6 font-semibold">
                     Set your USDT TRC20 wallet address to enable withdrawals.
                   </p>
-                  <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-md">
-                    <p className="text-sm font-medium text-blue-900 mb-1">Payment Method:</p>
-                    <p className="text-xs text-blue-700">
-                      Only <strong>USDT TRC20</strong> wallet addresses are accepted for withdrawals.
+                  <div className="mb-6 p-4 bg-gradient-to-r from-yellow-500/20 via-yellow-600/15 to-yellow-500/20 border-2 border-yellow-500/40 rounded-xl">
+                    <p className="text-sm font-bold text-yellow-400 mb-2">Payment Method:</p>
+                    <p className="text-xs text-white font-semibold">
+                      Only <strong className="text-yellow-400">USDT TRC20</strong> wallet addresses are accepted for withdrawals.
                     </p>
                   </div>
                   
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      USDT TRC20 Wallet Address {userWalletAddress && <span className="text-gray-500">(Cannot be changed)</span>}
+                    <label className="block text-sm font-bold text-yellow-400 mb-3">
+                      USDT TRC20 Wallet Address {userWalletAddress && <span className="text-gray-400">(Cannot be changed)</span>}
                     </label>
                     {userWalletAddress ? (
-                      <div className="p-3 bg-gray-50 border border-gray-300 rounded-md">
-                        <p className="text-sm font-mono text-gray-800 break-all">{userWalletAddress}</p>
-                        <p className="mt-1 text-xs text-red-600">
+                      <div className="p-4 bg-gray-800/80 border border-yellow-500/30 rounded-xl">
+                        <p className="text-sm font-mono text-white break-all font-semibold">{userWalletAddress}</p>
+                        <p className="mt-2 text-xs text-red-400 font-bold">
                           ⚠️ Wallet address cannot be changed once set. Contact admin support if you need to update it.
                         </p>
                       </div>
@@ -520,28 +532,28 @@ export default function WithdrawPage() {
                               e.preventDefault();
                             }
                           }}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 font-mono text-sm"
+                          className="w-full px-4 py-3 border border-yellow-500/40 rounded-xl bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-yellow-500/50 focus:border-yellow-500/70 font-mono text-sm font-semibold"
                           placeholder="Enter your USDT TRC20 wallet address (starts with T)"
                           autoComplete="off"
                         />
-                        <p className="mt-1 text-xs text-gray-500">
+                        <p className="mt-2 text-xs text-gray-400 font-semibold">
                           Enter your USDT TRC20 wallet address for withdrawals. This can only be set once.
                         </p>
-                        <p className="mt-1 text-xs text-gray-600 font-medium">
+                        <p className="mt-2 text-xs text-yellow-400 font-bold">
                           💡 USDT TRC20 wallet addresses start with "T" (e.g., Txxxxxxxxxxxxxxxxxxxxxxxxxxxxx).
                         </p>
                       </>
                     )}
                   </div>
 
-                  <div className="flex justify-end space-x-3 mt-6">
+                  <div className="flex justify-end space-x-3 mt-8">
                     <button
                       type="button"
                       onClick={() => {
                         setShowWalletModal(false);
                         setModalWalletAddress(''); // Reset modal input on cancel
                       }}
-                      className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300"
+                      className="px-6 py-2.5 text-sm font-bold text-gray-300 bg-gray-700 rounded-xl hover:bg-gray-600 transition-all"
                     >
                       Cancel
                     </button>
@@ -549,15 +561,16 @@ export default function WithdrawPage() {
                       type="button"
                       onClick={handleUpdatePaymentInfo}
                       disabled={!modalWalletAddress || modalWalletAddress.trim().length === 0}
-                      className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="px-6 py-2.5 text-sm font-bold text-black bg-gradient-to-r from-yellow-500 to-yellow-600 rounded-xl hover:from-yellow-400 hover:to-yellow-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg shadow-yellow-500/30 hover:shadow-yellow-500/50 hover:scale-105 active:scale-95"
                     >
                       Save
                     </button>
+                  </div>
+                </div>
+              </div>
             </div>
+          )}
           </div>
         </div>
-      </div>
-          )}
-    </div>
   );
 }

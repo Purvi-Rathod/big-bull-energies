@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { api } from '@/lib/api';
+import CneoLoader from '@/components/CneoLoader';
 
 interface BinaryTreeInfo {
   parent: {
@@ -67,21 +68,14 @@ export default function BinaryPage() {
   };
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center py-12">
-          <div className="text-center">
-          <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-slate-600"></div>
-            <p className="mt-4 text-gray-600">Loading binary tree information...</p>
-          </div>
-        </div>
-    );
+    return <CneoLoader fullScreen />;
   }
 
   if (!binaryTree) {
     return (
-      <div className="flex items-center justify-center py-12">
+      <div className="flex items-center justify-center py-12 bg-black min-h-screen">
           <div className="text-center">
-            <p className="text-gray-500 text-lg">Binary tree information not found</p>
+            <p className="text-gray-400 text-lg">Binary tree information not found</p>
           </div>
         </div>
     );
@@ -92,103 +86,128 @@ export default function BinaryPage() {
   const totalDownlines = binaryTree.leftDownlines + binaryTree.rightDownlines;
 
   return (
-        <div className="w-full">
+        <div className="w-full bg-gradient-to-br from-black via-gray-900 to-black min-h-screen py-8 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+          {/* Decorative background elements */}
+          <div className="fixed inset-0 pointer-events-none opacity-20">
+            <div className="absolute top-0 left-1/4 w-96 h-96 bg-yellow-500/10 rounded-full blur-3xl"></div>
+            <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-yellow-600/10 rounded-full blur-3xl"></div>
+          </div>
+
+          <div className="relative z-10">
           {error && (
-            <div className="mb-4 bg-red-50 border border-red-400 text-red-700 px-4 py-3 rounded">
+            <div className="mb-6 bg-red-900/30 border border-red-500/50 text-red-400 px-4 py-3 rounded-lg backdrop-blur-sm">
               {error}
             </div>
           )}
 
           <div className="px-4 py-6 sm:px-0">
             {/* Business Overview Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-              <div className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg shadow-lg p-6 text-white">
-                <p className="text-sm opacity-90 mb-2">Left Business</p>
-                <p className="text-3xl font-bold">${binaryTree.leftBusiness.toFixed(2)}</p>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+              <div className="group relative bg-gradient-to-br from-yellow-500/20 via-yellow-600/15 to-yellow-500/20 rounded-2xl shadow-2xl border-2 border-yellow-500/40 p-6 hover:border-yellow-500/60 hover:shadow-yellow-500/30 transition-all duration-300 overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-br from-yellow-500/0 to-yellow-500/0 group-hover:from-yellow-500/10 group-hover:to-transparent transition-all duration-300"></div>
+                <div className="relative z-10">
+                  <p className="text-sm text-gray-300 font-semibold mb-3">Left Business</p>
+                  <p className="text-4xl font-extrabold bg-gradient-to-r from-white to-yellow-100 bg-clip-text text-transparent">${binaryTree.leftBusiness.toFixed(2)}</p>
+                </div>
               </div>
-              <div className="bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg shadow-lg p-6 text-white">
-                <p className="text-sm opacity-90 mb-2">Right Business</p>
-                <p className="text-3xl font-bold">${binaryTree.rightBusiness.toFixed(2)}</p>
+              <div className="group relative bg-gradient-to-br from-yellow-500/20 via-yellow-600/15 to-yellow-500/20 rounded-2xl shadow-2xl border-2 border-yellow-500/40 p-6 hover:border-yellow-500/60 hover:shadow-yellow-500/30 transition-all duration-300 overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-br from-yellow-500/0 to-yellow-500/0 group-hover:from-yellow-500/10 group-hover:to-transparent transition-all duration-300"></div>
+                <div className="relative z-10">
+                  <p className="text-sm text-gray-300 font-semibold mb-3">Right Business</p>
+                  <p className="text-4xl font-extrabold bg-gradient-to-r from-white to-yellow-100 bg-clip-text text-transparent">${binaryTree.rightBusiness.toFixed(2)}</p>
+                </div>
               </div>
-              <div className="bg-gradient-to-br from-green-500 to-green-600 rounded-lg shadow-lg p-6 text-white">
-                <p className="text-sm opacity-90 mb-2">Binary Bonus</p>
-                <p className="text-3xl font-bold">${binaryBonus.toFixed(2)}</p>
-                <p className="text-xs opacity-75 mt-1">10% of minimum</p>
+              <div className="group relative bg-gradient-to-br from-yellow-500/30 via-yellow-600/20 to-yellow-500/30 rounded-2xl shadow-2xl border-2 border-yellow-500/60 p-6 hover:border-yellow-500/80 hover:shadow-yellow-500/40 transition-all duration-300 overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-br from-yellow-500/0 to-yellow-500/0 group-hover:from-yellow-500/10 group-hover:to-transparent transition-all duration-300"></div>
+                <div className="relative z-10">
+                  <p className="text-sm text-white font-semibold mb-3">Binary Bonus</p>
+                  <p className="text-4xl font-extrabold text-yellow-400">${binaryBonus.toFixed(2)}</p>
+                  <p className="text-xs text-yellow-300 mt-2 font-semibold">10% of minimum</p>
+                </div>
               </div>
-              <div className="bg-gradient-to-br from-yellow-500 to-yellow-600 rounded-lg shadow-lg p-6 text-white">
-                <p className="text-sm opacity-90 mb-2">Total Downlines</p>
-                <p className="text-3xl font-bold">{totalDownlines}</p>
+              <div className="group relative bg-gradient-to-br from-yellow-500/20 via-yellow-600/15 to-yellow-500/20 rounded-2xl shadow-2xl border-2 border-yellow-500/40 p-6 hover:border-yellow-500/60 hover:shadow-yellow-500/30 transition-all duration-300 overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-br from-yellow-500/0 to-yellow-500/0 group-hover:from-yellow-500/10 group-hover:to-transparent transition-all duration-300"></div>
+                <div className="relative z-10">
+                  <p className="text-sm text-gray-300 font-semibold mb-3">Total Downlines</p>
+                  <p className="text-4xl font-extrabold bg-gradient-to-r from-white to-yellow-100 bg-clip-text text-transparent">{totalDownlines}</p>
+                </div>
               </div>
             </div>
 
             {/* Detailed Information */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-10">
               {/* Business Details */}
-              <div className="bg-white rounded-lg shadow p-6">
-                <h2 className="text-xl font-bold text-gray-900 mb-4">Business Details</h2>
+              <div className="bg-gradient-to-br from-gray-900/95 via-gray-800/95 to-gray-900/95 backdrop-blur-sm rounded-2xl shadow-2xl border border-yellow-500/30 p-8">
+                <h2 className="text-2xl font-extrabold text-white mb-6 flex items-center gap-2">
+                  <span className="w-1 h-6 bg-gradient-to-b from-yellow-400 to-yellow-600 rounded"></span>
+                  Business Details
+                </h2>
                 <div className="space-y-4">
-                  <div className="flex justify-between items-center p-4 bg-blue-50 rounded-lg">
+                  <div className="flex justify-between items-center p-5 bg-gradient-to-r from-yellow-500/10 to-yellow-600/5 rounded-xl border border-yellow-500/30 hover:border-yellow-500/50 transition-all">
                     <div>
-                      <p className="font-medium text-gray-700">Left Business</p>
-                      <p className="text-sm text-gray-500">Total business from left leg</p>
+                      <p className="font-bold text-gray-200">Left Business</p>
+                      <p className="text-sm text-gray-400 mt-1">Total business from left leg</p>
                     </div>
-                    <p className="text-2xl font-bold text-blue-600">${binaryTree.leftBusiness.toFixed(2)}</p>
+                    <p className="text-2xl font-extrabold text-yellow-400">${binaryTree.leftBusiness.toFixed(2)}</p>
                   </div>
-                  <div className="flex justify-between items-center p-4 bg-purple-50 rounded-lg">
+                  <div className="flex justify-between items-center p-5 bg-gradient-to-r from-yellow-500/10 to-yellow-600/5 rounded-xl border border-yellow-500/30 hover:border-yellow-500/50 transition-all">
                     <div>
-                      <p className="font-medium text-gray-700">Right Business</p>
-                      <p className="text-sm text-gray-500">Total business from right leg</p>
+                      <p className="font-bold text-gray-200">Right Business</p>
+                      <p className="text-sm text-gray-400 mt-1">Total business from right leg</p>
                     </div>
-                    <p className="text-2xl font-bold text-purple-600">${binaryTree.rightBusiness.toFixed(2)}</p>
+                    <p className="text-2xl font-extrabold text-yellow-400">${binaryTree.rightBusiness.toFixed(2)}</p>
                   </div>
-                  <div className="flex justify-between items-center p-4 bg-green-50 rounded-lg">
+                  <div className="flex justify-between items-center p-5 bg-gradient-to-r from-yellow-500/20 to-yellow-600/15 rounded-xl border-2 border-yellow-500/40 hover:border-yellow-500/60 transition-all">
                     <div>
-                      <p className="font-medium text-gray-700">Minimum Business</p>
-                      <p className="text-sm text-gray-500">Used for binary bonus calculation</p>
+                      <p className="font-bold text-white">Minimum Business</p>
+                      <p className="text-sm text-gray-300 mt-1">Used for binary bonus calculation</p>
                     </div>
-                    <p className="text-2xl font-bold text-green-600">${minBusiness.toFixed(2)}</p>
+                    <p className="text-2xl font-extrabold text-yellow-400">${minBusiness.toFixed(2)}</p>
                   </div>
-                  <div className="flex justify-between items-center p-4 bg-yellow-50 rounded-lg">
+                  <div className="flex justify-between items-center p-5 bg-gradient-to-r from-yellow-500/30 via-yellow-600/20 to-yellow-500/30 rounded-xl border-2 border-yellow-500/50 shadow-lg shadow-yellow-500/20 hover:shadow-yellow-500/30 transition-all">
                     <div>
-                      <p className="font-medium text-gray-700">Binary Bonus (10%)</p>
-                      <p className="text-sm text-gray-500">Earned from matching business</p>
+                      <p className="font-extrabold text-white text-lg">Binary Bonus (10%)</p>
+                      <p className="text-sm text-yellow-200 mt-1">Earned from matching business</p>
                     </div>
-                    <p className="text-2xl font-bold text-yellow-600">${binaryBonus.toFixed(2)}</p>
+                    <p className="text-3xl font-extrabold text-yellow-400">${binaryBonus.toFixed(2)}</p>
                   </div>
                 </div>
               </div>
 
               {/* Carry Forward & Downlines */}
-              <div className="bg-white rounded-lg shadow p-6">
-                <h2 className="text-xl font-bold text-gray-900 mb-4">Carry Forward & Downlines</h2>
+              <div className="bg-gradient-to-br from-gray-900/95 via-gray-800/95 to-gray-900/95 backdrop-blur-sm rounded-2xl shadow-2xl border border-yellow-500/30 p-8">
+                <h2 className="text-2xl font-extrabold text-white mb-6 flex items-center gap-2">
+                  <span className="w-1 h-6 bg-gradient-to-b from-yellow-400 to-yellow-600 rounded"></span>
+                  Carry Forward & Downlines
+                </h2>
                 <div className="space-y-4">
-                  <div className="flex justify-between items-center p-4 bg-gray-50 rounded-lg">
+                  <div className="flex justify-between items-center p-5 bg-gradient-to-br from-gray-800 to-gray-800/80 rounded-xl border border-gray-700/50 hover:border-yellow-500/30 transition-all">
                     <div>
-                      <p className="font-medium text-gray-700">Left Carry</p>
-                      <p className="text-sm text-gray-500">Excess from left leg</p>
+                      <p className="font-bold text-gray-200">Left Carry</p>
+                      <p className="text-sm text-gray-400 mt-1">Excess from left leg</p>
                     </div>
-                    <p className="text-2xl font-bold text-gray-600">${binaryTree.leftCarry.toFixed(2)}</p>
+                    <p className="text-2xl font-extrabold text-white">${binaryTree.leftCarry.toFixed(2)}</p>
                   </div>
-                  <div className="flex justify-between items-center p-4 bg-gray-50 rounded-lg">
+                  <div className="flex justify-between items-center p-5 bg-gradient-to-br from-gray-800 to-gray-800/80 rounded-xl border border-gray-700/50 hover:border-yellow-500/30 transition-all">
                     <div>
-                      <p className="font-medium text-gray-700">Right Carry</p>
-                      <p className="text-sm text-gray-500">Excess from right leg</p>
+                      <p className="font-bold text-gray-200">Right Carry</p>
+                      <p className="text-sm text-gray-400 mt-1">Excess from right leg</p>
                     </div>
-                    <p className="text-2xl font-bold text-gray-600">${binaryTree.rightCarry.toFixed(2)}</p>
+                    <p className="text-2xl font-extrabold text-white">${binaryTree.rightCarry.toFixed(2)}</p>
                   </div>
-                  <div className="flex justify-between items-center p-4 bg-indigo-50 rounded-lg">
+                  <div className="flex justify-between items-center p-5 bg-gradient-to-r from-yellow-500/10 to-yellow-600/5 rounded-xl border border-yellow-500/30 hover:border-yellow-500/50 transition-all">
                     <div>
-                      <p className="font-medium text-gray-700">Left Downlines</p>
-                      <p className="text-sm text-gray-500">Users in left leg</p>
+                      <p className="font-bold text-gray-200">Left Downlines</p>
+                      <p className="text-sm text-gray-400 mt-1">Users in left leg</p>
                     </div>
-                    <p className="text-2xl font-bold text-indigo-600">{binaryTree.leftDownlines}</p>
+                    <p className="text-2xl font-extrabold text-yellow-400">{binaryTree.leftDownlines}</p>
                   </div>
-                  <div className="flex justify-between items-center p-4 bg-indigo-50 rounded-lg">
+                  <div className="flex justify-between items-center p-5 bg-gradient-to-r from-yellow-500/10 to-yellow-600/5 rounded-xl border border-yellow-500/30 hover:border-yellow-500/50 transition-all">
                     <div>
-                      <p className="font-medium text-gray-700">Right Downlines</p>
-                      <p className="text-sm text-gray-500">Users in right leg</p>
+                      <p className="font-bold text-gray-200">Right Downlines</p>
+                      <p className="text-sm text-gray-400 mt-1">Users in right leg</p>
                     </div>
-                    <p className="text-2xl font-bold text-indigo-600">{binaryTree.rightDownlines}</p>
+                    <p className="text-2xl font-extrabold text-yellow-400">{binaryTree.rightDownlines}</p>
                   </div>
                 </div>
               </div>
@@ -196,33 +215,37 @@ export default function BinaryPage() {
 
             {/* Tree Connections */}
             {(binaryTree.parent || binaryTree.leftChild || binaryTree.rightChild) && (
-              <div className="bg-white rounded-lg shadow p-6">
-                <h2 className="text-xl font-bold text-gray-900 mb-4">Tree Connections</h2>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="bg-gradient-to-br from-gray-900/95 via-gray-800/95 to-gray-900/95 backdrop-blur-sm rounded-2xl shadow-2xl border border-yellow-500/30 p-8">
+                <h2 className="text-2xl font-extrabold text-white mb-6 flex items-center gap-2">
+                  <span className="w-1 h-6 bg-gradient-to-b from-yellow-400 to-yellow-600 rounded"></span>
+                  Tree Connections
+                </h2>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   {binaryTree.parent && (
-                    <div className="p-4 bg-indigo-50 rounded-lg border-2 border-indigo-200">
-                      <p className="text-xs text-gray-500 mb-1">Parent (Sponsor)</p>
-                      <p className="font-bold text-indigo-700 text-lg">{binaryTree.parent.name}</p>
-                      <p className="text-sm text-gray-600">{binaryTree.parent.userId}</p>
+                    <div className="p-5 bg-gradient-to-br from-yellow-500/15 to-yellow-600/10 rounded-xl border border-yellow-500/40 hover:border-yellow-500/60 hover:shadow-lg hover:shadow-yellow-500/20 transition-all">
+                      <p className="text-xs text-gray-400 mb-2 uppercase tracking-wider font-bold">Parent (Sponsor)</p>
+                      <p className="font-extrabold text-white text-lg">{binaryTree.parent.name}</p>
+                      <p className="text-sm text-yellow-400 font-mono font-semibold mt-1">{binaryTree.parent.userId}</p>
                     </div>
                   )}
                   {binaryTree.leftChild && (
-                    <div className="p-4 bg-blue-50 rounded-lg border-2 border-blue-200">
-                      <p className="text-xs text-gray-500 mb-1">Left Child</p>
-                      <p className="font-bold text-blue-700 text-lg">{binaryTree.leftChild.name}</p>
-                      <p className="text-sm text-gray-600">{binaryTree.leftChild.userId}</p>
+                    <div className="p-5 bg-gradient-to-br from-yellow-500/15 to-yellow-600/10 rounded-xl border border-yellow-500/40 hover:border-yellow-500/60 hover:shadow-lg hover:shadow-yellow-500/20 transition-all">
+                      <p className="text-xs text-gray-400 mb-2 uppercase tracking-wider font-bold">Left Child</p>
+                      <p className="font-extrabold text-white text-lg">{binaryTree.leftChild.name}</p>
+                      <p className="text-sm text-yellow-400 font-mono font-semibold mt-1">{binaryTree.leftChild.userId}</p>
                     </div>
                   )}
                   {binaryTree.rightChild && (
-                    <div className="p-4 bg-purple-50 rounded-lg border-2 border-purple-200">
-                      <p className="text-xs text-gray-500 mb-1">Right Child</p>
-                      <p className="font-bold text-purple-700 text-lg">{binaryTree.rightChild.name}</p>
-                      <p className="text-sm text-gray-600">{binaryTree.rightChild.userId}</p>
+                    <div className="p-5 bg-gradient-to-br from-yellow-500/15 to-yellow-600/10 rounded-xl border border-yellow-500/40 hover:border-yellow-500/60 hover:shadow-lg hover:shadow-yellow-500/20 transition-all">
+                      <p className="text-xs text-gray-400 mb-2 uppercase tracking-wider font-bold">Right Child</p>
+                      <p className="font-extrabold text-white text-lg">{binaryTree.rightChild.name}</p>
+                      <p className="text-sm text-yellow-400 font-mono font-semibold mt-1">{binaryTree.rightChild.userId}</p>
                     </div>
                   )}
                 </div>
               </div>
             )}
+          </div>
           </div>
         </div>
   );

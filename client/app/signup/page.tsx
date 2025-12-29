@@ -5,6 +5,8 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { api } from '@/lib/api';
 import { countries } from '@/lib/countries';
+import Image from 'next/image';
+import CneoLoader from '@/components/CneoLoader';
 
 function SignupContent() {
   const searchParams = useSearchParams();
@@ -154,36 +156,63 @@ function SignupContent() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8 bg-white rounded-2xl shadow-xl p-8 border border-gray-200">
+    <div className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 relative">
+      {/* Background Image */}
+      <div className="fixed inset-0 z-0">
+        <Image
+          src="/signinbg.png"
+          alt="Background"
+          fill
+          className="object-cover"
+          priority
+          quality={90}
+        />
+        {/* Overlay for better readability */}
+        <div className="absolute inset-0 bg-black/50"></div>
+      </div>
+      
+      {/* Content - Made wider for better appearance */}
+      <div className="relative z-10 max-w-2xl w-full space-y-8 bg-gradient-to-br from-gray-900/95 via-gray-800/95 to-gray-900/95 backdrop-blur-sm rounded-2xl shadow-2xl p-8 border border-yellow-500/30">
         <div>
-          <h2 className="text-center text-3xl font-bold text-black mb-2">
-            Create your account
+          <div className="flex justify-center mb-6">
+            <Image
+              src="/logo1.png"
+              alt="CNEOX Logo"
+              width={180}
+              height={60}
+              className="h-14 w-auto"
+              priority
+            />
+          </div>
+          <h2 className="text-center text-3xl font-extrabold mb-2">
+            <span className="bg-gradient-to-r from-yellow-300 via-yellow-400 to-yellow-600 bg-clip-text text-transparent">
+              Create your account
+            </span>
           </h2>
           {referrerFromUrl && (
-            <div className="mt-4 p-3 bg-green-50 border-2 border-green-300 rounded-lg">
-              <p className="text-sm font-medium text-green-800 text-center">
+            <div className="mt-4 p-3 bg-gradient-to-r from-yellow-500/20 via-yellow-600/15 to-yellow-500/20 border-2 border-yellow-500/40 rounded-xl">
+              <p className="text-sm font-bold text-yellow-300 text-center">
                 ✓ You're signing up with a referral link! Referrer and position have been automatically set.
               </p>
             </div>
           )}
-          <p className="mt-2 text-center text-sm text-black/70">
+          <p className="mt-2 text-center text-sm text-gray-300">
             Already have an account?{' '}
-            <a href="/login" className="font-semibold text-indigo-600 hover:text-indigo-700 transition-colors">
+            <a href="/login" className="font-semibold text-yellow-400 hover:text-yellow-300 transition-colors">
               Sign in to existing account
             </a>
           </p>
         </div>
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           {error && (
-            <div className="bg-red-50 border-2 border-red-300 text-black px-4 py-3 rounded-lg">
-              <p className="font-medium text-red-700">{error}</p>
+            <div className="bg-red-900/30 border-2 border-red-500/50 text-red-400 px-4 py-3 rounded-xl">
+              <p className="font-bold">{error}</p>
             </div>
           )}
 
-          <div className="space-y-4">
-            <div>
-              <label htmlFor="name" className="block text-sm font-semibold text-black mb-2">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="md:col-span-2">
+              <label htmlFor="name" className="block text-sm font-bold text-yellow-400 mb-2">
                 Full Name
               </label>
               <input
@@ -191,7 +220,7 @@ function SignupContent() {
                 name="name"
                 type="text"
                 required
-                className="appearance-none relative block w-full px-4 py-3 border-2 border-gray-300 placeholder-gray-400 text-black bg-white rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all sm:text-sm"
+                className="appearance-none relative block w-full px-4 py-3 border-2 border-yellow-500/40 placeholder-gray-500 text-white bg-gray-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-yellow-500/50 focus:border-yellow-500/70 transition-all sm:text-sm font-semibold"
                 placeholder="Enter your full name"
                 value={formData.name}
                 onChange={handleChange}
@@ -201,29 +230,29 @@ function SignupContent() {
             {isAdmin ? (
               <>
                 <div>
-                  <label htmlFor="email" className="block text-sm font-semibold text-black mb-2">
-                    Email <span className="text-red-500">*</span>
+                  <label htmlFor="email" className="block text-sm font-bold text-yellow-400 mb-2">
+                    Email <span className="text-red-400">*</span>
                   </label>
                   <input
                     id="email"
                     name="email"
                     type="email"
                     required
-                    className="appearance-none relative block w-full px-4 py-3 border-2 border-gray-300 placeholder-gray-400 text-black bg-white rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all sm:text-sm"
+                    className="appearance-none relative block w-full px-4 py-3 border-2 border-yellow-500/40 placeholder-gray-500 text-white bg-gray-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-yellow-500/50 focus:border-yellow-500/70 transition-all sm:text-sm font-semibold"
                     placeholder="Enter your email address"
                     value={formData.email}
                     onChange={handleChange}
                   />
                 </div>
                 <div>
-                  <label htmlFor="phone" className="block text-sm font-semibold text-black mb-2">
+                  <label htmlFor="phone" className="block text-sm font-bold text-yellow-400 mb-2">
                     Phone (Optional)
                   </label>
                   <input
                     id="phone"
                     name="phone"
                     type="tel"
-                    className="appearance-none relative block w-full px-4 py-3 border-2 border-gray-300 placeholder-gray-400 text-black bg-white rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all sm:text-sm"
+                    className="appearance-none relative block w-full px-4 py-3 border-2 border-yellow-500/40 placeholder-gray-500 text-white bg-gray-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-yellow-500/50 focus:border-yellow-500/70 transition-all sm:text-sm font-semibold"
                     placeholder="Enter your phone number"
                     value={formData.phone}
                     onChange={handleChange}
@@ -233,14 +262,14 @@ function SignupContent() {
             ) : (
               <>
                 <div>
-                  <label htmlFor="email" className="block text-sm font-semibold text-black mb-2">
-                    Email <span className="text-red-500">*</span>
+                  <label htmlFor="email" className="block text-sm font-bold text-yellow-400 mb-2">
+                    Email <span className="text-red-400">*</span>
                   </label>
                   <input
                     id="email"
                     name="email"
                     type="email"
-                    className="appearance-none relative block w-full px-4 py-3 border-2 border-gray-300 placeholder-gray-400 text-black bg-white rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all sm:text-sm"
+                    className="appearance-none relative block w-full px-4 py-3 border-2 border-yellow-500/40 placeholder-gray-500 text-white bg-gray-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-yellow-500/50 focus:border-yellow-500/70 transition-all sm:text-sm font-semibold"
                     placeholder="Enter your email address"
                     value={formData.email}
                     onChange={handleChange}
@@ -248,14 +277,14 @@ function SignupContent() {
                   />
                 </div>
                 <div>
-                  <label htmlFor="phone" className="block text-sm font-semibold text-black mb-2">
-                    Phone <span className="text-red-500">*</span>
+                  <label htmlFor="phone" className="block text-sm font-bold text-yellow-400 mb-2">
+                    Phone <span className="text-red-400">*</span>
                   </label>
                   <input
                     id="phone"
                     name="phone"
                     type="tel"
-                    className="appearance-none relative block w-full px-4 py-3 border-2 border-gray-300 placeholder-gray-400 text-black bg-white rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all sm:text-sm"
+                    className="appearance-none relative block w-full px-4 py-3 border-2 border-yellow-500/40 placeholder-gray-500 text-white bg-gray-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-yellow-500/50 focus:border-yellow-500/70 transition-all sm:text-sm font-semibold"
                     placeholder="Enter your phone number"
                     value={formData.phone}
                     onChange={handleChange}
@@ -263,56 +292,56 @@ function SignupContent() {
                   />
                 </div>
                 <div>
-                  <label htmlFor="country" className="block text-sm font-semibold text-black mb-2">
-                    Country <span className="text-red-500">*</span>
+                  <label htmlFor="country" className="block text-sm font-bold text-yellow-400 mb-2">
+                    Country <span className="text-red-400">*</span>
                   </label>
                   <select
                     id="country"
                     name="country"
                     required
-                    className="appearance-none block w-full px-4 py-3 border-2 border-gray-300 bg-white rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm text-black transition-all"
+                    className="appearance-none block w-full px-4 py-3 border-2 border-yellow-500/40 bg-gray-800 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-yellow-500/50 focus:border-yellow-500/70 sm:text-sm text-white font-semibold transition-all"
                     value={formData.country}
                     onChange={handleChange}
                   >
                     <option value="">Select your country</option>
                     {countries.map((country) => (
-                      <option key={country.code} value={country.name}>
+                      <option key={country.code} value={country.name} className="bg-gray-800">
                         {country.name}
                       </option>
                     ))}
                   </select>
                 </div>
                 <div>
-                  <label htmlFor="referrerId" className="block text-sm font-semibold text-black mb-2">
-                    Referrer ID {referrerFromUrl && <span className="text-green-600">(From Link)</span>}
+                  <label htmlFor="referrerId" className="block text-sm font-bold text-yellow-400 mb-2">
+                    Referrer ID {referrerFromUrl && <span className="text-yellow-300">(From Link)</span>}
                   </label>
                   <input
                     id="referrerId"
                     name="referrerId"
                     type="text"
                     disabled={referrerFromUrl}
-                    className={`appearance-none relative block w-full px-4 py-3 border-2 placeholder-gray-400 text-black bg-white rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all sm:text-sm ${
+                    className={`appearance-none relative block w-full px-4 py-3 border-2 placeholder-gray-500 bg-gray-800 rounded-xl focus:outline-none focus:ring-2 transition-all sm:text-sm font-semibold ${
                       referrerFromUrl 
-                        ? 'bg-green-50 cursor-not-allowed border-green-300' 
+                        ? 'bg-gray-700/50 cursor-not-allowed border-yellow-500/30 text-gray-400' 
                         : referrerValidation.valid === true
-                        ? 'border-green-500'
+                        ? 'border-yellow-500/60 text-white focus:ring-yellow-500/50 focus:border-yellow-500/70'
                         : referrerValidation.valid === false
-                        ? 'border-red-500'
-                        : 'border-gray-300'
+                        ? 'border-red-500/50 text-white focus:ring-red-500/50 focus:border-red-500/70'
+                        : 'border-yellow-500/40 text-white focus:ring-yellow-500/50 focus:border-yellow-500/70'
                     }`}
                     placeholder="CROWN-XXXXXX"
                     value={formData.referrerId}
                     onChange={handleChange}
                   />
                   {referrerFromUrl && (
-                    <p className="mt-1 text-xs font-medium text-green-700">
+                    <p className="mt-1 text-xs font-bold text-yellow-300">
                       Referrer ID was automatically filled from your referral link
                     </p>
                   )}
                   {!referrerFromUrl && formData.referrerId && (
                     <div className="mt-1">
                       {referrerValidation.checking ? (
-                        <p className="text-xs text-gray-600 flex items-center">
+                        <p className="text-xs text-gray-400 flex items-center font-semibold">
                           <svg className="animate-spin h-3 w-3 mr-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                             <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                             <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
@@ -320,14 +349,14 @@ function SignupContent() {
                           Validating referrer ID...
                         </p>
                       ) : referrerValidation.valid === true ? (
-                        <p className="text-xs font-medium text-green-700 flex items-center">
+                        <p className="text-xs font-bold text-yellow-400 flex items-center">
                           <svg className="h-3 w-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                           </svg>
                           {referrerValidation.message}
                         </p>
                       ) : referrerValidation.valid === false ? (
-                        <p className="text-xs font-medium text-red-700 flex items-center">
+                        <p className="text-xs font-bold text-red-400 flex items-center">
                           <svg className="h-3 w-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                           </svg>
@@ -338,24 +367,24 @@ function SignupContent() {
                   )}
                 </div>
                 <div>
-                  <label htmlFor="position" className="block text-sm font-semibold text-black mb-2">
-                    Position {referrerFromUrl && <span className="text-green-600">(From Link)</span>}
+                  <label htmlFor="position" className="block text-sm font-bold text-yellow-400 mb-2">
+                    Position {referrerFromUrl && <span className="text-yellow-300">(From Link)</span>}
                   </label>
                   <select
                     id="position"
                     name="position"
                     disabled={referrerFromUrl}
-                    className={`appearance-none block w-full px-4 py-3 border-2 border-gray-300 bg-white rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm text-black transition-all ${
-                      referrerFromUrl ? 'bg-green-50 cursor-not-allowed border-green-300' : ''
+                    className={`appearance-none block w-full px-4 py-3 border-2 bg-gray-800 rounded-xl shadow-sm focus:outline-none focus:ring-2 sm:text-sm text-white font-semibold transition-all ${
+                      referrerFromUrl ? 'bg-gray-700/50 cursor-not-allowed border-yellow-500/30' : 'border-yellow-500/40 focus:ring-yellow-500/50 focus:border-yellow-500/70'
                     }`}
                     value={formData.position}
                     onChange={handleChange}
                   >
-                    <option value="left">Left</option>
-                    <option value="right">Right</option>
+                    <option value="left" className="bg-gray-800">Left</option>
+                    <option value="right" className="bg-gray-800">Right</option>
                   </select>
                   {referrerFromUrl && (
-                    <p className="mt-1 text-xs font-medium text-green-700">
+                    <p className="mt-1 text-xs font-bold text-yellow-300">
                       Position was automatically set from your referral link
                     </p>
                   )}
@@ -364,8 +393,8 @@ function SignupContent() {
             )}
 
             <div>
-              <label htmlFor="password" className="block text-sm font-semibold text-black mb-2">
-                Password <span className="text-red-500">*</span>
+              <label htmlFor="password" className="block text-sm font-bold text-yellow-400 mb-2">
+                Password <span className="text-red-400">*</span>
               </label>
               <div className="relative">
                 <input
@@ -374,14 +403,14 @@ function SignupContent() {
                   type={showPassword ? "text" : "password"}
                   required
                   minLength={8}
-                  className="appearance-none relative block w-full px-4 py-3 pr-12 border-2 border-gray-300 placeholder-gray-400 text-black bg-white rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all sm:text-sm"
+                  className="appearance-none relative block w-full px-4 py-3 pr-12 border-2 border-yellow-500/40 placeholder-gray-500 text-white bg-gray-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-yellow-500/50 focus:border-yellow-500/70 transition-all sm:text-sm font-semibold"
                   placeholder="Enter password (min 8 characters)"
                   value={formData.password}
                   onChange={handleChange}
                 />
                 <button
                   type="button"
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-600 hover:text-black focus:outline-none transition-colors"
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-yellow-400 focus:outline-none transition-colors"
                   onClick={() => setShowPassword(!showPassword)}
                   tabIndex={-1}
                 >
@@ -399,8 +428,8 @@ function SignupContent() {
               </div>
             </div>
             <div>
-              <label htmlFor="confirmPassword" className="block text-sm font-semibold text-black mb-2">
-                Confirm Password <span className="text-red-500">*</span>
+              <label htmlFor="confirmPassword" className="block text-sm font-bold text-yellow-400 mb-2">
+                Confirm Password <span className="text-red-400">*</span>
               </label>
               <div className="relative">
                 <input
@@ -409,14 +438,14 @@ function SignupContent() {
                   type={showConfirmPassword ? "text" : "password"}
                   required
                   minLength={8}
-                  className="appearance-none relative block w-full px-4 py-3 pr-12 border-2 border-gray-300 placeholder-gray-400 text-black bg-white rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all sm:text-sm"
+                  className="appearance-none relative block w-full px-4 py-3 pr-12 border-2 border-yellow-500/40 placeholder-gray-500 text-white bg-gray-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-yellow-500/50 focus:border-yellow-500/70 transition-all sm:text-sm font-semibold"
                   placeholder="Confirm your password"
                   value={formData.confirmPassword}
                   onChange={handleChange}
                 />
                 <button
                   type="button"
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-600 hover:text-black focus:outline-none transition-colors"
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-yellow-400 focus:outline-none transition-colors"
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                   tabIndex={-1}
                 >
@@ -449,15 +478,15 @@ function SignupContent() {
             </label>
           </div> */}
 
-          <div>
+          <div className="md:col-span-2">
             <button
               type="submit"
               disabled={loading}
-              className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-semibold rounded-lg text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-md hover:shadow-lg"
+              className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-bold rounded-xl text-black bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-400 hover:to-yellow-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg shadow-yellow-500/30 hover:shadow-yellow-500/50 hover:scale-105 active:scale-95"
             >
               {loading ? (
                 <span className="flex items-center">
-                  <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-black" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                   </svg>
@@ -476,16 +505,7 @@ function SignupContent() {
 
 export default function SignupPage() {
   return (
-    <Suspense
-      fallback={
-        <div className="min-h-screen flex items-center justify-center bg-gray-50">
-          <div className="text-center">
-            <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
-            <p className="mt-4 text-gray-600">Loading...</p>
-          </div>
-        </div>
-      }
-    >
+    <Suspense fallback={<CneoLoader fullScreen />}>
       <SignupContent />
     </Suspense>
   );

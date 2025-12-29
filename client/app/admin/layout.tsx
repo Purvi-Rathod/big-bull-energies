@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import Link from 'next/link';
+import Image from 'next/image';
 
 export default function AdminLayout({
   children,
@@ -163,8 +164,26 @@ export default function AdminLayout({
       >
         {/* Logo/Header */}
         <div className="h-16 flex items-center justify-between px-4 border-b border-gray-200">
-          {sidebarOpen && (
-            <h1 className="text-xl font-bold text-gray-900">Admin Panel</h1>
+          {sidebarOpen ? (
+            <Link href="/admin/dashboard" className="flex items-center gap-2">
+              <Image
+                src="/logo1.png"
+                alt="CNEOX Logo"
+                width={120}
+                height={40}
+                className="h-8 w-auto"
+              />
+            </Link>
+          ) : (
+            <Link href="/admin/dashboard" className="flex items-center justify-center">
+              <Image
+                src="/logo1.png"
+                alt="CNEOX"
+                width={40}
+                height={40}
+                className="h-8 w-8 object-contain"
+              />
+            </Link>
           )}
           <button
             onClick={() => setSidebarOpen(!sidebarOpen)}

@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { api } from '@/lib/api';
 import toast from 'react-hot-toast';
+import CneoLoader from '@/components/CneoLoader';
 
 interface Ticket {
   id: string;
@@ -100,77 +101,87 @@ export default function TicketsPage() {
   };
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center py-12">
-        <div className="text-center">
-          <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-slate-600"></div>
-          <p className="mt-4 text-gray-600">Loading tickets...</p>
-        </div>
-      </div>
-    );
+    return <CneoLoader fullScreen />;
   }
 
   return (
-    <div className="w-full">
-      <div className="mb-6 flex justify-between items-center">
+    <div className="w-full bg-gradient-to-br from-black via-gray-900 to-black min-h-screen py-8 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+      {/* Decorative background elements */}
+      <div className="fixed inset-0 pointer-events-none opacity-20">
+        <div className="absolute top-0 left-1/4 w-96 h-96 bg-yellow-500/10 rounded-full blur-3xl"></div>
+        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-yellow-600/10 rounded-full blur-3xl"></div>
+      </div>
+
+      <div className="relative z-10">
+      <div className="mb-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Support Tickets</h1>
-          <p className="mt-1 text-sm text-gray-500">Create and track your support tickets</p>
+          <h1 className="text-3xl font-extrabold mb-2 text-white">
+            <span className="bg-gradient-to-r from-yellow-300 via-yellow-400 to-yellow-600 bg-clip-text text-transparent drop-shadow-lg">Support Tickets</span>
+          </h1>
+          <p className="mt-1 text-sm text-gray-400">Create and track your support tickets</p>
         </div>
         <button
           onClick={() => setShowCreateModal(true)}
-          className="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          className="px-6 py-3 bg-gradient-to-r from-yellow-500 to-yellow-600 text-black rounded-xl hover:from-yellow-400 hover:to-yellow-500 font-bold transition-all shadow-lg shadow-yellow-500/30 hover:shadow-yellow-500/50 hover:scale-105 active:scale-95"
         >
           Create Ticket
         </button>
       </div>
 
       {/* Tickets List */}
-      <div className="space-y-4">
+      <div className="space-y-6">
         {tickets.length === 0 ? (
-          <div className="bg-white rounded-lg shadow p-12 text-center">
-            <p className="text-gray-500">No tickets found. Create your first ticket to get started.</p>
+          <div className="bg-gradient-to-br from-gray-900/95 via-gray-800/95 to-gray-900/95 backdrop-blur-sm rounded-2xl shadow-2xl border border-yellow-500/30 p-12 text-center">
+            <p className="text-gray-400 text-lg">No tickets found. Create your first ticket to get started.</p>
           </div>
         ) : (
           tickets.map((ticket) => (
-            <div key={ticket.id} className="bg-white rounded-lg shadow p-6">
+            <div key={ticket.id} className="bg-gradient-to-br from-gray-900/95 via-gray-800/95 to-gray-900/95 backdrop-blur-sm rounded-2xl shadow-2xl border border-yellow-500/30 p-6 hover:border-yellow-500/60 hover:shadow-yellow-500/20 transition-all duration-300">
               <div className="flex justify-between items-start mb-4">
                 <div>
-                  <h3 className="text-lg font-semibold text-gray-900">{ticket.subject}</h3>
-                  <p className="text-sm text-gray-500 mt-1">
-                    Ticket ID: {ticket.id.substring(0, 8)} | Created: {new Date(ticket.createdAt).toLocaleString()}
+                  <h3 className="text-lg font-extrabold text-white">{ticket.subject}</h3>
+                  <p className="text-sm text-gray-400 mt-1 font-semibold">
+                    Ticket ID: <span className="text-yellow-400 font-mono">{ticket.id.substring(0, 8)}</span> | Created: {new Date(ticket.createdAt).toLocaleString()}
                   </p>
                 </div>
-                <span className={`px-3 py-1 text-xs font-semibold rounded-full ${getStatusColor(ticket.status)}`}>
+                <span className={`px-4 py-1.5 text-xs font-bold rounded-full shadow-lg ${
+                  ticket.status === 'Open'
+                    ? 'bg-gradient-to-r from-yellow-500/30 to-yellow-600/20 text-yellow-300 border border-yellow-500/50 shadow-yellow-500/20'
+                    : ticket.status === 'In Progress'
+                    ? 'bg-gray-700/50 text-yellow-200 border border-yellow-500/30'
+                    : ticket.status === 'Closed'
+                    ? 'bg-gray-700/50 text-gray-300 border border-gray-600'
+                    : 'bg-gray-700/50 text-gray-300 border border-gray-600'
+                }`}>
                   {ticket.status}
                 </span>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                <div>
-                  <p className="text-sm font-medium text-gray-700">Department</p>
-                  <p className="text-sm text-gray-900">{ticket.department}</p>
+                <div className="p-4 bg-gray-800/80 rounded-xl border border-gray-700/50">
+                  <p className="text-sm text-gray-400 font-semibold mb-2">Department</p>
+                  <p className="text-sm font-extrabold text-white">{ticket.department}</p>
                 </div>
                 {ticket.service && (
-                  <div>
-                    <p className="text-sm font-medium text-gray-700">Service</p>
-                    <p className="text-sm text-gray-900">{ticket.service}</p>
+                  <div className="p-4 bg-gray-800/80 rounded-xl border border-gray-700/50">
+                    <p className="text-sm text-gray-400 font-semibold mb-2">Service</p>
+                    <p className="text-sm font-extrabold text-white">{ticket.service}</p>
                   </div>
                 )}
               </div>
 
               {ticket.description && (
-                <div className="mb-4">
-                  <p className="text-sm font-medium text-gray-700 mb-1">Description</p>
-                  <p className="text-sm text-gray-900 whitespace-pre-wrap">{ticket.description}</p>
+                <div className="mb-4 p-4 bg-gray-800/80 rounded-xl border border-gray-700/50">
+                  <p className="text-sm text-gray-400 font-semibold mb-3">Description</p>
+                  <p className="text-sm text-gray-200 whitespace-pre-wrap">{ticket.description}</p>
                 </div>
               )}
 
               {ticket.reply && (
-                <div className="mt-4 p-4 bg-indigo-50 rounded-md border border-indigo-200">
-                  <p className="text-sm font-medium text-indigo-900 mb-2">Admin Reply:</p>
-                  <p className="text-sm text-indigo-800 whitespace-pre-wrap">{ticket.reply}</p>
-                  <p className="text-xs text-indigo-600 mt-2">
+                <div className="mt-4 p-5 bg-gradient-to-r from-yellow-500/20 via-yellow-600/15 to-yellow-500/20 border-2 border-yellow-500/40 rounded-xl">
+                  <p className="text-sm font-extrabold text-yellow-400 mb-3">Admin Reply:</p>
+                  <p className="text-sm text-white whitespace-pre-wrap">{ticket.reply}</p>
+                  <p className="text-xs text-gray-400 mt-3 font-semibold">
                     Updated: {new Date(ticket.updatedAt).toLocaleString()}
                   </p>
                 </div>
@@ -182,11 +193,13 @@ export default function TicketsPage() {
 
       {/* Create Ticket Modal */}
       {showCreateModal && (
-        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-          <div className="relative top-20 mx-auto p-5 border w-full max-w-2xl shadow-lg rounded-md bg-white">
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm overflow-y-auto h-full w-full z-50">
+          <div className="relative top-10 mx-auto p-6 border border-yellow-500/30 w-full max-w-2xl shadow-2xl rounded-2xl bg-gradient-to-br from-gray-900/95 via-gray-800/95 to-gray-900/95 backdrop-blur-sm">
             <div className="mt-3">
-              <div className="flex justify-between items-center mb-4">
-                <h3 className="text-lg font-semibold text-gray-900">Create Support Ticket</h3>
+              <div className="flex justify-between items-center mb-6">
+                <h3 className="text-xl font-extrabold text-white flex items-center gap-2">
+                  <span className="bg-gradient-to-r from-yellow-300 via-yellow-400 to-yellow-600 bg-clip-text text-transparent">Create Support Ticket</span>
+                </h3>
                 <button
                   onClick={() => {
                     setShowCreateModal(false);
@@ -197,7 +210,7 @@ export default function TicketsPage() {
                       description: '',
                     });
                   }}
-                  className="text-gray-400 hover:text-gray-600"
+                  className="text-gray-400 hover:text-yellow-400 transition-colors"
                 >
                   <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -205,17 +218,17 @@ export default function TicketsPage() {
                 </button>
               </div>
 
-              <form onSubmit={handleCreateTicket} className="space-y-4">
+              <form onSubmit={handleCreateTicket} className="space-y-5">
                 <div>
-                  <label htmlFor="department" className="block text-sm font-medium text-gray-700 mb-2">
-                    Department <span className="text-red-500">*</span>
+                  <label htmlFor="department" className="block text-sm font-bold text-yellow-400 mb-3">
+                    Department <span className="text-red-400">*</span>
                   </label>
                   <select
                     id="department"
                     required
                     value={formData.department}
                     onChange={(e) => setFormData({ ...formData, department: e.target.value as 'Admin support' | 'Technical Support' })}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+                    className="w-full px-4 py-3 border border-yellow-500/40 rounded-xl bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-yellow-500/50 focus:border-yellow-500/70 font-semibold"
                   >
                     <option value="Admin support">Admin support</option>
                     <option value="Technical Support">Technical Support</option>
@@ -223,14 +236,14 @@ export default function TicketsPage() {
                 </div>
 
                 <div>
-                  <label htmlFor="service" className="block text-sm font-medium text-gray-700 mb-2">
+                  <label htmlFor="service" className="block text-sm font-bold text-yellow-400 mb-3">
                     Service (Optional)
                   </label>
                   <select
                     id="service"
                     value={formData.service}
                     onChange={(e) => setFormData({ ...formData, service: e.target.value as any })}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+                    className="w-full px-4 py-3 border border-yellow-500/40 rounded-xl bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-yellow-500/50 focus:border-yellow-500/70 font-semibold"
                   >
                     <option value="">Select a service (optional)</option>
                     <option value="Package Activation">Package Activation</option>
@@ -240,8 +253,8 @@ export default function TicketsPage() {
                 </div>
 
                 <div>
-                  <label htmlFor="subject" className="block text-sm font-medium text-gray-700 mb-2">
-                    Subject <span className="text-red-500">*</span>
+                  <label htmlFor="subject" className="block text-sm font-bold text-yellow-400 mb-3">
+                    Subject <span className="text-red-400">*</span>
                   </label>
                   <input
                     type="text"
@@ -250,12 +263,12 @@ export default function TicketsPage() {
                     value={formData.subject}
                     onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
                     placeholder="Enter ticket subject"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+                    className="w-full px-4 py-3 border border-yellow-500/40 rounded-xl bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-yellow-500/50 focus:border-yellow-500/70 font-semibold"
                   />
                 </div>
 
                 <div>
-                  <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-2">
+                  <label htmlFor="description" className="block text-sm font-bold text-yellow-400 mb-3">
                     Description
                   </label>
                   <textarea
@@ -264,11 +277,11 @@ export default function TicketsPage() {
                     value={formData.description}
                     onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                     placeholder="Describe your issue or request..."
-                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+                    className="w-full px-4 py-3 border border-yellow-500/40 rounded-xl bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-yellow-500/50 focus:border-yellow-500/70 font-semibold"
                   />
                 </div>
 
-                <div className="flex justify-end gap-3 pt-4 border-t border-gray-200">
+                <div className="flex justify-end gap-3 pt-6 border-t border-yellow-500/20">
                   <button
                     type="button"
                     onClick={() => {
@@ -280,14 +293,14 @@ export default function TicketsPage() {
                         description: '',
                       });
                     }}
-                    className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50"
+                    className="px-6 py-2.5 text-sm font-bold text-gray-300 bg-gray-700 rounded-xl hover:bg-gray-600 transition-all"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
                     disabled={creating}
-                    className="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="px-6 py-2.5 text-sm font-bold text-black bg-gradient-to-r from-yellow-500 to-yellow-600 rounded-xl hover:from-yellow-400 hover:to-yellow-500 disabled:opacity-50 transition-all shadow-lg shadow-yellow-500/30 hover:shadow-yellow-500/50 hover:scale-105 active:scale-95"
                   >
                     {creating ? 'Creating...' : 'Create Ticket'}
                   </button>
@@ -297,7 +310,8 @@ export default function TicketsPage() {
           </div>
         </div>
       )}
-    </div>
+          </div>
+        </div>
   );
 }
 

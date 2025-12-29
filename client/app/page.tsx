@@ -193,8 +193,8 @@ export default function Home() {
     <div className="min-h-screen bg-black">
       {/* Navigation */}
       <nav className="relative z-50 px-6 py-4 backdrop-blur-md bg-black/90 border-b border-yellow-500/20">
-        <div className="max-w-7xl mx-auto flex justify-between items-center">
-          <Link href="/" className="flex items-center gap-3">
+        <div className="max-w-7xl mx-auto flex justify-between items-center gap-4">
+          <Link href="/" className="flex items-center gap-3 flex-shrink-0">
             <Image
               src="/logo1.png"
               alt="CNEOX Logo"
@@ -204,18 +204,105 @@ export default function Home() {
               priority
             />
           </Link>
-          <div className="flex gap-4">
+          
+          {/* Navigation Links */}
+          <div className="hidden lg:flex items-center gap-6 flex-1 justify-center">
+            <Link
+              href="/how-to-start"
+              className="px-3 py-2 text-white/90 hover:text-yellow-400 transition-colors font-medium text-sm"
+            >
+              How to Start
+            </Link>
+            <Link
+              href="/how-it-works"
+              className="px-3 py-2 text-white/90 hover:text-yellow-400 transition-colors font-medium text-sm"
+            >
+              How It Works
+            </Link>
+            <Link
+              href="/binary-investment-system"
+              className="px-3 py-2 text-white/90 hover:text-yellow-400 transition-colors font-medium text-sm"
+            >
+              Binary Investment System
+            </Link>
+            <Link
+              href="/support"
+              className="px-3 py-2 text-white/90 hover:text-yellow-400 transition-colors font-medium text-sm"
+            >
+              Support
+            </Link>
+            <Link
+              href="/about-us"
+              className="px-3 py-2 text-white/90 hover:text-yellow-400 transition-colors font-medium text-sm"
+            >
+              About Us
+            </Link>
+            <Link
+              href="/policy"
+              className="px-3 py-2 text-white/90 hover:text-yellow-400 transition-colors font-medium text-sm"
+            >
+              Privacy & Terms
+            </Link>
+          </div>
+
+          {/* Mobile Navigation - Dropdown or Hidden */}
+          <div className="lg:hidden flex-1"></div>
+          
+          {/* Auth Buttons */}
+          <div className="flex gap-4 flex-shrink-0">
             <Link
               href="/login"
-              className="px-4 py-2 text-white hover:text-yellow-400 transition-colors font-medium"
+              className="px-4 py-2 text-white hover:text-yellow-400 transition-colors font-medium text-sm"
             >
               Login
             </Link>
             <Link
               href="/signup"
-              className="px-6 py-2 bg-gradient-to-r from-yellow-500 to-yellow-600 text-black rounded-lg hover:from-yellow-400 hover:to-yellow-500 transition-all shadow-lg hover:shadow-yellow-500/50 font-semibold"
+              className="px-4 sm:px-6 py-2 bg-gradient-to-r from-yellow-500 to-yellow-600 text-black rounded-lg hover:from-yellow-400 hover:to-yellow-500 transition-all shadow-lg hover:shadow-yellow-500/50 font-semibold text-sm"
             >
               Sign Up
+            </Link>
+          </div>
+        </div>
+        
+        {/* Mobile Navigation Menu */}
+        <div className="lg:hidden mt-4 pb-2 border-t border-yellow-500/20 pt-4">
+          <div className="flex flex-wrap gap-3 justify-center">
+            <Link
+              href="/how-to-start"
+              className="px-3 py-1.5 text-white/80 hover:text-yellow-400 transition-colors text-xs font-medium"
+            >
+              How to Start
+            </Link>
+            <Link
+              href="/how-it-works"
+              className="px-3 py-1.5 text-white/80 hover:text-yellow-400 transition-colors text-xs font-medium"
+            >
+              How It Works
+            </Link>
+            <Link
+              href="/binary-investment-system"
+              className="px-3 py-1.5 text-white/80 hover:text-yellow-400 transition-colors text-xs font-medium"
+            >
+              Binary System
+            </Link>
+            <Link
+              href="/support"
+              className="px-3 py-1.5 text-white/80 hover:text-yellow-400 transition-colors text-xs font-medium"
+            >
+              Support
+            </Link>
+            <Link
+              href="/about-us"
+              className="px-3 py-1.5 text-white/80 hover:text-yellow-400 transition-colors text-xs font-medium"
+            >
+              About Us
+            </Link>
+            <Link
+              href="/policy"
+              className="px-3 py-1.5 text-white/80 hover:text-yellow-400 transition-colors text-xs font-medium"
+            >
+              Privacy & Terms
             </Link>
           </div>
         </div>
@@ -223,8 +310,21 @@ export default function Home() {
 
       {/* Hero Section */}
       <main className="relative overflow-hidden">
-        <div className="absolute inset-0 bg-grid-yellow-500/[0.03] bg-[size:20px_20px]" />
-        <div className="relative max-w-7xl mx-auto px-6 py-20 sm:py-32 lg:py-40">
+        {/* Hero Background Image */}
+        <div className="absolute inset-0 z-0">
+          <Image
+            src="/hero.png"
+            alt="Hero Background"
+            fill
+            priority
+            className="object-cover object-center"
+            quality={90}
+            sizes="100vw"
+          />
+          {/* Overlay for better text readability */}
+          <div className="absolute inset-0 bg-black/40"></div>
+        </div>
+        <div className="relative z-10 max-w-7xl mx-auto px-6 py-20 sm:py-32 lg:py-40">
           <div className="text-center">
             {/* Animated Logo/Title */}
             <div className="mb-8 animate-fade-in">
@@ -289,10 +389,7 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Floating Elements */}
-        <div className="absolute top-20 left-10 w-72 h-72 bg-yellow-500/10 rounded-full mix-blend-multiply filter blur-xl opacity-50 animate-blob"></div>
-        <div className="absolute top-40 right-10 w-72 h-72 bg-yellow-600/10 rounded-full mix-blend-multiply filter blur-xl opacity-50 animate-blob animation-delay-2000"></div>
-        <div className="absolute -bottom-8 left-1/2 w-72 h-72 bg-yellow-500/10 rounded-full mix-blend-multiply filter blur-xl opacity-50 animate-blob animation-delay-4000"></div>
+        {/* Additional visual effects removed - hero image provides the background */}
       </main>
 
       {/* Features Section */}

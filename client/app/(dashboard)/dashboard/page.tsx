@@ -5,6 +5,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { api } from '@/lib/api';
 import toast from 'react-hot-toast';
 import CneoLoader from '@/components/CneoLoader';
+import Image from 'next/image';
 
 interface Wallet {
   type: string;
@@ -171,11 +172,22 @@ export default function DashboardPage() {
   }
 
   return (
-        <div className="w-full bg-gradient-to-br from-black via-gray-900 to-black min-h-screen py-8 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
-          {/* Decorative background elements */}
-          <div className="fixed inset-0 pointer-events-none opacity-20">
-            <div className="absolute top-0 left-1/4 w-96 h-96 bg-yellow-500/10 rounded-full blur-3xl"></div>
-            <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-yellow-600/10 rounded-full blur-3xl"></div>
+        <div className="w-full min-h-screen py-8 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+          {/* Dashboard Background Image */}
+          <div className="fixed inset-0 z-0">
+            <Image
+              src="/dash.png"
+              alt="Dashboard Background"
+              fill
+              priority
+              className="object-cover object-center"
+              quality={90}
+              sizes="100vw"
+            />
+            {/* Dark overlay for better content readability with stunning opacity effect */}
+            <div className="absolute inset-0 bg-black/60"></div>
+            {/* Subtle gradient overlay to blend with theme */}
+            <div className="absolute inset-0 bg-gradient-to-br from-black/40 via-transparent to-black/40"></div>
           </div>
 
           <div className="relative z-10">

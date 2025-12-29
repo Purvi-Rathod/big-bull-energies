@@ -388,8 +388,9 @@ export default function VouchersPage() {
                       .filter((wallet) => {
                         // Filter out referral_binary (already removed from system)
                         // Filter out investment and token wallets (not suitable for vouchers)
+                        // Filter out withdrawal wallet (removed - using separate income wallets)
                         // Only show wallets that can be used for vouchers
-                        const allowedTypes = ['roi', 'interest', 'referral', 'binary', 'withdrawal', 'career_level'];
+                        const allowedTypes = ['roi', 'interest', 'referral', 'binary', 'career_level'];
                         return allowedTypes.includes(wallet.type);
                       })
                       .map((wallet) => {
@@ -399,7 +400,6 @@ export default function VouchersPage() {
                           interest: 'Interest Wallet',
                           referral: 'Referral Wallet',
                           binary: 'Binary Wallet',
-                          withdrawal: 'Withdrawal Wallet',
                           career_level: 'Career Level Wallet',
                         };
                         return (

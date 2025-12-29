@@ -1504,25 +1504,34 @@ export const exchangeWalletFunds = asyncHandler(async (req, res) => {
   }
 
   // CRITICAL: Enforce wallet exchange restrictions
-  // Users can exchange FROM: referral, binary, career_level, or roi wallets
+  // Users can exchange FROM: referral, binary, career_level, roi, or interest wallets
   // Career Level and ROI wallets can only be exchanged once per day
   const allowedFromWallets = [
     WalletType.REFERRAL,
     WalletType.BINARY,
     WalletType.CAREER_LEVEL,
     WalletType.ROI,
+    WalletType.INTEREST,
   ];
   if (!allowedFromWallets.includes(fromWalletType)) {
     throw new AppError(
-      `Exchange is only allowed from Referral, Binary, Career Level, or ROI wallets. You cannot exchange from ${fromWalletType} wallet.`,
+      `Exchange is only allowed from Referral, Binary, Career Level, ROI, or Interest wallets. You cannot exchange from ${fromWalletType} wallet.`,
       400
     );
   }
 
-  // Users can ONLY exchange TO: withdrawal wallet
-  if (toWalletType !== WalletType.WITHDRAWAL) {
+  // Users can exchange TO: any income wallet (roi, interest, referral, binary, career_level)
+  // Withdrawal wallet is deprecated - users should withdraw directly from income wallets
+  const allowedToWallets = [
+    WalletType.ROI,
+    WalletType.INTEREST,
+    WalletType.REFERRAL,
+    WalletType.BINARY,
+    WalletType.CAREER_LEVEL,
+  ];
+  if (!allowedToWallets.includes(toWalletType)) {
     throw new AppError(
-      `Exchange is only allowed to Withdrawal wallet. You cannot exchange to ${toWalletType} wallet.`,
+      `Exchange is only allowed to ROI, Interest, Referral, Binary, or Career Level wallets. Withdrawal wallet is no longer available.`,
       400
     );
   }

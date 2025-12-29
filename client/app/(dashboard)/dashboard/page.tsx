@@ -63,7 +63,8 @@ export default function DashboardPage() {
   const [investments, setInvestments] = useState<Investment[]>([]);
   const [binaryTree, setBinaryTree] = useState<BinaryTreeInfo | null>(null);
   const [referralLinks, setReferralLinks] = useState<{ leftLink: string; rightLink: string; userId: string } | null>(null);
-  const [walletAddress, setWalletAddress] = useState('');
+  const [walletAddress, setWalletAddress] = useState(''); // Saved wallet address from profile
+  const [modalWalletAddress, setModalWalletAddress] = useState(''); // Temporary input value in modal
   const [showWalletModal, setShowWalletModal] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -500,7 +501,10 @@ export default function DashboardPage() {
               <h2 className="text-xl font-bold text-gray-900">Payment Information</h2>
               {!walletAddress && (
                 <button
-                  onClick={() => setShowWalletModal(true)}
+                  onClick={() => {
+                    setModalWalletAddress(''); // Reset modal input when opening modal
+                    setShowWalletModal(true);
+                  }}
                   className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700"
                 >
                   Setup Payment Info
@@ -573,8 +577,8 @@ export default function DashboardPage() {
                         <>
                           <input
                             type="text"
-                            value={walletAddress}
-                            onChange={(e) => setWalletAddress(e.target.value)}
+                            value={modalWalletAddress}
+                            onChange={(e) => setModalWalletAddress(e.target.value)}
                             onKeyDown={(e) => {
                               // Prevent Enter key from submitting
                               if (e.key === 'Enter') {
@@ -602,7 +606,7 @@ export default function DashboardPage() {
                     type="button"
                     onClick={() => {
                       setShowWalletModal(false);
-                      setWalletAddress(''); // Reset on cancel
+                      setModalWalletAddress(''); // Reset modal input on cancel
                     }}
                     className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300"
                   >
@@ -611,14 +615,14 @@ export default function DashboardPage() {
                   <button
                     type="button"
                     onClick={async () => {
-                      if (!walletAddress || walletAddress.trim().length === 0) {
+                      if (!modalWalletAddress || modalWalletAddress.trim().length === 0) {
                         const errorMsg = 'Please enter a USDT TRC20 wallet address';
                         setError(errorMsg);
                         toast.error(errorMsg);
                         return;
                       }
                       
-                      const trimmedAddress = walletAddress.trim();
+                      const trimmedAddress = modalWalletAddress.trim();
                       // Validate USDT TRC20 address format (should start with T)
                       if (!trimmedAddress.startsWith('T')) {
                         const errorMsg = 'Invalid USDT TRC20 address. USDT TRC20 addresses must start with "T".';
@@ -632,6 +636,7 @@ export default function DashboardPage() {
                           walletAddress: trimmedAddress
                         });
                         setShowWalletModal(false);
+                        setModalWalletAddress(''); // Clear modal input after successful save
                         toast.success('Payment information updated successfully!');
                         await fetchDashboardData();
                       } catch (err: any) {
@@ -640,7 +645,7 @@ export default function DashboardPage() {
                         toast.error(errorMsg);
                       }
                     }}
-                    disabled={!walletAddress || walletAddress.trim().length === 0}
+                    disabled={!modalWalletAddress || modalWalletAddress.trim().length === 0}
                     className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     Save

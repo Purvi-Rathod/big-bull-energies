@@ -133,10 +133,10 @@ export default function WalletExchangePage() {
       return;
     }
 
-    // Validate: Only allow exchange FROM referral, binary, career_level, or roi wallets
-    const allowedFromWallets = ['referral', 'binary', 'career_level', 'roi'];
+    // Validate: Only allow exchange FROM referral, binary, career_level, roi, or interest wallets
+    const allowedFromWallets = ['referral', 'binary', 'career_level', 'roi', 'interest'];
     if (!allowedFromWallets.includes(fromWalletType)) {
-      const errorMsg = 'You can only exchange from Referral, Binary, Career Level, or ROI wallets';
+      const errorMsg = 'You can only exchange from Referral, Binary, Career Level, ROI, or Interest wallets';
       setError(errorMsg);
       toast.error(errorMsg);
       return;
@@ -282,7 +282,8 @@ export default function WalletExchangePage() {
                           wallet.type === 'referral' || 
                           wallet.type === 'binary' || 
                           wallet.type === 'career_level' || 
-                          wallet.type === 'roi'
+                          wallet.type === 'roi' ||
+                          wallet.type === 'interest'
                         )
                         .map((wallet) => {
                           const available = getAvailableBalance(wallet.type);
@@ -302,7 +303,7 @@ export default function WalletExchangePage() {
                         })}
                     </select>
                     <p className="mt-1 text-xs text-gray-500">
-                      You can exchange from Referral, Binary, Career Level, or ROI wallets
+                      You can exchange from Referral, Binary, Career Level, ROI, or Interest wallets
                     </p>
                     {(fromWalletType === 'career_level' || fromWalletType === 'roi') && dailyLimitStatus[fromWalletType] && (
                       <p className="mt-1 text-xs text-red-600 font-medium">
@@ -334,7 +335,10 @@ export default function WalletExchangePage() {
                     >
                       <option value="">Select destination wallet</option>
                       {wallets
-                        .filter((wallet) => wallet.type === 'withdrawal')
+                        .filter((wallet) => 
+                          ['roi', 'interest', 'referral', 'binary', 'career_level'].includes(wallet.type) &&
+                          wallet.type !== fromWalletType // Don't allow same wallet
+                        )
                         .map((wallet) => (
                           <option key={wallet.type} value={wallet.type}>
                             {WALLET_TYPE_LABELS[wallet.type] || wallet.type}
@@ -342,7 +346,7 @@ export default function WalletExchangePage() {
                         ))}
                     </select>
                     <p className="mt-1 text-xs text-gray-500">
-                      Funds can only be transferred to Withdrawal wallet
+                      Select destination wallet (excluding source wallet)
                     </p>
                   </div>
 

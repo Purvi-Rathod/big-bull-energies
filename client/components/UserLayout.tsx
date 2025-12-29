@@ -127,7 +127,7 @@ export default function UserLayout({
         } bg-gradient-to-b from-gray-900 via-gray-900 to-black border-r border-yellow-500/30 shadow-2xl transition-all duration-300 ease-in-out flex flex-col fixed h-screen z-30`}
       >
         {/* Logo/Header */}
-        <div className="h-16 flex items-center justify-between px-4 border-b border-yellow-500/20 bg-gray-900/50 backdrop-blur-sm">
+        <div className="h-16 flex items-center justify-between px-4 border-b border-yellow-500/20 bg-gray-900/50 backdrop-blur-sm flex-shrink-0">
           {sidebarOpen ? (
             <Link href="/dashboard" className="flex items-center gap-2">
               <Image
@@ -170,14 +170,14 @@ export default function UserLayout({
         </div>
 
         {/* Navigation */}
-        <nav className="flex-1 px-3 py-4 space-y-2 overflow-y-auto">
+        <nav className="flex-1 px-3 py-2 space-y-1 overflow-hidden">
           {navigation.map((item) => {
             const active = isActive(item.href);
             return (
               <Link
                 key={item.name}
                 href={item.href}
-                className={`group flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-semibold transition-all duration-200 relative ${
+                className={`group flex items-center gap-2 px-2 py-1.5 rounded-lg text-sm font-semibold transition-all duration-200 relative ${
                   active
                     ? 'bg-gradient-to-r from-yellow-500/30 via-yellow-500/20 to-yellow-500/10 text-yellow-400 border border-yellow-500/40 shadow-lg shadow-yellow-500/10'
                     : 'text-gray-400 hover:bg-yellow-500/10 hover:text-yellow-300 hover:border-yellow-500/20 border border-transparent'
@@ -186,7 +186,7 @@ export default function UserLayout({
               >
                 {/* Active indicator */}
                 {active && (
-                  <span className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-gradient-to-b from-yellow-400 to-yellow-600 rounded-r-full"></span>
+                  <span className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-gradient-to-b from-yellow-400 to-yellow-600 rounded-r-full"></span>
                 )}
                 <span className={`flex-shrink-0 transition-colors ${active ? 'text-yellow-400' : 'text-gray-500 group-hover:text-yellow-400'}`}>
                   {item.icon}
@@ -198,17 +198,17 @@ export default function UserLayout({
         </nav>
 
         {/* User Info & Logout */}
-        <div className="border-t border-yellow-500/20 p-4 bg-gray-900/30 backdrop-blur-sm">
+        <div className="border-t border-yellow-500/20 p-3 bg-gray-900/30 backdrop-blur-sm flex-shrink-0">
           {sidebarOpen && user && (
-            <div className="mb-3 px-4 py-3 bg-gradient-to-r from-yellow-500/10 to-yellow-600/5 rounded-xl border border-yellow-500/20">
-              <p className="text-xs text-gray-400 mb-1 font-medium">Logged in as</p>
+            <div className="mb-2 px-3 py-2 bg-gradient-to-r from-yellow-500/10 to-yellow-600/5 rounded-lg border border-yellow-500/20">
+              <p className="text-xs text-gray-400 mb-0.5 font-medium">Logged in as</p>
               <p className="text-sm font-bold text-white truncate">{user.name || user.email}</p>
-              <p className="text-xs text-yellow-400 font-mono truncate mt-1">{user.userId}</p>
+              <p className="text-xs text-yellow-400 font-mono truncate mt-0.5">{user.userId}</p>
             </div>
           )}
           <button
             onClick={handleLogout}
-            className="w-full flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-semibold text-gray-400 hover:bg-red-900/20 hover:text-red-400 hover:border-red-500/30 border border-transparent transition-all duration-200"
+            className="w-full flex items-center gap-2 px-2 py-2 rounded-lg text-sm font-semibold text-gray-400 hover:bg-red-900/20 hover:text-red-400 hover:border-red-500/30 border border-transparent transition-all duration-200"
             title={!sidebarOpen ? 'Logout' : undefined}
           >
             <svg className="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -240,4 +240,3 @@ export default function UserLayout({
     </div>
   );
 }
-

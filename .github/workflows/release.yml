@@ -122,6 +122,15 @@ jobs:
           
           # Build and deploy
           $DOCKER_COMPOSE build --no-cache
+          
+          # Remove any stopped/exited containers with conflicting names
+          echo "🧹 Cleaning up stopped containers with conflicting names..."
+          # Remove stopped containers by name pattern
+          docker ps -a --filter "name=binary-system-backend" --filter "status=exited" --format "{{.ID}}" | xargs -r docker rm -f 2>/dev/null || true
+          docker ps -a --filter "name=binary-system-frontend" --filter "status=exited" --format "{{.ID}}" | xargs -r docker rm -f 2>/dev/null || true
+          # Also remove containers with ID prefixes in names (Docker Compose sometimes creates these)
+          docker ps -a --format "{{.Names}}" | grep -E "^[0-9a-f]{12}_binary-system" | xargs -r docker rm -f 2>/dev/null || true
+          
           $DOCKER_COMPOSE up -d
           
           # Health check

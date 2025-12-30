@@ -111,7 +111,13 @@ jobs:
           echo "${VERSION}" > "${DEPLOY_PATH}/.deploy-backup/last-version.txt"
           
           # Checkout the tagged version
-          git fetch origin --tags
+          # Force fetch tags to update any existing tags
+          git fetch origin --tags --force
+          # Delete local tag if it exists to avoid conflicts
+          git tag -d "${VERSION}" 2>/dev/null || true
+          # Fetch the tag again
+          git fetch origin tag "${VERSION}" --force
+          # Checkout the tag
           git checkout "${VERSION}"
           
           # Detect Docker Compose

@@ -152,13 +152,13 @@ export default function ROIReportPage() {
                 </button>
               </div>
               <div className="overflow-x-auto">
-                <table className="min-w-full divide-y divide-gray-200">
+                <table className="w-full divide-y divide-gray-200">
                   <thead className="bg-gray-50">
                     <tr>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">User ID</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">User Name</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Total ROI</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">ROI Count</th>
+                      <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase">User ID</th>
+                      <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase">User Name</th>
+                      <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase">Total ROI</th>
+                      <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase">ROI Count</th>
                     </tr>
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
@@ -166,16 +166,16 @@ export default function ROIReportPage() {
                       .sort((a: any, b: any) => b.totalROI - a.totalROI)
                       .map((u: any) => (
                         <tr key={u.userId}>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm font-mono text-gray-600">
+                          <td className="px-3 py-3 text-xs font-mono text-gray-600">
                             {u.userId}
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                          <td className="px-3 py-3 text-xs text-gray-900">
                             {u.userName}
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-purple-600">
+                          <td className="px-3 py-3 text-xs font-medium text-purple-600">
                             ${u.totalROI.toFixed(2)}
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          <td className="px-3 py-3 text-xs text-gray-500">
                             {u.roiCount}
                           </td>
                         </tr>
@@ -200,17 +200,17 @@ export default function ROIReportPage() {
               )}
             </div>
             <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200">
+              <table className="w-full divide-y divide-gray-200">
                 <thead className="bg-gray-50">
                   <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">User ID</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">User Name</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Type</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Amount</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Balance Before</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Balance After</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                    <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
+                    <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase">User ID</th>
+                    <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase">User Name</th>
+                    <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase">Type</th>
+                    <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase">Amount</th>
+                    <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase">Balance Before</th>
+                    <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase">Balance After</th>
+                    <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
@@ -223,32 +223,32 @@ export default function ROIReportPage() {
                   ) : (
                     report.transactions.map((tx: any) => (
                       <tr key={tx.id}>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        <td className="px-3 py-3 text-xs text-gray-500">
                           {new Date(tx.createdAt).toLocaleString()}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-mono text-gray-600">
+                        <td className="px-3 py-3 text-xs font-mono text-gray-600">
                           {tx.userId}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        <td className="px-3 py-3 text-xs text-gray-900">
                           {tx.userName}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm">
+                        <td className="px-3 py-3 text-xs">
                           <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
                             tx.type === 'credit' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
                           }`}>
                             {tx.type.toUpperCase()}
                           </span>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                        <td className="px-3 py-3 text-xs font-medium text-gray-900">
                           ${tx.amount.toFixed(2)}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        <td className="px-3 py-3 text-xs text-gray-500">
                           ${tx.balanceBefore.toFixed(2)}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        <td className="px-3 py-3 text-xs text-gray-500">
                           ${tx.balanceAfter.toFixed(2)}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm">
+                        <td className="px-3 py-3 text-xs">
                           <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
                             tx.status === 'completed' ? 'bg-green-100 text-green-800' :
                             tx.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :

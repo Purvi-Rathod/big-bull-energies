@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useConfirm } from '@/contexts/ConfirmContext';
 import { api } from '@/lib/api';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend, Cell } from 'recharts';
 import toast from 'react-hot-toast';
 
 interface Statistics {
@@ -293,94 +293,64 @@ export default function AdminDashboard() {
               </div>
             </div>
 
-            {/* Charts Section */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-              {/* Investment Breakdown Chart */}
-            <div className="bg-white rounded-lg shadow p-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Investment Breakdown</h3>
-                <ResponsiveContainer width="100%" height={300}>
-                  <BarChart
-                    data={[
-                      {
-                        name: 'Voucher',
-                        amount: parseFloat(statistics.totalVoucherInvestment),
-                      },
-                      {
-                        name: 'Free',
-                        amount: parseFloat(statistics.totalFreeInvestment),
-                      },
-                      {
-                        name: 'Powerleg',
-                        amount: parseFloat(statistics.totalPowerlegInvestment),
-                      },
-                    ]}
-                    margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
-                  >
-                    <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                    <XAxis dataKey="name" stroke="#6b7280" />
-                    <YAxis 
-                      stroke="#6b7280"
-                      tickFormatter={(value) => `$${(value / 1000).toFixed(0)}k`}
-                    />
-                    <Tooltip
-                      formatter={(value: number | undefined) => value !== undefined ? formatCurrency(value) : ''}
-                      contentStyle={{ backgroundColor: '#fff', border: '1px solid #e5e7eb', borderRadius: '6px' }}
-                    />
-                    <Bar dataKey="amount" fill="#4f46e5" radius={[4, 4, 0, 0]} />
-                  </BarChart>
-                </ResponsiveContainer>
-                </div>
-
-              {/* Earnings Breakdown Chart */}
-              <div className="bg-white rounded-lg shadow p-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Earnings Breakdown</h3>
-                <ResponsiveContainer width="100%" height={300}>
-                  <BarChart
-                    data={[
-                      {
-                        name: 'ROI',
-                        amount: parseFloat(statistics.totalROI),
-                      },
-                      {
-                        name: 'Referral',
-                        amount: parseFloat(statistics.totalReferralBonus),
-                      },
-                      {
-                        name: 'Binary',
-                        amount: parseFloat(statistics.totalBinaryBonus),
-                      },
-                    ]}
-                    margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
-                  >
-                    <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                    <XAxis dataKey="name" stroke="#6b7280" />
-                    <YAxis 
-                      stroke="#6b7280"
-                      tickFormatter={(value) => `$${(value / 1000).toFixed(0)}k`}
-                    />
-                    <Tooltip
-                      formatter={(value: number | undefined) => value !== undefined ? formatCurrency(value) : ''}
-                      contentStyle={{ backgroundColor: '#fff', border: '1px solid #e5e7eb', borderRadius: '6px' }}
-                    />
-                    <Bar dataKey="amount" fill="#6366f1" radius={[4, 4, 0, 0]} />
-                  </BarChart>
-                </ResponsiveContainer>
-              </div>
-            </div>
-
-            {/* Financial Flow Chart */}
+            {/* Comprehensive Financial Chart */}
             <div className="bg-white rounded-lg shadow p-6 mb-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Financial Overview</h3>
-              <ResponsiveContainer width="100%" height={300}>
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">Complete Financial Overview</h3>
+              <ResponsiveContainer width="100%" height={500}>
                 <BarChart
                   data={[
-                    { name: 'Deposits & Investment', amount: parseFloat(statistics.totalInvestment) },
-                    { name: 'Withdrawals', amount: parseFloat(statistics.totalWithdrawals) },
+                    {
+                      name: 'Voucher',
+                      value: parseFloat(statistics.totalVoucherInvestment),
+                      type: 'Investment',
+                    },
+                    {
+                      name: 'Free',
+                      value: parseFloat(statistics.totalFreeInvestment),
+                      type: 'Investment',
+                    },
+                    {
+                      name: 'Powerleg',
+                      value: parseFloat(statistics.totalPowerlegInvestment),
+                      type: 'Investment',
+                    },
+                    {
+                      name: 'ROI',
+                      value: parseFloat(statistics.totalROI),
+                      type: 'Earnings',
+                    },
+                    {
+                      name: 'Referral',
+                      value: parseFloat(statistics.totalReferralBonus),
+                      type: 'Earnings',
+                    },
+                    {
+                      name: 'Binary',
+                      value: parseFloat(statistics.totalBinaryBonus),
+                      type: 'Earnings',
+                    },
+                    {
+                      name: 'Deposits & Investment',
+                      value: parseFloat(statistics.totalInvestment),
+                      type: 'Financial Flow',
+                    },
+                    {
+                      name: 'Withdrawals',
+                      value: parseFloat(statistics.totalWithdrawals),
+                      type: 'Financial Flow',
+                    },
                   ]}
-                  margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+                  margin={{ top: 20, right: 30, left: 20, bottom: 80 }}
                 >
                   <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                  <XAxis dataKey="name" stroke="#6b7280" />
+                  <XAxis 
+                    dataKey="name" 
+                    stroke="#6b7280" 
+                    angle={-45}
+                    textAnchor="end"
+                    height={100}
+                    interval={0}
+                  />
                   <YAxis 
                     stroke="#6b7280"
                     tickFormatter={(value) => {
@@ -390,12 +360,54 @@ export default function AdminDashboard() {
                     }}
                   />
                   <Tooltip
-                    formatter={(value: number | undefined) => value !== undefined ? formatCurrency(value) : ''}
-                    contentStyle={{ backgroundColor: '#fff', border: '1px solid #e5e7eb', borderRadius: '6px' }}
+                    formatter={(value: number | string | undefined) => {
+                      if (value === undefined || value === null) return formatCurrency(0);
+                      const numValue = typeof value === 'string' ? parseFloat(value) : value;
+                      return formatCurrency(numValue);
+                    }}
+                    contentStyle={{ 
+                      backgroundColor: '#fff', 
+                      border: '1px solid #e5e7eb', 
+                      borderRadius: '6px',
+                      padding: '10px'
+                    }}
                   />
-                  <Bar dataKey="amount" fill="#4f46e5" radius={[4, 4, 0, 0]} />
+                  <Bar 
+                    dataKey="value" 
+                    fill="#4f46e5"
+                    radius={[4, 4, 0, 0]}
+                  >
+                    {[
+                      { name: 'Voucher', fill: '#4f46e5' },
+                      { name: 'Free', fill: '#6366f1' },
+                      { name: 'Powerleg', fill: '#818cf8' },
+                      { name: 'ROI', fill: '#10b981' },
+                      { name: 'Referral', fill: '#3b82f6' },
+                      { name: 'Binary', fill: '#f59e0b' },
+                      { name: 'Deposits & Investment', fill: '#059669' },
+                      { name: 'Withdrawals', fill: '#ef4444' },
+                    ].map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={entry.fill} />
+                    ))}
+                  </Bar>
                 </BarChart>
               </ResponsiveContainer>
+              
+              {/* Chart Legend Explanation */}
+              <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                <div className="border-l-4 border-indigo-500 pl-3">
+                  <h4 className="font-semibold text-gray-900 mb-1">Investment Types</h4>
+                  <p className="text-gray-600">Voucher, Free, Powerleg investment sources</p>
+                </div>
+                <div className="border-l-4 border-green-500 pl-3">
+                  <h4 className="font-semibold text-gray-900 mb-1">Earnings Types</h4>
+                  <p className="text-gray-600">ROI, Referral, Binary bonus earnings</p>
+                </div>
+                <div className="border-l-4 border-emerald-500 pl-3">
+                  <h4 className="font-semibold text-gray-900 mb-1">Financial Flow</h4>
+                  <p className="text-gray-600">Total deposits/investments vs withdrawals</p>
+                </div>
+              </div>
             </div>
           </>
         )}

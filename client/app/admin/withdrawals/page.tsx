@@ -230,78 +230,73 @@ export default function AdminWithdrawals() {
         {!loading && (
           <div className="bg-white shadow rounded-lg overflow-hidden">
             <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200">
+              <table className="w-full divide-y divide-gray-200">
                 <thead className="bg-gray-50">
                   <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">User</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Amount</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Wallet Type</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Wallet Address</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
+                    <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase w-[140px]">User</th>
+                    <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase w-[120px]">Amount</th>
+                    <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase w-[100px]">Wallet Type</th>
+                    <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase w-[180px]">Wallet Address</th>
+                    <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase w-[90px]">Status</th>
+                    <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase w-[130px]">Date</th>
+                    <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase w-[140px]">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
                   {withdrawals.length === 0 ? (
                     <tr>
-                      <td colSpan={8} className="px-6 py-8 text-center text-gray-500">
+                      <td colSpan={7} className="px-6 py-8 text-center text-gray-500">
                         No withdrawals found
                       </td>
                     </tr>
                   ) : (
                     withdrawals.map((wd) => (
                       <tr key={wd.id} className="hover:bg-gray-50">
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm font-medium text-gray-900">{wd.userName}</div>
-                          <div className="text-sm text-gray-500">{wd.userId}</div>
-                          <div className="text-sm text-gray-500">{wd.userEmail}</div>
+                        <td className="px-3 py-3">
+                          <div className="text-xs font-medium text-gray-900 truncate max-w-[140px]" title={wd.userName}>{wd.userName}</div>
+                          <div className="text-xs text-gray-500 truncate max-w-[140px]" title={wd.userId}>{wd.userId}</div>
+                          <div className="text-xs text-gray-500 truncate max-w-[140px]" title={wd.userEmail}>{wd.userEmail}</div>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm font-mono text-gray-600">
-                            {wd.withdrawalId || wd.id.substring(0, 8)}
-                          </div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm font-semibold text-gray-900">{formatCurrency(wd.amount)}</div>
+                        <td className="px-3 py-3">
+                          <div className="text-xs font-semibold text-gray-900">{formatCurrency(wd.amount)}</div>
                           <div className="text-xs text-gray-500">Charges: {formatCurrency(wd.charges)}</div>
                           <div className="text-xs text-gray-500">Final: {formatCurrency(wd.finalAmount)}</div>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm text-gray-900 capitalize">{wd.walletType}</div>
+                        <td className="px-3 py-3">
+                          <div className="text-xs text-gray-900 capitalize">{wd.walletType}</div>
                         </td>
-                        <td className="px-6 py-4">
-                          <div className="text-sm text-gray-900 font-mono max-w-xs truncate">
+                        <td className="px-3 py-3">
+                          <div className="text-xs text-gray-900 font-mono truncate max-w-[180px]" title={wd.walletAddress || wd.bankAccount?.accountNumber || '-'}>
                             {wd.walletAddress || wd.bankAccount?.accountNumber || '-'}
                           </div>
                           {wd.bankAccount && (
-                            <div className="text-xs text-gray-500 mt-1">
+                            <div className="text-xs text-gray-500 truncate max-w-[180px]" title={`${wd.bankAccount.bankName} - ${wd.bankAccount.accountHolderName}`}>
                               {wd.bankAccount.bankName} - {wd.bankAccount.accountHolderName}
                             </div>
                           )}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
+                        <td className="px-3 py-3">
                           <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusColor(wd.status)}`}>
                             {wd.status}
                           </span>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm text-gray-500">{formatDate(wd.createdAt)}</div>
+                        <td className="px-3 py-3">
+                          <div className="text-xs text-gray-500">{formatDate(wd.createdAt)}</div>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                        <td className="px-3 py-3 text-xs font-medium">
                           {wd.status === 'pending' && (
-                            <div className="flex gap-2">
+                            <div className="flex gap-1.5 flex-wrap">
                               <button
                                 onClick={() => handleApprove(wd.id)}
                                 disabled={processingId === wd.id}
-                                className="text-green-600 hover:text-green-900 bg-green-50 px-3 py-1 rounded-md hover:bg-green-100 disabled:opacity-50"
+                                className="text-green-600 hover:text-green-900 bg-green-50 px-2 py-1 rounded-md hover:bg-green-100 disabled:opacity-50 whitespace-nowrap"
                               >
                                 {processingId === wd.id ? 'Processing...' : 'Approve'}
                               </button>
                               <button
                                 onClick={() => handleReject(wd.id)}
                                 disabled={processingId === wd.id}
-                                className="text-red-600 hover:text-red-900 bg-red-50 px-3 py-1 rounded-md hover:bg-red-100 disabled:opacity-50"
+                                className="text-red-600 hover:text-red-900 bg-red-50 px-2 py-1 rounded-md hover:bg-red-100 disabled:opacity-50 whitespace-nowrap"
                               >
                                 Reject
                               </button>

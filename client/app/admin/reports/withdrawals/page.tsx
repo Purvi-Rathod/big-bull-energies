@@ -125,18 +125,18 @@ export default function WithdrawalsReportPage() {
               )}
             </div>
             <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200">
+              <table className="w-full divide-y divide-gray-200">
                 <thead className="bg-gray-50">
                   <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">User ID</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">User Name</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Withdrawal ID</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Amount</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Charges</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Final Amount</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Wallet Type</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                    <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase w-[140px]">Date</th>
+                    <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase w-[130px]">User ID</th>
+                    <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase w-[120px]">User Name</th>
+                    <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase w-[120px]">Withdrawal ID</th>
+                    <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase w-[100px]">Amount</th>
+                    <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase w-[90px]">Charges</th>
+                    <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase w-[110px]">Final Amount</th>
+                    <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase w-[100px]">Wallet Type</th>
+                    <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase w-[90px]">Status</th>
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
@@ -149,31 +149,31 @@ export default function WithdrawalsReportPage() {
                   ) : (
                     report.withdrawals.map((wd: any) => (
                       <tr key={wd.id}>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                          {new Date(wd.createdAt).toLocaleString()}
+                        <td className="px-3 py-3">
+                          <div className="text-xs text-gray-500">{new Date(wd.createdAt).toLocaleString()}</div>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-mono text-gray-600">
-                          {wd.userId}
+                        <td className="px-3 py-3">
+                          <div className="text-xs font-mono text-gray-600 truncate max-w-[130px]" title={wd.userId}>{wd.userId}</div>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                          {wd.userName}
+                        <td className="px-3 py-3">
+                          <div className="text-xs text-gray-900 truncate max-w-[120px]" title={wd.userName}>{wd.userName}</div>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-mono text-gray-600">
-                          {wd.withdrawalId || wd.id.substring(0, 8)}
+                        <td className="px-3 py-3">
+                          <div className="text-xs font-mono text-gray-600 truncate max-w-[120px]" title={wd.withdrawalId || wd.id.substring(0, 8)}>{wd.withdrawalId || wd.id.substring(0, 8)}</div>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                          ${wd.amount.toFixed(2)}
+                        <td className="px-3 py-3">
+                          <div className="text-xs font-medium text-gray-900">${wd.amount.toFixed(2)}</div>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                          ${wd.charges.toFixed(2)}
+                        <td className="px-3 py-3">
+                          <div className="text-xs text-gray-500">${wd.charges.toFixed(2)}</div>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-green-600">
-                          ${wd.finalAmount.toFixed(2)}
+                        <td className="px-3 py-3">
+                          <div className="text-xs font-medium text-green-600">${wd.finalAmount.toFixed(2)}</div>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 capitalize">
-                          {wd.walletType}
+                        <td className="px-3 py-3">
+                          <div className="text-xs text-gray-500 capitalize">{wd.walletType}</div>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm">
+                        <td className="px-3 py-3">
                           <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
                             wd.status === 'approved' ? 'bg-green-100 text-green-800' :
                             wd.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :

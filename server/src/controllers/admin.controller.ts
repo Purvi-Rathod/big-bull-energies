@@ -893,6 +893,54 @@ export const rejectWithdrawal = asyncHandler(async (req, res) => {
 });
 
 /**
+ * Update user status (activate/deactivate)
+ * PUT /api/v1/admin/users/:userId/status
+ */
+export const updateUserStatus = asyncHandler(async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const { status } = (req as any).body;
+
+    if (!status) {
+      throw new AppError("Status is required", 400);
+    }
+
+    if (!["active", "inactive", "suspended", "blocked", "suspected"].includes(status)) {
+      throw new AppError("Invalid status. Must be active, inactive, suspended, blocked, or suspected", 400);
+    }
+
+    // Find user by userId
+    const user = await User.findOne({ userId });
+    if (!user) {
+      throw new AppError("User not found", 404);
+    }
+
+    // Prevent status change of admin user
+    if (user.userId === "CROWN-000000") {
+      throw new AppError("Cannot change status of admin user", 403);
+    }
+
+    // Update status
+    user.status = status as "active" | "inactive" | "suspended" | "blocked" | "suspected";
+    await user.save();
+
+    const response = res as any;
+    response.status(200).json({
+      status: "success",
+      message: `User status updated to ${status} successfully`,
+      data: {
+        userId: user.userId,
+        name: user.name,
+        email: user.email,
+        status: user.status,
+      },
+    });
+  } catch (error: any) {
+    throw new AppError(error.message || "Failed to update user status", 500);
+  }
+});
+
+/**
  * Delete user and all related data
  * DELETE /api/v1/admin/users/:userId
  */
@@ -1152,58 +1200,22 @@ export const updateNOWPaymentsStatus = asyncHandler(async (req, res) => {
  * PUT /api/v1/admin/users/:userId/password
  */
 /**
- * Get admin reports (all user transactions)
+ * Get admin reports (all user transactions) with pagination
  * GET /api/v1/admin/reports
  */
 export const getAdminReports = asyncHandler(async (req, res) => {
+  const { 
+    type = 'all', // 'roi', 'binary', 'referral', 'investment', 'withdrawal', 'all'
+    page = 1, 
+    limit = 50 
+  } = req.query;
+
+  const skip = (Number(page) - 1) * Number(limit);
+  const limitNum = Number(limit);
+
   // Get all wallets
   const wallets = await Wallet.find({});
   const walletIds = wallets.map((w) => w._id);
-
-  // Get all transactions with user info
-  const transactions = await WalletTransaction.find({
-    wallet: { $in: walletIds },
-  })
-    .populate("wallet", "type")
-    .populate("user", "userId name email")
-    .sort({ createdAt: -1 })
-    .lean();
-
-  // Group transactions by type
-  const roiTransactions = transactions.filter(
-    (tx) => (tx.wallet as any)?.type === WalletType.ROI
-  );
-  const binaryTransactions = transactions.filter(
-    (tx) => (tx.wallet as any)?.type === WalletType.BINARY
-  );
-  const referralTransactions = transactions.filter(
-    (tx) => (tx.wallet as any)?.type === WalletType.REFERRAL
-  );
-  const investmentTransactions = transactions.filter(
-    (tx) => (tx.wallet as any)?.type === WalletType.INVESTMENT
-  );
-
-  // Get all withdrawals with user info
-  const withdrawals = await Withdrawal.find({})
-    .populate("user", "userId name email")
-    .sort({ createdAt: -1 })
-    .lean();
-
-  // Get investments for investment transactions
-  const investmentIds = investmentTransactions
-    .map((tx) => tx.txRef)
-    .filter((id): id is string => !!id);
-  
-  const investments = await Investment.find({
-    _id: { $in: investmentIds.map((id) => new Types.ObjectId(id)) },
-  })
-    .populate("packageId", "packageName roi duration")
-    .lean();
-
-  const investmentMap = new Map();
-  investments.forEach((inv) => {
-    investmentMap.set(inv._id.toString(), inv);
-  });
 
   const formatTransaction = (tx: any) => ({
     id: tx._id,
@@ -1221,7 +1233,7 @@ export const getAdminReports = asyncHandler(async (req, res) => {
     createdAt: tx.createdAt,
   });
 
-  const formatInvestmentTransaction = (tx: any) => {
+  const formatInvestmentTransaction = (tx: any, investmentMap: Map<string, any>) => {
     const investment = tx.txRef ? investmentMap.get(tx.txRef) : null;
     return {
       id: tx._id,
@@ -1264,15 +1276,169 @@ export const getAdminReports = asyncHandler(async (req, res) => {
     createdAt: wd.createdAt,
   });
 
+  // If type is 'all', return all types with pagination (for backward compatibility)
+  if (type === 'all') {
+    // Get all transactions with user info (with pagination)
+    const transactions = await WalletTransaction.find({
+      wallet: { $in: walletIds },
+    })
+      .populate("wallet", "type")
+      .populate("user", "userId name email")
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limitNum)
+      .lean();
+
+    // Group transactions by type
+    const roiTransactions = transactions.filter(
+      (tx) => (tx.wallet as any)?.type === WalletType.ROI
+    );
+    const binaryTransactions = transactions.filter(
+      (tx) => (tx.wallet as any)?.type === WalletType.BINARY
+    );
+    const referralTransactions = transactions.filter(
+      (tx) => (tx.wallet as any)?.type === WalletType.REFERRAL
+    );
+    const investmentTransactions = transactions.filter(
+      (tx) => (tx.wallet as any)?.type === WalletType.INVESTMENT
+    );
+
+    // Get investments for investment transactions
+    const investmentIds = investmentTransactions
+      .map((tx) => tx.txRef)
+      .filter((id): id is string => !!id);
+    
+    const investments = await Investment.find({
+      _id: { $in: investmentIds.map((id) => new Types.ObjectId(id)) },
+    })
+      .populate("packageId", "packageName roi duration")
+      .lean();
+
+    const investmentMap = new Map();
+    investments.forEach((inv) => {
+      investmentMap.set(inv._id.toString(), inv);
+    });
+
+    // Get withdrawals with pagination
+    const totalWithdrawals = await Withdrawal.countDocuments({});
+    const withdrawals = await Withdrawal.find({})
+      .populate("user", "userId name email")
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limitNum)
+      .lean();
+
+    const totalTransactions = await WalletTransaction.countDocuments({
+      wallet: { $in: walletIds },
+    });
+
+    const response = res as any;
+    response.status(200).json({
+      status: "success",
+      data: {
+        roi: roiTransactions.map(formatTransaction),
+        binary: binaryTransactions.map(formatTransaction),
+        referral: referralTransactions.map(formatTransaction),
+        investment: investmentTransactions.map((tx) => formatInvestmentTransaction(tx, investmentMap)),
+        withdrawals: withdrawals.map(formatWithdrawal),
+        pagination: {
+          page: Number(page),
+          limit: limitNum,
+          total: totalTransactions,
+          pages: Math.ceil(totalTransactions / limitNum),
+        },
+      },
+    });
+    return;
+  }
+
+  // Handle individual type requests with pagination
+  let result: any[] = [];
+  let total = 0;
+
+  if (type === 'roi' || type === 'binary' || type === 'referral') {
+    const walletTypeMap: { [key: string]: WalletType } = {
+      roi: WalletType.ROI,
+      binary: WalletType.BINARY,
+      referral: WalletType.REFERRAL,
+    };
+
+    const targetWalletType = walletTypeMap[type as string];
+    const targetWallets = wallets.filter((w) => w.type === targetWalletType);
+    const targetWalletIds = targetWallets.map((w) => w._id);
+
+    total = await WalletTransaction.countDocuments({
+      wallet: { $in: targetWalletIds },
+    });
+
+    const transactions = await WalletTransaction.find({
+      wallet: { $in: targetWalletIds },
+    })
+      .populate("wallet", "type")
+      .populate("user", "userId name email")
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limitNum)
+      .lean();
+
+    result = transactions.map(formatTransaction);
+  } else if (type === 'investment') {
+    const investmentWallets = wallets.filter((w) => w.type === WalletType.INVESTMENT);
+    const investmentWalletIds = investmentWallets.map((w) => w._id);
+
+    total = await WalletTransaction.countDocuments({
+      wallet: { $in: investmentWalletIds },
+    });
+
+    const transactions = await WalletTransaction.find({
+      wallet: { $in: investmentWalletIds },
+    })
+      .populate("wallet", "type")
+      .populate("user", "userId name email")
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limitNum)
+      .lean();
+
+    const investmentIds = transactions
+      .map((tx) => tx.txRef)
+      .filter((id): id is string => !!id);
+    
+    const investments = await Investment.find({
+      _id: { $in: investmentIds.map((id) => new Types.ObjectId(id)) },
+    })
+      .populate("packageId", "packageName roi duration")
+      .lean();
+
+    const investmentMap = new Map();
+    investments.forEach((inv) => {
+      investmentMap.set(inv._id.toString(), inv);
+    });
+
+    result = transactions.map((tx) => formatInvestmentTransaction(tx, investmentMap));
+  } else if (type === 'withdrawal') {
+    total = await Withdrawal.countDocuments({});
+    const withdrawals = await Withdrawal.find({})
+      .populate("user", "userId name email")
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limitNum)
+      .lean();
+
+    result = withdrawals.map(formatWithdrawal);
+  }
+
   const response = res as any;
   response.status(200).json({
     status: "success",
     data: {
-      roi: roiTransactions.map(formatTransaction),
-      binary: binaryTransactions.map(formatTransaction),
-      referral: referralTransactions.map(formatTransaction),
-      investment: investmentTransactions.map(formatInvestmentTransaction),
-      withdrawals: withdrawals.map(formatWithdrawal),
+      transactions: result,
+      pagination: {
+        page: Number(page),
+        limit: limitNum,
+        total,
+        pages: Math.ceil(total / limitNum),
+      },
     },
   });
 });

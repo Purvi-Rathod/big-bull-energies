@@ -285,37 +285,37 @@ export default function PackagesPage() {
           </div>
 
           <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
+            <table className="w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[130px]">
                     Package Name
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[130px]">
                     Min/Max Amount
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[90px]">
                     Duration
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[80px]">
                     ROI %
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Binary Bonus %
+                  <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[100px]">
+                    Binary %
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[90px]">
                     Referral %
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[110px]">
                     Capping Limit
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Principle Return %
+                  <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[110px]">
+                    Principle %
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[80px]">
                     Status
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[100px]">
                     Actions
                   </th>
                 </tr>
@@ -360,39 +360,55 @@ export default function PackagesPage() {
 
                     return (
                       <tr key={pkg._id || pkg.id} className="hover:bg-gray-50">
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                          {pkg.packageName}
+                        <td className="px-3 py-3">
+                          <div className="text-xs font-medium text-gray-900 truncate max-w-[130px]" title={pkg.packageName}>
+                            {pkg.packageName}
+                          </div>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                          ${formatAmount(minAmt)} - ${formatAmount(maxAmt)}
+                        <td className="px-3 py-3">
+                          <div className="text-xs text-gray-500">
+                            ${formatAmount(minAmt)} - ${formatAmount(maxAmt)}
+                          </div>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                          {pkg.duration} days
+                        <td className="px-3 py-3">
+                          <div className="text-xs text-gray-500">
+                            {pkg.duration} days
+                          </div>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                          {roiValue !== null && roiValue !== undefined && typeof roiValue === 'number' 
-                            ? `${roiValue.toFixed(2)}%` 
-                            : '-'}
+                        <td className="px-3 py-3">
+                          <div className="text-xs text-gray-500">
+                            {roiValue !== null && roiValue !== undefined && typeof roiValue === 'number' 
+                              ? `${roiValue.toFixed(2)}%` 
+                              : '-'}
+                          </div>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                          {binaryValue !== null && binaryValue !== undefined && typeof binaryValue === 'number'
-                            ? `${binaryValue.toFixed(2)}%`
-                            : '-'}
+                        <td className="px-3 py-3">
+                          <div className="text-xs text-gray-500">
+                            {binaryValue !== null && binaryValue !== undefined && typeof binaryValue === 'number'
+                              ? `${binaryValue.toFixed(2)}%`
+                              : '-'}
+                          </div>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                          {referralValue !== null && referralValue !== undefined && typeof referralValue === 'number'
-                            ? `${referralValue.toFixed(2)}%`
-                            : '-'}
+                        <td className="px-3 py-3">
+                          <div className="text-xs text-gray-500">
+                            {referralValue !== null && referralValue !== undefined && typeof referralValue === 'number'
+                              ? `${referralValue.toFixed(2)}%`
+                              : '-'}
+                          </div>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                          ${formatAmount(capLimit)}
+                        <td className="px-3 py-3">
+                          <div className="text-xs text-gray-500">
+                            ${formatAmount(capLimit)}
+                          </div>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                          {principleValue !== null && principleValue !== undefined && typeof principleValue === 'number'
-                            ? `${principleValue.toFixed(2)}%`
-                            : '-'}
+                        <td className="px-3 py-3">
+                          <div className="text-xs text-gray-500">
+                            {principleValue !== null && principleValue !== undefined && typeof principleValue === 'number'
+                              ? `${principleValue.toFixed(2)}%`
+                              : '-'}
+                          </div>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
+                        <td className="px-3 py-3">
                           <span
                             className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
                               pkg.status === 'Active'
@@ -403,19 +419,21 @@ export default function PackagesPage() {
                             {pkg.status}
                           </span>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
-                          <button
-                            onClick={() => handleOpenModal(pkg)}
-                            className="text-indigo-600 hover:text-indigo-900 transition-colors"
-                          >
-                            Edit
-                          </button>
-                          <button
-                            onClick={() => handleDelete(pkg._id || pkg.id!)}
-                            className="text-red-600 hover:text-red-900 transition-colors"
-                          >
-                            Delete
-                          </button>
+                        <td className="px-3 py-3 text-xs font-medium">
+                          <div className="flex gap-2">
+                            <button
+                              onClick={() => handleOpenModal(pkg)}
+                              className="text-indigo-600 hover:text-indigo-900 transition-colors"
+                            >
+                              Edit
+                            </button>
+                            <button
+                              onClick={() => handleDelete(pkg._id || pkg.id!)}
+                              className="text-red-600 hover:text-red-900 transition-colors"
+                            >
+                              Delete
+                            </button>
+                          </div>
                         </td>
                       </tr>
                     );

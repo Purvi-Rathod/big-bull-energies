@@ -12,6 +12,7 @@ import {
   getAllWithdrawals,
   approveWithdrawal,
   rejectWithdrawal,
+  updateUserStatus,
   deleteUser,
   flushAllInvestments,
   getNOWPaymentsStatus,
@@ -77,6 +78,7 @@ router.post("/trigger-daily-calculations", requireAdminAuth, triggerDailyCalcula
 // User management (admin only)
 router.get("/users", requireAdminAuth, getAllUsers);
 router.post("/impersonate/:userId", requireAdminAuth, impersonateUser);
+router.put("/users/:userId/status", requireAdminAuth, updateUserStatus);
 router.delete("/users/:userId", requireAdminAuth, deleteUser);
 
 // Admin statistics

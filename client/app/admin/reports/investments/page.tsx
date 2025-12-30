@@ -114,24 +114,24 @@ export default function InvestmentsReportPage() {
             <div className="bg-white rounded-lg shadow p-6 mb-6">
               <h3 className="text-lg font-semibold text-gray-900 mb-4">Package Statistics</h3>
               <div className="overflow-x-auto">
-                <table className="min-w-full divide-y divide-gray-200">
+                <table className="w-full divide-y divide-gray-200">
                   <thead className="bg-gray-50">
                     <tr>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Package Name</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Count</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Total Amount</th>
+                      <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase">Package Name</th>
+                      <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase">Count</th>
+                      <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase">Total Amount</th>
                     </tr>
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
                     {report.packageStats.map((pkg: any, idx: number) => (
                       <tr key={idx}>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                        <td className="px-3 py-3 text-xs font-medium text-gray-900">
                           {pkg.packageName}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        <td className="px-3 py-3 text-xs text-gray-500">
                           {pkg.count}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                        <td className="px-3 py-3 text-xs font-medium text-gray-900">
                           ${pkg.totalAmount.toFixed(2)}
                         </td>
                       </tr>
@@ -156,17 +156,17 @@ export default function InvestmentsReportPage() {
               )}
             </div>
             <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200">
+              <table className="w-full divide-y divide-gray-200">
                 <thead className="bg-gray-50">
                   <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">User ID</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">User Name</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Package</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Amount</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Type</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">ROI Earned</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                    <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
+                    <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase">User ID</th>
+                    <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase">User Name</th>
+                    <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase">Package</th>
+                    <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase">Amount</th>
+                    <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase">Type</th>
+                    <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase">ROI Earned</th>
+                    <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
@@ -179,28 +179,28 @@ export default function InvestmentsReportPage() {
                   ) : (
                     report.investments.map((inv: any) => (
                       <tr key={inv.id}>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        <td className="px-3 py-3 text-xs text-gray-500">
                           {new Date(inv.createdAt).toLocaleString()}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-mono text-gray-600">
+                        <td className="px-3 py-3 text-xs font-mono text-gray-600">
                           {inv.userId}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        <td className="px-3 py-3 text-xs text-gray-900">
                           {inv.userName}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        <td className="px-3 py-3 text-xs text-gray-500">
                           {inv.packageName}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                        <td className="px-3 py-3 text-xs font-medium text-gray-900">
                           ${inv.investedAmount.toFixed(2)}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 capitalize">
+                        <td className="px-3 py-3 text-xs text-gray-500 capitalize">
                           {inv.type}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-purple-600">
+                        <td className="px-3 py-3 text-xs font-medium text-purple-600">
                           ${inv.totalRoiEarned.toFixed(2)}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm">
+                        <td className="px-3 py-3 text-xs">
                           <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
                             inv.isActive ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
                           }`}>

@@ -459,6 +459,13 @@ class ApiClient {
     return response;
   }
 
+  async updateUserStatus(userId: string, status: 'active' | 'inactive' | 'suspended' | 'blocked' | 'suspected') {
+    return this.request<{ userId: string; name: string; email: string; status: string }>(`/admin/users/${userId}/status`, {
+      method: 'PUT',
+      body: JSON.stringify({ status }),
+    });
+  }
+
   async deleteUser(userId: string) {
     return this.request<{ deletedUserId: string; deletedUserName: string }>(`/admin/users/${userId}`, {
       method: 'DELETE',
@@ -516,14 +523,27 @@ class ApiClient {
     });
   }
 
-  async getAdminReports() {
+  async getAdminReports(params?: { type?: string; page?: number; limit?: number }) {
+    const queryParams = new URLSearchParams();
+    if (params?.type) queryParams.append('type', params.type);
+    if (params?.page) queryParams.append('page', params.page.toString());
+    if (params?.limit) queryParams.append('limit', params.limit.toString());
+    
+    const query = queryParams.toString();
     return this.request<{
-      roi: any[];
-      binary: any[];
-      referral: any[];
-      investment: any[];
-      withdrawals: any[];
-    }>('/admin/reports', {
+      roi?: any[];
+      binary?: any[];
+      referral?: any[];
+      investment?: any[];
+      withdrawals?: any[];
+      transactions?: any[];
+      pagination?: {
+        page: number;
+        limit: number;
+        total: number;
+        pages: number;
+      };
+    }>(`/admin/reports${query ? `?${query}` : ''}`, {
       method: 'GET',
     });
   }

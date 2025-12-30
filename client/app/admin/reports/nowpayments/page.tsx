@@ -127,19 +127,19 @@ export default function NOWPaymentsReportPage() {
               )}
             </div>
             <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200">
+              <table className="w-full divide-y divide-gray-200">
                 <thead className="bg-gray-50">
                   <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">User ID</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">User Name</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Package</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Order ID</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Payment ID</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Amount</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Pay Address</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actually Paid</th>
+                    <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase w-[140px]">Date</th>
+                    <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase w-[130px]">User ID</th>
+                    <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase w-[120px]">User Name</th>
+                    <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase w-[110px]">Package</th>
+                    <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase w-[120px]">Order ID</th>
+                    <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase w-[120px]">Payment ID</th>
+                    <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase w-[100px]">Amount</th>
+                    <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase w-[90px]">Status</th>
+                    <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase w-[150px]">Pay Address</th>
+                    <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase w-[110px]">Actually Paid</th>
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
@@ -152,28 +152,28 @@ export default function NOWPaymentsReportPage() {
                   ) : (
                     report.payments.map((p: any) => (
                       <tr key={p.id}>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                          {new Date(p.createdAt).toLocaleString()}
+                        <td className="px-3 py-3">
+                          <div className="text-xs text-gray-500">{new Date(p.createdAt).toLocaleString()}</div>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-mono text-gray-600">
-                          {p.userId}
+                        <td className="px-3 py-3">
+                          <div className="text-xs font-mono text-gray-600 truncate max-w-[130px]" title={p.userId}>{p.userId}</div>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                          {p.userName}
+                        <td className="px-3 py-3">
+                          <div className="text-xs text-gray-900 truncate max-w-[120px]" title={p.userName}>{p.userName}</div>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                          {p.packageName}
+                        <td className="px-3 py-3">
+                          <div className="text-xs text-gray-500 truncate max-w-[110px]" title={p.packageName}>{p.packageName}</div>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-mono text-gray-600">
-                          {p.orderId}
+                        <td className="px-3 py-3">
+                          <div className="text-xs font-mono text-gray-600 truncate max-w-[120px]" title={p.orderId}>{p.orderId}</div>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-mono text-gray-600">
-                          {p.paymentId}
+                        <td className="px-3 py-3">
+                          <div className="text-xs font-mono text-gray-600 truncate max-w-[120px]" title={p.paymentId}>{p.paymentId}</div>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                          ${p.amount.toFixed(2)} {p.currency}
+                        <td className="px-3 py-3">
+                          <div className="text-xs font-medium text-gray-900">${p.amount.toFixed(2)} {p.currency}</div>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm">
+                        <td className="px-3 py-3">
                           <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
                             p.status === 'completed' ? 'bg-green-100 text-green-800' :
                             p.status === 'pending' || p.status === 'processing' ? 'bg-yellow-100 text-yellow-800' :
@@ -182,11 +182,11 @@ export default function NOWPaymentsReportPage() {
                             {p.status}
                           </span>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-mono text-gray-500">
-                          {p.payAddress || 'N/A'}
+                        <td className="px-3 py-3">
+                          <div className="text-xs font-mono text-gray-500 truncate max-w-[150px]" title={p.payAddress || 'N/A'}>{p.payAddress || 'N/A'}</div>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                          {p.actuallyPaid ? `$${p.actuallyPaid.toFixed(2)}` : 'N/A'}
+                        <td className="px-3 py-3">
+                          <div className="text-xs font-medium text-gray-900">{p.actuallyPaid ? `$${p.actuallyPaid.toFixed(2)}` : 'N/A'}</div>
                         </td>
                       </tr>
                     ))

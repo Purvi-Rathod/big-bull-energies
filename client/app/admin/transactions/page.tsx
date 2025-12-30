@@ -46,6 +46,13 @@ interface Withdrawal {
   createdAt: string;
 }
 
+interface Pagination {
+  page: number;
+  limit: number;
+  total: number;
+  pages: number;
+}
+
 export default function AllTransactionsPage() {
   const { admin } = useAuth();
   const { confirm } = useConfirm();
@@ -58,33 +65,69 @@ export default function AllTransactionsPage() {
   const [error, setError] = useState('');
   const [activeTab, setActiveTab] = useState<'roi' | 'binary' | 'referral' | 'investment' | 'withdrawal'>('roi');
   const [flushing, setFlushing] = useState(false);
-  const hasFetchedRef = useRef(false);
+  
+  // Pagination state
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(50);
+  const [pagination, setPagination] = useState<Pagination>({ page: 1, limit: 50, total: 0, pages: 0 });
 
-  useEffect(() => {
-    if (hasFetchedRef.current) {
-      return;
-    }
-    hasFetchedRef.current = true;
-    
-    fetchReports();
-  }, []);
-
-  const fetchReports = async () => {
+  // Fetch transactions for the active tab with pagination
+  const fetchTransactions = async (tab: string, pageNum: number, limitNum: number) => {
     try {
       setLoading(true);
-      const response = await api.getAdminReports();
+      setError('');
+      const response = await api.getAdminReports({ type: tab, page: pageNum, limit: limitNum });
+      
       if (response.data) {
-        setRoiTransactions(response.data.roi || []);
-        setBinaryTransactions(response.data.binary || []);
-        setReferralTransactions(response.data.referral || []);
-        setInvestmentTransactions(response.data.investment || []);
-        setWithdrawals(response.data.withdrawals || []);
+        if (response.data.transactions) {
+          // Single type response with pagination
+          switch (tab) {
+            case 'roi':
+              setRoiTransactions(response.data.transactions);
+              break;
+            case 'binary':
+              setBinaryTransactions(response.data.transactions);
+              break;
+            case 'referral':
+              setReferralTransactions(response.data.transactions);
+              break;
+            case 'investment':
+              setInvestmentTransactions(response.data.transactions);
+              break;
+            case 'withdrawal':
+              setWithdrawals(response.data.transactions);
+              break;
+          }
+          
+          if (response.data.pagination) {
+            setPagination(response.data.pagination);
+          }
+        } else {
+          // Fallback: all types response (backward compatibility)
+          setRoiTransactions(response.data.roi || []);
+          setBinaryTransactions(response.data.binary || []);
+          setReferralTransactions(response.data.referral || []);
+          setInvestmentTransactions(response.data.investment || []);
+          setWithdrawals(response.data.withdrawals || []);
+        }
       }
     } catch (err: any) {
-      setError(err.message || 'Failed to load reports');
+      setError(err.message || 'Failed to load transactions');
+      console.error('Error fetching transactions:', err);
     } finally {
       setLoading(false);
     }
+  };
+
+  // Fetch reports on mount and when tab/page/limit changes
+  useEffect(() => {
+    fetchTransactions(activeTab, page, limit);
+  }, [activeTab, page, limit]);
+
+  // Reset to page 1 when tab changes
+  const handleTabChange = (tab: 'roi' | 'binary' | 'referral' | 'investment' | 'withdrawal') => {
+    setActiveTab(tab);
+    setPage(1);
   };
 
   const handleFlush = async () => {
@@ -103,7 +146,7 @@ export default function AllTransactionsPage() {
       await api.flushAllInvestments();
       toast.success('All transactions and NOWPayments history flushed successfully!');
       // Refresh the data
-      await fetchReports();
+      await fetchTransactions(activeTab, page, limit);
     } catch (err: any) {
       toast.error(err.message || 'Failed to flush transactions');
     } finally {
@@ -193,32 +236,68 @@ export default function AllTransactionsPage() {
     );
   };
 
+  const getCurrentTransactions = () => {
+    switch (activeTab) {
+      case 'roi':
+        return roiTransactions;
+      case 'binary':
+        return binaryTransactions;
+      case 'referral':
+        return referralTransactions;
+      case 'investment':
+        return investmentTransactions;
+      case 'withdrawal':
+        return withdrawals;
+      default:
+        return [];
+    }
+  };
+
   const renderTransactionTable = (transactions: Transaction[], title: string) => (
     <div className="bg-white rounded-lg shadow overflow-hidden">
       <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
         <h3 className="text-lg font-semibold text-gray-900">{title}</h3>
-        {transactions.length > 0 && (
-          <button
-            onClick={() => exportTransactions(transactions, title)}
-            className="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-          >
-            Export CSV
-          </button>
-        )}
+        <div className="flex items-center gap-4">
+          {/* Items per page selector */}
+          <div className="flex items-center gap-2">
+            <label className="text-sm text-gray-600">Show:</label>
+            <select
+              value={limit}
+              onChange={(e) => {
+                setLimit(Number(e.target.value));
+                setPage(1);
+              }}
+              className="px-3 py-1.5 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            >
+              <option value={25}>25</option>
+              <option value={50}>50</option>
+              <option value={100}>100</option>
+              <option value={200}>200</option>
+            </select>
+          </div>
+          {transactions.length > 0 && (
+            <button
+              onClick={() => exportTransactions(transactions, title)}
+              className="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            >
+              Export CSV
+            </button>
+          )}
+        </div>
       </div>
       <div className="overflow-x-auto">
-        <table className="min-w-full divide-y divide-gray-200">
+        <table className="w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">User ID</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">User Name</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">User Email</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Type</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Amount</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Balance Before</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Balance After</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+              <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase w-[140px]">Date</th>
+              <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase w-[130px]">User ID</th>
+              <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase w-[120px]">User Name</th>
+              <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase w-[160px]">User Email</th>
+              <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase w-[90px]">Type</th>
+              <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase w-[100px]">Amount</th>
+              <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase w-[110px]">Balance Before</th>
+              <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase w-[110px]">Balance After</th>
+              <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase w-[90px]">Status</th>
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
@@ -231,35 +310,35 @@ export default function AllTransactionsPage() {
             ) : (
               transactions.map((tx) => (
                 <tr key={tx.id}>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {new Date(tx.createdAt).toLocaleString()}
+                  <td className="px-3 py-3">
+                    <div className="text-xs text-gray-500">{new Date(tx.createdAt).toLocaleString()}</div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-mono text-gray-600">
-                    {tx.userId}
+                  <td className="px-3 py-3">
+                    <div className="text-xs font-mono text-gray-600 truncate max-w-[130px]" title={tx.userId}>{tx.userId}</div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {tx.userName}
+                  <td className="px-3 py-3">
+                    <div className="text-xs text-gray-900 truncate max-w-[120px]" title={tx.userName}>{tx.userName}</div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {tx.userEmail}
+                  <td className="px-3 py-3">
+                    <div className="text-xs text-gray-500 truncate max-w-[160px]" title={tx.userEmail}>{tx.userEmail}</div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm">
+                  <td className="px-3 py-3">
                     <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
                       tx.type === 'credit' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
                     }`}>
                       {tx.type.toUpperCase()}
                     </span>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                    ${tx.amount.toFixed(2)}
+                  <td className="px-3 py-3">
+                    <div className="text-xs font-medium text-gray-900">${tx.amount.toFixed(2)}</div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    ${tx.balanceBefore.toFixed(2)}
+                  <td className="px-3 py-3">
+                    <div className="text-xs text-gray-500">${tx.balanceBefore.toFixed(2)}</div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    ${tx.balanceAfter.toFixed(2)}
+                  <td className="px-3 py-3">
+                    <div className="text-xs text-gray-500">${tx.balanceAfter.toFixed(2)}</div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm">
+                  <td className="px-3 py-3">
                     <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
                       tx.status === 'completed' ? 'bg-green-100 text-green-800' :
                       tx.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
@@ -274,6 +353,59 @@ export default function AllTransactionsPage() {
           </tbody>
         </table>
       </div>
+      
+      {/* Pagination */}
+      {pagination.pages > 1 && (
+        <div className="px-6 py-4 border-t border-gray-200 flex items-center justify-between">
+          <div className="text-sm text-gray-500">
+            Showing {((pagination.page - 1) * pagination.limit) + 1} to {Math.min(pagination.page * pagination.limit, pagination.total)} of {pagination.total} transactions
+          </div>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setPage((p) => Math.max(1, p - 1))}
+              disabled={page === 1 || loading}
+              className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              Previous
+            </button>
+            <div className="flex items-center gap-1">
+              {Array.from({ length: Math.min(5, pagination.pages) }, (_, i) => {
+                let pageNum: number;
+                if (pagination.pages <= 5) {
+                  pageNum = i + 1;
+                } else if (pagination.page <= 3) {
+                  pageNum = i + 1;
+                } else if (pagination.page >= pagination.pages - 2) {
+                  pageNum = pagination.pages - 4 + i;
+                } else {
+                  pageNum = pagination.page - 2 + i;
+                }
+                return (
+                  <button
+                    key={pageNum}
+                    onClick={() => setPage(pageNum)}
+                    disabled={loading}
+                    className={`px-3 py-2 text-sm font-medium rounded-md ${
+                      page === pageNum
+                        ? 'bg-indigo-600 text-white'
+                        : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
+                    } disabled:opacity-50 disabled:cursor-not-allowed`}
+                  >
+                    {pageNum}
+                  </button>
+                );
+              })}
+            </div>
+            <button
+              onClick={() => setPage((p) => Math.min(pagination.pages, p + 1))}
+              disabled={page === pagination.pages || loading}
+              className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              Next
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 
@@ -281,28 +413,47 @@ export default function AllTransactionsPage() {
     <div className="bg-white rounded-lg shadow overflow-hidden">
       <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
         <h3 className="text-lg font-semibold text-gray-900">Investment Transactions</h3>
-        {investmentTransactions.length > 0 && (
-          <button
-            onClick={() => exportInvestmentTransactions(investmentTransactions)}
-            className="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-          >
-            Export CSV
-          </button>
-        )}
+        <div className="flex items-center gap-4">
+          {/* Items per page selector */}
+          <div className="flex items-center gap-2">
+            <label className="text-sm text-gray-600">Show:</label>
+            <select
+              value={limit}
+              onChange={(e) => {
+                setLimit(Number(e.target.value));
+                setPage(1);
+              }}
+              className="px-3 py-1.5 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            >
+              <option value={25}>25</option>
+              <option value={50}>50</option>
+              <option value={100}>100</option>
+              <option value={200}>200</option>
+            </select>
+          </div>
+          {investmentTransactions.length > 0 && (
+            <button
+              onClick={() => exportInvestmentTransactions(investmentTransactions)}
+              className="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            >
+              Export CSV
+            </button>
+          )}
+        </div>
       </div>
       <div className="overflow-x-auto">
-        <table className="min-w-full divide-y divide-gray-200">
+        <table className="w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">User ID</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">User Name</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Type</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Amount</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Package</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">ROI</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Invested Amount</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+              <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase w-[140px]">Date</th>
+              <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase w-[130px]">User ID</th>
+              <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase w-[120px]">User Name</th>
+              <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase w-[90px]">Type</th>
+              <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase w-[100px]">Amount</th>
+              <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase w-[110px]">Package</th>
+              <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase w-[70px]">ROI</th>
+              <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase w-[110px]">Invested Amount</th>
+              <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase w-[90px]">Status</th>
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
@@ -315,35 +466,35 @@ export default function AllTransactionsPage() {
             ) : (
               investmentTransactions.map((tx) => (
                 <tr key={tx.id}>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {new Date(tx.createdAt).toLocaleString()}
+                  <td className="px-3 py-3">
+                    <div className="text-xs text-gray-500">{new Date(tx.createdAt).toLocaleString()}</div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-mono text-gray-600">
-                    {tx.userId}
+                  <td className="px-3 py-3">
+                    <div className="text-xs font-mono text-gray-600 truncate max-w-[130px]" title={tx.userId}>{tx.userId}</div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {tx.userName}
+                  <td className="px-3 py-3">
+                    <div className="text-xs text-gray-900 truncate max-w-[120px]" title={tx.userName}>{tx.userName}</div>
                   </td>
-                  <td className="px-6 py-3 whitespace-nowrap text-sm">
+                  <td className="px-3 py-3">
                     <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
                       tx.type === 'credit' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
                     }`}>
                       {tx.type.toUpperCase()}
                     </span>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                    ${tx.amount.toFixed(2)}
+                  <td className="px-3 py-3">
+                    <div className="text-xs font-medium text-gray-900">${tx.amount.toFixed(2)}</div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {tx.investment?.packageName || 'N/A'}
+                  <td className="px-3 py-3">
+                    <div className="text-xs text-gray-500 truncate max-w-[110px]" title={tx.investment?.packageName || 'N/A'}>{tx.investment?.packageName || 'N/A'}</div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {tx.investment?.roi || 0}%
+                  <td className="px-3 py-3">
+                    <div className="text-xs text-gray-500">{tx.investment?.roi || 0}%</div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                    ${tx.investment?.investedAmount.toFixed(2) || '0.00'}
+                  <td className="px-3 py-3">
+                    <div className="text-xs font-medium text-gray-900">${tx.investment?.investedAmount.toFixed(2) || '0.00'}</div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm">
+                  <td className="px-3 py-3">
                     <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
                       tx.status === 'completed' ? 'bg-green-100 text-green-800' :
                       tx.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
@@ -358,6 +509,59 @@ export default function AllTransactionsPage() {
           </tbody>
         </table>
       </div>
+      
+      {/* Pagination */}
+      {pagination.pages > 1 && (
+        <div className="px-6 py-4 border-t border-gray-200 flex items-center justify-between">
+          <div className="text-sm text-gray-500">
+            Showing {((pagination.page - 1) * pagination.limit) + 1} to {Math.min(pagination.page * pagination.limit, pagination.total)} of {pagination.total} transactions
+          </div>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setPage((p) => Math.max(1, p - 1))}
+              disabled={page === 1 || loading}
+              className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              Previous
+            </button>
+            <div className="flex items-center gap-1">
+              {Array.from({ length: Math.min(5, pagination.pages) }, (_, i) => {
+                let pageNum: number;
+                if (pagination.pages <= 5) {
+                  pageNum = i + 1;
+                } else if (pagination.page <= 3) {
+                  pageNum = i + 1;
+                } else if (pagination.page >= pagination.pages - 2) {
+                  pageNum = pagination.pages - 4 + i;
+                } else {
+                  pageNum = pagination.page - 2 + i;
+                }
+                return (
+                  <button
+                    key={pageNum}
+                    onClick={() => setPage(pageNum)}
+                    disabled={loading}
+                    className={`px-3 py-2 text-sm font-medium rounded-md ${
+                      page === pageNum
+                        ? 'bg-indigo-600 text-white'
+                        : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
+                    } disabled:opacity-50 disabled:cursor-not-allowed`}
+                  >
+                    {pageNum}
+                  </button>
+                );
+              })}
+            </div>
+            <button
+              onClick={() => setPage((p) => Math.min(pagination.pages, p + 1))}
+              disabled={page === pagination.pages || loading}
+              className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              Next
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 
@@ -365,29 +569,48 @@ export default function AllTransactionsPage() {
     <div className="bg-white rounded-lg shadow overflow-hidden">
       <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
         <h3 className="text-lg font-semibold text-gray-900">Withdrawal History</h3>
-        {withdrawals.length > 0 && (
-          <button
-            onClick={() => exportWithdrawals(withdrawals)}
-            className="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-          >
-            Export CSV
-          </button>
-        )}
+        <div className="flex items-center gap-4">
+          {/* Items per page selector */}
+          <div className="flex items-center gap-2">
+            <label className="text-sm text-gray-600">Show:</label>
+            <select
+              value={limit}
+              onChange={(e) => {
+                setLimit(Number(e.target.value));
+                setPage(1);
+              }}
+              className="px-3 py-1.5 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            >
+              <option value={25}>25</option>
+              <option value={50}>50</option>
+              <option value={100}>100</option>
+              <option value={200}>200</option>
+            </select>
+          </div>
+          {withdrawals.length > 0 && (
+            <button
+              onClick={() => exportWithdrawals(withdrawals)}
+              className="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            >
+              Export CSV
+            </button>
+          )}
+        </div>
       </div>
       <div className="overflow-x-auto">
-        <table className="min-w-full divide-y divide-gray-200">
+        <table className="w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">User ID</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">User Name</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Withdrawal ID</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Amount</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Charges</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Final Amount</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Wallet Type</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Method</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+              <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase w-[140px]">Date</th>
+              <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase w-[130px]">User ID</th>
+              <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase w-[120px]">User Name</th>
+              <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase w-[120px]">Withdrawal ID</th>
+              <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase w-[100px]">Amount</th>
+              <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase w-[90px]">Charges</th>
+              <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase w-[110px]">Final Amount</th>
+              <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase w-[100px]">Wallet Type</th>
+              <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase w-[90px]">Method</th>
+              <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase w-[90px]">Status</th>
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
@@ -400,34 +623,34 @@ export default function AllTransactionsPage() {
             ) : (
               withdrawals.map((wd) => (
                 <tr key={wd.id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {new Date(wd.createdAt).toLocaleString()}
+                  <td className="px-3 py-3">
+                    <div className="text-xs text-gray-500">{new Date(wd.createdAt).toLocaleString()}</div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-mono text-gray-600">
-                    {wd.userId}
+                  <td className="px-3 py-3">
+                    <div className="text-xs font-mono text-gray-600 truncate max-w-[130px]" title={wd.userId}>{wd.userId}</div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {wd.userName}
+                  <td className="px-3 py-3">
+                    <div className="text-xs text-gray-900 truncate max-w-[120px]" title={wd.userName}>{wd.userName}</div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-mono text-gray-600">
-                    {wd.withdrawalId || wd.id.substring(0, 8)}
+                  <td className="px-3 py-3">
+                    <div className="text-xs font-mono text-gray-600 truncate max-w-[120px]" title={wd.withdrawalId || wd.id.substring(0, 8)}>{wd.withdrawalId || wd.id.substring(0, 8)}</div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                    ${wd.amount.toFixed(2)}
+                  <td className="px-3 py-3">
+                    <div className="text-xs font-medium text-gray-900">${wd.amount.toFixed(2)}</div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    ${wd.charges.toFixed(2)}
+                  <td className="px-3 py-3">
+                    <div className="text-xs text-gray-500">${wd.charges.toFixed(2)}</div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-green-600">
-                    ${wd.finalAmount.toFixed(2)}
+                  <td className="px-3 py-3">
+                    <div className="text-xs font-medium text-green-600">${wd.finalAmount.toFixed(2)}</div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 capitalize">
-                    {wd.walletType}
+                  <td className="px-3 py-3">
+                    <div className="text-xs text-gray-500 capitalize">{wd.walletType}</div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 capitalize">
-                    {wd.method || 'crypto'}
+                  <td className="px-3 py-3">
+                    <div className="text-xs text-gray-500 capitalize">{wd.method || 'crypto'}</div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm">
+                  <td className="px-3 py-3">
                     <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
                       wd.status === 'approved' ? 'bg-green-100 text-green-800' :
                       wd.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
@@ -442,6 +665,59 @@ export default function AllTransactionsPage() {
           </tbody>
         </table>
       </div>
+      
+      {/* Pagination */}
+      {pagination.pages > 1 && (
+        <div className="px-6 py-4 border-t border-gray-200 flex items-center justify-between">
+          <div className="text-sm text-gray-500">
+            Showing {((pagination.page - 1) * pagination.limit) + 1} to {Math.min(pagination.page * pagination.limit, pagination.total)} of {pagination.total} withdrawals
+          </div>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setPage((p) => Math.max(1, p - 1))}
+              disabled={page === 1 || loading}
+              className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              Previous
+            </button>
+            <div className="flex items-center gap-1">
+              {Array.from({ length: Math.min(5, pagination.pages) }, (_, i) => {
+                let pageNum: number;
+                if (pagination.pages <= 5) {
+                  pageNum = i + 1;
+                } else if (pagination.page <= 3) {
+                  pageNum = i + 1;
+                } else if (pagination.page >= pagination.pages - 2) {
+                  pageNum = pagination.pages - 4 + i;
+                } else {
+                  pageNum = pagination.page - 2 + i;
+                }
+                return (
+                  <button
+                    key={pageNum}
+                    onClick={() => setPage(pageNum)}
+                    disabled={loading}
+                    className={`px-3 py-2 text-sm font-medium rounded-md ${
+                      page === pageNum
+                        ? 'bg-indigo-600 text-white'
+                        : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
+                    } disabled:opacity-50 disabled:cursor-not-allowed`}
+                  >
+                    {pageNum}
+                  </button>
+                );
+              })}
+            </div>
+            <button
+              onClick={() => setPage((p) => Math.min(pagination.pages, p + 1))}
+              disabled={page === pagination.pages || loading}
+              className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              Next
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 
@@ -485,18 +761,18 @@ export default function AllTransactionsPage() {
               {(['roi', 'binary', 'referral', 'investment', 'withdrawal'] as const).map((tab) => (
                 <button
                   key={tab}
-                  onClick={() => setActiveTab(tab)}
+                  onClick={() => handleTabChange(tab)}
                   className={`${
                     activeTab === tab
                       ? 'border-indigo-500 text-indigo-600'
                       : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                   } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm capitalize`}
                 >
-                  {tab} {tab === 'roi' && `(${roiTransactions.length})`}
-                  {tab === 'binary' && `(${binaryTransactions.length})`}
-                  {tab === 'referral' && `(${referralTransactions.length})`}
-                  {tab === 'investment' && `(${investmentTransactions.length})`}
-                  {tab === 'withdrawal' && `(${withdrawals.length})`}
+                  {tab} {tab === 'roi' && `(${pagination.total || roiTransactions.length})`}
+                  {tab === 'binary' && `(${pagination.total || binaryTransactions.length})`}
+                  {tab === 'referral' && `(${pagination.total || referralTransactions.length})`}
+                  {tab === 'investment' && `(${pagination.total || investmentTransactions.length})`}
+                  {tab === 'withdrawal' && `(${pagination.total || withdrawals.length})`}
                 </button>
               ))}
             </nav>

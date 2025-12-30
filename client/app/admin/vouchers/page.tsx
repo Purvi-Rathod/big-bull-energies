@@ -260,34 +260,34 @@ export default function AdminVouchersPage() {
       {/* Vouchers Table */}
       <div className="bg-white shadow rounded-lg overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
+          <table className="w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[140px]">
                   Voucher ID
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[140px]">
                   User
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[100px]">
                   Amount
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[120px]">
                   Investment Value
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[90px]">
                   Status
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[140px]">
                   Created At
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[140px]">
                   Expiry Date
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Duration (Days)
+                <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[100px]">
+                  Duration
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[140px]">
                   Used At
                 </th>
               </tr>
@@ -309,51 +309,53 @@ export default function AdminVouchersPage() {
                   
                   return (
                     <tr key={voucher.id} className="hover:bg-gray-50">
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm font-mono text-gray-900">{voucher.voucherId}</div>
+                      <td className="px-3 py-3">
+                        <div className="text-xs font-mono text-gray-900 truncate max-w-[140px]" title={voucher.voucherId}>{voucher.voucherId}</div>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
+                      <td className="px-3 py-3">
                         {voucher.user ? (
                           <div>
-                            <div className="text-sm font-medium text-gray-900">{voucher.user.name}</div>
-                            <div className="text-sm text-gray-500">{voucher.user.userId}</div>
-                            <div className="text-xs text-gray-400">{voucher.user.email}</div>
+                            <div className="text-xs font-medium text-gray-900 truncate max-w-[140px]" title={voucher.user.name}>{voucher.user.name}</div>
+                            <div className="text-xs text-gray-500 truncate max-w-[140px]" title={voucher.user.userId}>{voucher.user.userId}</div>
+                            <div className="text-xs text-gray-400 truncate max-w-[140px]" title={voucher.user.email}>{voucher.user.email}</div>
                           </div>
                         ) : (
-                          <span className="text-sm text-gray-400">N/A</span>
+                          <span className="text-xs text-gray-400">N/A</span>
                         )}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm font-medium text-gray-900">
+                      <td className="px-3 py-3">
+                        <div className="text-xs font-medium text-gray-900">
                           ${voucher.amount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                         </div>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm font-medium text-green-600">
+                      <td className="px-3 py-3">
+                        <div className="text-xs font-medium text-green-600">
                           ${voucher.investmentValue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                         </div>
                         <div className="text-xs text-gray-500">({voucher.multiplier}x)</div>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
+                      <td className="px-3 py-3">
                         <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusColor(voucher.status)}`}>
                           {voucher.status}
                           {isExpired(voucher.expiry) && voucher.status === 'active' && ' (Expired)'}
                         </span>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {formatDate(voucher.createdAt)}
+                      <td className="px-3 py-3">
+                        <div className="text-xs text-gray-500">{formatDate(voucher.createdAt)}</div>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {formatDate(voucher.expiry)}
+                      <td className="px-3 py-3">
+                        <div className="text-xs text-gray-500">{formatDate(voucher.expiry)}</div>
                         {isExpired(voucher.expiry) && (
-                          <span className="ml-2 text-xs text-red-600">(Expired)</span>
+                          <span className="text-xs text-red-600">(Expired)</span>
                         )}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {durationDays !== null ? `${durationDays} days` : 'N/A'}
+                      <td className="px-3 py-3">
+                        <div className="text-xs text-gray-500">
+                          {durationDays !== null ? `${durationDays} days` : 'N/A'}
+                        </div>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {formatDate(voucher.usedAt)}
+                      <td className="px-3 py-3">
+                        <div className="text-xs text-gray-500">{formatDate(voucher.usedAt)}</div>
                       </td>
                     </tr>
                   );

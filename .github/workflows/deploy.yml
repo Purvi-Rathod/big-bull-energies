@@ -216,13 +216,14 @@ jobs:
           ROLLBACK_MODE: ${{ github.event.inputs.rollback == 'true' }}
         run: |
           echo "📤 Copying deployment script to server..."
+          # Use deployer's home directory instead of /tmp for better permissions
           scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=~/.ssh/known_hosts \
-            /tmp/deploy.sh ${{ secrets.PROD_USER }}@${{ secrets.PROD_HOST }}:/tmp/deploy.sh
+            /tmp/deploy.sh ${{ secrets.PROD_USER }}@${{ secrets.PROD_HOST }}:~/deploy.sh
           
           echo "🚀 Executing zero-downtime deployment on server..."
           ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=~/.ssh/known_hosts \
             ${{ secrets.PROD_USER }}@${{ secrets.PROD_HOST }} \
-            "DEPLOY_PATH='${{ secrets.PROD_PATH }}' ROLLBACK_MODE='${{ github.event.inputs.rollback == 'true' }}' bash /tmp/deploy.sh"
+            "chmod +x ~/deploy.sh && DEPLOY_PATH='${{ secrets.PROD_PATH }}' ROLLBACK_MODE='${{ github.event.inputs.rollback == 'true' }}' bash ~/deploy.sh"
 
       - name: Verify deployment
         run: |

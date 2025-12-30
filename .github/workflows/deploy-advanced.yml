@@ -252,12 +252,12 @@ jobs:
         run: |
           echo "📤 Copying deployment script to server..."
           scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=~/.ssh/known_hosts \
-            /tmp/deploy-zero-downtime.sh ${{ secrets.PROD_USER }}@${{ secrets.PROD_HOST }}:/tmp/deploy-zero-downtime.sh
+            /tmp/deploy-zero-downtime.sh ${{ secrets.PROD_USER }}@${{ secrets.PROD_HOST }}:~/deploy-zero-downtime.sh
           
           echo "🚀 Executing zero-downtime deployment on server..."
           ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=~/.ssh/known_hosts \
             ${{ secrets.PROD_USER }}@${{ secrets.PROD_HOST }} \
-            "DEPLOY_PATH='${{ secrets.PROD_PATH }}' DEPLOY_VERSION='${{ steps.version.outputs.version }}' DEPLOY_TYPE='${{ steps.version.outputs.deploy_type }}' bash /tmp/deploy-zero-downtime.sh"
+            "chmod +x ~/deploy-zero-downtime.sh && DEPLOY_PATH='${{ secrets.PROD_PATH }}' DEPLOY_VERSION='${{ steps.version.outputs.version }}' DEPLOY_TYPE='${{ steps.version.outputs.deploy_type }}' bash ~/deploy-zero-downtime.sh"
 
       - name: Verify deployment
         run: |

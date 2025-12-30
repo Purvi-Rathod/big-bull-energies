@@ -136,11 +136,11 @@ jobs:
           RELEASE_VERSION: ${{ github.ref_name }}
         run: |
           scp -o StrictHostKeyChecking=no /tmp/deploy-release.sh \
-            ${{ secrets.PROD_USER }}@${{ secrets.PROD_HOST }}:/tmp/deploy-release.sh
+            ${{ secrets.PROD_USER }}@${{ secrets.PROD_HOST }}:~/deploy-release.sh
           
           ssh -o StrictHostKeyChecking=no \
             ${{ secrets.PROD_USER }}@${{ secrets.PROD_HOST }} \
-            "DEPLOY_PATH='${{ secrets.PROD_PATH }}' RELEASE_VERSION='${{ github.ref_name }}' bash /tmp/deploy-release.sh"
+            "chmod +x ~/deploy-release.sh && DEPLOY_PATH='${{ secrets.PROD_PATH }}' RELEASE_VERSION='${{ github.ref_name }}' bash ~/deploy-release.sh"
 
       - name: Announce deployment
         run: |

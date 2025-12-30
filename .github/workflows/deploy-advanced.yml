@@ -207,16 +207,25 @@ jobs:
           COMPOSE_BACKUP="${DEPLOY_PATH}/docker-compose.backup.yml"
           cp "${DEPLOY_PATH}/docker-compose.yml" "${COMPOSE_BACKUP}"
           
-          # Remove any stopped/exited containers with conflicting names
-          echo "🧹 Cleaning up stopped containers with conflicting names..."
-          # Remove stopped containers by name pattern
-          docker ps -a --filter "name=binary-system-backend" --filter "status=exited" --format "{{.ID}}" | xargs -r docker rm -f 2>/dev/null || true
-          docker ps -a --filter "name=binary-system-frontend" --filter "status=exited" --format "{{.ID}}" | xargs -r docker rm -f 2>/dev/null || true
-          # Also remove containers with ID prefixes in names (Docker Compose sometimes creates these)
-          docker ps -a --format "{{.Names}}" | grep -E "^[0-9a-f]{12}_binary-system" | xargs -r docker rm -f 2>/dev/null || true
+          # Clean up containers with conflicting names
+          echo "🧹 Cleaning up containers with conflicting names..."
           
-          # Start new containers
-          $DOCKER_COMPOSE up -d --force-recreate --no-deps backend frontend
+          # Remove stopped/exited containers
+          docker ps -a --filter "name=binary-system-backend" --filter "status=exited" -q | while read -r cid; do
+            [ -n "$cid" ] && docker rm -f "$cid" 2>/dev/null || true
+          done || true
+          
+          docker ps -a --filter "name=binary-system-frontend" --filter "status=exited" -q | while read -r cid; do
+            [ -n "$cid" ] && docker rm -f "$cid" 2>/dev/null || true
+          done || true
+          
+          # Remove containers with ID prefixes in names
+          docker ps -a --format "{{.Names}} {{.ID}}" 2>/dev/null | grep -E "[0-9a-f]{12}_binary-system" | awk '{print $2}' | while read -r cid; do
+            [ -n "$cid" ] && docker rm -f "$cid" 2>/dev/null || true
+          done || true
+          
+          # Start new containers with --remove-orphans to clean up conflicts
+          $DOCKER_COMPOSE up -d --force-recreate --remove-orphans backend frontend
           
           # Wait and check health of new containers
           echo "⏳ Waiting for new containers to start..."

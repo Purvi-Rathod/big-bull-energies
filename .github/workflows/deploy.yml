@@ -186,20 +186,29 @@ jobs:
           echo "🔨 Building new Docker images..."
           $DOCKER_COMPOSE build --no-cache
           
-          # 2. Remove any stopped/exited containers with conflicting names (for zero-downtime)
-          echo "🧹 Cleaning up stopped containers with conflicting names..."
-          # Remove stopped containers by name pattern
-          docker ps -a --filter "name=binary-system-backend" --filter "status=exited" --format "{{.ID}}" | xargs -r docker rm -f 2>/dev/null || true
-          docker ps -a --filter "name=binary-system-frontend" --filter "status=exited" --format "{{.ID}}" | xargs -r docker rm -f 2>/dev/null || true
-          # Also remove containers with ID prefixes in names (Docker Compose sometimes creates these)
-          docker ps -a --format "{{.Names}}" | grep -E "^[0-9a-f]{12}_binary-system" | xargs -r docker rm -f 2>/dev/null || true
+          # 2. Clean up containers with conflicting names before recreating
+          echo "🧹 Cleaning up containers with conflicting names..."
           
-          # 3. Use docker compose up with --no-deps and --force-recreate for zero-downtime
-          # This creates new containers. Old running containers will be stopped automatically.
-          echo "🚀 Starting new containers (zero-downtime)..."
+          # Remove stopped/exited containers first (these cause conflicts)
+          docker ps -a --filter "name=binary-system-backend" --filter "status=exited" -q | while read -r cid; do
+            [ -n "$cid" ] && docker rm -f "$cid" 2>/dev/null || true
+          done || true
+          
+          docker ps -a --filter "name=binary-system-frontend" --filter "status=exited" -q | while read -r cid; do
+            [ -n "$cid" ] && docker rm -f "$cid" 2>/dev/null || true
+          done || true
+          
+          # Remove containers with ID prefixes in names (Docker Compose legacy naming issue)
+          docker ps -a --format "{{.Names}} {{.ID}}" 2>/dev/null | grep -E "[0-9a-f]{12}_binary-system" | awk '{print $2}' | while read -r cid; do
+            [ -n "$cid" ] && docker rm -f "$cid" 2>/dev/null || true
+          done || true
+          
+          # 3. Use docker compose up with --remove-orphans to clean up and recreate
+          # This will stop running containers and recreate them (brief downtime)
+          echo "🚀 Starting new containers..."
           
           # Start backend first
-          $DOCKER_COMPOSE up -d --no-deps --force-recreate backend
+          $DOCKER_COMPOSE up -d --force-recreate --remove-orphans backend
           
           # Wait and check backend health
           echo "⏳ Waiting for backend to start..."
@@ -213,7 +222,7 @@ jobs:
           
           # Start frontend (depends on backend)
           echo "🚀 Starting frontend..."
-          $DOCKER_COMPOSE up -d --no-deps --force-recreate frontend
+          $DOCKER_COMPOSE up -d --force-recreate --remove-orphans frontend
           
           # Wait and check frontend health
           echo "⏳ Waiting for frontend to start..."
@@ -232,8 +241,12 @@ jobs:
           echo "🧹 Cleaning up old stopped containers..."
           docker container prune -f
           
-          # Also remove any containers with old IDs in their names
-          docker ps -a --format "{{.Names}} {{.ID}}" | grep -E "binary-system.*[0-9a-f]{12}" | awk '{print $1}' | xargs -r docker rm -f 2>/dev/null || true
+          # Final cleanup: remove any remaining containers with ID prefixes
+          docker ps -a --format "{{.Names}} {{.ID}}" 2>/dev/null | grep -E "[0-9a-f]{12}_binary-system" | awk '{print $2}' | while read -r cid; do
+            if [ -n "$cid" ]; then
+              docker rm -f "$cid" 2>/dev/null || true
+            fi
+          done || true
           
           # Show final status
           echo "📊 Final container status:"

@@ -1,30 +1,114 @@
-name: Deploy
+name: Deploy to Production
 
 on:
   push:
     branches: [ main ]
     tags:
       - 'v*'
+  workflow_dispatch: # Allow manual trigger
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v')
+    name: Deploy to Production Server
     
     steps:
-    - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Full history for git commands
 
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '20'
+      - name: Setup SSH
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.PROD_SSH_KEY }}
 
-    - name: Build Docker images
-      run: |
-        docker-compose build
+      - name: Add server to known hosts
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan -H ${{ secrets.PROD_HOST }} >> ~/.ssh/known_hosts
 
-    # Add deployment steps here based on your infrastructure
-    # Examples:
-    # - Deploy to server via SSH
-    # - Push to container registry
-    # - Deploy to cloud platform (AWS, GCP, Azure, etc.)
+      - name: Create deployment script
+        run: |
+          cat > /tmp/deploy.sh << 'DEPLOY_SCRIPT'
+          #!/bin/bash
+          set -e
+          
+          echo "🚀 Starting deployment..."
+          
+          # Navigate to application directory
+          cd $DEPLOY_PATH
+          
+          # Pull latest changes
+          echo "📥 Pulling latest changes from repository..."
+          git fetch origin
+          git reset --hard origin/main
+          
+          # Detect Docker Compose command
+          if command -v docker &> /dev/null && docker compose version &> /dev/null; then
+            DOCKER_COMPOSE="docker compose"
+            echo "✅ Using Docker Compose v2"
+          elif command -v docker-compose &> /dev/null; then
+            DOCKER_COMPOSE="docker-compose"
+            echo "⚠️  Using Docker Compose v1 (legacy)"
+          else
+            echo "❌ Docker Compose not found!"
+            exit 1
+          fi
+          
+          # Stop existing containers gracefully
+          echo "🛑 Stopping existing containers..."
+          $DOCKER_COMPOSE down || true
+          
+          # Build new images
+          echo "🔨 Building Docker images..."
+          $DOCKER_COMPOSE build --no-cache
+          
+          # Start containers
+          echo "🚀 Starting containers..."
+          $DOCKER_COMPOSE up -d
+          
+          # Wait for services to be ready
+          echo "⏳ Waiting for services to start..."
+          sleep 10
+          
+          # Check container status
+          echo "📊 Container Status:"
+          $DOCKER_COMPOSE ps
+          
+          # Health checks
+          echo "🏥 Running health checks..."
+          
+          # Backend health check
+          if curl -f http://localhost:8000/health &> /dev/null; then
+            echo "✅ Backend is healthy"
+          else
+            echo "⚠️  Backend health check failed (may still be starting)"
+          fi
+          
+          # Frontend health check
+          if curl -f http://localhost:3000 &> /dev/null; then
+            echo "✅ Frontend is responding"
+          else
+            echo "⚠️  Frontend health check failed (may still be starting)"
+          fi
+          
+          # Clean up old Docker images (optional - remove if you want to keep images)
+          echo "🧹 Cleaning up unused Docker resources..."
+          docker image prune -f || true
+          
+          echo "✅ Deployment complete!"
+          DEPLOY_SCRIPT
+          chmod +x /tmp/deploy.sh
+
+      - name: Deploy to server
+        run: |
+          scp /tmp/deploy.sh ${{ secrets.PROD_USER }}@${{ secrets.PROD_HOST }}:/tmp/deploy.sh
+          ssh ${{ secrets.PROD_USER }}@${{ secrets.PROD_HOST }} "DEPLOY_PATH='${{ secrets.PROD_PATH }}' bash /tmp/deploy.sh"
+
+      - name: Verify deployment
+        run: |
+          echo "✅ Deployment workflow completed successfully"
+          echo "🌐 Application should be accessible at:"
+          echo "   Frontend: http://${{ secrets.PROD_HOST }}:3000"
+          echo "   Backend:  http://${{ secrets.PROD_HOST }}:8000"

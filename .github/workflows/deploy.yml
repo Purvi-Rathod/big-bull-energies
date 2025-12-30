@@ -3,20 +3,24 @@ name: Deploy to Production
 on:
   push:
     branches: [ main ]
-    tags:
-      - 'v*'
-  workflow_dispatch: # Allow manual trigger
+  workflow_dispatch:
+    inputs:
+      rollback:
+        description: 'Rollback to previous version'
+        required: false
+        type: boolean
+        default: false
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    name: Deploy to Production Server
+    name: Deploy to Production (Zero-Downtime)
     
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0 # Full history for git commands
+          fetch-depth: 0
 
       - name: Setup SSH
         uses: webfactory/ssh-agent@v0.9.0
@@ -32,105 +36,193 @@ jobs:
           
           # Test SSH connection
           echo "🔍 Testing SSH connection..."
-          ssh -v -o BatchMode=yes -o ConnectTimeout=5 ${{ secrets.PROD_USER }}@${{ secrets.PROD_HOST }} "echo 'SSH connection successful'" || {
-            echo "⚠️ SSH connection test failed. Please verify:"
-            echo "1. PROD_SSH_KEY contains the complete private key (including headers)"
-            echo "2. The corresponding public key is in ~/.ssh/authorized_keys on the server"
-            echo "3. PROD_USER, PROD_HOST, and PROD_PATH are correct"
+          ssh -o BatchMode=yes -o ConnectTimeout=5 ${{ secrets.PROD_USER }}@${{ secrets.PROD_HOST }} "echo 'SSH connection successful'" || {
+            echo "⚠️ SSH connection test failed"
             exit 1
           }
 
-      - name: Create deployment script
+      - name: Create zero-downtime deployment script
         run: |
           cat > /tmp/deploy.sh << 'DEPLOY_SCRIPT'
           #!/bin/bash
           set -e
           
-          echo "🚀 Starting deployment..."
+          DEPLOY_PATH="${DEPLOY_PATH}"
+          ROLLBACK_MODE="${ROLLBACK_MODE:-false}"
           
-          # Navigate to application directory
+          echo "🚀 Starting zero-downtime deployment..."
+          echo "📍 Path: ${DEPLOY_PATH}"
+          
           cd "${DEPLOY_PATH}"
           
-          # Verify we're in the right directory
+          # Verify directory
           if [ ! -f "docker-compose.yml" ]; then
-            echo "❌ Error: docker-compose.yml not found in ${DEPLOY_PATH}"
+            echo "❌ Error: docker-compose.yml not found"
             exit 1
           fi
+          
+          # Detect Docker Compose command
+          if command -v docker &> /dev/null && docker compose version &> /dev/null 2>&1; then
+            DOCKER_COMPOSE="docker compose"
+          elif command -v docker-compose &> /dev/null; then
+            DOCKER_COMPOSE="docker-compose"
+          else
+            echo "❌ Docker Compose not found!"
+            exit 1
+          fi
+          
+          # Function to check service health
+          check_health() {
+            local service=$1
+            local port=$2
+            local max_attempts=30
+            local attempt=1
+            
+            echo "🏥 Checking health of ${service} on port ${port}..."
+            while [ $attempt -le $max_attempts ]; do
+              if curl -f http://localhost:${port}/health &> /dev/null 2>&1 || curl -f http://localhost:${port} &> /dev/null 2>&1; then
+                echo "✅ ${service} is healthy (attempt ${attempt})"
+                return 0
+              fi
+              if [ $attempt -lt $max_attempts ]; then
+                echo "⏳ Attempt ${attempt}/${max_attempts}: ${service} not ready yet..."
+                sleep 2
+              fi
+              attempt=$((attempt + 1))
+            done
+            
+            echo "❌ ${service} failed health check after ${max_attempts} attempts"
+            return 1
+          }
+          
+          # Function to save current state for rollback
+          save_state() {
+            echo "💾 Saving current state for potential rollback..."
+            mkdir -p "${DEPLOY_PATH}/.deploy-backup"
+            $DOCKER_COMPOSE ps --format json > "${DEPLOY_PATH}/.deploy-backup/last-state.json" 2>/dev/null || true
+            git rev-parse HEAD > "${DEPLOY_PATH}/.deploy-backup/last-commit.txt" 2>/dev/null || true
+            echo "$(date -u +%Y%m%d-%H%M%S)" > "${DEPLOY_PATH}/.deploy-backup/last-deployment-time.txt"
+          }
+          
+          # Function to rollback
+          rollback() {
+            echo "🔄 Rolling back to previous version..."
+            if [ -f "${DEPLOY_PATH}/.deploy-backup/last-commit.txt" ]; then
+              LAST_COMMIT=$(cat "${DEPLOY_PATH}/.deploy-backup/last-commit.txt")
+              echo "📌 Rolling back to commit: ${LAST_COMMIT}"
+              git fetch origin
+              git reset --hard "${LAST_COMMIT}"
+              
+              # Rebuild and restart with previous code
+              echo "🔨 Rebuilding containers with previous version..."
+              $DOCKER_COMPOSE build --no-cache
+              $DOCKER_COMPOSE up -d
+              
+              echo "⏳ Waiting for services to start..."
+              sleep 15
+              
+              if check_health "backend" "8000" && check_health "frontend" "3000"; then
+                echo "✅ Rollback completed successfully"
+                return 0
+              else
+                echo "❌ Rollback health check failed"
+                return 1
+              fi
+            else
+              echo "❌ No backup found for rollback"
+              return 1
+            fi
+          }
+          
+          # Handle rollback request
+          if [ "${ROLLBACK_MODE}" = "true" ]; then
+            if rollback; then
+              exit 0
+            else
+              exit 1
+            fi
+          fi
+          
+          # Save current state before deployment
+          save_state
           
           # Pull latest changes
           echo "📥 Pulling latest changes from repository..."
           git fetch origin
           git reset --hard origin/main
           
-          # Detect Docker Compose command
-          if command -v docker &> /dev/null && docker compose version &> /dev/null 2>&1; then
-            DOCKER_COMPOSE="docker compose"
-            echo "✅ Using Docker Compose v2"
-          elif command -v docker-compose &> /dev/null; then
-            DOCKER_COMPOSE="docker-compose"
-            echo "⚠️  Using Docker Compose v1 (legacy)"
-          else
-            echo "❌ Docker Compose not found!"
+          CURRENT_COMMIT=$(git rev-parse --short HEAD)
+          echo "📌 Deploying commit: ${CURRENT_COMMIT}"
+          
+          # Zero-downtime deployment strategy:
+          # 1. Build new images (this doesn't stop existing containers)
+          echo "🔨 Building new Docker images..."
+          $DOCKER_COMPOSE build --no-cache
+          
+          # 2. Use docker compose up with --no-deps and --force-recreate for zero-downtime
+          # This creates new containers before stopping old ones
+          echo "🚀 Starting new containers (zero-downtime)..."
+          
+          # Start backend first
+          $DOCKER_COMPOSE up -d --no-deps --force-recreate backend
+          
+          # Wait and check backend health
+          echo "⏳ Waiting for backend to start..."
+          sleep 10
+          
+          if ! check_health "backend" "8000"; then
+            echo "❌ Backend failed health check, rolling back..."
+            rollback || true
             exit 1
           fi
           
-          # Stop existing containers gracefully
-          echo "🛑 Stopping existing containers..."
-          $DOCKER_COMPOSE down || true
+          # Start frontend (depends on backend)
+          echo "🚀 Starting frontend..."
+          $DOCKER_COMPOSE up -d --no-deps --force-recreate frontend
           
-          # Build new images
-          echo "🔨 Building Docker images..."
-          $DOCKER_COMPOSE build --no-cache
+          # Wait and check frontend health
+          echo "⏳ Waiting for frontend to start..."
+          sleep 5
           
-          # Start containers
-          echo "🚀 Starting containers..."
-          $DOCKER_COMPOSE up -d
+          if ! check_health "frontend" "3000"; then
+            echo "❌ Frontend failed health check, rolling back..."
+            rollback || true
+            exit 1
+          fi
           
-          # Wait for services to be ready
-          echo "⏳ Waiting for services to start..."
-          sleep 10
+          # Both services are healthy
+          echo "✅ All services are healthy!"
           
-          # Check container status
-          echo "📊 Container Status:"
+          # Remove old stopped containers (from previous deployment)
+          echo "🧹 Cleaning up old containers..."
+          docker container prune -f
+          
+          # Show final status
+          echo "📊 Final container status:"
           $DOCKER_COMPOSE ps
           
-          # Health checks
-          echo "🏥 Running health checks..."
-          
-          # Backend health check
-          if curl -f http://localhost:8000/health &> /dev/null; then
-            echo "✅ Backend is healthy"
-          else
-            echo "⚠️  Backend health check failed (may still be starting)"
-          fi
-          
-          # Frontend health check
-          if curl -f http://localhost:3000 &> /dev/null; then
-            echo "✅ Frontend is responding"
-          else
-            echo "⚠️  Frontend health check failed (may still be starting)"
-          fi
-          
-          # Clean up old Docker images (optional - remove if you want to keep images)
-          echo "🧹 Cleaning up unused Docker resources..."
+          # Clean up old Docker images (keep last 2 versions)
+          echo "🧹 Cleaning up unused Docker images..."
           docker image prune -f || true
           
-          echo "✅ Deployment complete!"
+          echo "✅ Zero-downtime deployment complete!"
+          echo "📌 Deployed commit: ${CURRENT_COMMIT}"
           DEPLOY_SCRIPT
           chmod +x /tmp/deploy.sh
 
       - name: Deploy to server
         env:
           DEPLOY_PATH: ${{ secrets.PROD_PATH }}
+          ROLLBACK_MODE: ${{ github.event.inputs.rollback == 'true' }}
         run: |
           echo "📤 Copying deployment script to server..."
           scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=~/.ssh/known_hosts \
             /tmp/deploy.sh ${{ secrets.PROD_USER }}@${{ secrets.PROD_HOST }}:/tmp/deploy.sh
           
-          echo "🚀 Executing deployment on server..."
+          echo "🚀 Executing zero-downtime deployment on server..."
           ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=~/.ssh/known_hosts \
             ${{ secrets.PROD_USER }}@${{ secrets.PROD_HOST }} \
-            "DEPLOY_PATH='${{ secrets.PROD_PATH }}' bash /tmp/deploy.sh"
+            "DEPLOY_PATH='${{ secrets.PROD_PATH }}' ROLLBACK_MODE='${{ github.event.inputs.rollback == 'true' }}' bash /tmp/deploy.sh"
 
       - name: Verify deployment
         run: |

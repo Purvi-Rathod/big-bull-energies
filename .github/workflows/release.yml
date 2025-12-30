@@ -1,0 +1,149 @@
+name: Create Release and Deploy
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'  # Matches v1.0.0, v1.2.3, etc.
+
+jobs:
+  create-release:
+    runs-on: ubuntu-latest
+    name: Create GitHub Release
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Extract version
+        id: version
+        run: |
+          VERSION="${{ github.ref_name }}"
+          echo "version=${VERSION}" >> $GITHUB_OUTPUT
+          echo "📦 Release version: ${VERSION}"
+
+      - name: Generate release notes
+        id: release-notes
+        run: |
+          PREVIOUS_TAG=$(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || echo "")
+          if [ -z "$PREVIOUS_TAG" ]; then
+            echo "📝 Generating release notes from beginning..."
+            NOTES=$(git log --pretty=format:"- %s (%h)" HEAD)
+          else
+            echo "📝 Generating release notes since ${PREVIOUS_TAG}..."
+            NOTES=$(git log --pretty=format:"- %s (%h)" ${PREVIOUS_TAG}..HEAD)
+          fi
+          
+          # Escape for JSON
+          NOTES_JSON=$(echo "$NOTES" | jq -Rs .)
+          echo "notes<<EOF" >> $GITHUB_OUTPUT
+          echo "$NOTES" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: Release ${{ github.ref_name }}
+          body: |
+            ## Release ${{ github.ref_name }}
+            
+            ### Changes in this release:
+            ${{ steps.release-notes.outputs.notes }}
+            
+            ### Deployment
+            This release will be automatically deployed to production.
+          draft: false
+          prerelease: ${{ contains(github.ref_name, 'alpha') || contains(github.ref_name, 'beta') || contains(github.ref_name, 'rc') }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  deploy-release:
+    needs: create-release
+    runs-on: ubuntu-latest
+    name: Deploy Release to Production
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup SSH
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.PROD_SSH_KEY }}
+
+      - name: Configure SSH
+        run: |
+          mkdir -p ~/.ssh
+          chmod 700 ~/.ssh
+          ssh-keyscan -H ${{ secrets.PROD_HOST }} >> ~/.ssh/known_hosts
+          chmod 644 ~/.ssh/known_hosts
+
+      - name: Create release deployment script
+        run: |
+          cat > /tmp/deploy-release.sh << 'DEPLOY_SCRIPT'
+          #!/bin/bash
+          set -e
+          
+          DEPLOY_PATH="${DEPLOY_PATH}"
+          VERSION="${RELEASE_VERSION}"
+          
+          echo "🚀 Deploying release ${VERSION}..."
+          
+          cd "${DEPLOY_PATH}"
+          
+          # Save current state for rollback
+          mkdir -p "${DEPLOY_PATH}/.deploy-backup"
+          git rev-parse HEAD > "${DEPLOY_PATH}/.deploy-backup/last-commit.txt" 2>/dev/null || true
+          echo "${VERSION}" > "${DEPLOY_PATH}/.deploy-backup/last-version.txt"
+          
+          # Checkout the tagged version
+          git fetch origin --tags
+          git checkout "${VERSION}"
+          
+          # Detect Docker Compose
+          if command -v docker &> /dev/null && docker compose version &> /dev/null 2>&1; then
+            DOCKER_COMPOSE="docker compose"
+          else
+            DOCKER_COMPOSE="docker-compose"
+          fi
+          
+          # Build and deploy
+          $DOCKER_COMPOSE build --no-cache
+          $DOCKER_COMPOSE up -d
+          
+          # Health check
+          sleep 15
+          if curl -f http://localhost:8000/health &> /dev/null && curl -f http://localhost:3000 &> /dev/null; then
+            echo "✅ Release ${VERSION} deployed successfully"
+            $DOCKER_COMPOSE ps
+          else
+            echo "❌ Health check failed, rolling back..."
+            git checkout "$(cat .deploy-backup/last-commit.txt)"
+            $DOCKER_COMPOSE build --no-cache
+            $DOCKER_COMPOSE up -d
+            exit 1
+          fi
+          DEPLOY_SCRIPT
+          chmod +x /tmp/deploy-release.sh
+
+      - name: Deploy release
+        env:
+          DEPLOY_PATH: ${{ secrets.PROD_PATH }}
+          RELEASE_VERSION: ${{ github.ref_name }}
+        run: |
+          scp -o StrictHostKeyChecking=no /tmp/deploy-release.sh \
+            ${{ secrets.PROD_USER }}@${{ secrets.PROD_HOST }}:/tmp/deploy-release.sh
+          
+          ssh -o StrictHostKeyChecking=no \
+            ${{ secrets.PROD_USER }}@${{ secrets.PROD_HOST }} \
+            "DEPLOY_PATH='${{ secrets.PROD_PATH }}' RELEASE_VERSION='${{ github.ref_name }}' bash /tmp/deploy-release.sh"
+
+      - name: Announce deployment
+        run: |
+          echo "✅ Release ${{ github.ref_name }} deployed to production!"
+          echo "🌐 Frontend: http://${{ secrets.PROD_HOST }}:3000"
+          echo "🌐 Backend: http://${{ secrets.PROD_HOST }}:8000"

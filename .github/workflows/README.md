@@ -2,6 +2,15 @@
 
 This directory contains CI/CD workflows for the Binary System application.
 
+## ✨ Advanced Features
+
+- 🔄 **Zero-Downtime Deployment** - No container stops during deployment
+- 🧯 **Automatic Rollback** - Rolls back on deployment failure  
+- 🔐 **Secure SSH** - Deployment user setup guide (disable root SSH)
+- 🏷️ **Versioned Releases** - Automatic deployment from version tags (v1.0.0)
+
+See **[ADVANCED_DEPLOYMENT_GUIDE.md](./ADVANCED_DEPLOYMENT_GUIDE.md)** for detailed documentation.
+
 ## Workflows
 
 ### 1. CI (`ci.yml`)

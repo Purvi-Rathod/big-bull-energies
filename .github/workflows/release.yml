@@ -9,6 +9,8 @@ jobs:
   create-release:
     runs-on: ubuntu-latest
     name: Create GitHub Release
+    permissions:
+      contents: write  # Required to create releases
     
     steps:
       - name: Checkout code
@@ -56,8 +58,7 @@ jobs:
             This release will be automatically deployed to production.
           draft: false
           prerelease: ${{ contains(github.ref_name, 'alpha') || contains(github.ref_name, 'beta') || contains(github.ref_name, 'rc') }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}
 
   deploy-release:
     needs: create-release

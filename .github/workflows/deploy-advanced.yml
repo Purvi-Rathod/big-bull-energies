@@ -95,6 +95,15 @@ jobs:
             exit 1
           fi
           
+          # Ensure GitHub host key is in known_hosts for deployer user
+          echo "🔐 Configuring GitHub SSH access..."
+          mkdir -p ~/.ssh
+          chmod 700 ~/.ssh
+          if ! grep -q "github.com" ~/.ssh/known_hosts 2>/dev/null; then
+            ssh-keyscan -H github.com >> ~/.ssh/known_hosts 2>/dev/null || true
+          fi
+          chmod 600 ~/.ssh/known_hosts 2>/dev/null || true
+          
           # Detect Docker Compose command
           if command -v docker &> /dev/null && docker compose version &> /dev/null 2>&1; then
             DOCKER_COMPOSE="docker compose"

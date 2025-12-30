@@ -61,6 +61,26 @@ jobs:
             exit 1
           fi
           
+          # Ensure GitHub host key is in known_hosts for deployer user
+          echo "🔐 Configuring GitHub SSH access..."
+          mkdir -p ~/.ssh
+          chmod 700 ~/.ssh
+          if ! grep -q "github.com" ~/.ssh/known_hosts 2>/dev/null; then
+            ssh-keyscan -H github.com >> ~/.ssh/known_hosts 2>/dev/null || true
+          fi
+          chmod 600 ~/.ssh/known_hosts 2>/dev/null || true
+          
+          # Configure git to use SSH properly (if using SSH remote)
+          if git remote get-url origin | grep -q "^git@github.com"; then
+            echo "✅ Git remote is using SSH"
+            # Ensure we have SSH key access (use existing keys or configure)
+            if [ -f ~/.ssh/id_rsa ] || [ -f ~/.ssh/id_ed25519 ]; then
+              echo "✅ SSH keys found for git access"
+            else
+              echo "⚠️  No SSH keys found, git may use existing keys from root"
+            fi
+          fi
+          
           # Detect Docker Compose command
           if command -v docker &> /dev/null && docker compose version &> /dev/null 2>&1; then
             DOCKER_COMPOSE="docker compose"
@@ -145,6 +165,13 @@ jobs:
           
           # Save current state before deployment
           save_state
+          
+          # Ensure GitHub host key is in known_hosts for deployer user
+          echo "🔐 Adding GitHub to known hosts..."
+          mkdir -p ~/.ssh
+          chmod 700 ~/.ssh
+          ssh-keyscan -H github.com >> ~/.ssh/known_hosts 2>/dev/null || true
+          chmod 600 ~/.ssh/known_hosts 2>/dev/null || true
           
           # Pull latest changes
           echo "📥 Pulling latest changes from repository..."

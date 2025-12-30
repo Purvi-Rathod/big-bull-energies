@@ -95,6 +95,15 @@ jobs:
           
           cd "${DEPLOY_PATH}"
           
+          # Ensure GitHub host key is in known_hosts
+          echo "🔐 Configuring GitHub SSH access..."
+          mkdir -p ~/.ssh
+          chmod 700 ~/.ssh
+          if ! grep -q "github.com" ~/.ssh/known_hosts 2>/dev/null; then
+            ssh-keyscan -H github.com >> ~/.ssh/known_hosts 2>/dev/null || true
+          fi
+          chmod 600 ~/.ssh/known_hosts 2>/dev/null || true
+          
           # Save current state for rollback
           mkdir -p "${DEPLOY_PATH}/.deploy-backup"
           git rev-parse HEAD > "${DEPLOY_PATH}/.deploy-backup/last-commit.txt" 2>/dev/null || true

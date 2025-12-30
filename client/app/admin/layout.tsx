@@ -35,7 +35,7 @@ export default function AdminLayout({
   useEffect(() => {
     if (authLoading) return;
 
-    const isAdminUser = user?.userId === 'CROWN-000000';
+    const isAdminUser = user?.userId === 'CNEOX-000000' || user?.userId === 'CROWN-000000';
     const isAdminAccount = !!admin;
 
     if (!isAdminUser && !isAdminAccount) {
@@ -54,7 +54,7 @@ export default function AdminLayout({
     );
   }
 
-  const isAdminUser = user?.userId === 'CROWN-000000';
+  const isAdminUser = user?.userId === 'CNEOX-000000' || user?.userId === 'CROWN-000000';
   const isAdminAccount = !!admin;
 
   if (!isAdminUser && !isAdminAccount) {

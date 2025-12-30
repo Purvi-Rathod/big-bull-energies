@@ -64,7 +64,7 @@ export const viewBinaryTree = asyncHandler(async (req, res) => {
   // First, find all admin children (if admin exists)
   const adminUser = users.find((u: any) => {
     const userInfo = userMap.get(u._id.toString());
-    return userInfo?.userId === "CROWN-000000";
+    return userInfo?.userId === "CNEOX-000000" || userInfo?.userId === "CROWN-000000";
   });
   
   let adminChildrenMap = new Map<string, string[]>();
@@ -84,8 +84,8 @@ export const viewBinaryTree = asyncHandler(async (req, res) => {
     const userInfo = userMap.get(userId);
 
     if (userInfo) {
-      // Check if this is admin (CROWN-000000)
-      const isAdmin = userInfo.userId === "CROWN-000000";
+      // Check if this is admin (CNEOX-000000 or CROWN-000000)
+      const isAdmin = userInfo.userId === "CNEOX-000000" || userInfo.userId === "CROWN-000000";
       
       // For admin, get all children (not just left/right)
       let allChildren: string[] = [];
@@ -188,7 +188,7 @@ export const getMyTree = asyncHandler(async (req, res) => {
     processed.add(nodeIdStr);
 
     // Get all children (for admin) or left/right children (for others)
-    const isAdmin = (nodeUser as any).userId === "CROWN-000000";
+    const isAdmin = (nodeUser as any).userId === "CNEOX-000000" || (nodeUser as any).userId === "CROWN-000000";
     let children: string[] = [];
 
     if (isAdmin) {

@@ -129,7 +129,7 @@ export default function UserLayout({
         {/* Logo/Header */}
         <div className="h-16 flex items-center justify-between px-4 border-b border-yellow-500/20 bg-gray-900/50 backdrop-blur-sm flex-shrink-0">
           {sidebarOpen ? (
-            <Link href="/dashboard" className="flex items-center gap-2">
+            <Link href="/" className="flex items-center gap-2">
               <Image
                 src="/logo1.png"
                 alt="CNEOX Logo"
@@ -139,7 +139,7 @@ export default function UserLayout({
               />
             </Link>
           ) : (
-            <Link href="/dashboard" className="flex items-center justify-center">
+            <Link href="/" className="flex items-center justify-center">
               <Image
                 src="/logo1.png"
                 alt="CNEOX"

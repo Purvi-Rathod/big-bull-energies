@@ -200,7 +200,15 @@ function InvestContent() {
         setError('Failed to create payment. Please try again.');
       }
     } catch (err: any) {
-      setError(err.message || 'Failed to create payment');
+      const errorMessage = err.message || 'Failed to create payment';
+      setError(errorMessage);
+      
+      // If session expired, the API client will handle redirect
+      // But we should still show a user-friendly message
+      if (errorMessage.includes('session has expired') || errorMessage.includes('expired')) {
+        // Error already handled by API client, just show message
+        console.log('Session expired, redirecting to login...');
+      }
     } finally {
       setCreatingPayment(false);
     }

@@ -14,7 +14,7 @@ declare global {
 
 /**
  * Middleware to authenticate admin using admin JWT token
- * Also allows CROWN-000000 user to access admin routes with user token
+ * Also allows CNEOX-000000 or CROWN-000000 user to access admin routes with user token
  * Sets req.admin with admin information
  */
 export async function requireAdminAuth(req: Request, res: Response, next: NextFunction) {
@@ -44,10 +44,10 @@ export async function requireAdminAuth(req: Request, res: Response, next: NextFu
       try {
         const decoded = verifyAuthToken(token);
         
-        // Check if this user is CROWN-000000
+        // Check if this user is CNEOX-000000 or CROWN-000000
         const user = await User.findById(decoded.sub);
-        if (user && user.userId === "CROWN-000000") {
-          // Allow CROWN-000000 user to access admin routes
+        if (user && (user.userId === "CNEOX-000000" || user.userId === "CROWN-000000")) {
+          // Allow CNEOX-000000 or CROWN-000000 user to access admin routes
           // Set req.user for compatibility
           req.user = {
             id: decoded.sub,

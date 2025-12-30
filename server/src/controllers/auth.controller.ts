@@ -21,8 +21,8 @@ export const validateReferrer = asyncHandler(async (req, res) => {
 
   let referrer = null;
   
-  // Check if referrerId is a userId format (CROWN-XXXXXX) or MongoDB ObjectId
-  if (typeof referrerId === 'string' && referrerId.startsWith('CROWN-')) {
+  // Check if referrerId is a userId format (CNEOX-XXXXXX or CROWN-XXXXXX) or MongoDB ObjectId
+  if (typeof referrerId === 'string' && (referrerId.startsWith('CNEOX-') || referrerId.startsWith('CROWN-'))) {
     // It's a userId format, use findUserByUserId
     referrer = await findUserByUserId(referrerId);
   } else {
@@ -79,7 +79,7 @@ export const userSignup = asyncHandler(async (req, res) => {
     password: string;
     country?: string;
     referrerId?: string; // MongoDB _id
-    referrerUserId?: string; // CROWN-XXXXXX format
+    referrerUserId?: string; // CNEOX-XXXXXX format
     position?: "left" | "right";
   };
   console.table({ name, email, phone, password, referrerId, referrerUserId, position });
@@ -121,10 +121,10 @@ export const userSignup = asyncHandler(async (req, res) => {
   }
 
   // Validate referrer if provided (can use either referrerId or referrerUserId)
-  // referrerId can be either MongoDB ObjectId or userId (CROWN-XXXXXX format)
+  // referrerId can be either MongoDB ObjectId or userId (CNEOX-XXXXXX format)
   let referrer = null;
   if (referrerUserId) {
-    // Lookup by userId (CROWN-XXXXXX format)
+    // Lookup by userId (CNEOX-XXXXXX format)
     referrer = await findUserByUserId(referrerUserId);
     if (!referrer) {
       throw new AppError(`Invalid referrer userId: ${referrerUserId}`, 400);
@@ -133,8 +133,8 @@ export const userSignup = asyncHandler(async (req, res) => {
       throw new AppError("Referrer account is not active", 400);
     }
   } else if (referrerId) {
-    // Check if referrerId is a userId format (CROWN-XXXXXX) or MongoDB ObjectId
-    if (typeof referrerId === 'string' && referrerId.startsWith('CROWN-')) {
+    // Check if referrerId is a userId format (CNEOX-XXXXXX or CROWN-XXXXXX) or MongoDB ObjectId
+    if (typeof referrerId === 'string' && (referrerId.startsWith('CNEOX-') || referrerId.startsWith('CROWN-'))) {
       // It's a userId format, use findUserByUserId
       referrer = await findUserByUserId(referrerId);
       if (!referrer) {
@@ -153,8 +153,8 @@ export const userSignup = asyncHandler(async (req, res) => {
   }
 
   // Validate position if provided
-  // Exception: If referrer is admin (CROWN-000000), position is not required
-  const referrerIsAdmin = referrer?.userId === "CROWN-000000";
+  // Exception: If referrer is admin (CNEOX-000000 or CROWN-000000), position is not required
+  const referrerIsAdmin = referrer?.userId === "CNEOX-000000" || referrer?.userId === "CROWN-000000";
   
   if (position && !["left", "right"].includes(position)) {
     throw new AppError("Position must be either 'left' or 'right'", 400);
@@ -171,7 +171,7 @@ export const userSignup = asyncHandler(async (req, res) => {
   // If referrer is NOT admin and position is not provided, it will be auto-assigned
   // If referrer is NOT admin and both positions are filled, system will find next available
 
-  // Generate userId in format CROWN-XXXXXX
+  // Generate userId in format CNEOX-XXXXXX
   const userId = await generateNextUserId();
 
   // Create user
@@ -194,7 +194,7 @@ export const userSignup = asyncHandler(async (req, res) => {
     
     // If no referrer was provided but admin was assigned, update user's referrer and position
     if (!referrer && initResult.position) {
-      const adminUser = await findUserByUserId("CROWN-000000");
+      const adminUser = await findUserByUserId("CNEOX-000000") || await findUserByUserId("CROWN-000000");
       if (adminUser) {
         user.referrer = adminUser._id as any;
         user.position = initResult.position;
@@ -277,9 +277,7 @@ export const userSignup = asyncHandler(async (req, res) => {
  */
 export const userLogin = asyncHandler(async (req, res) => {
   const body = (req as any).body;
-  const { email, phone, userId, password } = body as {
-    email?: string;
-    phone?: string;
+  const { userId, password } = body as {
     userId?: string;
     password: string;
   };
@@ -289,20 +287,12 @@ export const userLogin = asyncHandler(async (req, res) => {
     throw new AppError("Password is required", 400);
   }
 
-  if (!email && !phone && !userId) {
-    throw new AppError("Either email, phone number, or userId is required", 400);
+  if (!userId) {
+    throw new AppError("User ID is required", 400);
   }
 
-  // Find user by email, phone, or userId
-  let user;
-  if (userId) {
-    // Login with userId (CROWN-XXXXXX format)
-    user = await findUserByUserId(userId);
-  } else if (email) {
-    user = await User.findOne({ email: email.toLowerCase() });
-  } else if (phone) {
-    user = await User.findOne({ phone });
-  }
+  // Find user by userId only
+  const user = await findUserByUserId(userId);
 
   if (!user) {
     throw new AppError("Invalid credentials", 401);
@@ -482,21 +472,15 @@ export const verifyLoginToken = asyncHandler(async (req, res) => {
  * POST /api/v1/auth/forgot-password
  */
 export const forgotPassword = asyncHandler(async (req, res) => {
-  const { email } = req.body;
+  const { userId } = req.body;
 
   // Validation
-  if (!email) {
-    throw new AppError("Email is required", 400);
+  if (!userId) {
+    throw new AppError("User ID is required", 400);
   }
 
-  // Validate email format
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if (!emailRegex.test(email)) {
-    throw new AppError("Invalid email format", 400);
-  }
-
-  // Find user by email
-  const user = await User.findOne({ email: email.toLowerCase() });
+  // Find user by userId
+  const user = await findUserByUserId(userId);
   
   // Don't reveal if user exists or not (security best practice)
   // Always return success message even if user doesn't exist
@@ -529,11 +513,11 @@ export const forgotPassword = asyncHandler(async (req, res) => {
     });
   }
 
-  // Always return success to prevent email enumeration
+  // Always return success to prevent user enumeration
   const response = res as any;
   response.status(200).json({
     status: "success",
-    message: "If an account with that email exists, a password reset link has been sent.",
+    message: "If an account with that User ID exists, a password reset link has been sent.",
   });
 });
 

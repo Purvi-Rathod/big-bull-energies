@@ -7,12 +7,12 @@ import { AppError } from "../utils/AppError";
 import { findUserByUserId } from "./userId.service";
 
 /**
- * Check if a user is the admin (CROWN-000000)
+ * Check if a user is the admin (CNEOX-000000 or CROWN-000000 for backward compatibility)
  */
 async function isAdminUser(userId: Types.ObjectId): Promise<boolean> {
   try {
     const user = await User.findById(userId);
-    return user?.userId === "CROWN-000000";
+    return user?.userId === "CNEOX-000000" || user?.userId === "CROWN-000000";
   } catch (error) {
     return false;
   }
@@ -109,7 +109,7 @@ async function updateAncestorDownlineCounts(
 
 /**
  * Initialize binary tree entry for a new user
- * Special case: If parent is admin (CROWN-000000), no binary tree constraints apply
+ * Special case: If parent is admin (CNEOX-000000 or CROWN-000000), no binary tree constraints apply
  * All other nodes must follow binary tree rules (max 2 children: left and right)
  */
 export async function initializeBinaryTree(userId: Types.ObjectId, referrerId?: Types.ObjectId | null, position?: "left" | "right" | null) {
@@ -383,14 +383,17 @@ export async function findNextAvailablePositionInTree(
 }
 
 /**
- * Get or create admin user (CROWN-000000)
+ * Get or create admin user (CNEOX-000000 or CROWN-000000 for backward compatibility)
  * This is the root node that all users without sponsors will be attached to
  */
 export async function getAdminUser(): Promise<Types.ObjectId | null> {
   try {
-    const adminUser = await findUserByUserId("CROWN-000000");
+    let adminUser = await findUserByUserId("CNEOX-000000");
     if (!adminUser) {
-      throw new AppError("Admin user (CROWN-000000) not found. Please create admin user first.", 500);
+      adminUser = await findUserByUserId("CROWN-000000");
+    }
+    if (!adminUser) {
+      throw new AppError("Admin user (CNEOX-000000) not found. Please create admin user first.", 500);
     }
     return adminUser._id as Types.ObjectId;
   } catch (error) {
@@ -403,14 +406,14 @@ export async function getAdminUser(): Promise<Types.ObjectId | null> {
 
 /**
  * Complete user initialization: binary tree + wallets
- * If no referrer is provided, the user will be placed under admin (CROWN-000000)
- * Exception: If the user being initialized IS the admin (CROWN-000000), they will have no parent
+ * If no referrer is provided, the user will be placed under admin (CNEOX-000000 or CROWN-000000)
+ * Exception: If the user being initialized IS the admin (CNEOX-000000 or CROWN-000000), they will have no parent
  */
 export async function initializeUser(userId: Types.ObjectId, referrerId?: Types.ObjectId | null, position?: "left" | "right" | null) {
   try {
-    // Check if this user is the admin user (CROWN-000000)
+    // Check if this user is the admin user (CNEOX-000000 or CROWN-000000)
     const user = await User.findById(userId);
-    const userIsAdmin = user?.userId === "CROWN-000000";
+    const userIsAdmin = user?.userId === "CNEOX-000000" || user?.userId === "CROWN-000000";
 
     let finalReferrerId = referrerId;
     let finalPosition = position;
@@ -420,7 +423,7 @@ export async function initializeUser(userId: Types.ObjectId, referrerId?: Types.
       finalReferrerId = null;
       finalPosition = null;
     } else if (!finalReferrerId) {
-      // If no referrer is provided and this is NOT admin, assign admin (CROWN-000000) as the parent
+      // If no referrer is provided and this is NOT admin, assign admin (CNEOX-000000 or CROWN-000000) as the parent
       const adminId = await getAdminUser();
       if (!adminId) {
         throw new AppError("Failed to find admin user. Cannot initialize user without referrer.", 500);

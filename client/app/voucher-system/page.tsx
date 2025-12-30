@@ -3,52 +3,15 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useAuth } from "@/contexts/AuthContext";
-import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import PublicHeader from "@/components/PublicHeader";
 
 export default function VoucherSystemPage() {
   const { user, admin } = useAuth();
-  const router = useRouter();
-
-  useEffect(() => {
-    if (admin || user?.userId === 'CROWN-000000') {
-      router.push('/admin/dashboard');
-    } else if (user) {
-      router.push('/dashboard');
-    }
-  }, [user, admin, router]);
+  // Removed redirects - allow logged-in users to access this page
 
   return (
     <div className="min-h-screen bg-black">
-      {/* Navigation */}
-      <nav className="relative z-50 px-6 py-4 backdrop-blur-md bg-black/90 border-b border-yellow-500/20">
-        <div className="max-w-7xl mx-auto flex justify-between items-center">
-          <Link href="/" className="flex items-center gap-3">
-            <Image
-              src="/logo1.png"
-              alt="CNEOX Logo"
-              width={120}
-              height={40}
-              className="h-10 w-auto"
-              priority
-            />
-          </Link>
-          <div className="flex gap-4">
-            <Link
-              href="/login"
-              className="px-4 py-2 text-white hover:text-yellow-400 transition-colors font-medium"
-            >
-              Login
-            </Link>
-            <Link
-              href="/signup"
-              className="px-6 py-2 bg-gradient-to-r from-yellow-500 to-yellow-600 text-black rounded-lg hover:from-yellow-400 hover:to-yellow-500 transition-all shadow-lg hover:shadow-yellow-500/50 font-semibold"
-            >
-              Sign Up
-            </Link>
-          </div>
-        </div>
-      </nav>
+      <PublicHeader />
 
       {/* Hero Section */}
       <section className="relative py-20 px-6">

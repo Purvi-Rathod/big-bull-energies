@@ -112,51 +112,31 @@ curl -X POST http://localhost:8000/api/v1/auth/signup \
 
 ## User Login
 
-Authenticate a user and receive a JWT token. Users can login with either email or phone.
+Authenticate a user and receive a JWT token. Users must login with their User ID.
 
 **Endpoint:** `POST /api/v1/auth/login`
 
 **Authentication:** Not required
 
-**Request Body (with Email):**
+**Request Body:**
 ```json
 {
-  "email": "user@example.com",
-  "password": "password123"
-}
-```
-
-**Request Body (with Phone):**
-```json
-{
-  "phone": "1234567890",
+  "userId": "CNEOX-000001",
   "password": "password123"
 }
 ```
 
 **Fields:**
-- `email` (optional): User's email address (either email or phone required)
-- `phone` (optional): User's phone number (either email or phone required)
+- `userId` (required): User's unique ID in format CNEOX-XXXXXX
 - `password` (required): User's password
 
-**cURL Command (Email Login):**
+**cURL Command:**
 ```bash
 curl -X POST http://localhost:8000/api/v1/auth/login \
   -H "Content-Type: application/json" \
   -c cookies.txt \
   -d '{
-    "email": "user@example.com",
-    "password": "securepassword123"
-  }'
-```
-
-**cURL Command (Phone Login):**
-```bash
-curl -X POST http://localhost:8000/api/v1/auth/login \
-  -H "Content-Type: application/json" \
-  -c cookies.txt \
-  -d '{
-    "phone": "1234567890",
+    "userId": "CNEOX-000001",
     "password": "securepassword123"
   }'
 ```

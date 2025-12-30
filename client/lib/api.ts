@@ -39,7 +39,7 @@ class ApiClient {
       let token: string | null = null;
       
       if (isAdminRoute) {
-        // For admin routes: use adminToken, or token if CROWN-000000
+        // For admin routes: use adminToken, or token if CNEOX-000000 or CROWN-000000
         // Don't use impersonated token for admin routes
         if (!isImpersonating) {
           token = localStorage.getItem('adminToken') || localStorage.getItem('token');
@@ -62,15 +62,69 @@ class ApiClient {
     }
 
     try {
-      const response = await fetch(url, config);
+      // Add timeout to prevent hanging requests (60 seconds)
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 60000);
+      
+      const response = await fetch(url, {
+        ...config,
+        signal: controller.signal,
+      });
+      
+      clearTimeout(timeoutId);
+      
       const data = await response.json();
 
       if (!response.ok) {
+        // Handle token expiration (401 Unauthorized)
+        if (response.status === 401) {
+          // Check if this is an admin endpoint and user might just not have admin access
+          // In this case, don't redirect - let the component handle the error
+          const isAdminEndpoint = endpoint.startsWith('/admin');
+          const hasToken = typeof window !== 'undefined' && (
+            localStorage.getItem('token') || 
+            localStorage.getItem('adminToken') || 
+            sessionStorage.getItem('token')
+          );
+          
+          // If it's an admin endpoint and user has a token, they might just not have admin access
+          // Don't redirect in this case - let the error propagate so component can handle it
+          if (isAdminEndpoint && hasToken) {
+            // This is likely a permission issue, not a session expiration
+            // Let the component handle it gracefully
+            throw new Error(data.message || 'Access denied. Admin privileges required.');
+          }
+          
+          // Otherwise, it's a real session expiration - redirect to login
+          if (typeof window !== 'undefined') {
+            localStorage.removeItem('token');
+            localStorage.removeItem('adminToken');
+            localStorage.removeItem('impersonatedToken');
+            sessionStorage.removeItem('token');
+            sessionStorage.removeItem('isImpersonating');
+            
+            // Only redirect if not already on login page
+            if (!window.location.pathname.includes('/login')) {
+              // Store the current path to redirect back after login
+              sessionStorage.setItem('redirectAfterLogin', window.location.pathname);
+              window.location.href = '/login';
+            }
+          }
+          throw new Error('Your session has expired. Please log in again.');
+        }
         throw new Error(data.message || 'Request failed');
       }
 
       return data;
-    } catch (error) {
+    } catch (error: any) {
+      // Handle timeout errors
+      if (error.name === 'AbortError') {
+        throw new Error('Request timed out. Please try again.');
+      }
+      // Handle network errors
+      if (error.message && error.message.includes('Failed to fetch')) {
+        throw new Error('Network error. Please check your connection and try again.');
+      }
       throw error;
     }
   }
@@ -117,7 +171,7 @@ class ApiClient {
     return response;
   }
 
-  async userLogin(data: { email?: string; phone?: string; userId?: string; password: string }) {
+  async userLogin(data: { userId: string; password: string }) {
     const response = await this.request<{ user: any; token: string }>('/auth/login', {
       method: 'POST',
       body: JSON.stringify(data),
@@ -167,10 +221,10 @@ class ApiClient {
     });
   }
 
-  async forgotPassword(email: string) {
+  async forgotPassword(userId: string) {
     return this.request<{ message: string }>('/auth/forgot-password', {
       method: 'POST',
-      body: JSON.stringify({ email }),
+      body: JSON.stringify({ userId }),
     });
   }
 

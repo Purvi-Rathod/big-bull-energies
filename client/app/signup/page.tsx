@@ -6,6 +6,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { api } from '@/lib/api';
 import { countries } from '@/lib/countries';
 import Image from 'next/image';
+import Link from 'next/link';
 import CneoLoader from '@/components/CneoLoader';
 
 function SignupContent() {
@@ -175,14 +176,16 @@ function SignupContent() {
       <div className="relative z-10 max-w-2xl w-full space-y-8 bg-gradient-to-br from-gray-900/95 via-gray-800/95 to-gray-900/95 backdrop-blur-sm rounded-2xl shadow-2xl p-8 border border-yellow-500/30">
         <div>
           <div className="flex justify-center mb-6">
-            <Image
-              src="/logo1.png"
-              alt="CNEOX Logo"
-              width={180}
-              height={60}
-              className="h-14 w-auto"
-              priority
-            />
+            <Link href="/">
+              <Image
+                src="/logo1.png"
+                alt="CNEOX Logo"
+                width={180}
+                height={60}
+                className="h-14 w-auto cursor-pointer hover:opacity-80 transition-opacity"
+                priority
+              />
+            </Link>
           </div>
           <h2 className="text-center text-3xl font-extrabold mb-2">
             <span className="bg-gradient-to-r from-yellow-300 via-yellow-400 to-yellow-600 bg-clip-text text-transparent">
@@ -329,7 +332,7 @@ function SignupContent() {
                         ? 'border-red-500/50 text-white focus:ring-red-500/50 focus:border-red-500/70'
                         : 'border-yellow-500/40 text-white focus:ring-yellow-500/50 focus:border-yellow-500/70'
                     }`}
-                    placeholder="CROWN-XXXXXX"
+                    placeholder="CNEOX-XXXXXX"
                     value={formData.referrerId}
                     onChange={handleChange}
                   />

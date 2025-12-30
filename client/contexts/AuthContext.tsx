@@ -107,11 +107,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // No cleanup - we want to prevent duplicate calls even on remount
   }, []);
 
-  const login = async (emailOrPhoneOrUserId: string, password: string, isAdmin = false) => {
+  const login = async (userIdOrEmail: string, password: string, isAdmin = false) => {
     try {
       if (isAdmin) {
         const response = await api.adminLogin({
-          email: emailOrPhoneOrUserId,
+          email: userIdOrEmail,
           password,
         });
         if (response.data?.admin) {
@@ -119,18 +119,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           setUser(null);
         }
       } else {
-        // Check if it's a userId (CROWN-XXXXXX format)
-        const isUserId = /^CROWN-\d{6}$/.test(emailOrPhoneOrUserId);
-        const isEmail = emailOrPhoneOrUserId.includes('@');
-        
-        const loginData: any = { password };
-        if (isUserId) {
-          loginData.userId = emailOrPhoneOrUserId;
-        } else if (isEmail) {
-          loginData.email = emailOrPhoneOrUserId;
-        } else {
-          loginData.phone = emailOrPhoneOrUserId;
-        }
+        // Only accept userId for user login
+        const loginData: any = { 
+          userId: userIdOrEmail,
+          password 
+        };
         
         const response = await api.userLogin(loginData);
         if (response.data?.user) {

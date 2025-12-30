@@ -4,10 +4,11 @@ import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import Image from 'next/image';
+import Link from 'next/link';
 import CneoLoader from '@/components/CneoLoader';
 
 function LoginContent() {
-  const [emailOrPhoneOrUserId, setEmailOrPhoneOrUserId] = useState('');
+  const [userId, setUserId] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
@@ -35,8 +36,8 @@ function LoginContent() {
         router.replace('/admin/dashboard');
     } else if (user) {
       // Regular user login
-      if (user.userId === 'CROWN-000000') {
-        // CROWN-000000 user should be redirected to admin dashboard
+      if (user.userId === 'CNEOX-000000' || user.userId === 'CROWN-000000') {
+        // CNEOX-000000 or CROWN-000000 user should be redirected to admin dashboard
           router.replace('/admin/dashboard');
       } else {
           router.replace('/dashboard');
@@ -51,7 +52,7 @@ function LoginContent() {
     setLoading(true);
 
     try {
-      await login(emailOrPhoneOrUserId, password, isAdmin);
+      await login(userId, password, isAdmin);
       // Redirect will be handled by useEffect when user/admin state updates
     } catch (err: any) {
       setError(err.message || 'Login failed. Please check your credentials.');
@@ -108,14 +109,16 @@ function LoginContent() {
       <div className="relative z-10 max-w-md w-full space-y-8 bg-gradient-to-br from-gray-900/95 via-gray-800/95 to-gray-900/95 backdrop-blur-sm rounded-2xl shadow-2xl p-8 border border-yellow-500/30">
         <div>
           <div className="flex justify-center mb-6">
-            <Image
-              src="/logo1.png"
-              alt="CNEOX Logo"
-              width={180}
-              height={60}
-              className="h-14 w-auto"
-              priority
-            />
+            <Link href="/">
+              <Image
+                src="/logo1.png"
+                alt="CNEOX Logo"
+                width={180}
+                height={60}
+                className="h-14 w-auto cursor-pointer hover:opacity-80 transition-opacity"
+                priority
+              />
+            </Link>
           </div>
           <h2 className="text-center text-3xl font-extrabold mb-2">
             <span className="bg-gradient-to-r from-yellow-300 via-yellow-400 to-yellow-600 bg-clip-text text-transparent">
@@ -143,18 +146,18 @@ function LoginContent() {
           
           <div className="space-y-4">
             <div>
-              <label htmlFor="email-phone-userid" className="block text-sm font-bold text-yellow-400 mb-2">
-                {isAdmin ? "Email Address" : "Email, Phone, or User ID"}
+              <label htmlFor="user-id" className="block text-sm font-bold text-yellow-400 mb-2">
+                {isAdmin ? "Email Address" : "User ID"}
               </label>
               <input
-                id="email-phone-userid"
-                name="email-phone-userid"
+                id="user-id"
+                name="user-id"
                 type="text"
                 required
                 className="appearance-none relative block w-full px-4 py-3 border-2 border-yellow-500/40 placeholder-gray-500 text-white bg-gray-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-yellow-500/50 focus:border-yellow-500/70 transition-all sm:text-sm font-semibold"
-                placeholder={isAdmin ? "Enter your email" : "Email, phone, or User ID (CROWN-XXXXXX)"}
-                value={emailOrPhoneOrUserId}
-                onChange={(e) => setEmailOrPhoneOrUserId(e.target.value)}
+                placeholder={isAdmin ? "Enter your email" : "User ID (CNEOX-XXXXXX)"}
+                value={userId}
+                onChange={(e) => setUserId(e.target.value)}
               />
             </div>
             <div>

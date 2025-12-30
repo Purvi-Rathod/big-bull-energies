@@ -167,6 +167,21 @@ export default function DashboardPage() {
     return names[type] || type;
   };
 
+  // Wallet order: ROI, Referral, Binary Bonus, Career Level, Interest, Token, Investment, Withdrawal
+  const walletOrder = ['roi', 'referral', 'binary', 'career_level', 'interest', 'token', 'investment', 'withdrawal'];
+  
+  const sortWallets = (wallets: Wallet[]): Wallet[] => {
+    return [...wallets].sort((a, b) => {
+      const indexA = walletOrder.indexOf(a.type);
+      const indexB = walletOrder.indexOf(b.type);
+      // If type not found in order, put it at the end
+      if (indexA === -1 && indexB === -1) return 0;
+      if (indexA === -1) return 1;
+      if (indexB === -1) return -1;
+      return indexA - indexB;
+    });
+  };
+
   if (loading) {
     return <CneoLoader fullScreen />;
   }
@@ -206,7 +221,7 @@ export default function DashboardPage() {
               <div className="h-px flex-1 bg-gradient-to-r from-yellow-500/50 via-yellow-500/30 to-transparent"></div>
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {wallets.map((wallet, index) => (
+              {sortWallets(wallets).map((wallet, index) => (
                 <div 
                   key={wallet.type} 
                   className="group relative bg-gradient-to-br from-gray-900/90 via-gray-800/90 to-gray-900/90 backdrop-blur-sm rounded-2xl shadow-2xl border border-yellow-500/30 p-6 hover:border-yellow-500/60 hover:shadow-yellow-500/20 transition-all duration-300 overflow-hidden animate-scale-in"

@@ -55,7 +55,7 @@ export default function PackagesPage() {
   // Route protection is handled in layout
 
   useEffect(() => {
-    const isAdminUser = user?.userId === 'CROWN-000000';
+    const isAdminUser = user?.userId === 'CNEOX-000000' || user?.userId === 'CROWN-000000';
     const isAdminAccount = !!admin;
 
     if (isAdminUser || isAdminAccount) {
@@ -231,7 +231,18 @@ export default function PackagesPage() {
       fetchPackages();
       setTimeout(() => setSuccess(''), 3000);
     } catch (err: any) {
-      setError(err.message || 'Failed to save package');
+      const errorMessage = err.message || 'Failed to save package';
+      setError(errorMessage);
+      
+      // If session expired, the API client will handle redirect
+      if (errorMessage.includes('session has expired') || errorMessage.includes('expired')) {
+        console.log('Session expired, redirecting to login...');
+      } else if (errorMessage.includes('timed out') || errorMessage.includes('timeout')) {
+        setError('Request timed out. Please try again. If the problem persists, check your connection.');
+      } else if (errorMessage.includes('Network error')) {
+        setError('Network error. Please check your connection and try again.');
+      }
+      
       setTimeout(() => setError(''), 5000);
     }
   };

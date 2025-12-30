@@ -634,7 +634,7 @@ async function addBusinessVolumeUpTree(
       } else {
         // Check if parent is admin (has unlimited children via parent relationship)
         const parentUser = await User.findById(currentTree.parent);
-        if (parentUser?.userId === "CROWN-000000") {
+        if (parentUser?.userId === "CNEOX-000000" || parentUser?.userId === "CROWN-000000") {
           // User is admin's child, add BV but don't calculate binary bonus
           // Admin doesn't follow binary tree rules for bonuses
           const adminPosition = position; // Use the original position

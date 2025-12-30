@@ -11,7 +11,7 @@ interface LoginTokenData {
 
 /**
  * Generate a temporary login token and store it in Redis
- * @param userId - User ID in format CROWN-XXXXXX
+ * @param userId - User ID in format CNEOX-XXXXXX (or CROWN-XXXXXX for backward compatibility)
  * @param userMongoId - MongoDB ObjectId of the user
  * @returns Promise<string> - Temporary token
  */

@@ -66,7 +66,7 @@ const CustomNode = memo(({ data }: { data: CustomNodeData }) => {
     onHover(null);
   }, [onHover]);
 
-  const isAdmin = user.userId === "CROWN-000000";
+  const isAdmin = user.userId === "CNEOX-000000" || user.userId === "CROWN-000000";
   const totalChildren = isAdmin ? (user.allChildren?.length || user.leftDownlines || 0) : null;
 
   return (
@@ -251,7 +251,7 @@ export default function MyTreePage() {
       levels[level].push(user);
       processed.add(user.id);
 
-      const isAdmin = user.userId === "CROWN-000000";
+      const isAdmin = user.userId === "CNEOX-000000" || user.userId === "CROWN-000000";
       const childrenSet = new Set<TreeUser>();
       
       if (isAdmin) {

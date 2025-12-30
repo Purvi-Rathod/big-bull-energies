@@ -210,6 +210,21 @@ export default function WithdrawPage() {
     }
   };
 
+  // Wallet order: ROI, Referral, Binary Bonus, Career Level, Interest, Token, Investment, Withdrawal
+  const walletOrder = ['roi', 'referral', 'binary', 'career_level', 'interest', 'token', 'investment', 'withdrawal'];
+  
+  const sortWallets = (wallets: Wallet[]): Wallet[] => {
+    return [...wallets].sort((a, b) => {
+      const indexA = walletOrder.indexOf(a.type);
+      const indexB = walletOrder.indexOf(b.type);
+      // If type not found in order, put it at the end
+      if (indexA === -1 && indexB === -1) return 0;
+      if (indexA === -1) return 1;
+      if (indexB === -1) return -1;
+      return indexA - indexB;
+    });
+  };
+
   const selectedWallet = wallets.find((w) => w.type === selectedWalletType);
   const availableBalance = selectedWallet
     ? selectedWallet.balance - selectedWallet.reserved
@@ -261,12 +276,12 @@ export default function WithdrawPage() {
                     className="w-full px-4 py-3 border border-yellow-500/40 rounded-xl bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-yellow-500/50 focus:border-yellow-500/70 font-semibold"
                   >
                     <option value="">Select a wallet</option>
-                    {wallets
+                    {sortWallets(wallets
                       .filter((w) =>
                         ['roi', 'interest', 'referral', 'binary', 'career_level'].includes(
                           w.type
                         )
-                      )
+                      ))
                       .map((wallet) => {
                         const label =
                           wallet.type === 'career_level'

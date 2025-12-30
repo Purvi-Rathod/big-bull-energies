@@ -23,10 +23,22 @@ jobs:
         with:
           ssh-private-key: ${{ secrets.PROD_SSH_KEY }}
 
-      - name: Add server to known hosts
+      - name: Configure SSH
         run: |
           mkdir -p ~/.ssh
+          chmod 700 ~/.ssh
           ssh-keyscan -H ${{ secrets.PROD_HOST }} >> ~/.ssh/known_hosts
+          chmod 644 ~/.ssh/known_hosts
+          
+          # Test SSH connection
+          echo "🔍 Testing SSH connection..."
+          ssh -v -o BatchMode=yes -o ConnectTimeout=5 ${{ secrets.PROD_USER }}@${{ secrets.PROD_HOST }} "echo 'SSH connection successful'" || {
+            echo "⚠️ SSH connection test failed. Please verify:"
+            echo "1. PROD_SSH_KEY contains the complete private key (including headers)"
+            echo "2. The corresponding public key is in ~/.ssh/authorized_keys on the server"
+            echo "3. PROD_USER, PROD_HOST, and PROD_PATH are correct"
+            exit 1
+          }
 
       - name: Create deployment script
         run: |
@@ -37,7 +49,13 @@ jobs:
           echo "🚀 Starting deployment..."
           
           # Navigate to application directory
-          cd $DEPLOY_PATH
+          cd "${DEPLOY_PATH}"
+          
+          # Verify we're in the right directory
+          if [ ! -f "docker-compose.yml" ]; then
+            echo "❌ Error: docker-compose.yml not found in ${DEPLOY_PATH}"
+            exit 1
+          fi
           
           # Pull latest changes
           echo "📥 Pulling latest changes from repository..."
@@ -45,7 +63,7 @@ jobs:
           git reset --hard origin/main
           
           # Detect Docker Compose command
-          if command -v docker &> /dev/null && docker compose version &> /dev/null; then
+          if command -v docker &> /dev/null && docker compose version &> /dev/null 2>&1; then
             DOCKER_COMPOSE="docker compose"
             echo "✅ Using Docker Compose v2"
           elif command -v docker-compose &> /dev/null; then
@@ -102,9 +120,17 @@ jobs:
           chmod +x /tmp/deploy.sh
 
       - name: Deploy to server
+        env:
+          DEPLOY_PATH: ${{ secrets.PROD_PATH }}
         run: |
-          scp /tmp/deploy.sh ${{ secrets.PROD_USER }}@${{ secrets.PROD_HOST }}:/tmp/deploy.sh
-          ssh ${{ secrets.PROD_USER }}@${{ secrets.PROD_HOST }} "DEPLOY_PATH='${{ secrets.PROD_PATH }}' bash /tmp/deploy.sh"
+          echo "📤 Copying deployment script to server..."
+          scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=~/.ssh/known_hosts \
+            /tmp/deploy.sh ${{ secrets.PROD_USER }}@${{ secrets.PROD_HOST }}:/tmp/deploy.sh
+          
+          echo "🚀 Executing deployment on server..."
+          ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=~/.ssh/known_hosts \
+            ${{ secrets.PROD_USER }}@${{ secrets.PROD_HOST }} \
+            "DEPLOY_PATH='${{ secrets.PROD_PATH }}' bash /tmp/deploy.sh"
 
       - name: Verify deployment
         run: |

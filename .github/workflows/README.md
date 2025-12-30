@@ -43,10 +43,10 @@ Make sure you have the following secrets configured in your GitHub repository se
    - Example: `199.188.204.202` or `yourdomain.com`
 
 3. **PROD_USER** - SSH user for the production server
-   - Example: `ubuntu` or `root`
+   - Example: `root` (as per your server setup)
 
 4. **PROD_PATH** - Path to the application directory on the server
-   - Example: `/home/ubuntu/app` or `/root/webapps/binary_system`
+   - Example: `/root/webapps/binary_system` (as per your server setup)
 
 ## How to Configure Secrets
 
@@ -95,9 +95,17 @@ You can trigger a deployment manually:
 ## Troubleshooting
 
 ### SSH Connection Issues
-- Verify `PROD_SSH_KEY` contains the correct private key
-- Ensure the public key is in the server's `~/.ssh/authorized_keys`
-- Check that `PROD_HOST`, `PROD_USER`, and `PROD_PATH` are correct
+
+**Most Common Issue:** `Permission denied (publickey, password)`
+
+This means the SSH key authentication is failing. See **`.github/SSH_SETUP_GUIDE.md`** for detailed instructions.
+
+Quick checklist:
+- Verify `PROD_SSH_KEY` contains the **complete private key** (including `-----BEGIN` and `-----END` lines)
+- Ensure the corresponding **public key** is in the server's `~/.ssh/authorized_keys`
+- Check file permissions on server: `~/.ssh` should be `700`, `authorized_keys` should be `600`
+- Verify `PROD_HOST`, `PROD_USER`, and `PROD_PATH` are correct
+- Test SSH connection manually: `ssh -i ~/.ssh/github_deploy_key root@199.188.204.202`
 
 ### Build Failures
 - Check the Actions logs for specific error messages

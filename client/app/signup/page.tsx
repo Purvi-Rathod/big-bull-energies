@@ -32,7 +32,7 @@ function SignupContent() {
     valid: boolean | null;
     message: string;
   }>({ checking: false, valid: null, message: '' });
-  const { signup } = useAuth();
+  const { signup, user, admin, loading: authLoading } = useAuth();
   const router = useRouter();
   const validationTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -94,6 +94,24 @@ function SignupContent() {
     };
   }, [searchParams]);
 
+  // Redirect after successful signup - auto-login user
+  useEffect(() => {
+    if (!authLoading) {
+      if (admin) {
+        // Admin account signup
+        router.replace('/admin/dashboard');
+      } else if (user) {
+        // Regular user signup - redirect to dashboard
+        if (user.userId === 'CNEOX-000000' || user.userId === 'CROWN-000000') {
+          // CNEOX-000000 or CROWN-000000 user should be redirected to admin dashboard
+          router.replace('/admin/dashboard');
+        } else {
+          router.replace('/dashboard');
+        }
+      }
+    }
+  }, [user, admin, router, authLoading]);
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData({
@@ -146,9 +164,8 @@ function SignupContent() {
       }
 
       await signup(signupData, isAdmin);
-      // Redirect to login page after successful signup so user can login
-      // This ensures proper authentication flow and prevents "invalid token" errors
-      router.push('/login?signup=success');
+      // User is now logged in automatically after signup
+      // The useEffect hook will handle redirecting to dashboard
     } catch (err: any) {
       setError(err.message || 'Signup failed. Please try again.');
     } finally {

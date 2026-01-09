@@ -46,41 +46,51 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       // Check if we're in an impersonation context
       const isImpersonating = typeof window !== 'undefined' && sessionStorage.getItem('isImpersonating') === 'true';
       
+      // Check for tokens before making requests to avoid unnecessary 401 errors
+      const hasUserToken = typeof window !== 'undefined' && localStorage.getItem('token');
+      const hasAdminToken = typeof window !== 'undefined' && localStorage.getItem('adminToken');
+      
       // If impersonating, prioritize user auth
       if (isImpersonating) {
-        try {
-          const userResponse = await api.getUserProfile();
-          if (userResponse.data?.user) {
-            setUser(userResponse.data.user);
-            setAdmin(null);
-            return;
+        if (hasUserToken || sessionStorage.getItem('token')) {
+          try {
+            const userResponse = await api.getUserProfile();
+            if (userResponse.data?.user) {
+              setUser(userResponse.data.user);
+              setAdmin(null);
+              return;
+            }
+          } catch (error) {
+            // User not authenticated in impersonation context - silently fail
           }
-        } catch (error) {
-          // User not authenticated in impersonation context
         }
       } else {
         // Normal flow: try user first, then admin
-        try {
-          const userResponse = await api.getUserProfile();
-          if (userResponse.data?.user) {
-            setUser(userResponse.data.user);
-            setAdmin(null);
-            return;
+        if (hasUserToken) {
+          try {
+            const userResponse = await api.getUserProfile();
+            if (userResponse.data?.user) {
+              setUser(userResponse.data.user);
+              setAdmin(null);
+              return;
+            }
+          } catch (error) {
+            // User not authenticated, try admin
           }
-        } catch (error) {
-          // User not authenticated, try admin
         }
 
-        // Try to get admin profile
-        try {
-          const adminResponse = await api.getAdminProfile();
-          if (adminResponse.data?.admin) {
-            setAdmin(adminResponse.data.admin);
-            setUser(null);
-            return;
+        // Try to get admin profile only if admin token exists
+        if (hasAdminToken) {
+          try {
+            const adminResponse = await api.getAdminProfile();
+            if (adminResponse.data?.admin) {
+              setAdmin(adminResponse.data.admin);
+              setUser(null);
+              return;
+            }
+          } catch (error) {
+            // Admin not authenticated - silently fail
           }
-        } catch (error) {
-          // Admin not authenticated
         }
       }
 

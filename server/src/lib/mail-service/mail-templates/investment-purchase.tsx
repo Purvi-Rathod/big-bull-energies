@@ -35,7 +35,7 @@ const InvestmentPurchaseEmail: React.FC<InvestmentPurchaseEmailProps> = ({
 }) => (
   <Html lang="en" dir="ltr">
     <Head>
-      <title>Investment Purchase Confirmation - CNEOX</title>
+      <title>Investment Purchase Confirmation - CROWN</title>
       <Font
         fontFamily="Roboto"
         fallbackFontFamily="Verdana"
@@ -126,7 +126,7 @@ const InvestmentPurchaseEmail: React.FC<InvestmentPurchaseEmailProps> = ({
         </Row>
         <Row>
           <Text style={{ color: '#6b7280', fontSize: '14px', lineHeight: '20px', marginTop: '16px' }}>
-            Thank you for investing with CNEOX!
+            Thank you for investing with CROWN!
           </Text>
         </Row>
       </Section>

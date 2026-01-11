@@ -12,8 +12,8 @@ export default function PublicHeader() {
       <div className="max-w-7xl mx-auto flex justify-between items-center gap-4">
         <Link href="/" className="flex items-center gap-3 flex-shrink-0">
           <Image
-            src="/logo1.png"
-            alt="CNEOX Logo"
+            src="/image.png"
+            alt="Crown Bankers Logo"
             width={120}
             height={40}
             className="h-10 w-auto"

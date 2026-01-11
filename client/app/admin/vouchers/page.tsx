@@ -381,7 +381,7 @@ export default function AdminVouchersPage() {
                   type="text"
                   value={formUserId}
                   onChange={(e) => setFormUserId(e.target.value)}
-                  placeholder="e.g., CNEOX-000001"
+                  placeholder="e.g., CROWN-000001"
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
                 />
               </div>

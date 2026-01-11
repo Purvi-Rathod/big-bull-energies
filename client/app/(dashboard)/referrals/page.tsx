@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { api } from '@/lib/api';
-import CneoLoader from '@/components/CneoLoader';
+import CrownLoader from '@/components/CrownLoader';
 
 interface Referral {
   id: string;
@@ -118,7 +118,7 @@ export default function ReferralsPage() {
   };
 
   if (loading) {
-    return <CneoLoader fullScreen />;
+    return <CrownLoader fullScreen />;
   }
 
   return (

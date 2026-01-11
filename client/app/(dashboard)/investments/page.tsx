@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import { api } from '@/lib/api';
 import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
-import CneoLoader from '@/components/CneoLoader';
+import CrownLoader from '@/components/CrownLoader';
 
 interface Investment {
   id: string;
@@ -105,7 +105,7 @@ export default function InvestmentsPage() {
   };
 
   if (loading) {
-    return <CneoLoader fullScreen />;
+    return <CrownLoader fullScreen />;
   }
 
   return (

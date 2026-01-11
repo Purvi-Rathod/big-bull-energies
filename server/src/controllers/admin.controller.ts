@@ -916,7 +916,7 @@ export const updateUserStatus = asyncHandler(async (req, res) => {
     }
 
     // Prevent status change of admin user
-    if (user.userId === "CNEOX-000000" || user.userId === "CROWN-000000") {
+    if (user.userId === "CROWN-000000" || user.userId === "CNEOX-000000") {
       throw new AppError("Cannot change status of admin user", 403);
     }
 
@@ -955,7 +955,7 @@ export const deleteUser = asyncHandler(async (req, res) => {
     }
 
     // Prevent deletion of admin user
-    if (user.userId === "CNEOX-000000" || user.userId === "CROWN-000000") {
+    if (user.userId === "CROWN-000000" || user.userId === "CNEOX-000000") {
       throw new AppError("Cannot delete admin user", 403);
     }
 

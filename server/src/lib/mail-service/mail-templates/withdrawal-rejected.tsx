@@ -35,7 +35,7 @@ const WithdrawalRejectedEmail: React.FC<WithdrawalRejectedEmailProps> = ({
 }) => (
   <Html lang="en" dir="ltr">
     <Head>
-      <title>Withdrawal Request Rejected - CNEOX</title>
+      <title>Withdrawal Request Rejected - CROWN</title>
       <Font
         fontFamily="Roboto"
         fallbackFontFamily="Verdana"
@@ -133,7 +133,7 @@ const WithdrawalRejectedEmail: React.FC<WithdrawalRejectedEmailProps> = ({
         </Row>
         <Row>
           <Text style={{ color: '#6b7280', fontSize: '14px', lineHeight: '20px', marginTop: '16px' }}>
-            Thank you for using CNEOX!
+            Thank you for using CROWN!
           </Text>
         </Row>
       </Section>

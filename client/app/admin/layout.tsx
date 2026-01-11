@@ -35,7 +35,7 @@ export default function AdminLayout({
   useEffect(() => {
     if (authLoading) return;
 
-    const isAdminUser = user?.userId === 'CNEOX-000000' || user?.userId === 'CROWN-000000';
+    const isAdminUser = user?.userId === 'CROWN-000000' || user?.userId === 'CROWN-000000';
     const isAdminAccount = !!admin;
 
     if (!isAdminUser && !isAdminAccount) {
@@ -54,7 +54,7 @@ export default function AdminLayout({
     );
   }
 
-  const isAdminUser = user?.userId === 'CNEOX-000000' || user?.userId === 'CROWN-000000';
+  const isAdminUser = user?.userId === 'CROWN-000000' || user?.userId === 'CROWN-000000';
   const isAdminAccount = !!admin;
 
   if (!isAdminUser && !isAdminAccount) {
@@ -167,8 +167,8 @@ export default function AdminLayout({
           {sidebarOpen ? (
             <Link href="/admin/dashboard" className="flex items-center gap-2">
               <Image
-                src="/logo1.png"
-                alt="CNEOX Logo"
+                src="/image.png"
+                alt="Crown Bankers Logo"
                 width={120}
                 height={40}
                 className="h-8 w-auto"
@@ -177,8 +177,8 @@ export default function AdminLayout({
           ) : (
             <Link href="/admin/dashboard" className="flex items-center justify-center">
               <Image
-                src="/logo1.png"
-                alt="CNEOX"
+                src="/image.png"
+                alt="Crown Bankers Logo"
                 width={40}
                 height={40}
                 className="h-8 w-8 object-contain"

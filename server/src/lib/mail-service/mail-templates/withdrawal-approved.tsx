@@ -35,7 +35,7 @@ const WithdrawalApprovedEmail: React.FC<WithdrawalApprovedEmailProps> = ({
 }) => (
   <Html lang="en" dir="ltr">
     <Head>
-      <title>Withdrawal Approved - CNEOX</title>
+      <title>Withdrawal Approved - CROWN</title>
       <Font
         fontFamily="Roboto"
         fallbackFontFamily="Verdana"
@@ -119,7 +119,7 @@ const WithdrawalApprovedEmail: React.FC<WithdrawalApprovedEmailProps> = ({
         </Row>
         <Row>
           <Text style={{ color: '#6b7280', fontSize: '14px', lineHeight: '20px', marginTop: '16px' }}>
-            Thank you for using CNEOX!
+            Thank you for using CROWN!
           </Text>
         </Row>
       </Section>

@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { api } from '@/lib/api';
-import CneoLoader from '@/components/CneoLoader';
+import CrownLoader from '@/components/CrownLoader';
 
 interface BinaryTreeInfo {
   parent: {
@@ -68,7 +68,7 @@ export default function BinaryPage() {
   };
 
   if (loading) {
-    return <CneoLoader fullScreen />;
+    return <CrownLoader fullScreen />;
   }
 
   if (!binaryTree) {

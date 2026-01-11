@@ -39,7 +39,7 @@ class ApiClient {
       let token: string | null = null;
       
       if (isAdminRoute) {
-        // For admin routes: use adminToken, or token if CNEOX-000000 or CROWN-000000
+        // For admin routes: use adminToken, or token if CROWN-000000 or CROWN-000000
         // Don't use impersonated token for admin routes
         if (!isImpersonating) {
           token = localStorage.getItem('adminToken') || localStorage.getItem('token');

@@ -34,7 +34,7 @@ export default function AdminPanel() {
 
   useEffect(() => {
     // Only fetch users if authorized
-    const isAdminUser = user?.userId === 'CNEOX-000000' || user?.userId === 'CROWN-000000';
+    const isAdminUser = user?.userId === 'CROWN-000000' || user?.userId === 'CROWN-000000';
     const isAdminAccount = !!admin;
 
     if (isAdminUser || isAdminAccount) {
@@ -332,7 +332,7 @@ export default function AdminPanel() {
                                 e.stopPropagation();
                                 setOpenDropdown(openDropdown === user.userId ? null : user.userId);
                               }}
-                              disabled={deletingUserId === user.userId || updatingStatus === user.userId || user.userId === 'CNEOX-000000' || user.userId === 'CROWN-000000'}
+                              disabled={deletingUserId === user.userId || updatingStatus === user.userId || user.userId === 'CROWN-000000' || user.userId === 'CROWN-000000'}
                               className="p-1.5 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-md disabled:opacity-50 disabled:cursor-not-allowed"
                               title="Actions"
                             >
@@ -362,7 +362,7 @@ export default function AdminPanel() {
                                       e.stopPropagation();
                                       handleDeactivate(user.userId, user.status);
                                     }}
-                                    disabled={updatingStatus === user.userId || user.userId === 'CNEOX-000000' || user.userId === 'CROWN-000000'}
+                                    disabled={updatingStatus === user.userId || user.userId === 'CROWN-000000' || user.userId === 'CROWN-000000'}
                                     className="w-full text-left px-4 py-2 text-sm text-yellow-600 hover:bg-yellow-50 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                                   >
                                     {user.status === 'active' ? (
@@ -384,7 +384,7 @@ export default function AdminPanel() {
                                       setOpenDropdown(null);
                                       handleDeleteClick(user.userId, user.name);
                                     }}
-                                    disabled={deletingUserId === user.userId || user.userId === 'CNEOX-000000' || user.userId === 'CROWN-000000'}
+                                    disabled={deletingUserId === user.userId || user.userId === 'CROWN-000000' || user.userId === 'CROWN-000000'}
                                     className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                                   >
                                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

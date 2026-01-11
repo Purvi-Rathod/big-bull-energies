@@ -15,7 +15,7 @@ import ReactFlow, {
 } from 'reactflow';
 import 'reactflow/dist/style.css';
 import { api } from '@/lib/api';
-import CneoLoader from '@/components/CneoLoader';
+import CrownLoader from '@/components/CrownLoader';
 
 interface TreeUser {
   id: string;
@@ -66,7 +66,7 @@ const CustomNode = memo(({ data }: { data: CustomNodeData }) => {
     onHover(null);
   }, [onHover]);
 
-  const isAdmin = user.userId === "CNEOX-000000" || user.userId === "CROWN-000000";
+  const isAdmin = user.userId === "CROWN-000000" || user.userId === "CROWN-000000";
   const totalChildren = isAdmin ? (user.allChildren?.length || user.leftDownlines || 0) : null;
 
   return (
@@ -251,7 +251,7 @@ export default function MyTreePage() {
       levels[level].push(user);
       processed.add(user.id);
 
-      const isAdmin = user.userId === "CNEOX-000000" || user.userId === "CROWN-000000";
+      const isAdmin = user.userId === "CROWN-000000" || user.userId === "CROWN-000000";
       const childrenSet = new Set<TreeUser>();
       
       if (isAdmin) {
@@ -410,7 +410,7 @@ export default function MyTreePage() {
   }, []);
 
   if (loading) {
-    return <CneoLoader fullScreen />;
+    return <CrownLoader fullScreen />;
   }
 
   if (error) {

@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { api } from '@/lib/api';
-import CneoLoader from '@/components/CneoLoader';
+import CrownLoader from '@/components/CrownLoader';
 
 interface Package {
   id: string;
@@ -219,7 +219,7 @@ export default function PlansPage() {
 
 
   if (loading) {
-    return <CneoLoader fullScreen />;
+    return <CrownLoader fullScreen />;
   }
 
   return (

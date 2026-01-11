@@ -5,7 +5,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { api } from '@/lib/api';
 import { countries } from '@/lib/countries';
 import toast from 'react-hot-toast';
-import CneoLoader from '@/components/CneoLoader';
+import CrownLoader from '@/components/CrownLoader';
 
 export default function ProfilePage() {
   const { user, refreshAuth } = useAuth();
@@ -77,7 +77,7 @@ export default function ProfilePage() {
   };
 
   if (loading) {
-    return <CneoLoader fullScreen />;
+    return <CrownLoader fullScreen />;
   }
 
   return (

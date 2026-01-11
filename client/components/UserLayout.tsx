@@ -5,7 +5,7 @@ import { useRouter, usePathname } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import Link from 'next/link';
 import Image from 'next/image';
-import CneoLoader from './CneoLoader';
+import CrownLoader from './CrownLoader';
 
 export default function UserLayout({
   children,
@@ -105,7 +105,7 @@ export default function UserLayout({
   };
 
   if (authLoading) {
-    return <CneoLoader fullScreen />;
+    return <CrownLoader fullScreen />;
   }
 
   return (
@@ -131,8 +131,8 @@ export default function UserLayout({
           {sidebarOpen ? (
             <Link href="/" className="flex items-center gap-2">
               <Image
-                src="/logo1.png"
-                alt="CNEOX Logo"
+                src="/image.png"
+                alt="Crown Bankers Logo"
                 width={120}
                 height={40}
                 className="h-8 w-auto"
@@ -141,8 +141,8 @@ export default function UserLayout({
           ) : (
             <Link href="/" className="flex items-center justify-center">
               <Image
-                src="/logo1.png"
-                alt="CNEOX"
+                src="/image.png"
+                alt="Crown Bankers Logo"
                 width={40}
                 height={40}
                 className="h-8 w-8 object-contain"

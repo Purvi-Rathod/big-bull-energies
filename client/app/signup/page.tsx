@@ -7,7 +7,7 @@ import { api } from '@/lib/api';
 import { countries } from '@/lib/countries';
 import Image from 'next/image';
 import Link from 'next/link';
-import CneoLoader from '@/components/CneoLoader';
+import CrownLoader from '@/components/CrownLoader';
 
 function SignupContent() {
   const searchParams = useSearchParams();
@@ -102,8 +102,8 @@ function SignupContent() {
         router.replace('/admin/dashboard');
       } else if (user) {
         // Regular user signup - redirect to dashboard
-        if (user.userId === 'CNEOX-000000' || user.userId === 'CROWN-000000') {
-          // CNEOX-000000 or CROWN-000000 user should be redirected to admin dashboard
+        if (user.userId === 'CROWN-000000' || user.userId === 'CROWN-000000') {
+          // CROWN-000000 or CROWN-000000 user should be redirected to admin dashboard
           router.replace('/admin/dashboard');
         } else {
           router.replace('/dashboard');
@@ -195,8 +195,8 @@ function SignupContent() {
           <div className="flex justify-center mb-6">
             <Link href="/">
               <Image
-                src="/logo1.png"
-                alt="CNEOX Logo"
+                src="/image.png"
+                alt="Crown Bankers Logo"
                 width={180}
                 height={60}
                 className="h-14 w-auto cursor-pointer hover:opacity-80 transition-opacity"
@@ -349,7 +349,7 @@ function SignupContent() {
                         ? 'border-red-500/50 text-white focus:ring-red-500/50 focus:border-red-500/70'
                         : 'border-yellow-500/40 text-white focus:ring-yellow-500/50 focus:border-yellow-500/70'
                     }`}
-                    placeholder="CNEOX-XXXXXX"
+                    placeholder="CROWN-XXXXXX"
                     value={formData.referrerId}
                     onChange={handleChange}
                   />
@@ -525,7 +525,7 @@ function SignupContent() {
 
 export default function SignupPage() {
   return (
-    <Suspense fallback={<CneoLoader fullScreen />}>
+    <Suspense fallback={<CrownLoader fullScreen />}>
       <SignupContent />
     </Suspense>
   );

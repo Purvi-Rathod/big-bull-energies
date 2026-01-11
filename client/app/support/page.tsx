@@ -13,7 +13,7 @@ export default function SupportPage() {
     {
       icon: "📚",
       title: "Getting Started",
-      description: "New to CNEOX? Learn how to create an account, make your first investment, and start earning.",
+      description: "New to CROWN? Learn how to create an account, make your first investment, and start earning.",
       link: "/how-to-start"
     },
     {
@@ -50,7 +50,7 @@ export default function SupportPage() {
 
   const faqs = [
     {
-      question: "How do I get started with CNEOX?",
+      question: "How do I get started with CROWN?",
       answer: "Simply sign up for a free account, set up your USDT TRC20 wallet address, fund your Investment Wallet, choose a package, and start earning. Visit our 'How to Start' page for detailed steps."
     },
     {
@@ -114,7 +114,7 @@ export default function SupportPage() {
           <div className="p-8 bg-yellow-500/5 backdrop-blur-md rounded-2xl border border-yellow-500/20">
             <h2 className="text-3xl font-bold text-white mb-6">Our Support System</h2>
             <p className="text-white/80 text-lg leading-relaxed mb-6">
-              CNEOX provides comprehensive 24/7 support through our integrated ticket system. Once you're logged in, 
+              CROWN provides comprehensive 24/7 support through our integrated ticket system. Once you're logged in, 
               you can create support tickets for any questions, issues, or assistance you need. Our support team 
               responds promptly to ensure you have the best experience on our platform.
             </p>
@@ -144,7 +144,7 @@ export default function SupportPage() {
               <div className="p-6 bg-yellow-500/5 rounded-xl">
                 <h3 className="text-xl font-bold text-white mb-4">Step 1: Log In to Your Account</h3>
                 <p className="text-white/70">
-                  Access your CNEOX dashboard by logging in with your credentials. Support tickets are available 
+                  Access your CROWN dashboard by logging in with your credentials. Support tickets are available 
                   to all registered users.
                 </p>
               </div>
@@ -218,7 +218,7 @@ export default function SupportPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <Link href="/how-it-works" className="p-4 bg-white/10 rounded-lg hover:bg-white/15 transition-all">
                 <div className="font-semibold text-white mb-1">How It Works</div>
-                <div className="text-white/70 text-sm">Complete guide to CNEOX features</div>
+                <div className="text-white/70 text-sm">Complete guide to CROWN features</div>
               </Link>
               <Link href="/how-to-start" className="p-4 bg-white/10 rounded-lg hover:bg-white/15 transition-all">
                 <div className="font-semibold text-white mb-1">Getting Started Guide</div>
@@ -262,7 +262,7 @@ export default function SupportPage() {
       {/* Footer */}
       <footer className="relative z-10 border-t border-yellow-500/20 mt-20 bg-gray-900">
         <div className="max-w-7xl mx-auto px-6 py-8 text-center text-white/70">
-          <p>&copy; {new Date().getFullYear()} CNEOX. All rights reserved.</p>
+          <p>&copy; {new Date().getFullYear()} CROWN. All rights reserved.</p>
           <div className="mt-4 flex justify-center gap-6">
             <Link href="/about-us" className="hover:text-white transition-colors">About Us</Link>
             <Link href="/policy" className="hover:text-white transition-colors">Privacy & Terms</Link>

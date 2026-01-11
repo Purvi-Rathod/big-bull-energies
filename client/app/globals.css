@@ -1,5 +1,102 @@
 @import "tailwindcss";
 
+@font-face {
+  font-family: "CustomFont";
+  src: url("../fonts/font4.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "CustomFont";
+  src: url("../fonts/font5.woff2") format("woff2");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "CustomFont";
+  src: url("../fonts/font6.woff2") format("woff2");
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "CustomFont";
+  src: url("../fonts/font1.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "CustomFont";
+  src: url("../fonts/font2.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "CustomFont";
+  src: url("../fonts/font3.woff") format("woff");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Individual font families for showcase */
+@font-face {
+  font-family: "Font1";
+  src: url("../fonts/font1.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Font2";
+  src: url("../fonts/font2.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Font3";
+  src: url("../fonts/font3.woff") format("woff");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Font4";
+  src: url("../fonts/font4.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Font5";
+  src: url("../fonts/font5.woff2") format("woff2");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Font6";
+  src: url("../fonts/font6.woff2") format("woff2");
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
 :root {
   --background: #ffffff;
   --foreground: #171717;
@@ -35,8 +132,8 @@ body {
 /* Removed forced black text to allow dark theme pages to use white text */
 /* Individual components should set text color based on their theme */
 
-/* CNEOX Loader Animations */
-@keyframes cneoArcRotate1 {
+/* CROWN Loader Animations */
+@keyframes crownArcRotate1 {
   0% {
     transform: rotate(0deg);
     opacity: 1;
@@ -50,7 +147,7 @@ body {
   }
 }
 
-@keyframes cneoArcRotate2 {
+@keyframes crownArcRotate2 {
   0% {
     transform: rotate(180deg);
     opacity: 1;
@@ -64,16 +161,16 @@ body {
   }
 }
 
-.cneo-arc-1 {
-  animation: cneoArcRotate1 2s linear infinite;
+.crown-arc-1 {
+  animation: crownArcRotate1 2s linear infinite;
 }
 
-.cneo-arc-2 {
-  animation: cneoArcRotate2 2s linear infinite;
+.crown-arc-2 {
+  animation: crownArcRotate2 2s linear infinite;
 }
 
 /* Fade-in animation for loader */
-@keyframes cneoLoaderFadeIn {
+@keyframes crownLoaderFadeIn {
   from {
     opacity: 0;
   }
@@ -82,8 +179,8 @@ body {
   }
 }
 
-.cneo-loader-container {
-  animation: cneoLoaderFadeIn 0.3s ease-in;
+.crown-loader-container {
+  animation: crownLoaderFadeIn 0.3s ease-in;
 }
 
 /* Dashboard Page Animations */
@@ -224,4 +321,33 @@ body {
 
 .animation-delay-1500 {
   animation-delay: 1.5s;
+}
+
+@keyframes scroll {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-scroll {
+  animation: scroll 30s linear infinite;
+  display: flex;
+}
+
+@keyframes slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-slide-up {
+  animation: slide-up 0.6s ease-out forwards;
 }

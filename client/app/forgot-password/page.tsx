@@ -49,8 +49,8 @@ export default function ForgotPasswordPage() {
         <div>
           <div className="flex justify-center mb-6">
             <Image
-              src="/logo1.png"
-              alt="CNEOX Logo"
+              src="/image.png"
+              alt="Crown Bankers Logo"
               width={180}
               height={60}
               className="h-14 w-auto"
@@ -101,7 +101,7 @@ export default function ForgotPasswordPage() {
                 type="text"
                 required
                 className="appearance-none relative block w-full px-4 py-3 border-2 border-yellow-500/40 placeholder-gray-500 text-white bg-gray-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-yellow-500/50 focus:border-yellow-500/70 transition-all sm:text-sm font-semibold"
-                placeholder="User ID (CNEOX-XXXXXX)"
+                placeholder="User ID (CROWN-XXXXXX)"
                 value={userId}
                 onChange={(e) => setUserId(e.target.value)}
               />

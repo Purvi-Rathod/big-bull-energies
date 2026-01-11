@@ -42,9 +42,9 @@ export const sendSignupWelcomeEmail = async ({
 
     // Email options
     const mailOptions = {
-      from: process.env.EMAIL_USER || 'noreply@cneox.com',
+      from: process.env.EMAIL_USER || 'noreply@crown.com',
       to,
-      subject: 'Welcome to CNEOX - Your Account is Ready!',
+      subject: 'Welcome to CROWN - Your Account is Ready!',
       html: emailHtml,
     };
 
@@ -101,7 +101,7 @@ export const sendInvestmentPurchaseEmail = async ({
 
     // Email options
     const mailOptions = {
-      from: process.env.EMAIL_USER || 'noreply@cneox.com',
+      from: process.env.EMAIL_USER || 'noreply@crown.com',
       to,
       subject: `Investment Confirmation - ${packageName}`,
       html: emailHtml,
@@ -155,7 +155,7 @@ export const sendWithdrawalCreatedEmail = async ({
     );
 
     const mailOptions = {
-      from: process.env.EMAIL_USER || 'noreply@cneox.com',
+      from: process.env.EMAIL_USER || 'noreply@crown.com',
       to,
       subject: `Withdrawal Request Submitted - $${amount.toFixed(2)}`,
       html: emailHtml,
@@ -210,7 +210,7 @@ export const sendWithdrawalApprovedEmail = async ({
     );
 
     const mailOptions = {
-      from: process.env.EMAIL_USER || 'noreply@cneox.com',
+      from: process.env.EMAIL_USER || 'noreply@crown.com',
       to,
       subject: `Withdrawal Approved - $${amount.toFixed(2)}`,
       html: emailHtml,
@@ -265,7 +265,7 @@ export const sendWithdrawalRejectedEmail = async ({
     );
 
     const mailOptions = {
-      from: process.env.EMAIL_USER || 'noreply@cneox.com',
+      from: process.env.EMAIL_USER || 'noreply@crown.com',
       to,
       subject: `Withdrawal Request Rejected - $${amount.toFixed(2)}`,
       html: emailHtml,
@@ -302,9 +302,9 @@ export const sendPasswordResetEmail = async ({
     );
 
     const mailOptions = {
-      from: process.env.EMAIL_USER || 'noreply@cneox.com',
+      from: process.env.EMAIL_USER || 'noreply@crown.com',
       to,
-      subject: 'Reset Your Password - CNEOX',
+      subject: 'Reset Your Password - CROWN',
       html: emailHtml,
     };
 
@@ -345,7 +345,7 @@ export const sendTicketCreatedEmail = async ({
     );
 
     const mailOptions = {
-      from: process.env.EMAIL_USER || 'noreply@cneox.com',
+      from: process.env.EMAIL_USER || 'noreply@crown.com',
       to,
       subject: `Support Ticket Created - ${subject}`,
       html: emailHtml,
@@ -393,7 +393,7 @@ export const sendTicketStatusUpdateEmail = async ({
     );
 
     const mailOptions = {
-      from: process.env.EMAIL_USER || 'noreply@cneox.com',
+      from: process.env.EMAIL_USER || 'noreply@crown.com',
       to,
       subject: `Ticket Status Updated - ${subject}`,
       html: emailHtml,

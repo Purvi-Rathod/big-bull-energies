@@ -32,7 +32,7 @@ export default function BinaryInvestmentSystemPage() {
           <div className="p-8 bg-yellow-500/5 backdrop-blur-md rounded-2xl border border-yellow-500/20">
             <h2 className="text-3xl font-bold text-white mb-6">What is the Binary System?</h2>
             <p className="text-white/80 text-lg leading-relaxed mb-6">
-              The Binary Investment System is the core structure of CNEOX, designed to reward users for building 
+              The Binary Investment System is the core structure of CROWN, designed to reward users for building 
               balanced networks. Unlike traditional MLM structures, the binary system focuses on two legs (left and right), 
               creating a fair and sustainable compensation model.
             </p>
@@ -225,7 +225,7 @@ export default function BinaryInvestmentSystemPage() {
           <div className="text-center p-8 bg-gradient-to-br from-yellow-500/20 via-yellow-600/20 to-amber-500/20 backdrop-blur-md rounded-2xl border border-white/20">
             <h2 className="text-3xl font-bold text-white mb-4">Ready to Start Earning Binary Bonuses?</h2>
             <p className="text-white/80 mb-6 text-lg">
-              Join CNEOX and start building your balanced binary network today
+              Join CROWN and start building your balanced binary network today
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link
@@ -238,7 +238,7 @@ export default function BinaryInvestmentSystemPage() {
                 href="/how-it-works"
                 className="px-8 py-3 bg-yellow-500/10 backdrop-blur-sm text-white rounded-xl font-semibold border-2 border-yellow-500/30 hover:bg-yellow-500/20 transition-all"
               >
-                Learn More About CNEOX
+                Learn More About CROWN
               </Link>
             </div>
           </div>
@@ -248,7 +248,7 @@ export default function BinaryInvestmentSystemPage() {
       {/* Footer */}
       <footer className="relative z-10 border-t border-yellow-500/20 mt-20 bg-gray-900">
         <div className="max-w-7xl mx-auto px-6 py-8 text-center text-white/70">
-          <p>&copy; {new Date().getFullYear()} CNEOX. All rights reserved.</p>
+          <p>&copy; {new Date().getFullYear()} CROWN. All rights reserved.</p>
           <div className="mt-4 flex justify-center gap-6">
             <Link href="/about-us" className="hover:text-white transition-colors">About Us</Link>
             <Link href="/policy" className="hover:text-white transition-colors">Privacy & Terms</Link>

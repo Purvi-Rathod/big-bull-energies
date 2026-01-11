@@ -2,6 +2,17 @@
  * Utility functions for optimization and common operations
  */
 
+import { type ClassValue, clsx } from "clsx";
+import { twMerge } from "tailwind-merge";
+
+/**
+ * Utility function to merge Tailwind CSS classes
+ * Combines clsx and tailwind-merge for optimal class merging
+ */
+export function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs));
+}
+
 /**
  * Debounce function to limit the rate of function calls
  * Useful for search inputs, resize events, etc.

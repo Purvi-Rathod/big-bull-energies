@@ -25,7 +25,7 @@ const SignupWelcomeEmail: React.FC<SignupWelcomeEmailProps> = ({
 }) => (
   <Html lang="en" dir="ltr">
     <Head>
-      <title>Welcome to CNEOX</title>
+      <title>Welcome to CROWN</title>
       <Font
         fontFamily="Roboto"
         fallbackFontFamily="Verdana"
@@ -37,12 +37,12 @@ const SignupWelcomeEmail: React.FC<SignupWelcomeEmailProps> = ({
         fontStyle="normal"
       />
     </Head>
-    <Preview>Welcome to CNEOX! Your account has been successfully created.</Preview>
+    <Preview>Welcome to CROWN! Your account has been successfully created.</Preview>
     <Container style={{ maxWidth: '600px', margin: '0 auto', padding: '20px', fontFamily: 'Roboto, Verdana, sans-serif' }}>
       <Section>
         <Row>
           <Heading as="h2" style={{ color: '#1f2937', marginBottom: '20px' }}>
-            Welcome to CNEOX, {name}!
+            Welcome to CROWN, {name}!
           </Heading>
         </Row>
         <Row>

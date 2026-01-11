@@ -13,7 +13,7 @@ export default function HowItWorksPage() {
     {
       number: "1",
       title: "Create Your Account",
-      description: "Sign up for free and get your unique user ID (e.g., CNEOX-XXXXXX). No upfront costs or hidden fees.",
+      description: "Sign up for free and get your unique user ID (e.g., CROWN-XXXXXX). No upfront costs or hidden fees.",
       icon: "👤",
       details: [
         "Provide your name, email, and password",
@@ -118,7 +118,7 @@ export default function HowItWorksPage() {
       <section className="relative py-20 px-6">
         <div className="max-w-4xl mx-auto text-center">
           <h1 className="text-5xl sm:text-6xl font-extrabold text-white mb-6">
-            How <span className="bg-gradient-to-r from-yellow-400 to-yellow-600 bg-clip-text text-transparent">CNEOX</span> Works
+            How <span className="bg-gradient-to-r from-yellow-400 to-yellow-600 bg-clip-text text-transparent">CROWN</span> Works
           </h1>
           <p className="text-xl text-white/80 leading-relaxed">
             A simple 6-step process to start earning through our binary investment platform
@@ -211,7 +211,7 @@ export default function HowItWorksPage() {
             <h2 className="text-3xl font-bold text-white mb-6">Understanding the Binary System</h2>
             <div className="space-y-6 text-white/80 text-lg leading-relaxed">
               <p>
-                CNEOX uses a binary tree structure where each user can have two direct referrals: one on the left 
+                CROWN uses a binary tree structure where each user can have two direct referrals: one on the left 
                 and one on the right. This structure creates balanced growth opportunities:
               </p>
               <ul className="space-y-4 ml-6">
@@ -270,7 +270,7 @@ export default function HowItWorksPage() {
       {/* Footer */}
       <footer className="relative z-10 border-t border-yellow-500/20 mt-20 bg-gray-900">
         <div className="max-w-7xl mx-auto px-6 py-8 text-center text-white/70">
-          <p>&copy; {new Date().getFullYear()} CNEOX. All rights reserved.</p>
+          <p>&copy; {new Date().getFullYear()} CROWN. All rights reserved.</p>
           <div className="mt-4 flex justify-center gap-6">
             <Link href="/about-us" className="hover:text-white transition-colors">About Us</Link>
             <Link href="/policy" className="hover:text-white transition-colors">Privacy & Terms</Link>

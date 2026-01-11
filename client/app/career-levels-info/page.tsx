@@ -282,7 +282,7 @@ export default function CareerLevelsInfoPage() {
           <div className="text-center p-8 bg-gradient-to-br from-yellow-500/20 via-amber-500/20 to-orange-500/20 backdrop-blur-md rounded-2xl border border-white/20">
             <h2 className="text-3xl font-bold text-white mb-4">Start Your Career Level Journey</h2>
             <p className="text-white/80 mb-6 text-lg">
-              Join CNEOX and begin earning career level rewards as you build your network
+              Join CROWN and begin earning career level rewards as you build your network
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link
@@ -305,7 +305,7 @@ export default function CareerLevelsInfoPage() {
       {/* Footer */}
       <footer className="relative z-10 border-t border-yellow-500/20 mt-20 bg-gray-900">
         <div className="max-w-7xl mx-auto px-6 py-8 text-center text-white/70">
-          <p>&copy; {new Date().getFullYear()} CNEOX. All rights reserved.</p>
+          <p>&copy; {new Date().getFullYear()} CROWN. All rights reserved.</p>
           <div className="mt-4 flex justify-center gap-6">
             <Link href="/about-us" className="hover:text-white transition-colors">About Us</Link>
             <Link href="/policy" className="hover:text-white transition-colors">Privacy & Terms</Link>

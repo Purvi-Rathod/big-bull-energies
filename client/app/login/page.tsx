@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import Image from 'next/image';
 import Link from 'next/link';
-import CneoLoader from '@/components/CneoLoader';
+import CrownLoader from '@/components/CrownLoader';
 
 function LoginContent() {
   const [userId, setUserId] = useState('');
@@ -36,8 +36,8 @@ function LoginContent() {
         router.replace('/admin/dashboard');
     } else if (user) {
       // Regular user login
-      if (user.userId === 'CNEOX-000000' || user.userId === 'CROWN-000000') {
-        // CNEOX-000000 or CROWN-000000 user should be redirected to admin dashboard
+      if (user.userId === 'CROWN-000000' || user.userId === 'CROWN-000000') {
+        // CROWN-000000 or CROWN-000000 user should be redirected to admin dashboard
           router.replace('/admin/dashboard');
       } else {
           router.replace('/dashboard');
@@ -111,8 +111,8 @@ function LoginContent() {
           <div className="flex justify-center mb-6">
             <Link href="/">
               <Image
-                src="/logo1.png"
-                alt="CNEOX Logo"
+                src="/image.png"
+                alt="Crown Bankers Logo"
                 width={180}
                 height={60}
                 className="h-14 w-auto cursor-pointer hover:opacity-80 transition-opacity"
@@ -155,7 +155,7 @@ function LoginContent() {
                 type="text"
                 required
                 className="appearance-none relative block w-full px-4 py-3 border-2 border-yellow-500/40 placeholder-gray-500 text-white bg-gray-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-yellow-500/50 focus:border-yellow-500/70 transition-all sm:text-sm font-semibold"
-                placeholder={isAdmin ? "Enter your email" : "User ID (CNEOX-XXXXXX)"}
+                placeholder={isAdmin ? "Enter your email" : "User ID (CROWN-XXXXXX)"}
                 value={userId}
                 onChange={(e) => setUserId(e.target.value)}
               />
@@ -250,7 +250,7 @@ function LoginContent() {
 
 export default function LoginPage() {
   return (
-    <Suspense fallback={<CneoLoader fullScreen />}>
+    <Suspense fallback={<CrownLoader fullScreen />}>
       <LoginContent />
     </Suspense>
   );

@@ -333,7 +333,7 @@ export default function StoragePage() {
             {/* Right Side - Diagram Illustration */}
             <div className="relative w-full h-[300px] sm:h-[350px] md:h-[400px] lg:h-[500px] xl:h-[600px] order-1 lg:order-2 mb-4 sm:mb-0">
               <Image
-                src="/img2.webp"
+                src="/image copy.png"
                 alt="How Energy Storage Works Diagram"
                 fill
                 className="object-contain"

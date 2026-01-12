@@ -4,7 +4,7 @@ import compression from 'compression';
 import {setupSwagger} from './swagger'
 import { asyncHandler } from './utils/asyncHandler';
 import { AppError } from './utils/AppError';
-import { cors, securityHeaders, generalLimiter, authLimiter } from './config';
+import { cors, securityHeaders, generalLimiter, authLimiter, conditionalAuthLimiter } from './config';
 import adminRoutes from './routes/admin.routes';
 
 const app = express();
@@ -42,13 +42,16 @@ import authRoutes from './routes/auth.routes';
 import treeRoutes from './routes/tree.routes';
 import userRoutes from './routes/user.routes';
 import paymentRoutes from './routes/payment.routes';
+import galleryRoutes from './routes/gallery.routes';
 
 // Apply rate limiting to specific routes
-app.use("/api/v1/auth", authLimiter, authRoutes);
+// Auth routes use conditional rate limiting (can be disabled via admin panel)
+app.use("/api/v1/auth", conditionalAuthLimiter, authRoutes);
 app.use("/api/v1/admin", generalLimiter, adminRoutes);
 app.use("/api/v1/tree", generalLimiter, treeRoutes);
 app.use("/api/v1/user", generalLimiter, userRoutes);
 app.use("/api/v1/payment", generalLimiter, paymentRoutes);
+app.use("/api/v1/gallery", generalLimiter, galleryRoutes);
 
 app.get('/health', asyncHandler(async (req, res) => {
     // Type assertion needed due to TypeScript type inference limitation with asyncHandler wrapper

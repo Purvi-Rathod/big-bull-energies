@@ -1,76 +1,94 @@
 "use client";
 
 import Link from "next/link";
-import { CheckCircle, ArrowRight, Users, DollarSign, TrendingUp, Shield, Clock, Network, Award } from "lucide-react";
+import Image from "next/image";
+import { CheckCircle, ArrowRight, Users, DollarSign, TrendingUp, Shield, Clock, Network } from "lucide-react";
 import Footer from "@/components/Footer";
 
-export default function HowItWorksPage() {
+export default function HowPlatformWorksPage() {
   const steps = [
     {
       number: 1,
-      title: "Create Your Account",
-      description: "Sign up for free and get your unique user ID (e.g., CROWN-XXXXXX). No upfront costs or hidden fees.",
+      title: "Registration & Account Setup",
+      description: "Create your free Crown Bankers account in minutes. Get your unique user ID and access your personal dashboard.",
       icon: <Users className="w-8 h-8" />,
       details: [
-        "Provide your name, email, and password",
-        "Enter your referrer's user ID (optional but recommended)",
-        "Get instant access to your dashboard"
+        "Sign up with your email and personal details",
+        "Receive your unique user ID (CROWN-XXXXXX)",
+        "Access your dashboard immediately",
+        "Get your personal referral link"
       ]
     },
     {
       number: 2,
-      title: "Choose Your Investment Plan",
-      description: "Browse our range of investment packages, each with different returns, durations, and minimum investment amounts.",
-      icon: <TrendingUp className="w-8 h-8" />,
+      title: "Fund Your Investment Wallet",
+      description: "Deposit funds using USDT TRC20 cryptocurrency. Your investment wallet is secure and ready for package purchases.",
+      icon: <DollarSign className="w-8 h-8" />,
       details: [
-        "View all available packages with detailed information",
-        "See total output percentage, duration, and terms",
-        "Select a plan that matches your investment goals"
+        "Use USDT TRC20 for secure transactions",
+        "Minimum deposit: $25",
+        "Instant wallet funding",
+        "Secure blockchain technology"
       ]
     },
     {
       number: 3,
-      title: "Make Your Investment",
-      description: "Fund your investment wallet and activate your chosen package. Your investment starts earning immediately.",
-      icon: <DollarSign className="w-8 h-8" />,
+      title: "Choose Your Investment Package",
+      description: "Select from three investment tiers: Solar Starter, Power Growth, or Elite Energy. Each offers different returns and benefits.",
+      icon: <TrendingUp className="w-8 h-8" />,
       details: [
-        "Deposit funds to your Investment Wallet via USDT TRC20",
-        "Select your package and investment amount",
-        "Activate your investment—it starts earning ROI from day one"
+        "Solar Starter: $25 - $4,999 (1.5% daily ROI)",
+        "Power Growth: $5,000 - $49,999 (1.75% daily ROI)",
+        "Elite Energy: $50,000+ (2% daily ROI)",
+        "Compare packages and choose your fit"
       ]
     },
     {
       number: 4,
-      title: "Build Your Binary Network",
-      description: "Invite people to join your binary tree. Earn referral bonuses on their first investment and binary bonuses as your teams grow.",
-      icon: <Network className="w-8 h-8" />,
+      title: "Activate Your Investment",
+      description: "Once you select a package, your investment starts earning immediately. Daily ROI begins accruing from day one.",
+      icon: <Clock className="w-8 h-8" />,
       details: [
-        "Share your unique referral link with others",
-        "People join your left or right leg based on availability",
-        "Build balanced teams for maximum binary bonus earnings"
+        "Investment activates instantly",
+        "Daily ROI credited automatically",
+        "Bond period: 180-200 days",
+        "Track progress in real-time"
       ]
     },
     {
       number: 5,
-      title: "Earn Multiple Income Streams",
-      description: "Start earning from day one through multiple income sources that grow with your network.",
-      icon: <Award className="w-8 h-8" />,
+      title: "Build Your Network",
+      description: "Share your referral link and invite others to join. Build your binary tree structure and earn multiple income streams.",
+      icon: <Network className="w-8 h-8" />,
       details: [
-        "Daily ROI: Automatic daily returns credited to your ROI wallet",
-        "Referral Income: Instant bonuses when your network members invest",
-        "Binary Bonuses: Daily matching bonuses when your teams balance",
-        "Career Level Rewards: Progressive bonuses as you reach milestones"
+        "Share your unique referral link",
+        "Earn 8-10% referral commission",
+        "Build left and right binary legs",
+        "Earn binary bonuses daily"
       ]
     },
     {
       number: 6,
-      title: "Reinvest or Withdraw",
-      description: "Convert your earnings into vouchers for reinvestment, or withdraw directly to your USDT TRC20 wallet.",
+      title: "Earn Multiple Income Streams",
+      description: "Generate income from daily ROI, referral commissions, binary bonuses, and principal returns. Multiple ways to earn!",
+      icon: <DollarSign className="w-8 h-8" />,
+      details: [
+        "Daily ROI: 1.5% - 2% per day",
+        "Referral Income: 8% - 10% commission",
+        "Binary Income: 10% of smaller leg",
+        "Principal Return: 60% - 100% at maturity"
+      ]
+    },
+    {
+      number: 7,
+      title: "Track & Withdraw Earnings",
+      description: "Monitor all your earnings in your dashboard. Withdraw funds to your USDT TRC20 wallet whenever you're ready.",
       icon: <Shield className="w-8 h-8" />,
       details: [
-        "Create vouchers from any income wallet for easy reinvestment",
-        "Request withdrawals from ROI, Referral, Binary, or Career Level wallets",
-        "Fast, secure withdrawals processed to your crypto wallet"
+        "Real-time earnings dashboard",
+        "Detailed reports and analytics",
+        "Secure withdrawal process",
+        "USDT TRC20 wallet transfers"
       ]
     }
   ];
@@ -95,10 +113,10 @@ export default function HowItWorksPage() {
       example: "Smaller leg: $2,800 → Earn $280 daily"
     },
     {
-      title: "Career Levels",
-      percentage: "Progressive",
-      description: "Unlock rewards at each career milestone based on your total business volume.",
-      example: "Reach milestones → Unlock exclusive bonuses"
+      title: "Principal Return",
+      percentage: "60% - 100%",
+      description: "Get a percentage of your original investment back at bond maturity. Higher tiers = better returns.",
+      example: "Invest $10,000 → Get $6,000-10,000 back"
     }
   ];
 
@@ -124,7 +142,7 @@ export default function HowItWorksPage() {
                 fontFamily: "var(--font-font4), sans-serif",
               }}
             >
-              How Crown Bankers Works
+              How the Crown Bankers Platform Works
             </h1>
             <p
               className="text-sm sm:text-base md:text-lg lg:text-xl leading-relaxed max-w-2xl mx-auto px-2"
@@ -133,7 +151,7 @@ export default function HowItWorksPage() {
                 fontFamily: "var(--font-font4), sans-serif",
               }}
             >
-              A simple 6-step process to start earning through our binary investment platform
+              A comprehensive guide to understanding our investment platform, earning methods, and how to maximize your returns.
             </p>
           </div>
         </div>
@@ -143,6 +161,12 @@ export default function HowItWorksPage() {
       <section className="relative w-full bg-white py-12 sm:py-16 md:py-20 lg:py-24">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-6xl mx-auto">
+            <h2
+              className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-8 sm:mb-10 md:mb-12 text-center px-2"
+              style={{ color: "#042B19" }}
+            >
+              The Complete Process
+            </h2>
             <div className="space-y-8 sm:space-y-12">
               {steps.map((step, index) => (
                 <div
@@ -262,77 +286,37 @@ export default function HowItWorksPage() {
         </div>
       </section>
 
-      {/* Binary Tree Explanation */}
+      {/* Key Features */}
       <section className="relative w-full bg-white py-12 sm:py-16 md:py-20 lg:py-24">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-4xl mx-auto">
-            <div className="bg-[#E8F5F0] p-6 sm:p-8 md:p-10 rounded-lg border-2" style={{ borderColor: "#042B19" }}>
-              <h2
-                className="text-2xl sm:text-3xl md:text-4xl font-bold mb-6"
-                style={{ color: "#042B19" }}
-              >
-                Understanding the Binary System
-              </h2>
-              <div className="space-y-4 sm:space-y-6">
-                <p
-                  className="text-sm sm:text-base md:text-lg leading-relaxed"
-                  style={{
-                    color: "#042B19",
-                    fontFamily: "var(--font-font4), sans-serif",
-                  }}
-                >
-                  Crown Bankers uses a binary tree structure where each user can have two direct referrals: one on the left 
-                  and one on the right. This structure creates balanced growth opportunities:
-                </p>
-                <ul className="space-y-3 sm:space-y-4">
-                  <li className="flex items-start gap-3">
-                    <CheckCircle className="w-5 h-5 flex-shrink-0 mt-0.5" style={{ color: "#042B19" }} />
-                    <span
-                      className="text-sm sm:text-base"
-                      style={{ color: "#042B19" }}
-                    >
-                      <strong>Left Leg & Right Leg:</strong> Your network branches into two sides, allowing for organized growth
-                    </span>
-                  </li>
-                  <li className="flex items-start gap-3">
-                    <CheckCircle className="w-5 h-5 flex-shrink-0 mt-0.5" style={{ color: "#042B19" }} />
-                    <span
-                      className="text-sm sm:text-base"
-                      style={{ color: "#042B19" }}
-                    >
-                      <strong>Matching Bonuses:</strong> When both legs have business volume, you earn binary bonuses daily
-                    </span>
-                  </li>
-                  <li className="flex items-start gap-3">
-                    <CheckCircle className="w-5 h-5 flex-shrink-0 mt-0.5" style={{ color: "#042B19" }} />
-                    <span
-                      className="text-sm sm:text-base"
-                      style={{ color: "#042B19" }}
-                    >
-                      <strong>Carry Forward:</strong> Unmatched volume carries over to the next day, ensuring nothing is lost
-                    </span>
-                  </li>
-                  <li className="flex items-start gap-3">
-                    <CheckCircle className="w-5 h-5 flex-shrink-0 mt-0.5" style={{ color: "#042B19" }} />
-                    <span
-                      className="text-sm sm:text-base"
-                      style={{ color: "#042B19" }}
-                    >
-                      <strong>Binary Capping:</strong> Your daily binary bonus is capped based on your active package ($1,000 - $10,000 per day)
-                    </span>
-                  </li>
-                </ul>
-                <p
-                  className="pt-4 text-sm sm:text-base md:text-lg leading-relaxed"
-                  style={{
-                    color: "#042B19",
-                    fontFamily: "var(--font-font4), sans-serif",
-                  }}
-                >
-                  The system is designed to reward balanced network building, encouraging sustainable growth 
-                  and fair distribution of earnings.
-                </p>
-              </div>
+            <h2
+              className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-8 sm:mb-10 md:mb-12 text-center px-2"
+              style={{ color: "#042B19" }}
+            >
+              Platform Features
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
+              {[
+                "Secure USDT TRC20 transactions",
+                "Real-time earnings dashboard",
+                "Automated daily ROI payouts",
+                "Binary tree visualization",
+                "Career level progression",
+                "Comprehensive reporting",
+                "24/7 customer support",
+                "Mobile-responsive platform"
+              ].map((feature, index) => (
+                <div key={index} className="flex items-center gap-3 sm:gap-4">
+                  <CheckCircle className="w-6 h-6 flex-shrink-0" style={{ color: "#042B19" }} />
+                  <span
+                    className="text-sm sm:text-base md:text-lg"
+                    style={{ color: "#042B19" }}
+                  >
+                    {feature}
+                  </span>
+                </div>
+              ))}
             </div>
           </div>
         </div>
@@ -353,7 +337,7 @@ export default function HowItWorksPage() {
             <p
               className="text-base sm:text-lg md:text-xl leading-relaxed mb-8 sm:mb-10 px-2"
             >
-              Join thousands of successful investors and start earning today
+              Join thousands of investors already earning with Crown Bankers. Start your journey today!
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link
@@ -364,11 +348,11 @@ export default function HowItWorksPage() {
                 CREATE ACCOUNT
               </Link>
               <Link
-                href="/how-to-start"
+                href="/our-plan"
                 className="inline-block bg-transparent border-2 border-white text-white font-bold px-6 sm:px-8 lg:px-12 py-3 sm:py-4 lg:py-5 text-xs sm:text-sm md:text-base uppercase tracking-wide transition hover:bg-white hover:text-[#042B19] text-center"
                 style={{ borderRadius: "0" }}
               >
-                GETTING STARTED GUIDE
+                VIEW PLANS
               </Link>
             </div>
           </div>

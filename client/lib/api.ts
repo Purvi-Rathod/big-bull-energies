@@ -399,6 +399,22 @@ class ApiClient {
     });
   }
 
+  async getWithdrawalSchedule() {
+    return this.request<{
+      hasActiveInvestment: boolean;
+      packageName?: string;
+      scheduleDescription?: string;
+      canWithdrawToday?: boolean;
+      nextWithdrawalDate?: string;
+      nextWithdrawalDateFormatted?: string;
+      thisMonthDates?: Array<{ date: string; formatted: string }>;
+      nextMonthDates?: Array<{ date: string; formatted: string }>;
+      message?: string;
+    }>('/user/withdrawal-schedule', {
+      method: 'GET',
+    });
+  }
+
   async createWithdrawal(data: { amount: number; walletType: string; method?: string; cryptoType?: string; merchant?: string }) {
     return this.request<{ withdrawal: any }>('/user/withdraw', {
       method: 'POST',
@@ -736,6 +752,32 @@ class ApiClient {
     });
   }
 
+  async getAuthRateLimitingStatus() {
+    return this.request<{ enabled: boolean }>('/admin/settings/auth-rate-limiting', {
+      method: 'GET',
+    });
+  }
+
+  async updateAuthRateLimitingStatus(enabled: boolean) {
+    return this.request<{ enabled: boolean }>('/admin/settings/auth-rate-limiting', {
+      method: 'PUT',
+      body: JSON.stringify({ enabled }),
+    });
+  }
+
+  async getWithdrawalSchedules() {
+    return this.request<{ schedules: any; packageSchedules: Array<{ packageName: string; hasCustomSchedule: boolean; schedule: any }> }>('/admin/settings/withdrawal-schedules', {
+      method: 'GET',
+    });
+  }
+
+  async updateWithdrawalSchedule(packageName: string, schedule: { type: 'days_of_month' | 'day_of_week'; values: number[]; enabled: boolean } | null) {
+    return this.request<{ schedules: any }>('/admin/settings/withdrawal-schedules', {
+      method: 'PUT',
+      body: JSON.stringify({ packageName, schedule }),
+    });
+  }
+
   // Career Level Management (Admin)
   async getAllCareerLevels() {
     return this.request<{ levels: any[] }>('/admin/career-levels', {
@@ -802,6 +844,71 @@ class ApiClient {
   // Career Progress (User)
   async getUserCareerProgress() {
     return this.request<{ progress: any }>('/user/career-progress', {
+      method: 'GET',
+    });
+  }
+
+  // Gallery Management (Admin)
+  async getAllGalleryItemsAdmin(params?: { category?: string; status?: string; page?: number; limit?: number }) {
+    const queryParams = new URLSearchParams();
+    if (params?.category) queryParams.append('category', params.category);
+    if (params?.status) queryParams.append('status', params.status);
+    if (params?.page) queryParams.append('page', params.page.toString());
+    if (params?.limit) queryParams.append('limit', params.limit.toString());
+    
+    const query = queryParams.toString();
+    return this.request<{ items: any[]; categories: string[]; pagination: any }>(
+      `/admin/gallery${query ? `?${query}` : ''}`,
+      { method: 'GET' }
+    );
+  }
+
+  async getGalleryItemById(id: string) {
+    return this.request<{ item: any }>(`/admin/gallery/${id}`, {
+      method: 'GET',
+    });
+  }
+
+  async createGalleryItem(data: {
+    title: string;
+    description?: string;
+    mediaUrl: string;
+    mediaType: 'photo' | 'video';
+    category: string;
+    thumbnailUrl?: string;
+    order?: number;
+    status?: 'Active' | 'InActive';
+  }) {
+    return this.request<{ item: any }>('/admin/gallery', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  }
+
+  async updateGalleryItem(id: string, data: {
+    title?: string;
+    description?: string;
+    mediaUrl?: string;
+    mediaType?: 'photo' | 'video';
+    category?: string;
+    thumbnailUrl?: string;
+    order?: number;
+    status?: 'Active' | 'InActive';
+  }) {
+    return this.request<{ item: any }>(`/admin/gallery/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    });
+  }
+
+  async deleteGalleryItem(id: string) {
+    return this.request(`/admin/gallery/${id}`, {
+      method: 'DELETE',
+    });
+  }
+
+  async getGalleryCategories() {
+    return this.request<{ categories: string[] }>('/admin/gallery/categories', {
       method: 'GET',
     });
   }

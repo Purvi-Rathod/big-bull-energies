@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { MorphingText } from "./MorphingText";
 
 export default function ExpertiseSection() {
@@ -33,18 +34,17 @@ export default function ExpertiseSection() {
       <div className="relative w-full bg-white overflow-hidden py-8 md:py-12 lg:py-16">
         {/* Description Text in White Section */}
         <div className="relative z-10 h-full flex items-center justify-center px-4 sm:px-6 md:px-8 lg:px-16">
-          <p
-            className="text-center text-sm sm:text-base md:text-lg lg:text-xl leading-relaxed max-w-4xl"
-            style={{
-              color: "#042B19",
-              fontFamily: "var(--font-font4), sans-serif",
-            }}
-          >
-            Demand for secure, lower cost power is growing, and our customers
-            count on us to meet their evolving energy needs with a flexible
-            range of technologies, engineering expertise, and the highest safety
-            standards.
-          </p>
+            <p
+              className="text-center text-sm sm:text-base md:text-lg lg:text-xl leading-relaxed max-w-4xl"
+              style={{
+                color: "#042B19",
+                fontFamily: "var(--font-font4), sans-serif",
+              }}
+            >
+              Crown Bankers combines innovative binary investment systems with sustainable energy projects. 
+              We provide secure, transparent investment opportunities backed by renewable energy infrastructure, 
+              empowering investors to build wealth while supporting the global transition to clean energy.
+            </p>
         </div>
       </div>
 
@@ -894,7 +894,7 @@ export default function ExpertiseSection() {
               </span>
             </h2>
             <p className="text-gray-600 text-base sm:text-lg md:text-xl lg:text-xl xl:text-2xl max-w-lg leading-relaxed mt-2 sm:mt-4">
-              With the know-how and experience to rise to any challenge.
+              Building wealth through innovative investment systems and sustainable energy solutions.
             </p>
           </div>
 
@@ -909,12 +909,13 @@ export default function ExpertiseSection() {
             />
             {/* Yellow Button Overlay - Bottom Left Corner */}
             <div className="absolute bottom-0 left-0 p-3 sm:p-4 md:p-5 lg:p-6">
-              <button
-                className="bg-[#ffcf0B] text-gray-900 font-bold px-4 sm:px-6 py-3 sm:py-4 transition hover:opacity-90 text-xs sm:text-sm uppercase tracking-wide whitespace-nowrap"
+              <Link
+                href="/how-it-works"
+                className="inline-block bg-[#ffcf0B] text-gray-900 font-bold px-4 sm:px-6 py-3 sm:py-4 transition hover:opacity-90 text-xs sm:text-sm uppercase tracking-wide whitespace-nowrap"
                 style={{ borderRadius: "0" }}
               >
                 SEE HOW WE WORK
-              </button>
+              </Link>
             </div>
           </div>
         </div>

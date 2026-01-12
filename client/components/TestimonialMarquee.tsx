@@ -14,19 +14,19 @@ interface Testimonial {
 export default function TestimonialMarquee() {
   const testimonials: Testimonial[] = [
     {
-      category: "COMMUNITIES",
+      category: "INVESTORS",
       quote:
-        "We partner with communities and landowners across the country to provide jobs, significant tax revenues and payments to landowners, while providing low-cost, reliable energy to customers.",
-      name: "BRISTI CURE",
-      title: "SENIOR VICE PRESIDENT, DEVELOPMENT, INVENERGY",
+        "Crown Bankers has transformed how I think about investment opportunities. The binary system is transparent, the returns are consistent, and the focus on sustainable energy makes me feel good about where my money is going. It's been a game-changer for my financial future.",
+      name: "SARAH MITCHELL",
+      title: "ACTIVE INVESTOR, CROWN BANKERS",
       image: "/testimonial1.webp",
     },
     {
-      category: "CUSTOMERS",
+      category: "PARTNERS",
       quote:
-        "Winning the AI race requires cleaner, affordable energy and infrastructure - today and in the future. We're grateful for our continued partnership with Meta and look forward to strengthening our partnerships as we work to support American energy independence and economic prosperity.",
-      name: "TED ROMAINE",
-      title: "EXECUTIVE VICE PRESIDENT, ORIC",
+        "Partnering with Crown Bankers has been exceptional. Their commitment to renewable energy investments combined with their innovative binary MLM platform creates unique opportunities for growth. The team is professional, responsive, and truly dedicated to sustainable energy solutions.",
+      name: "JAMES ANDERSON",
+      title: "ENERGY PARTNER, CROWN BANKERS",
       image: "/testimonial2.webp",
     },
   ];

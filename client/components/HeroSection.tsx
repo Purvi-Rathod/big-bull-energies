@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef } from "react";
+import Link from "next/link";
 
 export default function HeroSection() {
   const [isPlaying, setIsPlaying] = useState(true);
@@ -29,7 +30,7 @@ export default function HeroSection() {
           playsInline
           className="absolute inset-0 w-full h-full object-cover"
         >
-          <source src="/herobg.mp4" type="video/mp4" />
+          <source src="/solar-plant-groningen.mp4" type="video/mp4" />
         </video>
         {/* Overlay for better text readability */}
         <div className="absolute inset-0 bg-gradient-to-b from-gray-900/40 to-gray-800/40"></div>
@@ -38,7 +39,7 @@ export default function HeroSection() {
       {/* Centered Text */}
       <div className="relative z-10 text-center px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto py-8 md:py-12">
         <h1
-          className="text-white text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl leading-tight font-normal mb-4 md:mb-6"
+          className="text-white text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl leading-tight font-normal mb-6 md:mb-8"
           style={{
             fontFamily: "var(--font-font4), 'Font4', sans-serif",
             textShadow:
@@ -50,6 +51,14 @@ export default function HeroSection() {
           <span className="sm:hidden"> </span>
           reliable, affordable energy
         </h1>
+        {/* Sign Up Button */}
+        <Link
+          href="/signup"
+          className="inline-block bg-[#ffcf0B] text-gray-900 font-bold px-6 sm:px-8 lg:px-12 py-3 sm:py-4 lg:py-5 text-sm sm:text-base md:text-lg uppercase tracking-wide transition hover:opacity-90 shadow-lg"
+          style={{ borderRadius: "0" }}
+        >
+          SIGN UP NOW
+        </Link>
       </div>
 
       {/* Scroll Indicator */}

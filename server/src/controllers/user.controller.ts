@@ -17,6 +17,8 @@ import { sendInvestmentPurchaseEmail, sendWithdrawalCreatedEmail } from "../lib/
 import { getUserCareerProgress } from "../services/career-level.service";
 import { getMinimumVoucherAmount as getMinVoucherAmount } from "../services/package.service";
 import { Types } from "mongoose";
+import { isWithdrawalDateValid, getNextWithdrawalDate, getWithdrawalScheduleDescription, getWithdrawalDatesForMonth, getCustomSchedules } from "../utils/withdrawalSchedule";
+import type { WithdrawalSchedules, CustomSchedule } from "../utils/withdrawalSchedule";
 
 /**
  * Get user wallets
@@ -714,6 +716,100 @@ export const getUserReports = asyncHandler(async (req, res) => {
 });
 
 /**
+ * Get withdrawal schedule information for user
+ * GET /api/v1/user/withdrawal-schedule
+ */
+export const getWithdrawalSchedule = asyncHandler(async (req, res) => {
+  const userId = (req as any).user?.id;
+  if (!userId) {
+    throw new AppError("User not authenticated", 401);
+  }
+
+  // Get user's active investments to determine package
+  const activeInvestments = await Investment.find({
+    user: userId,
+    isActive: true,
+  })
+    .populate("packageId")
+    .lean();
+
+  if (activeInvestments.length === 0) {
+    const response = res as any;
+    response.status(200).json({
+      status: "success",
+      data: {
+        hasActiveInvestment: false,
+        message: "You need an active investment to have a withdrawal schedule",
+      },
+    });
+    return;
+  }
+
+  // Get package information from first active investment
+  const firstInvestment = activeInvestments[0];
+  const pkg = firstInvestment.packageId as any;
+  
+  if (!pkg || !pkg.packageName) {
+    const response = res as any;
+    response.status(200).json({
+      status: "success",
+      data: {
+        hasActiveInvestment: true,
+        canWithdrawToday: true,
+        message: "Withdrawal schedule not available for this package",
+      },
+    });
+    return;
+  }
+
+  const packageName = pkg.packageName;
+  const customSchedules = await getCustomSchedules();
+  const canWithdrawToday = await isWithdrawalDateValid(packageName, new Date(), customSchedules);
+  const nextDate = await getNextWithdrawalDate(packageName, new Date(), customSchedules);
+  const scheduleDescription = await getWithdrawalScheduleDescription(packageName, customSchedules);
+  const thisMonthDates = await getWithdrawalDatesForMonth(packageName, undefined, undefined, customSchedules);
+  const nextMonthDates = await getWithdrawalDatesForMonth(
+    packageName,
+    new Date().getMonth() + 1,
+    undefined,
+    customSchedules
+  );
+
+  const response = res as any;
+  response.status(200).json({
+    status: "success",
+    data: {
+      hasActiveInvestment: true,
+      packageName,
+      scheduleDescription,
+      canWithdrawToday,
+      nextWithdrawalDate: nextDate.toISOString(),
+      nextWithdrawalDateFormatted: nextDate.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+      }),
+      thisMonthDates: thisMonthDates.map((d) => ({
+        date: d.toISOString(),
+        formatted: d.toLocaleDateString('en-US', {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric',
+        }),
+      })),
+      nextMonthDates: nextMonthDates.map((d) => ({
+        date: d.toISOString(),
+        formatted: d.toLocaleDateString('en-US', {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric',
+        }),
+      })),
+    },
+  });
+});
+
+/**
  * Create withdrawal request
  * POST /api/v1/user/withdraw
  */
@@ -777,6 +873,55 @@ export const createWithdrawal = asyncHandler(async (req, res) => {
   const currentBalance = parseFloat(wallet.balance.toString());
   if (amount > currentBalance) {
     throw new AppError("Insufficient balance", 400);
+  }
+
+  // Check ROI withdrawal schedule if withdrawing from ROI wallet
+  if (walletType === "roi") {
+    // Get user's active investments to determine package
+    const activeInvestments = await Investment.find({
+      user: userId,
+      isActive: true,
+    })
+      .populate("packageId")
+      .lean();
+
+    if (activeInvestments.length > 0) {
+      // Check if today is a valid withdrawal date for any of the user's packages
+      let canWithdraw = false;
+      let packageName = "";
+      let scheduleDescription = "";
+
+      // Get custom schedules once for all checks
+      const { getCustomSchedules } = await import('../utils/withdrawalSchedule');
+      const customSchedules = await getCustomSchedules();
+
+      for (const investment of activeInvestments) {
+        const pkg = investment.packageId as any;
+        if (pkg && pkg.packageName) {
+          packageName = pkg.packageName;
+          scheduleDescription = await getWithdrawalScheduleDescription(packageName, customSchedules);
+          
+          if (await isWithdrawalDateValid(packageName, new Date(), customSchedules)) {
+            canWithdraw = true;
+            break; // At least one package allows withdrawal today
+          }
+        }
+      }
+
+      if (!canWithdraw && packageName) {
+        const nextDate = await getNextWithdrawalDate(packageName, new Date(), customSchedules);
+        const nextDateStr = nextDate.toLocaleDateString('en-US', {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric',
+        });
+        
+        throw new AppError(
+          `ROI withdrawals are only allowed on scheduled dates. ${scheduleDescription}. Next withdrawal date: ${nextDateStr}`,
+          400
+        );
+      }
+    }
   }
 
   // Calculate charges (5% default)
@@ -1435,38 +1580,81 @@ export const getUserDirectReferrals = asyncHandler(async (req, res) => {
     ];
   }
 
-  // Status filter
-  if (status) {
-    query.status = status;
-  }
-
   // Position filter
   if (position) {
     query.position = position;
   }
 
-  // Get total count
-  const total = await User.countDocuments(query);
-
-  // Find users with pagination
-  const referrals = await User.find(query)
-    .select("userId name email phone status createdAt position country")
-    .sort({ createdAt: -1 }) // Sort by newest first
-    .skip(skip)
-    .limit(limitNum)
+  // First, get all referrals matching the base query (without status filter)
+  // We need to check investments for all to determine status correctly
+  const allReferrals = await User.find(query)
+    .select("userId name email phone status createdAt position country _id")
+    .sort({ createdAt: -1 })
     .lean();
 
-  const formatted = referrals.map((ref) => ({
-    id: ref._id,
-    userId: ref.userId,
-    name: ref.name,
-    email: ref.email,
-    phone: ref.phone,
-    status: ref.status,
-    position: ref.position,
-    country: ref.country,
-    joinedAt: ref.createdAt,
-  }));
+  // Get all referral user IDs
+  const allReferralIds = allReferrals.map((ref) => ref._id);
+
+  // Check which referrals have active investments
+  const activeInvestments = await Investment.find({
+    user: { $in: allReferralIds },
+    isActive: true,
+  })
+    .select("user")
+    .lean();
+
+  // Create a Set of user IDs with active investments (normalize to string for comparison)
+  const usersWithActiveInvestments = new Set(
+    activeInvestments.map((inv) => {
+      // Handle both ObjectId and string formats
+      const userId = inv.user;
+      return userId instanceof Types.ObjectId ? userId.toString() : String(userId);
+    })
+  );
+
+  // Format all referrals and determine status based on active investments
+  const allFormatted = allReferrals.map((ref) => {
+    // Determine status: "active" if user has active investment, otherwise "inactive"
+    // But preserve other statuses like "suspended" or "blocked" from user.status
+    let displayStatus: string;
+    const refIdStr = ref._id.toString();
+    
+    if (ref.status === "suspended" || ref.status === "blocked" || ref.status === "suspected") {
+      // Preserve these statuses
+      displayStatus = ref.status;
+    } else if (usersWithActiveInvestments.has(refIdStr)) {
+      // User has active investment
+      displayStatus = "active";
+    } else {
+      // User has no active investment
+      displayStatus = "inactive";
+    }
+
+    return {
+      id: ref._id,
+      userId: ref.userId,
+      name: ref.name,
+      email: ref.email,
+      phone: ref.phone,
+      status: displayStatus,
+      position: ref.position,
+      country: ref.country,
+      joinedAt: ref.createdAt,
+    };
+  });
+
+  // Apply status filter if provided
+  let filtered = allFormatted;
+  if (status) {
+    const statusStr = typeof status === 'string' ? status : String(status);
+    filtered = allFormatted.filter((ref) => ref.status.toLowerCase() === statusStr.toLowerCase());
+  }
+
+  // Get total count after status filtering
+  const total = filtered.length;
+
+  // Apply pagination
+  const formatted = filtered.slice(skip, skip + limitNum);
 
   const response = res as any;
   response.status(200).json({

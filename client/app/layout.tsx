@@ -66,10 +66,97 @@ const font4 = localFont({
   display: "swap",
 });
 
+// Base URL for meta tags - can be overridden with environment variable
+const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || process.env.NEXT_PUBLIC_API_URL?.replace('/api', '') || 'https://crownbanker.com';
+
 export const metadata: Metadata = {
-  title: "CROWN - Revolutionary Binary MLM Platform",
+  metadataBase: new URL(baseUrl),
+  title: {
+    default: "Crown Bankers - Revolutionary Business Opportunity Platform",
+    template: "%s | Crown Bankers",
+  },
+  description:
+    "Build your network, maximize your earnings, and unlock unlimited potential with Crown Bankers' advanced binary system. Join the future of sustainable energy investments.",
+  keywords: [
+    "Crown Bankers",
+    "Binary MLM",
+    "Network Marketing",
+    "Energy Investments",
+    "Sustainable Energy",
+    "Solar Energy",
+    "Wind Energy",
+    "Investment Platform",
+    "MLM Platform",
+    "Binary System",
+  ],
+  authors: [{ name: "Crown Bankers" }],
+  creator: "Crown Bankers",
+  publisher: "Crown Bankers",
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    url: baseUrl,
+    siteName: "Crown Bankers",
+    title: "Crown Bankers - Revolutionary Binary MLM Platform",
     description:
-      "Build your network, maximize your earnings, and unlock unlimited potential with CROWN's advanced binary system",
+      "Build your network, maximize your earnings, and unlock unlimited potential with Crown Bankers' advanced binary system. Join the future of sustainable energy investments.",
+    images: [
+      {
+        url: "/image.png",
+        width: 1200,
+        height: 630,
+        alt: "Crown Bankers Logo",
+        type: "image/png",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Crown Bankers - Revolutionary Binary MLM Platform",
+    description:
+      "Build your network, maximize your earnings, and unlock unlimited potential with Crown Bankers' advanced binary system.",
+    images: ["/image.png"],
+    creator: "@crownbankers",
+    site: "@crownbankers",
+  },
+  icons: {
+    icon: [
+      { url: "/icon.png", type: "image/png", sizes: "512x512" },
+      { url: "/icon.png", type: "image/png", sizes: "192x192" },
+      { url: "/icon.png", type: "image/png", sizes: "32x32" },
+      { url: "/icon.png", type: "image/png", sizes: "16x16" },
+    ],
+    apple: [
+      { url: "/icon.png", sizes: "180x180", type: "image/png" },
+    ],
+    shortcut: "/icon.png",
+  },
+  manifest: "/manifest.json",
+  alternates: {
+    canonical: baseUrl,
+  },
+  category: "Finance",
+  classification: "Business",
+  other: {
+    "application-name": "Crown Bankers",
+    "apple-mobile-web-app-title": "Crown Bankers",
+    "apple-mobile-web-app-capable": "yes",
+    "apple-mobile-web-app-status-bar-style": "black-translucent",
+    "mobile-web-app-capable": "yes",
+    "theme-color": "#042B19",
+    "color-scheme": "light",
+  },
 };
 
 export default function RootLayout({

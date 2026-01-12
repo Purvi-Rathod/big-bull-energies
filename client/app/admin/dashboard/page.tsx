@@ -32,6 +32,8 @@ export default function AdminDashboard() {
   const [flushLoading, setFlushLoading] = useState(false);
   const [nowpaymentsEnabled, setNowpaymentsEnabled] = useState<boolean | null>(null);
   const [nowpaymentsLoading, setNowpaymentsLoading] = useState(false);
+  const [rateLimitingEnabled, setRateLimitingEnabled] = useState<boolean | null>(null);
+  const [rateLimitingLoading, setRateLimitingLoading] = useState(false);
 
   // Route protection is handled in layout
 
@@ -42,6 +44,7 @@ export default function AdminDashboard() {
     if (isAdminUser || isAdminAccount) {
       fetchStatistics();
       fetchNOWPaymentsStatus();
+      fetchRateLimitingStatus();
     }
   }, [user, admin]);
 
@@ -181,6 +184,53 @@ export default function AdminDashboard() {
     }
   };
 
+  const fetchRateLimitingStatus = async () => {
+    try {
+      setRateLimitingLoading(true);
+      const response = await api.getAuthRateLimitingStatus();
+      if (response.data) {
+        setRateLimitingEnabled(response.data.enabled);
+      }
+    } catch (err: any) {
+      console.error('Failed to fetch rate limiting status:', err);
+      // Default to true if error (for security)
+      setRateLimitingEnabled(true);
+    } finally {
+      setRateLimitingLoading(false);
+    }
+  };
+
+  const handleToggleRateLimiting = async () => {
+    if (rateLimitingEnabled === null) return;
+
+    const newStatus = !rateLimitingEnabled;
+    const confirmed = await confirm({
+      title: newStatus ? 'Enable Rate Limiting' : 'Disable Rate Limiting',
+      message: newStatus
+        ? 'Are you sure you want to enable rate limiting? This will restrict signup/login attempts per IP (30 per 15 minutes).'
+        : 'Are you sure you want to disable rate limiting? Leaders will be able to create multiple accounts without restrictions.',
+      variant: 'warning',
+      confirmText: newStatus ? 'Yes, Enable' : 'Yes, Disable',
+      cancelText: 'Cancel',
+    });
+
+    if (!confirmed) return;
+
+    try {
+      setRateLimitingLoading(true);
+      const response = await api.updateAuthRateLimitingStatus(newStatus);
+      if (response.data) {
+        setRateLimitingEnabled(response.data.enabled);
+        toast.success(`Auth rate limiting ${newStatus ? 'enabled' : 'disabled'} successfully!`);
+      }
+    } catch (err: any) {
+      toast.error(err.message || 'Failed to update rate limiting status');
+      console.error('Error updating rate limiting status:', err);
+    } finally {
+      setRateLimitingLoading(false);
+    }
+  };
+
   const formatCurrency = (value: string | number) => {
     const num = typeof value === 'string' ? parseFloat(value) : value;
     return new Intl.NumberFormat('en-US', {
@@ -263,6 +313,48 @@ export default function AdminDashboard() {
             <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded">
               <p className="text-sm text-yellow-800">
                 <strong>Warning:</strong> NOWPayments gateway is disabled. Users will not be able to make payments until it is re-enabled.
+              </p>
+            </div>
+          )}
+        </div>
+
+        {/* Rate Limiting Settings */}
+        <div className="mb-6 bg-white rounded-lg shadow p-6">
+          <div className="flex justify-between items-center">
+            <div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-1">Auth Rate Limiting</h3>
+              <p className="text-sm text-gray-600">Control rate limiting for signup and login endpoints</p>
+            </div>
+            <div className="flex items-center gap-4">
+              <span className={`text-sm font-medium ${rateLimitingEnabled ? 'text-green-600' : 'text-red-600'}`}>
+                {rateLimitingEnabled === null ? 'Loading...' : rateLimitingEnabled ? 'Enabled' : 'Disabled'}
+              </span>
+              <button
+                onClick={handleToggleRateLimiting}
+                disabled={rateLimitingEnabled === null || rateLimitingLoading}
+                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 ${
+                  rateLimitingEnabled ? 'bg-indigo-600' : 'bg-gray-300'
+                } ${(rateLimitingEnabled === null || rateLimitingLoading) ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+              >
+                <span
+                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                    rateLimitingEnabled ? 'translate-x-6' : 'translate-x-1'
+                  }`}
+                />
+              </button>
+            </div>
+          </div>
+          {rateLimitingEnabled === false && (
+            <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded">
+              <p className="text-sm text-blue-800">
+                <strong>Info:</strong> Rate limiting is disabled. Leaders can now create multiple accounts without restrictions. Re-enable for security.
+              </p>
+            </div>
+          )}
+          {rateLimitingEnabled === true && (
+            <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded">
+              <p className="text-sm text-yellow-800">
+                <strong>Note:</strong> Rate limiting is enabled (30 requests per 15 minutes per IP). Disable to allow leaders to create multiple accounts at once.
               </p>
             </div>
           )}

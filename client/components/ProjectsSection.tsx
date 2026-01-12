@@ -154,7 +154,7 @@ export default function ProjectsSection() {
                   fontFamily: "var(--font-custom), 'CustomFont', sans-serif",
                 }}
               >
-                220 projects
+                50+ projects
               </h2>
               <h2
                 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl 2xl:text-7xl font-normal leading-[1.1] sm:leading-tight break-words bg-white/10 md:bg-transparent px-4 py-3 md:px-0 md:py-0 rounded-lg md:rounded-none"
@@ -163,7 +163,7 @@ export default function ProjectsSection() {
                   fontFamily: "var(--font-custom), 'CustomFont', sans-serif",
                 }}
               >
-                36 gigawatts
+                500+ megawatts
               </h2>
               <h2
                 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl 2xl:text-7xl font-normal leading-[1.1] sm:leading-tight break-words bg-white/10 md:bg-transparent px-4 py-3 md:px-0 md:py-0 rounded-lg md:rounded-none"
@@ -172,7 +172,7 @@ export default function ProjectsSection() {
                   fontFamily: "var(--font-custom), 'CustomFont', sans-serif",
                 }}
               >
-                4 continents
+                3 continents
               </h2>
             </div>
             <Link

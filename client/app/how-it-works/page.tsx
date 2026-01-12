@@ -1,20 +1,16 @@
-'use client';
+"use client";
 
 import Link from "next/link";
-import Image from "next/image";
-import { useAuth } from "@/contexts/AuthContext";
-import PublicHeader from "@/components/PublicHeader";
+import { CheckCircle, ArrowRight, Users, DollarSign, TrendingUp, Shield, Clock, Network, Award } from "lucide-react";
+import Footer from "@/components/Footer";
 
 export default function HowItWorksPage() {
-  const { user, admin } = useAuth();
-  // Removed redirects - allow logged-in users to access this page
-
   const steps = [
     {
-      number: "1",
+      number: 1,
       title: "Create Your Account",
       description: "Sign up for free and get your unique user ID (e.g., CROWN-XXXXXX). No upfront costs or hidden fees.",
-      icon: "👤",
+      icon: <Users className="w-8 h-8" />,
       details: [
         "Provide your name, email, and password",
         "Enter your referrer's user ID (optional but recommended)",
@@ -22,10 +18,10 @@ export default function HowItWorksPage() {
       ]
     },
     {
-      number: "2",
+      number: 2,
       title: "Choose Your Investment Plan",
       description: "Browse our range of investment packages, each with different returns, durations, and minimum investment amounts.",
-      icon: "📦",
+      icon: <TrendingUp className="w-8 h-8" />,
       details: [
         "View all available packages with detailed information",
         "See total output percentage, duration, and terms",
@@ -33,10 +29,10 @@ export default function HowItWorksPage() {
       ]
     },
     {
-      number: "3",
+      number: 3,
       title: "Make Your Investment",
       description: "Fund your investment wallet and activate your chosen package. Your investment starts earning immediately.",
-      icon: "💰",
+      icon: <DollarSign className="w-8 h-8" />,
       details: [
         "Deposit funds to your Investment Wallet via USDT TRC20",
         "Select your package and investment amount",
@@ -44,10 +40,10 @@ export default function HowItWorksPage() {
       ]
     },
     {
-      number: "4",
+      number: 4,
       title: "Build Your Binary Network",
       description: "Invite people to join your binary tree. Earn referral bonuses on their first investment and binary bonuses as your teams grow.",
-      icon: "🌳",
+      icon: <Network className="w-8 h-8" />,
       details: [
         "Share your unique referral link with others",
         "People join your left or right leg based on availability",
@@ -55,10 +51,10 @@ export default function HowItWorksPage() {
       ]
     },
     {
-      number: "5",
+      number: 5,
       title: "Earn Multiple Income Streams",
       description: "Start earning from day one through multiple income sources that grow with your network.",
-      icon: "💵",
+      icon: <Award className="w-8 h-8" />,
       details: [
         "Daily ROI: Automatic daily returns credited to your ROI wallet",
         "Referral Income: Instant bonuses when your network members invest",
@@ -67,10 +63,10 @@ export default function HowItWorksPage() {
       ]
     },
     {
-      number: "6",
+      number: 6,
       title: "Reinvest or Withdraw",
       description: "Convert your earnings into vouchers for reinvestment, or withdraw directly to your USDT TRC20 wallet.",
-      icon: "🚀",
+      icon: <Shield className="w-8 h-8" />,
       details: [
         "Create vouchers from any income wallet for easy reinvestment",
         "Request withdrawals from ROI, Referral, Binary, or Career Level wallets",
@@ -82,202 +78,304 @@ export default function HowItWorksPage() {
   const incomeStreams = [
     {
       title: "Daily ROI",
-      percentage: "Up to 225%",
-      description: "Receive daily returns on your investment, automatically calculated and credited to your ROI wallet",
-      frequency: "Daily",
-      type: "Automated"
+      percentage: "1.5% - 2%",
+      description: "Earn daily returns on your investment. Calculated and credited automatically every day.",
+      example: "Invest $1,000 → Earn $15-20 per day"
     },
     {
       title: "Referral Income",
-      percentage: "7% One-Time",
-      description: "Get instant referral bonuses when your direct referrals make their first investment",
-      frequency: "Immediate",
-      type: "One-Time"
+      percentage: "8% - 10%",
+      description: "Earn commission when people you refer make investments. No limit on referrals!",
+      example: "Refer $5,000 investment → Earn $400-500"
     },
     {
-      title: "Binary Bonuses",
-      percentage: "10% Daily",
-      description: "Earn daily matching bonuses when your left and right teams balance each other",
-      frequency: "Daily",
-      type: "Automated"
+      title: "Binary Income",
+      percentage: "10%",
+      description: "Earn bonuses based on your binary tree structure. Calculated on the smaller leg's volume.",
+      example: "Smaller leg: $2,800 → Earn $280 daily"
     },
     {
       title: "Career Levels",
       percentage: "Progressive",
-      description: "Unlock rewards at each career milestone based on your total business volume",
-      frequency: "Milestone-Based",
-      type: "Reward System"
+      description: "Unlock rewards at each career milestone based on your total business volume.",
+      example: "Reach milestones → Unlock exclusive bonuses"
     }
   ];
 
   return (
-    <div className="min-h-screen bg-black">
-      <PublicHeader />
-
+    <main className="min-h-screen w-full overflow-x-hidden pt-24 sm:pt-28 md:pt-32 lg:pt-[126px]">
       {/* Hero Section */}
-      <section className="relative py-20 px-6">
-        <div className="max-w-4xl mx-auto text-center">
-          <h1 className="text-5xl sm:text-6xl font-extrabold text-white mb-6">
-            How <span className="bg-gradient-to-r from-yellow-400 to-yellow-600 bg-clip-text text-transparent">CROWN</span> Works
-          </h1>
-          <p className="text-xl text-white/80 leading-relaxed">
-            A simple 6-step process to start earning through our binary investment platform
-          </p>
-        </div>
-      </section>
-
-      {/* Steps Section */}
-      <section className="relative py-12 px-6 bg-gray-900">
-        <div className="max-w-6xl mx-auto">
-          <div className="space-y-12">
-            {steps.map((step, index) => (
-              <div key={index} className="relative">
-                {/* Connection Line */}
-                {index < steps.length - 1 && (
-                  <div className="hidden md:block absolute left-12 top-24 w-1 h-full bg-gradient-to-b from-yellow-500 to-yellow-600 opacity-30"></div>
-                )}
-                
-                <div className="flex flex-col md:flex-row gap-8 items-start">
-                  {/* Step Number & Icon */}
-                  <div className="flex-shrink-0">
-                    <div className="w-24 h-24 bg-gradient-to-br from-yellow-500 to-yellow-600 rounded-full flex flex-col items-center justify-center text-4xl shadow-xl relative z-10">
-                      <div className="text-2xl mb-1">{step.icon}</div>
-                      <div className="text-sm font-bold text-white">Step {step.number}</div>
-                    </div>
-                  </div>
-
-                  {/* Content */}
-                  <div className="flex-1 p-8 bg-yellow-500/5 backdrop-blur-md rounded-2xl border border-yellow-500/20">
-                    <h2 className="text-3xl font-bold text-white mb-4">{step.title}</h2>
-                    <p className="text-white/80 text-lg mb-6 leading-relaxed">{step.description}</p>
-                    <ul className="space-y-3">
-                      {step.details.map((detail, idx) => (
-                        <li key={idx} className="flex items-start text-white/70">
-                          <svg className="w-5 h-5 text-yellow-400 mr-3 mt-1 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                          </svg>
-                          <span>{detail}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Income Streams Section */}
-      <section className="relative py-20 px-6 bg-gradient-to-b from-black/30 to-transparent">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-12">
-            <h2 className="text-4xl font-extrabold text-white mb-4">
-              Multiple <span className="bg-gradient-to-r from-yellow-400 to-yellow-600 bg-clip-text text-transparent">Income Streams</span>
-            </h2>
-            <p className="text-xl text-white/70">
-              Earn from four different sources as you build your network
+      <section className="relative w-full bg-[#E8F5F0] py-12 sm:py-16 md:py-20 lg:py-24">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="max-w-4xl mx-auto text-center">
+            <div className="flex items-center justify-center gap-2 sm:gap-3 mb-4 sm:mb-6">
+              <div className="h-px w-8 sm:w-12" style={{ backgroundColor: "#042B19" }}></div>
+              <span
+                className="text-xs font-medium uppercase tracking-wide"
+                style={{ color: "#042B19" }}
+              >
+                HOW IT WORKS
+              </span>
+            </div>
+            <h1
+              className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl 2xl:text-7xl font-normal leading-tight mb-4 sm:mb-6 px-2"
+              style={{
+                color: "#042B19",
+                fontFamily: "var(--font-font4), sans-serif",
+              }}
+            >
+              How Crown Bankers Works
+            </h1>
+            <p
+              className="text-sm sm:text-base md:text-lg lg:text-xl leading-relaxed max-w-2xl mx-auto px-2"
+              style={{
+                color: "#042B19",
+                fontFamily: "var(--font-font4), sans-serif",
+              }}
+            >
+              A simple 6-step process to start earning through our binary investment platform
             </p>
           </div>
+        </div>
+      </section>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {incomeStreams.map((stream, index) => (
-              <div key={index} className="p-8 bg-yellow-500/5 backdrop-blur-md rounded-2xl border border-yellow-500/20 hover:bg-white/15 transition-all">
-                <div className="flex justify-between items-start mb-4">
-                  <h3 className="text-2xl font-bold text-white">{stream.title}</h3>
-                  <span className="px-4 py-1 bg-gradient-to-r from-yellow-500 to-yellow-600 text-white rounded-full text-sm font-semibold">
-                    {stream.percentage}
-                  </span>
+      {/* Step-by-Step Process */}
+      <section className="relative w-full bg-white py-12 sm:py-16 md:py-20 lg:py-24">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="max-w-6xl mx-auto">
+            <div className="space-y-8 sm:space-y-12">
+              {steps.map((step, index) => (
+                <div
+                  key={index}
+                  className={`flex flex-col ${index % 2 === 0 ? 'lg:flex-row' : 'lg:flex-row-reverse'} gap-6 sm:gap-8 lg:gap-12 items-center`}
+                >
+                  <div className="w-full lg:w-1/2">
+                    <div className="bg-[#E8F5F0] p-6 sm:p-8 md:p-10 rounded-lg h-full">
+                      <div className="flex items-center gap-4 mb-4 sm:mb-6">
+                        <div
+                          className="w-16 h-16 sm:w-20 sm:h-20 rounded-full flex items-center justify-center font-bold text-2xl sm:text-3xl shadow-lg"
+                          style={{
+                            backgroundColor: "#042B19",
+                            color: "#ffffff"
+                          }}
+                        >
+                          {step.number}
+                        </div>
+                        <div className="flex-1" style={{ color: "#042B19" }}>
+                          {step.icon}
+                        </div>
+                      </div>
+                      <h3
+                        className="text-xl sm:text-2xl md:text-3xl font-bold mb-3 sm:mb-4"
+                        style={{ color: "#042B19" }}
+                      >
+                        {step.title}
+                      </h3>
+                      <p
+                        className="text-sm sm:text-base md:text-lg leading-relaxed mb-4 sm:mb-6"
+                        style={{
+                          color: "#042B19",
+                          fontFamily: "var(--font-font4), sans-serif",
+                        }}
+                      >
+                        {step.description}
+                      </p>
+                      <ul className="space-y-2 sm:space-y-3">
+                        {step.details.map((detail, detailIndex) => (
+                          <li key={detailIndex} className="flex items-start gap-2 sm:gap-3">
+                            <CheckCircle className="w-5 h-5 flex-shrink-0 mt-0.5" style={{ color: "#042B19" }} />
+                            <span
+                              className="text-sm sm:text-base"
+                              style={{ color: "#042B19" }}
+                            >
+                              {detail}
+                            </span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  </div>
+                  {index < steps.length - 1 && (
+                    <div className="hidden lg:flex flex-col items-center">
+                      <ArrowRight className="w-8 h-8 rotate-90 lg:rotate-0" style={{ color: "#042B19" }} />
+                    </div>
+                  )}
                 </div>
-                <p className="text-white/70 mb-4 leading-relaxed">{stream.description}</p>
-                <div className="flex gap-4 text-sm">
-                  <span className="px-3 py-1 bg-white/10 rounded-full text-white/70">
-                    {stream.frequency}
-                  </span>
-                  <span className="px-3 py-1 bg-white/10 rounded-full text-white/70">
-                    {stream.type}
-                  </span>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Income Streams */}
+      <section className="relative w-full bg-[#E8F5F0] py-12 sm:py-16 md:py-20 lg:py-24">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="max-w-6xl mx-auto">
+            <h2
+              className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-8 sm:mb-10 md:mb-12 text-center px-2"
+              style={{ color: "#042B19" }}
+            >
+              Four Ways to Earn
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
+              {incomeStreams.map((stream, index) => (
+                <div
+                  key={index}
+                  className="bg-white p-6 sm:p-8 rounded-lg border-2 shadow-lg"
+                  style={{ borderColor: "#042B19" }}
+                >
+                  <div className="flex items-center justify-between mb-4">
+                    <h3
+                      className="text-xl sm:text-2xl md:text-3xl font-bold"
+                      style={{ color: "#042B19" }}
+                    >
+                      {stream.title}
+                    </h3>
+                    <span
+                      className="text-lg sm:text-xl md:text-2xl font-bold px-3 sm:px-4 py-1 sm:py-2 rounded"
+                      style={{
+                        backgroundColor: "#E8F5F0",
+                        color: "#042B19"
+                      }}
+                    >
+                      {stream.percentage}
+                    </span>
+                  </div>
+                  <p
+                    className="text-sm sm:text-base md:text-lg leading-relaxed mb-4"
+                    style={{
+                      color: "#042B19",
+                      fontFamily: "var(--font-font4), sans-serif",
+                    }}
+                  >
+                    {stream.description}
+                  </p>
+                  <div className="bg-[#E8F5F0] p-3 sm:p-4 rounded">
+                    <p className="text-xs sm:text-sm font-semibold" style={{ color: "#042B19" }}>
+                      Example: {stream.example}
+                    </p>
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         </div>
       </section>
 
       {/* Binary Tree Explanation */}
-      <section className="relative py-20 px-6 bg-gray-900">
-        <div className="max-w-4xl mx-auto">
-          <div className="p-8 bg-yellow-500/5 backdrop-blur-md rounded-2xl border border-yellow-500/20">
-            <h2 className="text-3xl font-bold text-white mb-6">Understanding the Binary System</h2>
-            <div className="space-y-6 text-white/80 text-lg leading-relaxed">
-              <p>
-                CROWN uses a binary tree structure where each user can have two direct referrals: one on the left 
-                and one on the right. This structure creates balanced growth opportunities:
-              </p>
-              <ul className="space-y-4 ml-6">
-                <li className="flex items-start">
-                  <span className="text-yellow-400 mr-3">•</span>
-                  <span><strong className="text-white">Left Leg & Right Leg:</strong> Your network branches into two sides, allowing for organized growth</span>
-                </li>
-                <li className="flex items-start">
-                  <span className="text-yellow-400 mr-3">•</span>
-                  <span><strong className="text-white">Matching Bonuses:</strong> When both legs have business volume, you earn binary bonuses daily</span>
-                </li>
-                <li className="flex items-start">
-                  <span className="text-yellow-400 mr-3">•</span>
-                  <span><strong className="text-white">Carry Forward:</strong> Unmatched volume carries over to the next day, ensuring nothing is lost</span>
-                </li>
-                <li className="flex items-start">
-                  <span className="text-yellow-400 mr-3">•</span>
-                  <span><strong className="text-white">Power Capacity:</strong> Your daily binary bonus is capped based on your active package's power capacity</span>
-                </li>
-              </ul>
-              <p className="pt-4">
-                The system is designed to reward balanced network building, encouraging sustainable growth 
-                and fair distribution of earnings.
-              </p>
+      <section className="relative w-full bg-white py-12 sm:py-16 md:py-20 lg:py-24">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="max-w-4xl mx-auto">
+            <div className="bg-[#E8F5F0] p-6 sm:p-8 md:p-10 rounded-lg border-2" style={{ borderColor: "#042B19" }}>
+              <h2
+                className="text-2xl sm:text-3xl md:text-4xl font-bold mb-6"
+                style={{ color: "#042B19" }}
+              >
+                Understanding the Binary System
+              </h2>
+              <div className="space-y-4 sm:space-y-6">
+                <p
+                  className="text-sm sm:text-base md:text-lg leading-relaxed"
+                  style={{
+                    color: "#042B19",
+                    fontFamily: "var(--font-font4), sans-serif",
+                  }}
+                >
+                  Crown Bankers uses a binary tree structure where each user can have two direct referrals: one on the left 
+                  and one on the right. This structure creates balanced growth opportunities:
+                </p>
+                <ul className="space-y-3 sm:space-y-4">
+                  <li className="flex items-start gap-3">
+                    <CheckCircle className="w-5 h-5 flex-shrink-0 mt-0.5" style={{ color: "#042B19" }} />
+                    <span
+                      className="text-sm sm:text-base"
+                      style={{ color: "#042B19" }}
+                    >
+                      <strong>Left Leg & Right Leg:</strong> Your network branches into two sides, allowing for organized growth
+                    </span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <CheckCircle className="w-5 h-5 flex-shrink-0 mt-0.5" style={{ color: "#042B19" }} />
+                    <span
+                      className="text-sm sm:text-base"
+                      style={{ color: "#042B19" }}
+                    >
+                      <strong>Matching Bonuses:</strong> When both legs have business volume, you earn binary bonuses daily
+                    </span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <CheckCircle className="w-5 h-5 flex-shrink-0 mt-0.5" style={{ color: "#042B19" }} />
+                    <span
+                      className="text-sm sm:text-base"
+                      style={{ color: "#042B19" }}
+                    >
+                      <strong>Carry Forward:</strong> Unmatched volume carries over to the next day, ensuring nothing is lost
+                    </span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <CheckCircle className="w-5 h-5 flex-shrink-0 mt-0.5" style={{ color: "#042B19" }} />
+                    <span
+                      className="text-sm sm:text-base"
+                      style={{ color: "#042B19" }}
+                    >
+                      <strong>Binary Capping:</strong> Your daily binary bonus is capped based on your active package ($1,000 - $10,000 per day)
+                    </span>
+                  </li>
+                </ul>
+                <p
+                  className="pt-4 text-sm sm:text-base md:text-lg leading-relaxed"
+                  style={{
+                    color: "#042B19",
+                    fontFamily: "var(--font-font4), sans-serif",
+                  }}
+                >
+                  The system is designed to reward balanced network building, encouraging sustainable growth 
+                  and fair distribution of earnings.
+                </p>
+              </div>
             </div>
           </div>
         </div>
       </section>
 
       {/* CTA Section */}
-      <section className="relative py-20 px-6">
-        <div className="max-w-4xl mx-auto text-center">
-          <div className="p-12 bg-gradient-to-br from-yellow-500/20 via-yellow-600/20 to-amber-500/20 backdrop-blur-md rounded-3xl border border-white/20">
-            <h2 className="text-4xl font-extrabold text-white mb-6">Ready to Get Started?</h2>
-            <p className="text-xl text-white/80 mb-8">
+      <section className="relative w-full bg-[#042B19] py-12 sm:py-16 md:py-20 lg:py-24 text-white text-center">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="max-w-3xl mx-auto">
+            <h2
+              className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-4 sm:mb-6 px-2"
+              style={{
+                fontFamily: "var(--font-font4), sans-serif",
+              }}
+            >
+              Ready to Get Started?
+            </h2>
+            <p
+              className="text-base sm:text-lg md:text-xl leading-relaxed mb-8 sm:mb-10 px-2"
+            >
               Join thousands of successful investors and start earning today
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link
                 href="/signup"
-                className="px-8 py-4 bg-gradient-to-r from-yellow-500 to-yellow-600 text-black rounded-xl font-semibold text-lg hover:from-yellow-400 hover:to-yellow-500 transition-all shadow-lg"
+                className="inline-block bg-[#ffcf0B] text-gray-900 font-bold px-6 sm:px-8 lg:px-12 py-3 sm:py-4 lg:py-5 text-xs sm:text-sm md:text-base uppercase tracking-wide transition hover:opacity-90 text-center"
+                style={{ borderRadius: "0" }}
               >
-                Create Free Account
+                CREATE ACCOUNT
               </Link>
               <Link
                 href="/how-to-start"
-                className="px-8 py-4 bg-white/10 backdrop-blur-sm text-white rounded-xl font-semibold text-lg border-2 border-white/20 hover:bg-white/20 transition-all"
+                className="inline-block bg-transparent border-2 border-white text-white font-bold px-6 sm:px-8 lg:px-12 py-3 sm:py-4 lg:py-5 text-xs sm:text-sm md:text-base uppercase tracking-wide transition hover:bg-white hover:text-[#042B19] text-center"
+                style={{ borderRadius: "0" }}
               >
-                Detailed Getting Started Guide
+                GETTING STARTED GUIDE
               </Link>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="relative z-10 border-t border-yellow-500/20 mt-20 bg-gray-900">
-        <div className="max-w-7xl mx-auto px-6 py-8 text-center text-white/70">
-          <p>&copy; {new Date().getFullYear()} CROWN. All rights reserved.</p>
-          <div className="mt-4 flex justify-center gap-6">
-            <Link href="/about-us" className="hover:text-white transition-colors">About Us</Link>
-            <Link href="/policy" className="hover:text-white transition-colors">Privacy & Terms</Link>
-            <Link href="/support" className="hover:text-white transition-colors">Support</Link>
-          </div>
-        </div>
-      </footer>
-    </div>
+      <Footer />
+    </main>
   );
 }

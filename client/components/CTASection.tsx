@@ -3,7 +3,7 @@ import Image from "next/image";
 
 export default function CTASection() {
   return (
-    <section className="relative w-full bg-blue-50 py-12 sm:py-16 md:py-20 lg:py-24">
+    <section className="relative w-full bg-[#E8F5F0] py-12 sm:py-16 md:py-20 lg:py-24">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col lg:flex-row items-center gap-8 sm:gap-10 md:gap-12 lg:gap-16">
           {/* Left Section: Text Content */}
@@ -24,24 +24,32 @@ export default function CTASection() {
               the energy future.
             </h2>
             <p className="text-sm sm:text-base md:text-lg text-gray-700 leading-relaxed mb-6 sm:mb-8 max-w-lg">
-              At Invenergy, innovation is driven by a unique array of ideas and
-              perspectives. Our growing team of 2,800+ people is dedicated to
-              empowering the world with secure, reliable energy.
+              At Crown Bankers, we combine innovative binary investment systems with sustainable energy projects. 
+              Join thousands of investors building wealth while supporting renewable energy initiatives worldwide.
             </p>
-            <Link
-              href="/careers"
-              className="inline-block bg-[#ffcf0B] text-gray-900 font-bold px-4 sm:px-6 py-2 sm:py-3 transition hover:opacity-90 text-xs sm:text-sm uppercase w-full sm:w-auto text-center"
-              style={{ borderRadius: "0", maxWidth: "fit-content" }}
-            >
-              SEE WHAT WE&apos;RE ALL ABOUT
-            </Link>
+            <div className="flex flex-col sm:flex-row gap-4">
+              <Link
+                href="/signup"
+                className="inline-block bg-[#ffcf0B] text-gray-900 font-bold px-4 sm:px-6 py-2 sm:py-3 transition hover:opacity-90 text-xs sm:text-sm uppercase w-full sm:w-auto text-center"
+                style={{ borderRadius: "0", maxWidth: "fit-content" }}
+              >
+                GET STARTED
+              </Link>
+              <Link
+                href="/career-rewards"
+                className="inline-block bg-transparent border-2 border-[#042B19] text-[#042B19] font-bold px-4 sm:px-6 py-2 sm:py-3 transition hover:bg-[#042B19] hover:text-white text-xs sm:text-sm uppercase w-full sm:w-auto text-center"
+                style={{ borderRadius: "0", maxWidth: "fit-content" }}
+              >
+                CAREER REWARDS
+              </Link>
+            </div>
           </div>
 
           {/* Right Section: Image */}
           <div className="w-full lg:w-1/2 relative min-h-[300px] sm:min-h-[400px] md:min-h-[450px] lg:min-h-[500px] order-1 lg:order-2">
             <Image
               src="/CTA.webp"
-              alt="Invenergy Team Working"
+              alt="Crown Bankers Team"
               fill
               className="object-cover"
               priority

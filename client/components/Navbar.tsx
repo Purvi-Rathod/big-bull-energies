@@ -30,12 +30,12 @@ export default function Navbar() {
     {
       name: "Energy Technologies",
       items: [
-        { label: "Natural Gas", href: "/energy-technologies/natural-gas" },
+        // { label: "Natural Gas", href: "/energy-technologies/natural-gas" },
         { label: "Solar", href: "/energy-technologies/solar" },
-        { label: "Storage", href: "/energy-technologies/storage" },
-        { label: "Land-based Wind", href: "/energy-technologies/wind" },
-        { label: "Transmission", href: "/energy-technologies/transmission" },
-        { label: "Geothermal", href: "/energy-technologies/geothermal" },
+        // { label: "Storage", href: "/energy-technologies/storage" },
+        // { label: "Land-based Wind", href: "/energy-technologies/wind" },
+        // { label: "Transmission", href: "/energy-technologies/transmission" },
+        // { label: "Geothermal", href: "/energy-technologies/geothermal" },
       ],
     },
     {
@@ -48,6 +48,10 @@ export default function Navbar() {
     {
       name: "Our Plan",
       href: "/our-plan",
+    },
+    {
+      name: "Gallery",
+      href: "/gallery",
     },
     {
       name: "Download",
@@ -140,12 +144,12 @@ export default function Navbar() {
 
               {/* Email */}
               <a
-                href="mailto:info@crownbanker.com"
+                href="mailto:crownbankers.com@gmail.com"
                 className="flex items-center gap-2 text-xs font-bold transition hover:opacity-70"
                 style={{ color: "#042B19" }}
               >
                 <Mail className="w-4 h-4" />
-                crownbanker.com
+                crownbankers.com@gmail.com
               </a>
 
               {/* Login Button */}
@@ -408,7 +412,7 @@ export default function Navbar() {
                 <Phone className="w-4 h-4" />
               </a>
               <a
-                href="mailto:info@crownbanker.com"
+                href="mailto:crownbankers.com@gmail.com"
                 className="flex items-center gap-1 text-white transition hover:text-yellow-400"
                 aria-label="Email us"
               >

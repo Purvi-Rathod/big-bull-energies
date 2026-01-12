@@ -11,6 +11,7 @@ export default function ProfilePage() {
   const { user, refreshAuth } = useAuth();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [referralLinks, setReferralLinks] = useState<{ leftLink: string; rightLink: string; userId: string } | null>(null);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -27,7 +28,20 @@ export default function ProfilePage() {
     }
     hasFetchedRef.current = true;
     fetchProfile();
+    fetchReferralLinks();
   }, []);
+
+  const fetchReferralLinks = async () => {
+    try {
+      const response = await api.getUserReferralLinks();
+      if (response.data) {
+        setReferralLinks(response.data);
+      }
+    } catch (err: any) {
+      console.error('Failed to fetch referral links:', err);
+      // Don't show error toast - referral links are optional
+    }
+  };
 
   const fetchProfile = async () => {
     try {
@@ -187,31 +201,132 @@ export default function ProfilePage() {
                   </p>
                 </div>
               </div>
+            </div>
 
-              <div>
-                <label className="block text-sm font-bold text-yellow-400 mb-3">
-                  Referral Link
+            {/* Referral Links Section */}
+            {referralLinks && (
+              <div className="mt-6">
+                <label className="block text-sm font-bold text-yellow-400 mb-4">
+                  Referral Links
                 </label>
-                <div className="p-4 bg-gray-800/80 border border-yellow-500/30 rounded-xl">
-                  <p className="text-sm font-mono text-white break-all font-semibold mb-2">
-                    {typeof window !== 'undefined' ? `${window.location.origin}/signup?ref=${formData.userId || user?.userId || ''}` : 'Loading...'}
-                  </p>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      const link = typeof window !== 'undefined' ? `${window.location.origin}/signup?ref=${formData.userId || user?.userId || ''}` : '';
-                      if (link) {
-                        navigator.clipboard.writeText(link);
-                        toast.success('Referral link copied to clipboard!');
-                      }
-                    }}
-                    className="text-xs text-yellow-400 hover:text-yellow-300 font-bold underline transition-colors"
-                  >
-                    Copy Link
-                  </button>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="group relative p-6 bg-gradient-to-br from-yellow-500/10 via-yellow-500/5 to-transparent rounded-2xl border-2 border-yellow-500/40 hover:border-yellow-500/70 hover:shadow-yellow-500/30 hover:shadow-2xl transition-all duration-300 overflow-hidden">
+                    <div className="absolute inset-0 bg-gradient-to-br from-yellow-500/0 to-yellow-500/0 group-hover:from-yellow-500/10 group-hover:to-transparent transition-all duration-300"></div>
+                    <div className="relative z-10">
+                      <h3 className="font-bold text-yellow-400 mb-4 flex items-center gap-3 text-lg">
+                        <span className="w-3 h-3 bg-gradient-to-r from-yellow-400 to-yellow-600 rounded-full shadow-lg shadow-yellow-500/50"></span>
+                        Left Referral Link
+                      </h3>
+                      <div className="flex items-center space-x-3">
+                        <input
+                          type="text"
+                          value={referralLinks.leftLink}
+                          readOnly
+                          className="flex-1 px-4 py-3 border border-yellow-500/40 rounded-xl bg-gray-900/80 text-white text-sm focus:outline-none focus:border-yellow-500/70 focus:ring-2 focus:ring-yellow-500/30 font-mono backdrop-blur-sm"
+                        />
+                        <button
+                          type="button"
+                          onClick={async () => {
+                            try {
+                              // Try modern clipboard API first
+                              if (navigator.clipboard && window.isSecureContext) {
+                                await navigator.clipboard.writeText(referralLinks.leftLink);
+                                toast.success('Left referral link copied!');
+                              } else {
+                                // Fallback for older browsers or non-secure contexts
+                                const textArea = document.createElement('textarea');
+                                textArea.value = referralLinks.leftLink;
+                                textArea.style.position = 'fixed';
+                                textArea.style.left = '-999999px';
+                                textArea.style.top = '-999999px';
+                                document.body.appendChild(textArea);
+                                textArea.focus();
+                                textArea.select();
+                                try {
+                                  const successful = document.execCommand('copy');
+                                  if (successful) {
+                                    toast.success('Left referral link copied!');
+                                  } else {
+                                    throw new Error('Copy command failed');
+                                  }
+                                } catch (err) {
+                                  toast.error('Failed to copy link. Please copy manually.');
+                                } finally {
+                                  document.body.removeChild(textArea);
+                                }
+                              }
+                            } catch (err) {
+                              console.error('Failed to copy:', err);
+                              toast.error('Failed to copy link. Please copy manually.');
+                            }
+                          }}
+                          className="px-6 py-3 bg-gradient-to-r from-yellow-500 to-yellow-600 text-black rounded-xl hover:from-yellow-400 hover:to-yellow-500 text-sm font-bold transition-all shadow-lg shadow-yellow-500/30 hover:shadow-yellow-500/50 hover:scale-105 active:scale-95"
+                        >
+                          Copy
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="group relative p-6 bg-gradient-to-br from-yellow-500/10 via-yellow-500/5 to-transparent rounded-2xl border-2 border-yellow-500/40 hover:border-yellow-500/70 hover:shadow-yellow-500/30 hover:shadow-2xl transition-all duration-300 overflow-hidden">
+                    <div className="absolute inset-0 bg-gradient-to-br from-yellow-500/0 to-yellow-500/0 group-hover:from-yellow-500/10 group-hover:to-transparent transition-all duration-300"></div>
+                    <div className="relative z-10">
+                      <h3 className="font-bold text-yellow-400 mb-4 flex items-center gap-3 text-lg">
+                        <span className="w-3 h-3 bg-gradient-to-r from-yellow-400 to-yellow-600 rounded-full shadow-lg shadow-yellow-500/50"></span>
+                        Right Referral Link
+                      </h3>
+                      <div className="flex items-center space-x-3">
+                        <input
+                          type="text"
+                          value={referralLinks.rightLink}
+                          readOnly
+                          className="flex-1 px-4 py-3 border border-yellow-500/40 rounded-xl bg-gray-900/80 text-white text-sm focus:outline-none focus:border-yellow-500/70 focus:ring-2 focus:ring-yellow-500/30 font-mono backdrop-blur-sm"
+                        />
+                        <button
+                          type="button"
+                          onClick={async () => {
+                            try {
+                              // Try modern clipboard API first
+                              if (navigator.clipboard && window.isSecureContext) {
+                                await navigator.clipboard.writeText(referralLinks.rightLink);
+                                toast.success('Right referral link copied!');
+                              } else {
+                                // Fallback for older browsers or non-secure contexts
+                                const textArea = document.createElement('textarea');
+                                textArea.value = referralLinks.rightLink;
+                                textArea.style.position = 'fixed';
+                                textArea.style.left = '-999999px';
+                                textArea.style.top = '-999999px';
+                                document.body.appendChild(textArea);
+                                textArea.focus();
+                                textArea.select();
+                                try {
+                                  const successful = document.execCommand('copy');
+                                  if (successful) {
+                                    toast.success('Right referral link copied!');
+                                  } else {
+                                    throw new Error('Copy command failed');
+                                  }
+                                } catch (err) {
+                                  toast.error('Failed to copy link. Please copy manually.');
+                                } finally {
+                                  document.body.removeChild(textArea);
+                                }
+                              }
+                            } catch (err) {
+                              console.error('Failed to copy:', err);
+                              toast.error('Failed to copy link. Please copy manually.');
+                            }
+                          }}
+                          className="px-6 py-3 bg-gradient-to-r from-yellow-500 to-yellow-600 text-black rounded-xl hover:from-yellow-400 hover:to-yellow-500 text-sm font-bold transition-all shadow-lg shadow-yellow-500/30 hover:shadow-yellow-500/50 hover:scale-105 active:scale-95"
+                        >
+                          Copy
+                        </button>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
-            </div>
+            )}
           </div>
 
           {/* Wallet Information - Read Only */}

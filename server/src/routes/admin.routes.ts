@@ -17,6 +17,10 @@ import {
   flushAllInvestments,
   getNOWPaymentsStatus,
   updateNOWPaymentsStatus,
+  getAuthRateLimitingStatus,
+  updateAuthRateLimitingStatus,
+  getWithdrawalSchedules,
+  updateWithdrawalSchedule,
   changeUserPassword,
   getAdminReports,
   getDailyBusinessReport,
@@ -49,6 +53,14 @@ import {
   getUserCareerProgressAdmin,
   getAllUsersCareerProgress,
 } from "../controllers/career-level.controller";
+import {
+  getAllGalleryItemsAdmin,
+  getGalleryItemById,
+  createGalleryItem,
+  updateGalleryItem,
+  deleteGalleryItem,
+  getGalleryCategories,
+} from "../controllers/gallery.controller";
 import { requireAdminAuth } from "../middleware/admin.middleware";
 
 const router = Router();
@@ -111,6 +123,10 @@ router.put("/tickets/:ticketId", requireAdminAuth, updateTicket);
 // Settings management
 router.get("/settings/nowpayments", requireAdminAuth, getNOWPaymentsStatus);
 router.put("/settings/nowpayments", requireAdminAuth, updateNOWPaymentsStatus);
+router.get("/settings/auth-rate-limiting", requireAdminAuth, getAuthRateLimitingStatus);
+router.put("/settings/auth-rate-limiting", requireAdminAuth, updateAuthRateLimitingStatus);
+router.get("/settings/withdrawal-schedules", requireAdminAuth, getWithdrawalSchedules);
+router.put("/settings/withdrawal-schedules", requireAdminAuth, updateWithdrawalSchedule);
 
 // Career level management
 router.get("/career-levels", requireAdminAuth, getAllCareerLevels);
@@ -126,5 +142,13 @@ router.get("/career-progress/:userId", requireAdminAuth, getUserCareerProgressAd
 // Voucher management
 router.get("/vouchers", requireAdminAuth, getAllVouchers);
 router.post("/vouchers", requireAdminAuth, createVoucherForUser);
+
+// Gallery management
+router.get("/gallery", requireAdminAuth, getAllGalleryItemsAdmin);
+router.get("/gallery/categories", requireAdminAuth, getGalleryCategories);
+router.get("/gallery/:id", requireAdminAuth, getGalleryItemById);
+router.post("/gallery", requireAdminAuth, createGalleryItem);
+router.put("/gallery/:id", requireAdminAuth, updateGalleryItem);
+router.delete("/gallery/:id", requireAdminAuth, deleteGalleryItem);
 
 export default router;

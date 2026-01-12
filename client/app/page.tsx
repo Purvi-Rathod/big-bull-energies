@@ -9,6 +9,7 @@ import ProjectsSection from "@/components/ProjectsSection";
 import TechnologiesMarquee from "@/components/TechnologiesMarquee";
 import EnergyTechnologiesSection from "@/components/EnergyTechnologiesSection";
 import ImpactSection from "@/components/ImpactSection";
+import LearnMoreSection from "@/components/LearnMoreSection";
 import Footer from "@/components/Footer";
 
 export default function Home() {
@@ -22,6 +23,7 @@ export default function Home() {
       <TestimonialMarquee />
       <ImpactSection />
       <NewsInsightsSection />
+      <LearnMoreSection />
       <CTASection />
       <Footer />
     </main>

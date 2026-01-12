@@ -253,7 +253,7 @@ export default function ProjectsPage() {
                   className="text-4xl md:text-5xl font-bold mb-2"
                   style={{ color: "#042B19" }}
                 >
-                  330+
+                  50+
                 </div>
                 <div className="text-sm md:text-base text-gray-600 uppercase tracking-wide">
                   Projects
@@ -264,7 +264,7 @@ export default function ProjectsPage() {
                   className="text-4xl md:text-5xl font-bold mb-2"
                   style={{ color: "#042B19" }}
                 >
-                  4
+                  3
                 </div>
                 <div className="text-sm md:text-base text-gray-600 uppercase tracking-wide">
                   Continents
@@ -275,7 +275,7 @@ export default function ProjectsPage() {
                   className="text-4xl md:text-5xl font-bold mb-2"
                   style={{ color: "#042B19" }}
                 >
-                  2,500+
+                  500+
                 </div>
                 <div className="text-sm md:text-base text-gray-600 uppercase tracking-wide">
                   MW Capacity
@@ -286,7 +286,7 @@ export default function ProjectsPage() {
                   className="text-4xl md:text-5xl font-bold mb-2"
                   style={{ color: "#042B19" }}
                 >
-                  15+
+                  5+
                 </div>
                 <div className="text-sm md:text-base text-gray-600 uppercase tracking-wide">
                   Years Experience

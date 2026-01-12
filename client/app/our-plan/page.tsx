@@ -2,12 +2,13 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { DollarSign, Users, Network } from "lucide-react";
+import { DollarSign, Users, Network, TrendingUp, Percent, Award } from "lucide-react";
 import Footer from "@/components/Footer";
 
 export default function OurPlanPage() {
   const [investmentAmount, setInvestmentAmount] = useState<string>("435");
   const [calculatedResults, setCalculatedResults] = useState<any>(null);
+  const [activeTab, setActiveTab] = useState<string>("roi");
 
   const investmentPlans = [
     {
@@ -170,66 +171,66 @@ export default function OurPlanPage() {
 
                   {/* Plan Details */}
                   <div className="space-y-3 sm:space-y-4 mb-6 sm:mb-8">
-                    <div className="flex justify-between items-center border-b pb-2" style={{ borderColor: "#042B19", opacity: 0.3 }}>
+                    <div className="flex justify-between items-center border-b pb-2" style={{ borderColor: "#000000" }}>
                       <span
                         className="text-xs sm:text-sm md:text-base font-medium"
-                        style={{ color: "#042B19" }}
+                        style={{ color: "#000000" }}
                       >
                         Daily ROI:
                       </span>
                       <span
                         className="text-sm sm:text-base md:text-lg font-bold"
-                        style={{ color: "#042B19" }}
+                        style={{ color: "#000000" }}
                       >
                         {plan.roi}
                       </span>
                     </div>
-                    <div className="flex justify-between items-center border-b pb-2" style={{ borderColor: "#042B19", opacity: 0.3 }}>
+                    <div className="flex justify-between items-center border-b pb-2" style={{ borderColor: "#042B19"}}>
                       <span
                         className="text-xs sm:text-sm md:text-base font-medium"
-                        style={{ color: "#042B19" }}
+                        style={{ color: "#000000" }}
                       >
                         Duration:
                       </span>
                       <span
                         className="text-sm sm:text-base md:text-lg font-bold"
-                        style={{ color: "#042B19" }}
+                        style={{ color: "#000000" }}
                       >
                         {plan.bondDays}
                       </span>
                     </div>
-                    <div className="flex justify-between items-center border-b pb-2" style={{ borderColor: "#042B19", opacity: 0.3 }}>
+                    <div className="flex justify-between items-center border-b pb-2" style={{ borderColor: "#042B19" }}>
                       <span
                         className="text-xs sm:text-sm md:text-base font-medium"
-                        style={{ color: "#042B19" }}
+                        style={{ color: "#000000" }}
                       >
                         Referral Income:
                       </span>
                       <span
                         className="text-sm sm:text-base md:text-lg font-bold"
-                        style={{ color: "#042B19" }}
+                        style={{ color: "#000000" }}
                       >
                         {plan.referral}
                       </span>
                     </div>
-                    <div className="flex justify-between items-center border-b pb-2" style={{ borderColor: "#042B19", opacity: 0.3 }}>
+                    <div className="flex justify-between items-center border-b pb-2" style={{ borderColor: "#042B19" }}>
                       <span
                         className="text-xs sm:text-sm md:text-base font-medium"
-                        style={{ color: "#042B19" }}
+                        style={{ color: "#000000" }}
                       >
                         Binary Income:
                       </span>
                       <span
                         className="text-sm sm:text-base md:text-lg font-bold"
-                        style={{ color: "#042B19" }}
+                        style={{ color: "#000000" }}
                       >
                         {plan.binary}
                       </span>
                     </div>
-                    <div className="flex justify-between items-center border-b pb-2" style={{ borderColor: "#042B19", opacity: 0.3 }}>
+                    <div className="flex justify-between items-center border-b pb-2" style={{ borderColor: "#042B19" }}>
                       <span
                         className="text-xs sm:text-sm md:text-base font-medium"
-                        style={{ color: "#042B19" }}
+                        style={{ color: "#000000" }}
                       >
                         Binary Capping:
                       </span>
@@ -240,10 +241,10 @@ export default function OurPlanPage() {
                         {plan.binaryCapping}
                       </span>
                     </div>
-                    <div className="flex justify-between items-center border-b pb-2" style={{ borderColor: "#042B19", opacity: 0.3 }}>
+                    <div className="flex justify-between items-center border-b pb-2" style={{ borderColor: "#042B19" }}>
                       <span
                         className="text-xs sm:text-sm md:text-base font-medium"
-                        style={{ color: "#042B19" }}
+                        style={{ color: "#000000" }}
                       >
                         Principal Return:
                       </span>
@@ -254,10 +255,10 @@ export default function OurPlanPage() {
                         {plan.principalReturn}
                       </span>
                     </div>
-                    <div className="flex justify-between items-center border-b pb-2" style={{ borderColor: "#042B19", opacity: 0.3 }}>
+                    <div className="flex justify-between items-center border-b pb-2" style={{ borderColor: "#042B19" }}>
                       <span
                         className="text-xs sm:text-sm md:text-base font-medium"
-                        style={{ color: "#042B19" }}
+                        style={{ color: "#000000" }}
                       >
                         Total ROI Returns:
                       </span>
@@ -268,10 +269,10 @@ export default function OurPlanPage() {
                         {plan.totalROIReturns}
                       </span>
                     </div>
-                    <div className="flex justify-between items-center pb-2" style={{ borderColor: "#042B19", opacity: 0.3 }}>
+                    <div className="flex justify-between items-center pb-2" style={{ borderColor: "#042B19" }}>
                       <span
                         className="text-xs sm:text-sm md:text-base font-medium"
-                        style={{ color: "#042B19" }}
+                        style={{ color: "#000000" }}
                       >
                         Total Returns:
                       </span>
@@ -300,7 +301,7 @@ export default function OurPlanPage() {
       </section>
 
       {/* Investment Calculator Section */}
-      <section className="relative w-full bg-white py-12 sm:py-16 md:py-20 lg:py-24">
+      <section className="relative w-full bg-[#E8F5F0] py-12 sm:py-16 md:py-20 lg:py-24">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-4xl mx-auto">
             <h2
@@ -309,7 +310,7 @@ export default function OurPlanPage() {
             >
               Investment Calculator
             </h2>
-            <div className="bg-gray-50 rounded-lg p-6 sm:p-8 md:p-10 shadow-lg">
+            <div className="bg-white rounded-lg p-6 sm:p-8 md:p-10 shadow-lg border-2" style={{ borderColor: "#042B19" }}>
               {/* Input Section */}
               <div className="mb-8">
                 <label
@@ -355,11 +356,11 @@ export default function OurPlanPage() {
               {calculatedResults && (
                 <div className="space-y-6">
                   {/* Plan Details */}
-                  <div className="space-y-4 pb-6 border-b-2" style={{ borderColor: "#042B19", opacity: 0.2 }}>
+                  <div className="space-y-4 pb-6 border-b-2" style={{ borderColor: "#042B19" }}>
                     <div className="flex justify-between items-center">
                       <span
                         className="text-base md:text-lg font-semibold"
-                        style={{ color: "#042B19" }}
+                        style={{ color: "#000000" }}
                       >
                         Applied Plan:
                       </span>
@@ -373,7 +374,7 @@ export default function OurPlanPage() {
                     <div className="flex justify-between items-center">
                       <span
                         className="text-base md:text-lg font-semibold"
-                        style={{ color: "#042B19" }}
+                        style={{ color: "#000000" }}
                       >
                         Daily ROI:
                       </span>
@@ -387,7 +388,7 @@ export default function OurPlanPage() {
                     <div className="flex justify-between items-center">
                       <span
                         className="text-base md:text-lg font-semibold"
-                        style={{ color: "#042B19" }}
+                        style={{ color: "#000000" }}
                       >
                         Bond Period:
                       </span>
@@ -401,7 +402,7 @@ export default function OurPlanPage() {
                     <div className="flex justify-between items-center">
                       <span
                         className="text-sm sm:text-base md:text-lg font-semibold"
-                        style={{ color: "#042B19" }}
+                        style={{ color: "#000000" }}
                       >
                         Principal Return:
                       </span>
@@ -415,7 +416,7 @@ export default function OurPlanPage() {
                     <div className="flex justify-between items-center">
                       <span
                         className="text-sm sm:text-base md:text-lg font-semibold"
-                        style={{ color: "#042B19" }}
+                        style={{ color: "#000000" }}
                       >
                         Total ROI Returns:
                       </span>
@@ -429,7 +430,7 @@ export default function OurPlanPage() {
                     <div className="flex justify-between items-center">
                       <span
                         className="text-sm sm:text-base md:text-lg font-semibold"
-                        style={{ color: "#042B19" }}
+                        style={{ color: "#000000" }}
                       >
                         Total Returns (ROI + Principal):
                       </span>
@@ -443,11 +444,11 @@ export default function OurPlanPage() {
                   </div>
 
                   {/* Financial Returns */}
-                  <div className="space-y-4 pb-6 border-b-2" style={{ borderColor: "#042B19", opacity: 0.3 }}>
+                  <div className="space-y-4 pb-6 border-b-2" style={{ borderColor: "#042B19" }}>
                     <div className="flex justify-between items-center">
                       <span
                         className="text-sm sm:text-base md:text-lg font-semibold"
-                        style={{ color: "#042B19" }}
+                        style={{ color: "#000000" }}
                       >
                         Daily Return:
                       </span>
@@ -461,7 +462,7 @@ export default function OurPlanPage() {
                     <div className="flex justify-between items-center">
                       <span
                         className="text-sm sm:text-base md:text-lg font-semibold"
-                        style={{ color: "#042B19" }}
+                        style={{ color: "#000000" }}
                       >
                         ROI Profit (Total):
                       </span>
@@ -475,7 +476,7 @@ export default function OurPlanPage() {
                     <div className="flex justify-between items-center">
                       <span
                         className="text-sm sm:text-base md:text-lg font-semibold"
-                        style={{ color: "#042B19" }}
+                        style={{ color: "#000000" }}
                       >
                         Principal Amount:
                       </span>
@@ -489,7 +490,7 @@ export default function OurPlanPage() {
                     <div className="flex justify-between items-center">
                       <span
                         className="text-sm sm:text-base md:text-lg font-semibold"
-                        style={{ color: "#042B19" }}
+                        style={{ color: "#000000" }}
                       >
                         Principal Return Amount:
                       </span>
@@ -503,7 +504,7 @@ export default function OurPlanPage() {
                   </div>
 
                   {/* Total Return */}
-                  <div className="flex justify-between items-center pt-4">
+                  <div className="flex justify-between items-center pt-4 bg-[#E8F5F0] p-4 rounded-lg">
                     <span
                       className="text-lg sm:text-xl md:text-2xl font-bold"
                       style={{ color: "#042B19" }}
@@ -519,6 +520,312 @@ export default function OurPlanPage() {
                   </div>
                 </div>
               )}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Informational Tabs Section - Explaining Key Concepts */}
+      <section className="relative w-full bg-[#E8F5F0] py-12 sm:py-16 md:py-20 lg:py-24">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="max-w-6xl mx-auto">
+            <div className="text-center mb-8 sm:mb-10 md:mb-12">
+              <h2
+                className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold mb-4 sm:mb-6 px-2"
+                style={{ color: "#042B19" }}
+              >
+                Understanding Your Earnings
+              </h2>
+              <p
+                className="text-sm sm:text-base md:text-lg leading-relaxed max-w-3xl mx-auto px-2"
+                style={{ color: "#042B19" }}
+              >
+                Learn about the different ways you can earn with Crown Bankers and how each income stream works.
+              </p>
+            </div>
+
+            {/* Tabs */}
+            <div className="bg-white rounded-lg shadow-lg border-2 mb-6 sm:mb-8" style={{ borderColor: "#042B19" }}>
+              <div className="flex flex-wrap border-b-2" style={{ borderColor: "#042B19" }}>
+                <button
+                  onClick={() => setActiveTab("roi")}
+                  className={`flex-1 min-w-[120px] px-4 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm font-bold uppercase tracking-wide transition ${
+                    activeTab === "roi"
+                      ? "bg-[#042B19] text-white"
+                      : "bg-white text-[#042B19] hover:bg-[#E8F5F0]"
+                  }`}
+                  style={{ borderRadius: "0" }}
+                >
+                  <div className="flex items-center justify-center gap-2">
+                    <TrendingUp className="w-4 h-4" />
+                    <span>Daily ROI</span>
+                  </div>
+                </button>
+                <button
+                  onClick={() => setActiveTab("referral")}
+                  className={`flex-1 min-w-[120px] px-4 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm font-bold uppercase tracking-wide transition ${
+                    activeTab === "referral"
+                      ? "bg-[#042B19] text-white"
+                      : "bg-white text-[#042B19] hover:bg-[#E8F5F0]"
+                  }`}
+                  style={{ borderRadius: "0" }}
+                >
+                  <div className="flex items-center justify-center gap-2">
+                    <Users className="w-4 h-4" />
+                    <span>Referral Income</span>
+                  </div>
+                </button>
+                <button
+                  onClick={() => setActiveTab("binary")}
+                  className={`flex-1 min-w-[120px] px-4 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm font-bold uppercase tracking-wide transition ${
+                    activeTab === "binary"
+                      ? "bg-[#042B19] text-white"
+                      : "bg-white text-[#042B19] hover:bg-[#E8F5F0]"
+                  }`}
+                  style={{ borderRadius: "0" }}
+                >
+                  <div className="flex items-center justify-center gap-2">
+                    <Network className="w-4 h-4" />
+                    <span>Binary Income</span>
+                  </div>
+                </button>
+                <button
+                  onClick={() => setActiveTab("principal")}
+                  className={`flex-1 min-w-[120px] px-4 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm font-bold uppercase tracking-wide transition ${
+                    activeTab === "principal"
+                      ? "bg-[#042B19] text-white"
+                      : "bg-white text-[#042B19] hover:bg-[#E8F5F0]"
+                  }`}
+                  style={{ borderRadius: "0" }}
+                >
+                  <div className="flex items-center justify-center gap-2">
+                    <DollarSign className="w-4 h-4" />
+                    <span>Principal Return</span>
+                  </div>
+                </button>
+              </div>
+
+              {/* Tab Content */}
+              <div className="p-6 sm:p-8 md:p-10">
+                {activeTab === "roi" && (
+                  <div className="space-y-4 sm:space-y-6">
+                    <h3 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4" style={{ color: "#042B19" }}>
+                      Daily ROI (Return on Investment)
+                    </h3>
+                    <div className="space-y-4">
+                      <p className="text-sm sm:text-base md:text-lg leading-relaxed" style={{ color: "#042B19" }}>
+                        <strong>What is Daily ROI?</strong> Daily ROI is the percentage return you earn on your investment every single day. This is calculated based on your chosen investment package.
+                      </p>
+                      <div className="bg-[#E8F5F0] p-4 sm:p-6 rounded-lg">
+                        <h4 className="font-bold mb-2 text-base sm:text-lg" style={{ color: "#042B19" }}>
+                          How It Works:
+                        </h4>
+                        <ul className="space-y-2 text-sm sm:text-base" style={{ color: "#042B19" }}>
+                          <li className="flex items-start gap-2">
+                            <span className="font-bold">•</span>
+                            <span>Each package has a specific daily ROI percentage (1.5% - 2%)</span>
+                          </li>
+                          <li className="flex items-start gap-2">
+                            <span className="font-bold">•</span>
+                            <span>ROI is calculated daily and credited to your account</span>
+                          </li>
+                          <li className="flex items-start gap-2">
+                            <span className="font-bold">•</span>
+                            <span>Example: Invest $1,000 at 1.5% daily ROI = $15 per day</span>
+                          </li>
+                          <li className="flex items-start gap-2">
+                            <span className="font-bold">•</span>
+                            <span>ROI accumulates over the bond period (180-200 days)</span>
+                          </li>
+                        </ul>
+                      </div>
+                      <div className="border-l-4 pl-4 sm:pl-6 py-2" style={{ borderColor: "#042B19" }}>
+                        <p className="text-sm sm:text-base italic" style={{ color: "#042B19" }}>
+                          <strong>Tip:</strong> Higher investment amounts unlock better daily ROI rates. Check our investment packages to see the rates for each tier.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {activeTab === "referral" && (
+                  <div className="space-y-4 sm:space-y-6">
+                    <h3 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4" style={{ color: "#042B19" }}>
+                      Referral Income
+                    </h3>
+                    <div className="space-y-4">
+                      <p className="text-sm sm:text-base md:text-lg leading-relaxed" style={{ color: "#042B19" }}>
+                        <strong>What is Referral Income?</strong> When you refer someone to Crown Bankers and they make an investment, you earn a percentage commission on their investment amount.
+                      </p>
+                      <div className="bg-[#E8F5F0] p-4 sm:p-6 rounded-lg">
+                        <h4 className="font-bold mb-2 text-base sm:text-lg" style={{ color: "#042B19" }}>
+                          How It Works:
+                        </h4>
+                        <ul className="space-y-2 text-sm sm:text-base" style={{ color: "#042B19" }}>
+                          <li className="flex items-start gap-2">
+                            <span className="font-bold">•</span>
+                            <span>Share your unique referral link with others</span>
+                          </li>
+                          <li className="flex items-start gap-2">
+                            <span className="font-bold">•</span>
+                            <span>When they sign up and invest, you earn 8% - 10% commission</span>
+                          </li>
+                          <li className="flex items-start gap-2">
+                            <span className="font-bold">•</span>
+                            <span>Commission rate depends on your investment package tier</span>
+                          </li>
+                          <li className="flex items-start gap-2">
+                            <span className="font-bold">•</span>
+                            <span>Example: Refer someone who invests $5,000 = $400 - $500 referral bonus</span>
+                          </li>
+                          <li className="flex items-start gap-2">
+                            <span className="font-bold">•</span>
+                            <span>No limit on the number of people you can refer</span>
+                          </li>
+                        </ul>
+                      </div>
+                      <div className="border-l-4 pl-4 sm:pl-6 py-2" style={{ borderColor: "#042B19" }}>
+                        <p className="text-sm sm:text-base italic" style={{ color: "#042B19" }}>
+                          <strong>Tip:</strong> Building a strong referral network can significantly boost your earnings. The more active investors you refer, the more referral income you generate.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {activeTab === "binary" && (
+                  <div className="space-y-4 sm:space-y-6">
+                    <h3 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4" style={{ color: "#042B19" }}>
+                      Binary Income
+                    </h3>
+                    <div className="space-y-4">
+                      <p className="text-sm sm:text-base md:text-lg leading-relaxed" style={{ color: "#042B19" }}>
+                        <strong>What is Binary Income?</strong> Binary income is earned when your referred members (and their referrals) make investments, creating a balanced binary tree structure. You earn based on the smaller leg&apos;s volume.
+                      </p>
+                      <div className="bg-[#E8F5F0] p-4 sm:p-6 rounded-lg">
+                        <h4 className="font-bold mb-2 text-base sm:text-lg" style={{ color: "#042B19" }}>
+                          How It Works:
+                        </h4>
+                        <ul className="space-y-2 text-sm sm:text-base" style={{ color: "#042B19" }}>
+                          <li className="flex items-start gap-2">
+                            <span className="font-bold">•</span>
+                            <span>Your referrals are placed in a binary tree structure (left and right legs)</span>
+                          </li>
+                          <li className="flex items-start gap-2">
+                            <span className="font-bold">•</span>
+                            <span>Binary bonus is calculated on the smaller leg&apos;s total investment volume</span>
+                          </li>
+                          <li className="flex items-start gap-2">
+                            <span className="font-bold">•</span>
+                            <span>Standard binary rate is 10% of the smaller leg</span>
+                          </li>
+                          <li className="flex items-start gap-2">
+                            <span className="font-bold">•</span>
+                            <span>Example: Left leg = $2,800, Right leg = $4,650 → Binary bonus = 10% of $2,800 = $280</span>
+                          </li>
+                          <li className="flex items-start gap-2">
+                            <span className="font-bold">•</span>
+                            <span>Daily capping limits apply based on your package ($1,000 - $10,000 per day)</span>
+                          </li>
+                        </ul>
+                      </div>
+                      <div className="border-l-4 pl-4 sm:pl-6 py-2" style={{ borderColor: "#042B19" }}>
+                        <p className="text-sm sm:text-base italic" style={{ color: "#042B19" }}>
+                          <strong>Tip:</strong> Focus on building both legs of your binary tree evenly to maximize your binary income potential. Balance is key!
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {activeTab === "principal" && (
+                  <div className="space-y-4 sm:space-y-6">
+                    <h3 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4" style={{ color: "#042B19" }}>
+                      Principal Return
+                    </h3>
+                    <div className="space-y-4">
+                      <p className="text-sm sm:text-base md:text-lg leading-relaxed" style={{ color: "#042B19" }}>
+                        <strong>What is Principal Return?</strong> At the end of your investment bond period, you receive a percentage of your original investment amount back. This percentage varies by package tier.
+                      </p>
+                      <div className="bg-[#E8F5F0] p-4 sm:p-6 rounded-lg">
+                        <h4 className="font-bold mb-2 text-base sm:text-lg" style={{ color: "#042B19" }}>
+                          How It Works:
+                        </h4>
+                        <ul className="space-y-2 text-sm sm:text-base" style={{ color: "#042B19" }}>
+                          <li className="flex items-start gap-2">
+                            <span className="font-bold">•</span>
+                            <span>Solar Starter: 60% of principal returned</span>
+                          </li>
+                          <li className="flex items-start gap-2">
+                            <span className="font-bold">•</span>
+                            <span>Power Growth: 80% of principal returned</span>
+                          </li>
+                          <li className="flex items-start gap-2">
+                            <span className="font-bold">•</span>
+                            <span>Elite Energy: 100% of principal returned</span>
+                          </li>
+                          <li className="flex items-start gap-2">
+                            <span className="font-bold">•</span>
+                            <span>Example: Invest $10,000 in Power Growth → Receive $8,000 back at bond maturity</span>
+                          </li>
+                          <li className="flex items-start gap-2">
+                            <span className="font-bold">•</span>
+                            <span>Principal return is paid at the end of the bond period (180-200 days)</span>
+                          </li>
+                        </ul>
+                      </div>
+                      <div className="border-l-4 pl-4 sm:pl-6 py-2" style={{ borderColor: "#042B19" }}>
+                        <p className="text-sm sm:text-base italic" style={{ color: "#042B19" }}>
+                          <strong>Tip:</strong> Higher-tier packages offer better principal return rates. Consider your investment goals when choosing a package.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Additional Resources Links */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
+              <Link
+                href="/how-it-works"
+                className="bg-white p-4 sm:p-6 rounded-lg border-2 hover:shadow-lg transition text-center"
+                style={{ borderColor: "#042B19" }}
+              >
+                <Award className="w-8 h-8 mx-auto mb-2" style={{ color: "#042B19" }} />
+                <h4 className="font-bold mb-2 text-sm sm:text-base" style={{ color: "#042B19" }}>
+                  How It Works
+                </h4>
+                <p className="text-xs sm:text-sm" style={{ color: "#042B19" }}>
+                  Complete guide to the platform
+                </p>
+              </Link>
+              <Link
+                href="/career-levels-info"
+                className="bg-white p-4 sm:p-6 rounded-lg border-2 hover:shadow-lg transition text-center"
+                style={{ borderColor: "#042B19" }}
+              >
+                <Award className="w-8 h-8 mx-auto mb-2" style={{ color: "#042B19" }} />
+                <h4 className="font-bold mb-2 text-sm sm:text-base" style={{ color: "#042B19" }}>
+                  Career Levels
+                </h4>
+                <p className="text-xs sm:text-sm" style={{ color: "#042B19" }}>
+                  Unlock advanced rewards
+                </p>
+              </Link>
+              <Link
+                href="/binary-investment-system"
+                className="bg-white p-4 sm:p-6 rounded-lg border-2 hover:shadow-lg transition text-center"
+                style={{ borderColor: "#042B19" }}
+              >
+                <Network className="w-8 h-8 mx-auto mb-2" style={{ color: "#042B19" }} />
+                <h4 className="font-bold mb-2 text-sm sm:text-base" style={{ color: "#042B19" }}>
+                  Binary System
+                </h4>
+                <p className="text-xs sm:text-sm" style={{ color: "#042B19" }}>
+                  Understand binary tree structure
+                </p>
+              </Link>
             </div>
           </div>
         </div>

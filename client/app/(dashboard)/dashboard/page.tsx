@@ -345,9 +345,39 @@ export default function DashboardPage() {
                           className="flex-1 px-4 py-3 border border-yellow-500/40 rounded-xl bg-gray-900/80 text-white text-sm focus:outline-none focus:border-yellow-500/70 focus:ring-2 focus:ring-yellow-500/30 font-mono backdrop-blur-sm"
                         />
                         <button
-                          onClick={() => {
-                            navigator.clipboard.writeText(referralLinks.leftLink);
-                            toast.success('Left referral link copied!');
+                          onClick={async () => {
+                            try {
+                              // Try modern clipboard API first
+                              if (navigator.clipboard && window.isSecureContext) {
+                                await navigator.clipboard.writeText(referralLinks.leftLink);
+                                toast.success('Left referral link copied!');
+                              } else {
+                                // Fallback for older browsers or non-secure contexts
+                                const textArea = document.createElement('textarea');
+                                textArea.value = referralLinks.leftLink;
+                                textArea.style.position = 'fixed';
+                                textArea.style.left = '-999999px';
+                                textArea.style.top = '-999999px';
+                                document.body.appendChild(textArea);
+                                textArea.focus();
+                                textArea.select();
+                                try {
+                                  const successful = document.execCommand('copy');
+                                  if (successful) {
+                                    toast.success('Left referral link copied!');
+                                  } else {
+                                    throw new Error('Copy command failed');
+                                  }
+                                } catch (err) {
+                                  toast.error('Failed to copy link. Please copy manually.');
+                                } finally {
+                                  document.body.removeChild(textArea);
+                                }
+                              }
+                            } catch (err) {
+                              console.error('Failed to copy:', err);
+                              toast.error('Failed to copy link. Please copy manually.');
+                            }
                           }}
                           className="px-6 py-3 bg-gradient-to-r from-yellow-500 to-yellow-600 text-black rounded-xl hover:from-yellow-400 hover:to-yellow-500 text-sm font-bold transition-all shadow-lg shadow-yellow-500/30 hover:shadow-yellow-500/50 hover:scale-105 active:scale-95"
                         >
@@ -371,9 +401,39 @@ export default function DashboardPage() {
                           className="flex-1 px-4 py-3 border border-yellow-500/40 rounded-xl bg-gray-900/80 text-white text-sm focus:outline-none focus:border-yellow-500/70 focus:ring-2 focus:ring-yellow-500/30 font-mono backdrop-blur-sm"
                         />
                         <button
-                          onClick={() => {
-                            navigator.clipboard.writeText(referralLinks.rightLink);
-                            toast.success('Right referral link copied!');
+                          onClick={async () => {
+                            try {
+                              // Try modern clipboard API first
+                              if (navigator.clipboard && window.isSecureContext) {
+                                await navigator.clipboard.writeText(referralLinks.rightLink);
+                                toast.success('Right referral link copied!');
+                              } else {
+                                // Fallback for older browsers or non-secure contexts
+                                const textArea = document.createElement('textarea');
+                                textArea.value = referralLinks.rightLink;
+                                textArea.style.position = 'fixed';
+                                textArea.style.left = '-999999px';
+                                textArea.style.top = '-999999px';
+                                document.body.appendChild(textArea);
+                                textArea.focus();
+                                textArea.select();
+                                try {
+                                  const successful = document.execCommand('copy');
+                                  if (successful) {
+                                    toast.success('Right referral link copied!');
+                                  } else {
+                                    throw new Error('Copy command failed');
+                                  }
+                                } catch (err) {
+                                  toast.error('Failed to copy link. Please copy manually.');
+                                } finally {
+                                  document.body.removeChild(textArea);
+                                }
+                              }
+                            } catch (err) {
+                              console.error('Failed to copy:', err);
+                              toast.error('Failed to copy link. Please copy manually.');
+                            }
                           }}
                           className="px-6 py-3 bg-gradient-to-r from-yellow-500 to-yellow-600 text-black rounded-xl hover:from-yellow-400 hover:to-yellow-500 text-sm font-bold transition-all shadow-lg shadow-yellow-500/30 hover:shadow-yellow-500/50 hover:scale-105 active:scale-95"
                         >

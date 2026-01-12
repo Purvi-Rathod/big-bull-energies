@@ -190,7 +190,7 @@ export default function SolarPage() {
                   fontFamily: "var(--font-font4), sans-serif",
                 }}
               >
-                A core component of Invenergy&apos;s energy mix.
+                A core component of Crown Bankers&apos; investment portfolio.
               </h1>
             </div>
 
@@ -215,9 +215,10 @@ export default function SolarPage() {
                 }}
               >
                 Solar energy harnesses the power of the sun to generate clean,
-                renewable electricity. Our solar projects provide sustainable
-                energy solutions that reduce carbon emissions and support the
-                transition to a cleaner energy future.
+                renewable electricity. Crown Bankers invests in solar projects that
+                provide sustainable energy solutions, reduce carbon emissions, and
+                generate returns for our investors while supporting the transition
+                to a cleaner energy future.
               </p>
             </div>
           </div>
@@ -234,7 +235,7 @@ export default function SolarPage() {
                 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-6 sm:mb-8"
                 style={{ color: "#042B19" }}
               >
-                Our proven track record in solar
+                Our solar investment portfolio
               </h2>
 
               {/* Statistics */}
@@ -247,13 +248,13 @@ export default function SolarPage() {
                       className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold"
                       style={{ color: "#042B19" }}
                     >
-                      59
+                      2
                     </span>
                     <span
                       className="text-sm sm:text-base md:text-lg lg:text-xl"
                       style={{ color: "#042B19" }}
                     >
-                      projects developed
+                      solar plants operational
                     </span>
                   </div>
                 </div>
@@ -266,13 +267,13 @@ export default function SolarPage() {
                       className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold"
                       style={{ color: "#042B19" }}
                     >
-                      8
+                      500+
                     </span>
                     <span
                       className="text-sm sm:text-base md:text-lg lg:text-xl"
                       style={{ color: "#042B19" }}
                     >
-                      gigawatts of solar power developed
+                      megawatts of solar capacity
                     </span>
                   </div>
                 </div>
@@ -285,13 +286,13 @@ export default function SolarPage() {
                       className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold"
                       style={{ color: "#042B19" }}
                     >
-                      30+
+                      50+
                     </span>
                     <span
                       className="text-sm sm:text-base md:text-lg lg:text-xl"
                       style={{ color: "#042B19" }}
                     >
-                      gigawatts of solar projects in our development pipeline
+                      solar projects in our investment portfolio
                     </span>
                   </div>
                 </div>
@@ -313,7 +314,7 @@ export default function SolarPage() {
                   textUnderlineOffset: "4px",
                 }}
               >
-                VIEW INVENERGY PROJECTS
+                VIEW CROWN BANKERS PROJECTS
               </Link>
 
               {/* Line Art Illustration */}

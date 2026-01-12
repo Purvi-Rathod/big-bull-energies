@@ -42,7 +42,7 @@ const technologies: Technology[] = [
     title: "Storage",
     description:
       "Storing energy for delivery when and where it's needed helps to stabilize power supply costs, availability and resilience.",
-    image: "/img2.webp",
+    image: "/image copy.png",
     icon: (
       <svg
         className="w-8 h-8"

@@ -29,7 +29,7 @@ export default function HeroSection() {
           playsInline
           className="absolute inset-0 w-full h-full object-cover"
         >
-          <source src="/landing.mp4" type="video/mp4" />
+          <source src="/herobg.mp4" type="video/mp4" />
         </video>
         {/* Overlay for better text readability */}
         <div className="absolute inset-0 bg-gradient-to-b from-gray-900/40 to-gray-800/40"></div>

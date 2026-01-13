@@ -3,7 +3,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { api } from '@/lib/api';
-import { useConfirm } from '@/contexts/ConfirmContext';
 import toast from 'react-hot-toast';
 
 interface Transaction {
@@ -55,7 +54,6 @@ interface Pagination {
 
 export default function AllTransactionsPage() {
   const { admin } = useAuth();
-  const { confirm } = useConfirm();
   const [roiTransactions, setRoiTransactions] = useState<Transaction[]>([]);
   const [binaryTransactions, setBinaryTransactions] = useState<Transaction[]>([]);
   const [referralTransactions, setReferralTransactions] = useState<Transaction[]>([]);
@@ -64,17 +62,30 @@ export default function AllTransactionsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [activeTab, setActiveTab] = useState<'roi' | 'binary' | 'referral' | 'investment' | 'withdrawal'>('roi');
-  const [flushing, setFlushing] = useState(false);
+  
+  // Separate counts for each tab
+  const [tabCounts, setTabCounts] = useState({
+    roi: 0,
+    binary: 0,
+    referral: 0,
+    investment: 0,
+    withdrawal: 0,
+  });
   
   // Pagination state
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(50);
   const [pagination, setPagination] = useState<Pagination>({ page: 1, limit: 50, total: 0, pages: 0 });
+  
+  // Track which tabs have been loaded
+  const [loadedTabs, setLoadedTabs] = useState<Set<string>>(new Set());
 
   // Fetch transactions for the active tab with pagination
-  const fetchTransactions = async (tab: string, pageNum: number, limitNum: number) => {
+  const fetchTransactions = async (tab: string, pageNum: number, limitNum: number, showLoading = true) => {
     try {
-      setLoading(true);
+      if (showLoading) {
+        setLoading(true);
+      }
       setError('');
       const response = await api.getAdminReports({ type: tab, page: pageNum, limit: limitNum });
       
@@ -100,7 +111,21 @@ export default function AllTransactionsPage() {
           }
           
           if (response.data.pagination) {
-            setPagination(response.data.pagination);
+            // Always update count for this tab (for UI display) - triggers re-render
+            setTabCounts(prev => {
+              const newCount = response.data.pagination.total;
+              
+              // Always return new object to ensure React detects the update
+              return {
+                ...prev,
+                [tab]: newCount,
+              };
+            });
+            
+            // Only update pagination if this is the active tab
+            if (tab === activeTab) {
+              setPagination(response.data.pagination);
+            }
           }
         } else {
           // Fallback: all types response (backward compatibility)
@@ -112,47 +137,129 @@ export default function AllTransactionsPage() {
         }
       }
     } catch (err: any) {
-      setError(err.message || 'Failed to load transactions');
+      if (showLoading) {
+        setError(err.message || 'Failed to load transactions');
+      }
       console.error('Error fetching transactions:', err);
     } finally {
-      setLoading(false);
+      if (showLoading) {
+        setLoading(false);
+      }
     }
   };
 
-  // Fetch reports on mount and when tab/page/limit changes
+  // Fetch counts for all tabs (background, no loading state)
+  const fetchTabCounts = async () => {
+    try {
+      const tabs: Array<'roi' | 'binary' | 'referral' | 'investment' | 'withdrawal'> = ['roi', 'binary', 'referral', 'investment', 'withdrawal'];
+      
+      // Fetch counts in parallel
+      const countPromises = tabs.map(async (tab) => {
+        try {
+          const response = await api.getAdminReports({ type: tab, page: 1, limit: 1 });
+          if (response.data?.pagination?.total !== undefined) {
+            return { tab, count: response.data.pagination.total };
+          }
+          return { tab, count: 0 };
+        } catch (err) {
+          console.error(`Error fetching count for ${tab}:`, err);
+          return { tab, count: 0 };
+        }
+      });
+      
+      const results = await Promise.all(countPromises);
+      // Update counts state - this will trigger UI update
+      setTabCounts(prev => {
+        const newCounts = { ...prev };
+        let hasChanges = false;
+        
+        results.forEach(({ tab, count }) => {
+          if (prev[tab] !== count) {
+            newCounts[tab] = count;
+            hasChanges = true;
+          }
+        });
+        
+        // Always return new object to ensure React detects the change
+        // This ensures UI updates even if counts are the same initially
+        return newCounts;
+      });
+    } catch (err) {
+      console.error('Error fetching tab counts:', err);
+    }
+  };
+
+  // Initial load: fetch active tab first, then counts and other tabs in background
   useEffect(() => {
-    fetchTransactions(activeTab, page, limit);
+    // Fetch active tab data immediately
+    fetchTransactions(activeTab, page, limit, true);
+    
+    // Fetch counts in background (don't block UI) - runs after initial load
+    const countsTimer = setTimeout(() => {
+      fetchTabCounts();
+    }, 100);
+    
+    // Load other tabs in background if not already loaded
+    const tabs: Array<'roi' | 'binary' | 'referral' | 'investment' | 'withdrawal'> = ['roi', 'binary', 'referral', 'investment', 'withdrawal'];
+    tabs.forEach((tab) => {
+      if (tab !== activeTab && !loadedTabs.has(tab)) {
+        // Load first page of each tab in background
+        setTimeout(() => {
+          fetchTransactions(tab, 1, limit, false).then(() => {
+            // Mark tab as loaded after fetch completes
+            setLoadedTabs(prev => new Set([...prev, tab]));
+          });
+        }, 500); // Small delay to not overwhelm the server
+      }
+    });
+    
+    return () => {
+      clearTimeout(countsTimer);
+    };
   }, [activeTab, page, limit]);
+
+  // Update counts when pagination changes for active tab
+  useEffect(() => {
+    if (pagination.total > 0 && activeTab) {
+      setTabCounts(prev => ({
+        ...prev,
+        [activeTab]: pagination.total,
+      }));
+    }
+  }, [pagination.total, activeTab]);
 
   // Reset to page 1 when tab changes
   const handleTabChange = (tab: 'roi' | 'binary' | 'referral' | 'investment' | 'withdrawal') => {
     setActiveTab(tab);
     setPage(1);
-  };
-
-  const handleFlush = async () => {
-    const confirmed = await confirm({
-      title: 'Flush All Transactions',
-      message: 'Are you sure you want to flush all transactions and NOWPayments history? This action cannot be undone and will delete all transaction records and payment history.',
-      variant: 'danger',
-      confirmText: 'Yes, Flush All',
-      cancelText: 'Cancel',
-    });
-
-    if (!confirmed) return;
-
-    try {
-      setFlushing(true);
-      await api.flushAllInvestments();
-      toast.success('All transactions and NOWPayments history flushed successfully!');
-      // Refresh the data
-      await fetchTransactions(activeTab, page, limit);
-    } catch (err: any) {
-      toast.error(err.message || 'Failed to flush transactions');
-    } finally {
-      setFlushing(false);
+    
+    // If tab data is already loaded, update pagination immediately
+    // Otherwise it will be loaded by useEffect
+    const hasData = 
+      (tab === 'roi' && roiTransactions.length > 0) ||
+      (tab === 'binary' && binaryTransactions.length > 0) ||
+      (tab === 'referral' && referralTransactions.length > 0) ||
+      (tab === 'investment' && investmentTransactions.length > 0) ||
+      (tab === 'withdrawal' && withdrawals.length > 0);
+    
+    if (hasData && tabCounts[tab] > 0) {
+      // Update pagination based on loaded data
+      const currentDataLength = 
+        tab === 'roi' ? roiTransactions.length :
+        tab === 'binary' ? binaryTransactions.length :
+        tab === 'referral' ? referralTransactions.length :
+        tab === 'investment' ? investmentTransactions.length :
+        withdrawals.length;
+      
+      setPagination({
+        page: 1,
+        limit: limit,
+        total: tabCounts[tab],
+        pages: Math.ceil(tabCounts[tab] / limit),
+      });
     }
   };
+
 
   const exportToCSV = (data: any[], filename: string, headers: string[], getRow: (item: any) => string[]) => {
     const csvHeaders = headers.join(',');
@@ -739,13 +846,6 @@ export default function AllTransactionsPage() {
           <h1 className="text-3xl font-bold text-gray-900">All Transactions</h1>
           <p className="mt-1 text-sm text-gray-500">View all transactions across the system</p>
         </div>
-        <button
-          onClick={handleFlush}
-          disabled={flushing}
-          className="px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          {flushing ? 'Flushing...' : 'Flush All Transactions'}
-        </button>
       </div>
       {error && (
         <div className="mb-4 bg-red-50 border border-red-400 text-red-700 px-4 py-3 rounded">
@@ -758,23 +858,28 @@ export default function AllTransactionsPage() {
         <div className="mb-6">
           <div className="border-b border-gray-200">
             <nav className="-mb-px flex space-x-8">
-              {(['roi', 'binary', 'referral', 'investment', 'withdrawal'] as const).map((tab) => (
-                <button
-                  key={tab}
-                  onClick={() => handleTabChange(tab)}
-                  className={`${
-                    activeTab === tab
-                      ? 'border-indigo-500 text-indigo-600'
-                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                  } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm capitalize`}
-                >
-                  {tab} {tab === 'roi' && `(${pagination.total || roiTransactions.length})`}
-                  {tab === 'binary' && `(${pagination.total || binaryTransactions.length})`}
-                  {tab === 'referral' && `(${pagination.total || referralTransactions.length})`}
-                  {tab === 'investment' && `(${pagination.total || investmentTransactions.length})`}
-                  {tab === 'withdrawal' && `(${pagination.total || withdrawals.length})`}
-                </button>
-              ))}
+              {(['roi', 'binary', 'referral', 'investment', 'withdrawal'] as const).map((tab) => {
+                // Get count for this specific tab
+                const count = tabCounts[tab] || (tab === 'roi' ? roiTransactions.length :
+                                                 tab === 'binary' ? binaryTransactions.length :
+                                                 tab === 'referral' ? referralTransactions.length :
+                                                 tab === 'investment' ? investmentTransactions.length :
+                                                 withdrawals.length);
+                
+                return (
+                  <button
+                    key={tab}
+                    onClick={() => handleTabChange(tab)}
+                    className={`${
+                      activeTab === tab
+                        ? 'border-indigo-500 text-indigo-600'
+                        : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                    } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm capitalize`}
+                  >
+                    {tab} ({count.toLocaleString()})
+                  </button>
+                );
+              })}
             </nav>
           </div>
         </div>

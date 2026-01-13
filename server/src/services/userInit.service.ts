@@ -19,8 +19,33 @@ async function isAdminUser(userId: Types.ObjectId): Promise<boolean> {
 }
 
 /**
+ * Incrementally update downline counts for a user
+ * Instead of recursively counting all users, we just increment the count
+ * This is MUCH faster for signup operations
+ */
+async function incrementDownlineCount(userId: Types.ObjectId, leg: "left" | "right") {
+  try {
+    const userTree = await BinaryTree.findOne({ user: userId });
+    if (!userTree) {
+      return;
+    }
+
+    if (leg === "left") {
+      userTree.leftDownlines = (userTree.leftDownlines || 0) + 1;
+    } else {
+      userTree.rightDownlines = (userTree.rightDownlines || 0) + 1;
+    }
+    
+    await userTree.save();
+  } catch (error) {
+    console.error("Error incrementing downline count:", error);
+  }
+}
+
+/**
  * Recursively count all users in a subtree (left or right leg)
  * This counts ALL descendants, not just direct children
+ * NOTE: This is kept for backward compatibility but should be avoided during signup
  */
 async function countSubtreeUsers(
   rootUserId: Types.ObjectId,
@@ -56,6 +81,7 @@ async function countSubtreeUsers(
 
 /**
  * Update downline counts for a user by recursively counting all users in each leg
+ * NOTE: This is slow and should only be used for verification/correction, not during signup
  */
 async function updateDownlineCounts(userId: Types.ObjectId) {
   try {
@@ -78,11 +104,13 @@ async function updateDownlineCounts(userId: Types.ObjectId) {
 }
 
 /**
- * Recursively update downline counts for all ancestors up the tree
- * When a new user is added, we need to update counts for all parents
+ * Incrementally update downline counts for all ancestors up the tree
+ * When a new user is added, we increment counts for all parents
+ * This is MUCH faster than recursively counting all users
  */
 async function updateAncestorDownlineCounts(
   userId: Types.ObjectId,
+  position: "left" | "right" | null,
   visited: Set<string> = new Set()
 ) {
   try {
@@ -97,11 +125,32 @@ async function updateAncestorDownlineCounts(
       return; // No parent, we're at the root
     }
 
-    // Update this user's downline counts
-    await updateDownlineCounts(userId);
+    // Increment parent's downline count based on position
+    // Only increment if position is known (not null)
+    if (position) {
+      await incrementDownlineCount(userTree.parent as Types.ObjectId, position);
+    }
 
-    // Recursively update parent's counts
-    await updateAncestorDownlineCounts(userTree.parent as Types.ObjectId, visited);
+    // Find parent's position relative to its parent to continue up the tree
+    const parentTree = await BinaryTree.findOne({ user: userTree.parent });
+    if (parentTree && parentTree.parent) {
+      // Determine parent's position relative to grandparent
+      // Check if parent is the left or right child of grandparent
+      const grandparentTree = await BinaryTree.findOne({ user: parentTree.parent });
+      if (grandparentTree) {
+        const parentPosition = 
+          grandparentTree.leftChild?.toString() === parentTree.user.toString() ? "left" :
+          grandparentTree.rightChild?.toString() === parentTree.user.toString() ? "right" :
+          null;
+        
+        // Continue up the tree with parent's position
+        await updateAncestorDownlineCounts(
+          userTree.parent as Types.ObjectId,
+          parentPosition || position, // Use parent's position if available, otherwise use current
+          visited
+        );
+      }
+    }
   } catch (error) {
     console.error("Error updating ancestor downline counts:", error);
   }
@@ -138,10 +187,8 @@ export async function initializeBinaryTree(userId: Types.ObjectId, referrerId?: 
         
         if (referrerIsAdmin) {
           // Admin can have unlimited children - no binary tree constraints
-          // Just update downlines count (we'll use leftDownlines to track total children for admin)
-          // For admin, count all direct children
-          const adminChildren = await BinaryTree.countDocuments({ parent: referrerId });
-          referrerTree.leftDownlines = adminChildren;
+          // Increment downlines count instead of recounting (much faster)
+          referrerTree.leftDownlines = (referrerTree.leftDownlines || 0) + 1;
           await referrerTree.save();
         } else {
           // For non-admin parents, enforce binary tree rules (left/right only)
@@ -150,25 +197,25 @@ export async function initializeBinaryTree(userId: Types.ObjectId, referrerId?: 
               throw new AppError("Left position already occupied. Binary tree constraint violated.", 400);
             }
           referrerTree.leftChild = userId;
-            // Update downline count by counting all users in left subtree
+            // Increment downline count instead of recounting (much faster)
+            referrerTree.leftDownlines = (referrerTree.leftDownlines || 0) + 1;
             await referrerTree.save();
-            await updateDownlineCounts(referrerId);
         } else if (position === "right") {
             if (referrerTree.rightChild) {
               throw new AppError("Right position already occupied. Binary tree constraint violated.", 400);
             }
           referrerTree.rightChild = userId;
-            // Update downline count by counting all users in right subtree
+            // Increment downline count instead of recounting (much faster)
+            referrerTree.rightDownlines = (referrerTree.rightDownlines || 0) + 1;
         await referrerTree.save();
-            await updateDownlineCounts(referrerId);
           } else {
             throw new AppError("Position (left or right) is required for non-admin parents.", 400);
           }
         }
 
-        // Update downline counts for all ancestors up the tree
-        // This ensures that when a user is placed deeper in the tree, all ancestors' counts are updated
-        await updateAncestorDownlineCounts(referrerId);
+        // Incrementally update downline counts for all ancestors up the tree
+        // This is MUCH faster than recursively counting all users
+        await updateAncestorDownlineCounts(referrerId, position);
       }
     }
 

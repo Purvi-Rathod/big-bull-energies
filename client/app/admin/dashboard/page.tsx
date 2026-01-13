@@ -2,10 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import { useConfirm } from '@/contexts/ConfirmContext';
 import { api } from '@/lib/api';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend, Cell } from 'recharts';
-import toast from 'react-hot-toast';
 
 interface Statistics {
   totalUsers: number;
@@ -24,16 +22,9 @@ interface Statistics {
 
 export default function AdminDashboard() {
   const { user, admin, loading: authLoading } = useAuth();
-  const { confirm } = useConfirm();
   const [statistics, setStatistics] = useState<Statistics | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [cronLoading, setCronLoading] = useState(false);
-  const [flushLoading, setFlushLoading] = useState(false);
-  const [nowpaymentsEnabled, setNowpaymentsEnabled] = useState<boolean | null>(null);
-  const [nowpaymentsLoading, setNowpaymentsLoading] = useState(false);
-  const [rateLimitingEnabled, setRateLimitingEnabled] = useState<boolean | null>(null);
-  const [rateLimitingLoading, setRateLimitingLoading] = useState(false);
 
   // Route protection is handled in layout
 
@@ -43,8 +34,6 @@ export default function AdminDashboard() {
 
     if (isAdminUser || isAdminAccount) {
       fetchStatistics();
-      fetchNOWPaymentsStatus();
-      fetchRateLimitingStatus();
     }
   }, [user, admin]);
 
@@ -64,172 +53,6 @@ export default function AdminDashboard() {
     }
   };
 
-  const handleTriggerCron = async () => {
-    const confirmed = await confirm({
-      title: 'Trigger Daily Calculations',
-      message: 'Are you sure you want to trigger the daily calculations (ROI, Binary, Referral)?',
-      variant: 'info',
-      confirmText: 'Yes, Trigger',
-      cancelText: 'Cancel',
-    });
-
-    if (!confirmed) return;
-
-    try {
-      setCronLoading(true);
-      const response = await api.triggerDailyCalculations({
-        includeROI: true,
-        includeBinary: true,
-        includeReferral: true,
-      });
-      
-      if (response.data) {
-        toast.success('Daily calculations triggered successfully!');
-        // Refresh statistics after cron
-        setTimeout(() => {
-          fetchStatistics();
-        }, 2000);
-      }
-    } catch (err: any) {
-      toast.error(err.message || 'Failed to trigger daily calculations');
-      console.error('Error triggering cron:', err);
-    } finally {
-      setCronLoading(false);
-    }
-  };
-
-  const handleFlushInvestments = async () => {
-    const confirmed = await confirm({
-      title: '⚠️ WARNING: Flush All Investments',
-      message: 'This will permanently delete ALL investments and related data for ALL users!\n\n' +
-        'This action will:\n' +
-        '• Delete all investments\n' +
-        '• Delete all ROI, Binary, Referral, and Investment transactions\n' +
-        '• Reset ROI, Binary, Referral, and Investment wallet balances to zero\n' +
-        '• Reset all binary tree business volumes to zero\n\n' +
-        'Users will NOT be deleted, but all their investment data will be lost.\n\n' +
-        'This action CANNOT be undone. Are you absolutely sure?',
-      variant: 'danger',
-      confirmText: 'Yes, Flush All',
-      cancelText: 'Cancel',
-    });
-
-    if (!confirmed) return;
-
-    try {
-      setFlushLoading(true);
-      setError('');
-      const response = await api.flushAllInvestments();
-      
-      if (response.data) {
-        toast.success(
-          `All investments flushed successfully! Investments deleted: ${response.data.investmentsDeleted}, Transactions deleted: ${response.data.transactionsDeleted}`,
-          { duration: 5000 }
-        );
-        // Refresh statistics after flush
-        setTimeout(() => {
-          fetchStatistics();
-        }, 1000);
-      }
-    } catch (err: any) {
-      setError(err.message || 'Failed to flush investments');
-      toast.error(err.message || 'Failed to flush investments');
-      console.error('Error flushing investments:', err);
-    } finally {
-      setFlushLoading(false);
-    }
-  };
-
-  const fetchNOWPaymentsStatus = async () => {
-    try {
-      const response = await api.getNOWPaymentsStatus();
-      if (response.data) {
-        setNowpaymentsEnabled(response.data.enabled);
-      }
-    } catch (err: any) {
-      console.error('Error fetching NOWPayments status:', err);
-      // Default to true if error (for backward compatibility)
-      setNowpaymentsEnabled(true);
-    }
-  };
-
-  const handleToggleNOWPayments = async () => {
-    if (nowpaymentsEnabled === null) return;
-
-    const newStatus = !nowpaymentsEnabled;
-    const confirmed = await confirm({
-      title: newStatus ? 'Enable NOWPayments Gateway' : 'Disable NOWPayments Gateway',
-      message: newStatus
-        ? 'Are you sure you want to enable NOWPayments gateway? Users will be able to make real payments.'
-        : 'Are you sure you want to disable NOWPayments gateway? Users will not be able to make payments until it is re-enabled.',
-      variant: 'warning',
-      confirmText: newStatus ? 'Yes, Enable' : 'Yes, Disable',
-      cancelText: 'Cancel',
-    });
-
-    if (!confirmed) return;
-
-    try {
-      setNowpaymentsLoading(true);
-      const response = await api.updateNOWPaymentsStatus(newStatus);
-      if (response.data) {
-        setNowpaymentsEnabled(response.data.enabled);
-        toast.success(`NOWPayments gateway ${newStatus ? 'enabled' : 'disabled'} successfully!`);
-      }
-    } catch (err: any) {
-      toast.error(err.message || 'Failed to update NOWPayments status');
-      console.error('Error updating NOWPayments status:', err);
-    } finally {
-      setNowpaymentsLoading(false);
-    }
-  };
-
-  const fetchRateLimitingStatus = async () => {
-    try {
-      setRateLimitingLoading(true);
-      const response = await api.getAuthRateLimitingStatus();
-      if (response.data) {
-        setRateLimitingEnabled(response.data.enabled);
-      }
-    } catch (err: any) {
-      console.error('Failed to fetch rate limiting status:', err);
-      // Default to true if error (for security)
-      setRateLimitingEnabled(true);
-    } finally {
-      setRateLimitingLoading(false);
-    }
-  };
-
-  const handleToggleRateLimiting = async () => {
-    if (rateLimitingEnabled === null) return;
-
-    const newStatus = !rateLimitingEnabled;
-    const confirmed = await confirm({
-      title: newStatus ? 'Enable Rate Limiting' : 'Disable Rate Limiting',
-      message: newStatus
-        ? 'Are you sure you want to enable rate limiting? This will restrict signup/login attempts per IP (30 per 15 minutes).'
-        : 'Are you sure you want to disable rate limiting? Leaders will be able to create multiple accounts without restrictions.',
-      variant: 'warning',
-      confirmText: newStatus ? 'Yes, Enable' : 'Yes, Disable',
-      cancelText: 'Cancel',
-    });
-
-    if (!confirmed) return;
-
-    try {
-      setRateLimitingLoading(true);
-      const response = await api.updateAuthRateLimitingStatus(newStatus);
-      if (response.data) {
-        setRateLimitingEnabled(response.data.enabled);
-        toast.success(`Auth rate limiting ${newStatus ? 'enabled' : 'disabled'} successfully!`);
-      }
-    } catch (err: any) {
-      toast.error(err.message || 'Failed to update rate limiting status');
-      console.error('Error updating rate limiting status:', err);
-    } finally {
-      setRateLimitingLoading(false);
-    }
-  };
 
   const formatCurrency = (value: string | number) => {
     const num = typeof value === 'string' ? parseFloat(value) : value;
@@ -254,111 +77,10 @@ export default function AdminDashboard() {
 
   return (
     <div className="w-full">
-        <div className="mb-6 flex justify-between items-center">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
-          <p className="mt-1 text-sm text-gray-500">Overview of system statistics and controls</p>
-        </div>
-            <div className="flex gap-3">
-            <button
-              onClick={handleTriggerCron}
-              disabled={cronLoading}
-                className="px-6 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-            >
-              {cronLoading ? 'Processing...' : 'Trigger Daily Calculations'}
-            </button>
-            <button
-                onClick={handleFlushInvestments}
-                disabled={flushLoading}
-                className="px-6 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-            >
-                {flushLoading ? 'Flushing...' : 'Flush All Investments'}
-            </button>
-          </div>
-        </div>
-
-        {error && (
-          <div className="mb-6 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
-            {error}
-          </div>
-        )}
-
-        {/* Payment Gateway Settings */}
-        <div className="mb-6 bg-white rounded-lg shadow p-6">
-          <div className="flex justify-between items-center">
-            <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-1">Payment Gateway Settings</h3>
-              <p className="text-sm text-gray-600">Control NOWPayments gateway for development and testing</p>
-            </div>
-            <div className="flex items-center gap-4">
-              <span className={`text-sm font-medium ${nowpaymentsEnabled ? 'text-green-600' : 'text-red-600'}`}>
-                {nowpaymentsEnabled === null ? 'Loading...' : nowpaymentsEnabled ? 'Enabled' : 'Disabled'}
-              </span>
-              <button
-                onClick={handleToggleNOWPayments}
-                disabled={nowpaymentsEnabled === null || nowpaymentsLoading}
-                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 ${
-                  nowpaymentsEnabled ? 'bg-indigo-600' : 'bg-gray-300'
-                } ${(nowpaymentsEnabled === null || nowpaymentsLoading) ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
-              >
-                <span
-                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                    nowpaymentsEnabled ? 'translate-x-6' : 'translate-x-1'
-                  }`}
-                />
-              </button>
-            </div>
-          </div>
-          {nowpaymentsEnabled === false && (
-            <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded">
-              <p className="text-sm text-yellow-800">
-                <strong>Warning:</strong> NOWPayments gateway is disabled. Users will not be able to make payments until it is re-enabled.
-              </p>
-            </div>
-          )}
-        </div>
-
-        {/* Rate Limiting Settings */}
-        <div className="mb-6 bg-white rounded-lg shadow p-6">
-          <div className="flex justify-between items-center">
-            <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-1">Auth Rate Limiting</h3>
-              <p className="text-sm text-gray-600">Control rate limiting for signup and login endpoints</p>
-            </div>
-            <div className="flex items-center gap-4">
-              <span className={`text-sm font-medium ${rateLimitingEnabled ? 'text-green-600' : 'text-red-600'}`}>
-                {rateLimitingEnabled === null ? 'Loading...' : rateLimitingEnabled ? 'Enabled' : 'Disabled'}
-              </span>
-              <button
-                onClick={handleToggleRateLimiting}
-                disabled={rateLimitingEnabled === null || rateLimitingLoading}
-                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 ${
-                  rateLimitingEnabled ? 'bg-indigo-600' : 'bg-gray-300'
-                } ${(rateLimitingEnabled === null || rateLimitingLoading) ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
-              >
-                <span
-                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                    rateLimitingEnabled ? 'translate-x-6' : 'translate-x-1'
-                  }`}
-                />
-              </button>
-            </div>
-          </div>
-          {rateLimitingEnabled === false && (
-            <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded">
-              <p className="text-sm text-blue-800">
-                <strong>Info:</strong> Rate limiting is disabled. Leaders can now create multiple accounts without restrictions. Re-enable for security.
-              </p>
-            </div>
-          )}
-          {rateLimitingEnabled === true && (
-            <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded">
-              <p className="text-sm text-yellow-800">
-                <strong>Note:</strong> Rate limiting is enabled (30 requests per 15 minutes per IP). Disable to allow leaders to create multiple accounts at once.
-              </p>
-            </div>
-          )}
-        </div>
+      <div className="mb-6">
+        <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
+        <p className="mt-1 text-sm text-gray-500">Overview of system statistics</p>
+      </div>
 
         {statistics && (
           <>

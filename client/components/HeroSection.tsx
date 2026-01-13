@@ -1,18 +1,55 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 
 export default function HeroSection() {
   const [isPlaying, setIsPlaying] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
+  const [hasError, setHasError] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (video) {
+      const handleCanPlay = () => {
+        setIsLoading(false);
+        // Start playing once video can play
+        video.play().catch(() => {
+          setIsPlaying(false);
+        });
+      };
+
+      const handleError = () => {
+        setIsLoading(false);
+        setHasError(true);
+        setIsPlaying(false);
+      };
+
+      const handleLoadStart = () => {
+        setIsLoading(true);
+      };
+
+      video.addEventListener('canplay', handleCanPlay);
+      video.addEventListener('error', handleError);
+      video.addEventListener('loadstart', handleLoadStart);
+
+      return () => {
+        video.removeEventListener('canplay', handleCanPlay);
+        video.removeEventListener('error', handleError);
+        video.removeEventListener('loadstart', handleLoadStart);
+      };
+    }
+  }, []);
 
   const togglePlayPause = () => {
     if (videoRef.current) {
       if (isPlaying) {
         videoRef.current.pause();
       } else {
-        videoRef.current.play();
+        videoRef.current.play().catch(() => {
+          setIsPlaying(false);
+        });
       }
       setIsPlaying(!isPlaying);
     }
@@ -28,12 +65,29 @@ export default function HeroSection() {
           loop
           muted
           playsInline
+          preload="metadata"
           className="absolute inset-0 w-full h-full object-cover"
+          style={{ opacity: isLoading ? 0 : 1, transition: 'opacity 0.5s ease-in-out' }}
         >
           <source src="/solar-plant-groningen.mp4" type="video/mp4" />
+          {/* Fallback message if video fails to load */}
+          Your browser does not support the video tag.
         </video>
+        {/* Loading overlay */}
+        {isLoading && (
+          <div className="absolute inset-0 bg-gray-900 flex items-center justify-center z-10">
+            <div className="text-white text-center">
+              <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-white mb-4"></div>
+              <p className="text-sm">Loading video...</p>
+            </div>
+          </div>
+        )}
+        {/* Error fallback */}
+        {hasError && (
+          <div className="absolute inset-0 bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900"></div>
+        )}
         {/* Overlay for better text readability */}
-        <div className="absolute inset-0 bg-gradient-to-b from-gray-900/40 to-gray-800/40"></div>
+        <div className="absolute inset-0 bg-gradient-to-b from-gray-900/40 to-gray-800/40 z-0"></div>
       </div>
 
       {/* Centered Text */}

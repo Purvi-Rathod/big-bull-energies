@@ -2,6 +2,7 @@ import { asyncHandler } from "../utils/asyncHandler";
 import { AppError } from "../utils/AppError";
 import { Gallery } from "../models/Gallery";
 import { Types } from "mongoose";
+import { uploadToCloudinary, deleteFromCloudinary, extractPublicIdFromUrl } from "../services/cloudinary.service";
 
 /**
  * Get all gallery items (public - filtered by status)
@@ -209,10 +210,24 @@ export const deleteGalleryItem = asyncHandler(async (req, res) => {
     throw new AppError("Invalid gallery item ID", 400);
   }
 
-  const item = await Gallery.findByIdAndDelete(id);
+  const item = await Gallery.findById(id);
   if (!item) {
     throw new AppError("Gallery item not found", 404);
   }
+
+  // Try to delete from Cloudinary if it's a Cloudinary URL
+  try {
+    const publicId = extractPublicIdFromUrl(item.mediaUrl);
+    if (publicId) {
+      const resourceType = item.mediaType === "video" ? "video" : "image";
+      await deleteFromCloudinary(publicId, resourceType);
+    }
+  } catch (error: any) {
+    console.error("Failed to delete from Cloudinary:", error);
+    // Continue with database deletion even if Cloudinary deletion fails
+  }
+
+  await Gallery.findByIdAndDelete(id);
 
   const response = res as any;
   response.status(200).json({
@@ -235,4 +250,57 @@ export const getGalleryCategories = asyncHandler(async (req, res) => {
       categories,
     },
   });
+});
+
+/**
+ * Upload media file to Cloudinary
+ * POST /api/v1/admin/gallery/upload
+ */
+export const uploadGalleryMedia = asyncHandler(async (req, res) => {
+  if (!req.file) {
+    throw new AppError("No file uploaded", 400);
+  }
+
+  const { folder = "gallery", resourceType = "auto" } = req.body;
+
+  // Determine resource type from file mimetype if not specified
+  let detectedResourceType: "image" | "video" | "auto" | "raw" = "auto";
+  if (resourceType === "auto") {
+    if (req.file.mimetype.startsWith("image/")) {
+      detectedResourceType = "image";
+    } else if (req.file.mimetype.startsWith("video/")) {
+      detectedResourceType = "video";
+    }
+  } else {
+    detectedResourceType = resourceType as "image" | "video" | "auto" | "raw";
+  }
+
+  try {
+    const uploadResult = await uploadToCloudinary(
+      req.file.buffer,
+      folder,
+      detectedResourceType,
+      {
+        overwrite: false,
+        invalidate: true,
+      }
+    );
+
+    const response = res as any;
+    response.status(200).json({
+      status: "success",
+      message: "File uploaded successfully",
+      data: {
+        url: uploadResult.secure_url,
+        publicId: uploadResult.public_id,
+        format: uploadResult.format,
+        width: uploadResult.width,
+        height: uploadResult.height,
+        bytes: uploadResult.bytes,
+        resourceType: uploadResult.resource_type,
+      },
+    });
+  } catch (error: any) {
+    throw new AppError(`Failed to upload file: ${error.message}`, 500);
+  }
 });

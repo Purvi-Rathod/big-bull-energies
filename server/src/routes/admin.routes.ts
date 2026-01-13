@@ -60,8 +60,10 @@ import {
   updateGalleryItem,
   deleteGalleryItem,
   getGalleryCategories,
+  uploadGalleryMedia,
 } from "../controllers/gallery.controller";
 import { requireAdminAuth } from "../middleware/admin.middleware";
+import multer from "multer";
 
 const router = Router();
 
@@ -150,5 +152,22 @@ router.get("/gallery/:id", requireAdminAuth, getGalleryItemById);
 router.post("/gallery", requireAdminAuth, createGalleryItem);
 router.put("/gallery/:id", requireAdminAuth, updateGalleryItem);
 router.delete("/gallery/:id", requireAdminAuth, deleteGalleryItem);
+
+// Gallery media upload (with multer middleware)
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: {
+    fileSize: 100 * 1024 * 1024, // 100MB limit
+  },
+  fileFilter: (req, file, cb) => {
+    // Accept images and videos
+    if (file.mimetype.startsWith("image/") || file.mimetype.startsWith("video/")) {
+      cb(null, true);
+    } else {
+      cb(new Error("Only image and video files are allowed"));
+    }
+  },
+});
+router.post("/gallery/upload", requireAdminAuth, upload.single("file"), uploadGalleryMedia);
 
 export default router;

@@ -20,10 +20,13 @@ class ApiClient {
   ): Promise<ApiResponse<T>> {
     const url = `${this.baseURL}${endpoint}`;
     
+    // Check if body is FormData - if so, don't set Content-Type (browser will set it with boundary)
+    const isFormData = options.body instanceof FormData;
+    
     const config: RequestInit = {
       ...options,
       headers: {
-        'Content-Type': 'application/json',
+        ...(isFormData ? {} : { 'Content-Type': 'application/json' }),
         ...options.headers,
       },
       credentials: 'include', // Include cookies
@@ -910,6 +913,26 @@ class ApiClient {
   async getGalleryCategories() {
     return this.request<{ categories: string[] }>('/admin/gallery/categories', {
       method: 'GET',
+    });
+  }
+
+  async uploadGalleryMedia(file: File, folder?: string, resourceType?: 'image' | 'video' | 'auto') {
+    const formData = new FormData();
+    formData.append('file', file);
+    if (folder) formData.append('folder', folder);
+    if (resourceType) formData.append('resourceType', resourceType);
+
+    return this.request<{
+      url: string;
+      publicId: string;
+      format: string;
+      width?: number;
+      height?: number;
+      bytes: number;
+      resourceType: string;
+    }>('/admin/gallery/upload', {
+      method: 'POST',
+      body: formData,
     });
   }
 }

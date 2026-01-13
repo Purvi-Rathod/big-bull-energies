@@ -5,7 +5,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useConfirm } from '@/contexts/ConfirmContext';
 import { api } from '@/lib/api';
 import toast from 'react-hot-toast';
-import { Image as ImageIcon, Video, Plus, Edit, Trash2, Eye, EyeOff } from 'lucide-react';
+import { Image as ImageIcon, Video, Plus, Edit, Trash2, Eye, EyeOff, Upload, X } from 'lucide-react';
 
 interface GalleryItem {
   _id?: string;
@@ -43,6 +43,10 @@ export default function GalleryPage() {
     order: 0,
     status: 'Active',
   });
+  const [uploading, setUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [uploadPreview, setUploadPreview] = useState<string | null>(null);
 
   useEffect(() => {
     const isAdminUser = user?.userId === 'CROWN-000000' || user?.userId === 'CNEOX-000000';
@@ -99,6 +103,8 @@ export default function GalleryPage() {
         order: item.order,
         status: item.status,
       });
+      setSelectedFile(null);
+      setUploadPreview(null);
     } else {
       setEditingItem(null);
       setFormData({
@@ -111,8 +117,87 @@ export default function GalleryPage() {
         order: 0,
         status: 'Active',
       });
+      setSelectedFile(null);
+      setUploadPreview(null);
     }
     setShowModal(true);
+  };
+
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    if (!file.type.startsWith('image/') && !file.type.startsWith('video/')) {
+      toast.error('Please select an image or video file');
+      return;
+    }
+
+    // Validate file size (100MB)
+    if (file.size > 100 * 1024 * 1024) {
+      toast.error('File size must be less than 100MB');
+      return;
+    }
+
+    setSelectedFile(file);
+    
+    // Set media type based on file type
+    if (file.type.startsWith('image/')) {
+      setFormData({ ...formData, mediaType: 'photo' });
+    } else if (file.type.startsWith('video/')) {
+      setFormData({ ...formData, mediaType: 'video' });
+    }
+
+    // Create preview
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setUploadPreview(reader.result as string);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleUpload = async () => {
+    if (!selectedFile) {
+      toast.error('Please select a file to upload');
+      return;
+    }
+
+    try {
+      setUploading(true);
+      setUploadProgress(0);
+      setError('');
+
+      // Determine resource type
+      const resourceType = selectedFile.type.startsWith('image/') ? 'image' : 
+                          selectedFile.type.startsWith('video/') ? 'video' : 'auto';
+
+      const response = await api.uploadGalleryMedia(selectedFile, 'gallery', resourceType);
+      
+      if (response.data) {
+        setFormData({
+          ...formData,
+          mediaUrl: response.data.url,
+          thumbnailUrl: formData.mediaType === 'video' ? response.data.url : response.data.url,
+        });
+        toast.success('File uploaded successfully!');
+        setSelectedFile(null);
+        setUploadPreview(null);
+        setUploadProgress(100);
+      }
+    } catch (err: any) {
+      const errorMessage = err.message || 'Failed to upload file';
+      setError(errorMessage);
+      toast.error(errorMessage);
+    } finally {
+      setUploading(false);
+      setTimeout(() => setUploadProgress(0), 2000);
+    }
+  };
+
+  const handleRemoveFile = () => {
+    setSelectedFile(null);
+    setUploadPreview(null);
+    setFormData({ ...formData, mediaUrl: '', thumbnailUrl: '' });
   };
 
   const handleDelete = async (id: string) => {
@@ -476,6 +561,86 @@ export default function GalleryPage() {
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Media URL/Link *
                   </label>
+                  
+                  {/* File Upload Section */}
+                  <div className="mb-3">
+                    <label className="block text-xs font-medium text-gray-600 mb-2">
+                      Or upload a file:
+                    </label>
+                    <div className="flex gap-2">
+                      <label className="flex-1 cursor-pointer">
+                        <input
+                          type="file"
+                          accept="image/*,video/*"
+                          onChange={handleFileSelect}
+                          className="hidden"
+                          disabled={uploading}
+                        />
+                        <div className="px-4 py-2 border-2 border-dashed border-gray-300 rounded-md hover:border-indigo-500 transition text-center">
+                          <Upload className="w-5 h-5 mx-auto mb-1 text-gray-400" />
+                          <span className="text-sm text-gray-600">Choose File</span>
+                        </div>
+                      </label>
+                      {selectedFile && (
+                        <>
+                          <button
+                            type="button"
+                            onClick={handleUpload}
+                            disabled={uploading}
+                            className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+                          >
+                            {uploading ? 'Uploading...' : 'Upload'}
+                          </button>
+                          <button
+                            type="button"
+                            onClick={handleRemoveFile}
+                            disabled={uploading}
+                            className="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 disabled:opacity-50 text-sm"
+                          >
+                            <X className="w-4 h-4" />
+                          </button>
+                        </>
+                      )}
+                    </div>
+                    
+                    {selectedFile && (
+                      <div className="mt-2">
+                        <p className="text-xs text-gray-600 mb-1">
+                          Selected: {selectedFile.name} ({(selectedFile.size / 1024 / 1024).toFixed(2)} MB)
+                        </p>
+                        {uploadPreview && (
+                          <div className="mt-2">
+                            {formData.mediaType === 'photo' ? (
+                              <img
+                                src={uploadPreview}
+                                alt="Preview"
+                                className="max-w-full h-32 object-contain rounded border border-gray-300"
+                              />
+                            ) : (
+                              <video
+                                src={uploadPreview}
+                                controls
+                                className="max-w-full h-32 rounded border border-gray-300"
+                              />
+                            )}
+                          </div>
+                        )}
+                        {uploading && (
+                          <div className="mt-2">
+                            <div className="w-full bg-gray-200 rounded-full h-2">
+                              <div
+                                className="bg-indigo-600 h-2 rounded-full transition-all duration-300"
+                                style={{ width: `${uploadProgress}%` }}
+                              />
+                            </div>
+                            <p className="text-xs text-gray-500 mt-1">Uploading... {uploadProgress}%</p>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* URL Input */}
                   <input
                     type="url"
                     value={formData.mediaUrl}
@@ -485,7 +650,7 @@ export default function GalleryPage() {
                     required
                   />
                   <p className="mt-1 text-xs text-gray-500">
-                    Paste the link/URL to your photo or video (already uploaded elsewhere)
+                    Upload a file above or paste the link/URL to your photo or video
                   </p>
                 </div>
 

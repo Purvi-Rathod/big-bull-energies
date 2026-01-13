@@ -769,7 +769,7 @@ class ApiClient {
   }
 
   async getWithdrawalSchedules() {
-    return this.request<{ schedules: any; packageSchedules: Array<{ packageName: string; hasCustomSchedule: boolean; schedule: any }> }>('/admin/settings/withdrawal-schedules', {
+    return this.request<{ schedules: any; packageSchedules: Array<{ packageId: string; packageName: string; hasCustomSchedule: boolean; schedule: any }> }>('/admin/settings/withdrawal-schedules', {
       method: 'GET',
     });
   }

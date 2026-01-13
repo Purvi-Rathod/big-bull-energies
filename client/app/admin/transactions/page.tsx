@@ -110,10 +110,11 @@ export default function AllTransactionsPage() {
               break;
           }
           
-          if (response.data.pagination) {
+          if (response.data?.pagination) {
             // Always update count for this tab (for UI display) - triggers re-render
+            const pagination = response.data.pagination;
             setTabCounts(prev => {
-              const newCount = response.data.pagination.total;
+              const newCount = pagination.total;
               
               // Always return new object to ensure React detects the update
               return {
@@ -124,7 +125,7 @@ export default function AllTransactionsPage() {
             
             // Only update pagination if this is the active tab
             if (tab === activeTab) {
-              setPagination(response.data.pagination);
+              setPagination(pagination);
             }
           }
         } else {

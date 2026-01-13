@@ -1,78 +1,44 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 
 export default function HeroSection() {
-  const [isPlaying, setIsPlaying] = useState(true);
   const [isLoading, setIsLoading] = useState(true);
-  const [hasError, setHasError] = useState(false);
-  const videoRef = useRef<HTMLVideoElement>(null);
+  const [videoReady, setVideoReady] = useState(false);
+
+  // YouTube video ID extracted from URL: https://youtu.be/EWeTt4RbTVU?si=MjfxIk5ic-kFYBEu
+  const youtubeVideoId = "EWeTt4RbTVU";
 
   useEffect(() => {
-    const video = videoRef.current;
-    if (video) {
-      const handleCanPlay = () => {
-        setIsLoading(false);
-        // Start playing once video can play
-        video.play().catch(() => {
-          setIsPlaying(false);
-        });
-      };
+    // YouTube iframe API loads faster than local video
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+      setVideoReady(true);
+    }, 500); // Small delay to show loading state
 
-      const handleError = () => {
-        setIsLoading(false);
-        setHasError(true);
-        setIsPlaying(false);
-      };
-
-      const handleLoadStart = () => {
-        setIsLoading(true);
-      };
-
-      video.addEventListener('canplay', handleCanPlay);
-      video.addEventListener('error', handleError);
-      video.addEventListener('loadstart', handleLoadStart);
-
-      return () => {
-        video.removeEventListener('canplay', handleCanPlay);
-        video.removeEventListener('error', handleError);
-        video.removeEventListener('loadstart', handleLoadStart);
-      };
-    }
+    return () => clearTimeout(timer);
   }, []);
-
-  const togglePlayPause = () => {
-    if (videoRef.current) {
-      if (isPlaying) {
-        videoRef.current.pause();
-      } else {
-        videoRef.current.play().catch(() => {
-          setIsPlaying(false);
-        });
-      }
-      setIsPlaying(!isPlaying);
-    }
-  };
 
   return (
     <section className="relative min-h-screen w-full flex items-center justify-center overflow-hidden pt-20 md:pt-28 lg:pt-36">
-      {/* Background Video */}
+      {/* Background Video - YouTube Embed */}
       <div className="absolute inset-0 z-0">
-        <video
-          ref={videoRef}
-          autoPlay
-          loop
-          muted
-          playsInline
-          preload="metadata"
+        {/* YouTube iframe embed - optimized for performance */}
+        <iframe
           className="absolute inset-0 w-full h-full object-cover"
-          style={{ opacity: isLoading ? 0 : 1, transition: 'opacity 0.5s ease-in-out' }}
-        >
-          <source src="/solar-plant-groningen.mp4" type="video/mp4" />
-          {/* Fallback message if video fails to load */}
-          Your browser does not support the video tag.
-        </video>
+          src={`https://www.youtube.com/embed/${youtubeVideoId}?autoplay=1&mute=1&loop=1&playlist=${youtubeVideoId}&controls=0&showinfo=0&rel=0&iv_load_policy=3&modestbranding=1&playsinline=1&enablejsapi=1&origin=${typeof window !== 'undefined' ? window.location.origin : ''}`}
+          title="Crown Bankers Solar Plant Video"
+          allow="autoplay; encrypted-media; picture-in-picture"
+          allowFullScreen
+          style={{
+            opacity: videoReady ? 1 : 0,
+            transition: 'opacity 0.5s ease-in-out',
+            pointerEvents: 'none', // Prevent interaction with video
+          }}
+          loading="lazy"
+        />
+        
         {/* Loading overlay */}
         {isLoading && (
           <div className="absolute inset-0 bg-gray-900 flex items-center justify-center z-10">
@@ -82,10 +48,7 @@ export default function HeroSection() {
             </div>
           </div>
         )}
-        {/* Error fallback */}
-        {hasError && (
-          <div className="absolute inset-0 bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900"></div>
-        )}
+        
         {/* Overlay for better text readability */}
         <div className="absolute inset-0 bg-gradient-to-b from-gray-900/40 to-gray-800/40 z-0"></div>
       </div>
@@ -136,32 +99,23 @@ export default function HeroSection() {
         </svg>
       </div>
 
-      {/* Play/Pause Button */}
-      <button
-        onClick={togglePlayPause}
-        className="absolute bottom-4 right-4 md:bottom-8 md:right-8 z-10 w-10 h-10 md:w-12 md:h-12 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center transition-all duration-300 hover:bg-[#ffcf0B]"
-        aria-label={isPlaying ? "Pause video" : "Play video"}
+      {/* YouTube Link Button */}
+      <a
+        href={`https://www.youtube.com/watch?v=${youtubeVideoId}`}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="absolute bottom-4 right-4 md:bottom-8 md:right-8 z-10 w-10 h-10 md:w-12 md:h-12 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center transition-all duration-300 hover:bg-[#ffcf0B] group"
+        aria-label="Watch on YouTube"
+        title="Watch on YouTube"
       >
-        {isPlaying ? (
-          // Pause icon (two vertical lines)
-          <svg
-            className="w-4 h-4 md:w-5 md:h-5 text-white"
-            fill="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z" />
-          </svg>
-        ) : (
-          // Play icon (triangle)
-          <svg
-            className="w-4 h-4 md:w-5 md:h-5 text-white"
-            fill="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path d="M8 5v14l11-7z" />
-          </svg>
-        )}
-      </button>
+        <svg
+          className="w-4 h-4 md:w-5 md:h-5 text-white group-hover:text-gray-900"
+          fill="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+        </svg>
+      </a>
     </section>
   );
 }

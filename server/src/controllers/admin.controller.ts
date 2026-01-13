@@ -1283,7 +1283,7 @@ export const getWithdrawalSchedules = asyncHandler(async (req, res) => {
     // Get all packages to show in admin panel
     const { Package } = await import("../models/Package");
     const packages = await Package.find({ status: "Active" })
-      .select("packageName")
+      .select("packageName _id")
       .lean();
 
     const schedules = setting.value as any || {};
@@ -1292,6 +1292,7 @@ export const getWithdrawalSchedules = asyncHandler(async (req, res) => {
       const customSchedule = schedules[packageName];
       
       return {
+        packageId: pkg._id.toString(),
         packageName,
         hasCustomSchedule: !!customSchedule,
         schedule: customSchedule || null,

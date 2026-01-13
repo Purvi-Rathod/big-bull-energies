@@ -116,7 +116,7 @@ sudo lsof -i :8000
 sudo lsof -i :3000
 
 # Test backend health
-curl http://localhost:8000/api/health
+curl https://api.crownbankers.com/api/health
 
 # Test frontend
 curl http://localhost:3000

@@ -11,7 +11,7 @@ const allowedOrigins = process.env.ALLOWED_ORIGINS
       'http://localhost:3000',
       'http://localhost:3001',
       'http://localhost:5000',
-      'http://localhost:8000'
+      'https://api.crownbankers.com'
     ];
 
 export const corsOptions: CorsOptions = {

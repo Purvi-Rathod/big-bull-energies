@@ -1,6 +1,6 @@
 # User API Documentation
 
-Base URL: `http://localhost:8000` (or your configured PORT)
+Base URL: `https://api.crownbankers.com` (or your configured PORT)
 
 All user endpoints are prefixed with `/api/v1/auth`
 
@@ -49,7 +49,7 @@ Create a new user account in the binary MLM system. This will automatically:
 
 **cURL Command:**
 ```bash
-curl -X POST http://localhost:8000/api/v1/auth/signup \
+curl -X POST https://api.crownbankers.com/api/v1/auth/signup \
   -H "Content-Type: application/json" \
   -d '{
     "name": "John Doe",
@@ -63,7 +63,7 @@ curl -X POST http://localhost:8000/api/v1/auth/signup \
 
 **Signup with Email only:**
 ```bash
-curl -X POST http://localhost:8000/api/v1/auth/signup \
+curl -X POST https://api.crownbankers.com/api/v1/auth/signup \
   -H "Content-Type: application/json" \
   -d '{
     "name": "Jane Smith",
@@ -74,7 +74,7 @@ curl -X POST http://localhost:8000/api/v1/auth/signup \
 
 **Signup with Phone only:**
 ```bash
-curl -X POST http://localhost:8000/api/v1/auth/signup \
+curl -X POST https://api.crownbankers.com/api/v1/auth/signup \
   -H "Content-Type: application/json" \
   -d '{
     "name": "Bob Johnson",
@@ -132,7 +132,7 @@ Authenticate a user and receive a JWT token. Users must login with their User ID
 
 **cURL Command:**
 ```bash
-curl -X POST http://localhost:8000/api/v1/auth/login \
+curl -X POST https://api.crownbankers.com/api/v1/auth/login \
   -H "Content-Type: application/json" \
   -c cookies.txt \
   -d '{
@@ -179,13 +179,13 @@ Logout and clear the user authentication token.
 
 **cURL Command (Using Bearer Token):**
 ```bash
-curl -X POST http://localhost:8000/api/v1/auth/logout \
+curl -X POST https://api.crownbankers.com/api/v1/auth/logout \
   -H "Authorization: Bearer YOUR_USER_TOKEN_HERE"
 ```
 
 **cURL Command (Using Cookie):**
 ```bash
-curl -X POST http://localhost:8000/api/v1/auth/logout \
+curl -X POST https://api.crownbankers.com/api/v1/auth/logout \
   -b cookies.txt
 ```
 
@@ -212,13 +212,13 @@ Get the current authenticated user's profile information.
 
 **cURL Command (Using Bearer Token):**
 ```bash
-curl -X GET http://localhost:8000/api/v1/auth/me \
+curl -X GET https://api.crownbankers.com/api/v1/auth/me \
   -H "Authorization: Bearer YOUR_USER_TOKEN_HERE"
 ```
 
 **cURL Command (Using Cookie):**
 ```bash
-curl -X GET http://localhost:8000/api/v1/auth/me \
+curl -X GET https://api.crownbankers.com/api/v1/auth/me \
   -b cookies.txt
 ```
 
@@ -272,7 +272,7 @@ The token is automatically stored in a cookie named `token` after login. Use:
 
 ### Step 1: Signup (with Referrer)
 ```bash
-curl -X POST http://localhost:8000/api/v1/auth/signup \
+curl -X POST https://api.crownbankers.com/api/v1/auth/signup \
   -H "Content-Type: application/json" \
   -c cookies.txt \
   -d '{
@@ -287,7 +287,7 @@ curl -X POST http://localhost:8000/api/v1/auth/signup \
 
 ### Step 2: Login (if not already logged in)
 ```bash
-curl -X POST http://localhost:8000/api/v1/auth/login \
+curl -X POST https://api.crownbankers.com/api/v1/auth/login \
   -H "Content-Type: application/json" \
   -c cookies.txt \
   -d '{
@@ -298,13 +298,13 @@ curl -X POST http://localhost:8000/api/v1/auth/login \
 
 ### Step 3: Get Profile (using saved cookie)
 ```bash
-curl -X GET http://localhost:8000/api/v1/auth/me \
+curl -X GET https://api.crownbankers.com/api/v1/auth/me \
   -b cookies.txt
 ```
 
 ### Step 4: Logout
 ```bash
-curl -X POST http://localhost:8000/api/v1/auth/logout \
+curl -X POST https://api.crownbankers.com/api/v1/auth/logout \
   -b cookies.txt
 ```
 

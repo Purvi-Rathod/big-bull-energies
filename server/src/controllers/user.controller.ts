@@ -1207,7 +1207,7 @@ export const createVoucher = asyncHandler(async (req, res) => {
 
   // Get callback URLs
   const baseUrl = process.env.CLIENT_URL || process.env.FRONTEND_URL || 'http://localhost:3000';
-  const callbackUrl = process.env.NOWPAYMENTS_CALLBACK_URL || `${process.env.API_URL || 'http://localhost:8000'}/api/v1/payment/callback`;
+  const callbackUrl = process.env.NOWPAYMENTS_CALLBACK_URL || `${process.env.API_URL || 'https://api.crownbankers.com'}/api/v1/payment/callback`;
   const successUrl = `${baseUrl}/vouchers/success?orderId=${orderId}`;
   const cancelUrl = `${baseUrl}/vouchers/cancel?orderId=${orderId}`;
 

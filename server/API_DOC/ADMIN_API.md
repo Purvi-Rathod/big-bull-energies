@@ -1,6 +1,6 @@
 # Admin API Documentation
 
-Base URL: `http://localhost:8000` (or your configured PORT)
+Base URL: `https://api.crownbankers.com` (or your configured PORT)
 
 All admin endpoints are prefixed with `/api/v1/admin`
 
@@ -43,7 +43,7 @@ Create a new admin account.
 
 **cURL Command:**
 ```bash
-curl -X POST http://localhost:8000/api/v1/admin/signup \
+curl -X POST https://api.crownbankers.com/api/v1/admin/signup \
   -H "Content-Type: application/json" \
   -d '{
     "name": "John Doe",
@@ -101,7 +101,7 @@ Authenticate an admin and receive a JWT token.
 
 **cURL Command:**
 ```bash
-curl -X POST http://localhost:8000/api/v1/admin/login \
+curl -X POST https://api.crownbankers.com/api/v1/admin/login \
   -H "Content-Type: application/json" \
   -d '{
     "email": "admin@example.com",
@@ -111,7 +111,7 @@ curl -X POST http://localhost:8000/api/v1/admin/login \
 
 **With Cookie Storage:**
 ```bash
-curl -X POST http://localhost:8000/api/v1/admin/login \
+curl -X POST https://api.crownbankers.com/api/v1/admin/login \
   -H "Content-Type: application/json" \
   -c cookies.txt \
   -d '{
@@ -156,13 +156,13 @@ Logout and clear the admin authentication token.
 
 **cURL Command (Using Bearer Token):**
 ```bash
-curl -X POST http://localhost:8000/api/v1/admin/logout \
+curl -X POST https://api.crownbankers.com/api/v1/admin/logout \
   -H "Authorization: Bearer YOUR_ADMIN_TOKEN_HERE"
 ```
 
 **cURL Command (Using Cookie):**
 ```bash
-curl -X POST http://localhost:8000/api/v1/admin/logout \
+curl -X POST https://api.crownbankers.com/api/v1/admin/logout \
   -b cookies.txt
 ```
 
@@ -189,13 +189,13 @@ Get the current authenticated admin's profile information.
 
 **cURL Command (Using Bearer Token):**
 ```bash
-curl -X GET http://localhost:8000/api/v1/admin/me \
+curl -X GET https://api.crownbankers.com/api/v1/admin/me \
   -H "Authorization: Bearer YOUR_ADMIN_TOKEN_HERE"
 ```
 
 **cURL Command (Using Cookie):**
 ```bash
-curl -X GET http://localhost:8000/api/v1/admin/me \
+curl -X GET https://api.crownbankers.com/api/v1/admin/me \
   -b cookies.txt
 ```
 
@@ -247,7 +247,7 @@ The token is automatically stored in a cookie named `adminToken` after login. Us
 
 ### Step 1: Signup
 ```bash
-curl -X POST http://localhost:8000/api/v1/admin/signup \
+curl -X POST https://api.crownbankers.com/api/v1/admin/signup \
   -H "Content-Type: application/json" \
   -c cookies.txt \
   -d '{
@@ -260,7 +260,7 @@ curl -X POST http://localhost:8000/api/v1/admin/signup \
 
 ### Step 2: Login (if not already logged in)
 ```bash
-curl -X POST http://localhost:8000/api/v1/admin/login \
+curl -X POST https://api.crownbankers.com/api/v1/admin/login \
   -H "Content-Type: application/json" \
   -c cookies.txt \
   -d '{
@@ -271,13 +271,13 @@ curl -X POST http://localhost:8000/api/v1/admin/login \
 
 ### Step 3: Get Profile (using saved cookie)
 ```bash
-curl -X GET http://localhost:8000/api/v1/admin/me \
+curl -X GET https://api.crownbankers.com/api/v1/admin/me \
   -b cookies.txt
 ```
 
 ### Step 4: Logout
 ```bash
-curl -X POST http://localhost:8000/api/v1/admin/logout \
+curl -X POST https://api.crownbankers.com/api/v1/admin/logout \
   -b cookies.txt
 ```
 

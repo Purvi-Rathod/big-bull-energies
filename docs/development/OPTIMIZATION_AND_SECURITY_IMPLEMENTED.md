@@ -107,7 +107,7 @@ Add these to your `.env` file:
 ALLOWED_ORIGINS=http://localhost:3000,http://yourdomain.com:3000
 
 # API URL (for Swagger)
-API_URL=http://localhost:8000
+API_URL=https://api.crownbankers.com
 ```
 
 ## 📊 Performance Impact

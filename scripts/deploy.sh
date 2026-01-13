@@ -76,7 +76,7 @@ echo ""
 echo "🏥 Running health checks..."
 
 # Backend health check
-if curl -f http://localhost:8000/health &> /dev/null; then
+if curl -f https://api.crownbankers.com/health &> /dev/null; then
     echo -e "${GREEN}✅ Backend is healthy${NC}"
 else
     echo -e "${YELLOW}⚠️  Backend health check failed (may still be starting)${NC}"
@@ -101,5 +101,5 @@ echo "  Restart services: $DOCKER_COMPOSE restart"
 echo ""
 echo "🌐 Access the application:"
 echo "  Frontend: http://199.188.204.202:3000"
-echo "  Backend:  http://199.188.204.202:8000"
-echo "  API Docs: http://199.188.204.202:8000/api-docs"
+echo "  Backend:  https://api.crownbankers.com"
+echo "  API Docs: https://api.crownbankers.com/api-docs"

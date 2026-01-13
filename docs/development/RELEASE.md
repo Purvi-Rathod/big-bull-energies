@@ -394,7 +394,7 @@ This release includes significant improvements to wallet management, user experi
 ## 📞 Support & Contact
 
 For issues or questions during testing:
-- **Backend API:** `http://localhost:8000/api/v1`
+- **Backend API:** `https://api.crownbankers.com/api/v1`
 - **Frontend:** `http://localhost:3000`
 - **Documentation:** See codebase README files
 

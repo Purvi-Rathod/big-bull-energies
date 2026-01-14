@@ -13,7 +13,7 @@
     "cobe": "^0.6.5",
     "gsap": "^3.14.2",
     "lucide-react": "^0.562.0",
-    "next": "16.0.7",
+    "next": "^16.0.10",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-hot-toast": "^2.6.0",
@@ -28,7 +28,7 @@
     "@types/react-dom": "^18.3.1",
     "baseline-browser-mapping": "^2.9.2",
     "eslint": "^9",
-    "eslint-config-next": "16.0.7",
+    "eslint-config-next": "^16.0.10",
     "tailwindcss": "^4",
     "typescript": "^5"
   }

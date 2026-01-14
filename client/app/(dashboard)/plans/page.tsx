@@ -257,9 +257,11 @@ export default function PlansPage() {
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 {packages.map((pkg) => {
-                // Calculate daily ROI rate from totalOutputPct or use legacy roi
+                // Use roi field directly if available (it's already a percentage), otherwise calculate from totalOutputPct
                 const totalOutputPct = pkg.totalOutputPct || (pkg.roi ? pkg.roi * pkg.duration : 225);
-                const dailyRoiRate = (totalOutputPct / 100) / pkg.duration;
+                // roi field is the daily ROI percentage (e.g., 1.5 means 1.5% per day)
+                // If roi exists, use it directly; otherwise calculate from totalOutputPct
+                const dailyRoiRate = pkg.roi ? pkg.roi / 100 : (totalOutputPct / 100) / pkg.duration;
                 const renewablePrinciplePct = pkg.renewablePrinciplePct || pkg.principleReturn || 50;
                 const referralPct = pkg.referralPct || pkg.levelOneReferral || 7;
                 const binaryPct = pkg.binaryPct || pkg.binaryBonus || 10;
@@ -307,7 +309,9 @@ export default function PlansPage() {
                         {/* Daily ROI Rate */}
                         <div className="flex justify-between items-center py-3 border-b border-yellow-500/20">
                           <span className="text-sm font-semibold text-gray-300">Daily ROI Rate:</span>
-                          <span className="text-sm font-bold text-yellow-300">{(dailyRoiRate * 100).toFixed(4)}%</span>
+                          <span className="text-sm font-bold text-yellow-300">
+                            {pkg.roi ? `${pkg.roi}%` : `${(dailyRoiRate * 100).toFixed(4)}%`}
+                          </span>
                         </div>
 
                         {/* Renewable Principle */}

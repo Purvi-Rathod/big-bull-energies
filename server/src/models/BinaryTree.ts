@@ -36,6 +36,12 @@ const BinaryTreeSchema = new Schema<IBinaryTree>({
   cappingLimit: { type: Schema.Types.Decimal128, default: "0" }
 }, { timestamps: true });
 
+// Performance indexes for tree queries
 BinaryTreeSchema.index({ parent: 1 });
+BinaryTreeSchema.index({ user: 1 }); // Already unique, but explicit index helps
+BinaryTreeSchema.index({ leftChild: 1 });
+BinaryTreeSchema.index({ rightChild: 1 });
+// Compound index for admin children queries
+BinaryTreeSchema.index({ parent: 1, user: 1 });
 
 export const BinaryTree = model<IBinaryTree>("BinaryTree", BinaryTreeSchema);

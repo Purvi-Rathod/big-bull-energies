@@ -40,7 +40,7 @@ export default function CTASection() {
           {/* Right Section: Image */}
           <div className="w-full lg:w-1/2 relative min-h-[300px] sm:min-h-[400px] md:min-h-[450px] lg:min-h-[500px] order-1 lg:order-2">
             <Image
-              src="/CTA.webp"
+              src="/CTA.png"
               alt="Invenergy Team Working"
               fill
               className="object-cover"

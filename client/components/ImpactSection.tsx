@@ -11,7 +11,7 @@ export default function ImpactSection() {
         {/* Top Left Image - banner.jpeg */}
         <div className="absolute top-0 left-0 w-full sm:w-1/2 h-1/3 sm:h-1/2 z-0">
           <Image
-            src="/banner.jpeg"
+            src="/BANNER.png"
             alt="Community workers"
             fill
             className="object-cover"

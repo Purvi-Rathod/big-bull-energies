@@ -7,7 +7,7 @@ export default function NewsInsightsSection() {
     category: "NEWS",
     headline:
       "With Invenergy's Support, Prysmian Doubles Down on U.S. Manufacturing and Domestic Energy Supply Chains",
-    image: "/CTA1.webp",
+    image: "/CTA1.png",
   };
 
   const newsArticles = [
@@ -57,7 +57,7 @@ export default function NewsInsightsSection() {
             >
               FEATURED
             </p>
-            <div className="relative w-full h-[250px] sm:h-[300px] md:h-[350px] bg-gray-200 overflow-hidden group">
+            <div className="relative w-full h-[250px] sm:h-[300px] md:h-[350px] bg-gray-200 overflow-hidden group object-cover">
               <Image
                 src={featuredArticle.image}
                 alt={featuredArticle.headline}

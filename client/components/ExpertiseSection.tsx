@@ -901,7 +901,7 @@ export default function ExpertiseSection() {
           {/* Right Side - Image */}
           <div className="relative w-full h-full min-h-[300px] sm:min-h-[400px] md:min-h-[450px] lg:min-h-[500px] order-1 lg:order-2">
             <Image
-              src="/rightside.webp"
+              src="/rightside.png"
               alt="Industrial energy facility"
               fill
               className="object-cover"

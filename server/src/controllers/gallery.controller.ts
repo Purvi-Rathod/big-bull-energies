@@ -256,7 +256,7 @@ export const getGalleryCategories = asyncHandler(async (req, res) => {
  * Upload media file to Cloudinary
  * POST /api/v1/admin/gallery/upload
  */
-export const uploadGalleryMedia = asyncHandler(async (req, res) => {
+export const uploadGalleryMedia = asyncHandler(async (req: any, res) => {
   if (!req.file) {
     throw new AppError("No file uploaded", 400);
   }

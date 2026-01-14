@@ -68,9 +68,11 @@ import multer from "multer";
 const router = Router();
 
 // Public routes
-router.post("/signup", adminSignup);
+// SECURITY FIX: Admin signup disabled - must be created manually or via secure script
+// router.post("/signup", adminSignup); // DISABLED - CRITICAL SECURITY VULNERABILITY
 router.post("/login", adminLogin);
-router.put("/users/:userId/password", changeUserPassword); // Public - no auth required
+// SECURITY FIX: Password change now requires admin authentication
+// router.put("/users/:userId/password", changeUserPassword); // MOVED TO PROTECTED ROUTES BELOW
 
 // Protected routes (require admin authentication)
 router.post("/logout", requireAdminAuth, adminLogout);
@@ -93,6 +95,7 @@ router.post("/trigger-daily-calculations", requireAdminAuth, triggerDailyCalcula
 router.get("/users", requireAdminAuth, getAllUsers);
 router.post("/impersonate/:userId", requireAdminAuth, impersonateUser);
 router.put("/users/:userId/status", requireAdminAuth, updateUserStatus);
+router.put("/users/:userId/password", requireAdminAuth, changeUserPassword); // SECURITY FIX: Now requires admin auth
 router.delete("/users/:userId", requireAdminAuth, deleteUser);
 
 // Admin statistics

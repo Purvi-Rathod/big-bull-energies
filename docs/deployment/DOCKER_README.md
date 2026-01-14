@@ -121,7 +121,7 @@ docker run -p 3000:3000 \
 docker ps
 
 # View logs
-docker-compose logs -f
+docker compose logs -f
 
 # View logs for specific service
 docker-compose logs -f backend
@@ -135,7 +135,7 @@ docker-compose restart frontend
 docker-compose down
 
 # Stop and remove containers, volumes, and images
-docker-compose down -v --rmi all
+docker ompose down -v --rmi all
 
 # Rebuild without cache
 docker-compose build --no-cache

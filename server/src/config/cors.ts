@@ -16,20 +16,29 @@ const allowedOrigins = process.env.ALLOWED_ORIGINS
 
 export const corsOptions: CorsOptions = {
   origin: (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
-    // Allow requests with no origin (like mobile apps or curl requests)
-    if (!origin) return callback(null, true);
+    // SECURITY: In production, reject requests with no origin (prevents CSRF from curl/Postman)
+    if (!origin) {
+      if (process.env.NODE_ENV === 'development') {
+        return callback(null, true); // Allow in development for testing
+      }
+      return callback(new Error('Origin header required'));
+    }
     
-    if (allowedOrigins.indexOf(origin) !== -1 || process.env.NODE_ENV === 'development') {
+    // SECURITY: Strict origin checking
+    if (allowedOrigins.indexOf(origin) !== -1) {
       callback(null, true);
     } else {
+      // Log blocked origins for security monitoring
+      console.warn(`[SECURITY] Blocked CORS request from origin: ${origin}`);
       callback(new Error('Not allowed by CORS'));
     }
   },
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  credentials: true, // Allow cookies/auth headers
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'], // Only allow necessary methods
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin'],
-  exposedHeaders: ['Content-Length', 'X-Foo', 'X-Bar'],
-  maxAge: 86400 // 24 hours
+  exposedHeaders: ['Content-Length'], // Minimize exposed headers
+  maxAge: 3600, // SECURITY: Reduced from 24h to 1h for better security
+  optionsSuccessStatus: 200 // Some legacy browsers choke on 204
 };
 
 export default cors(corsOptions);

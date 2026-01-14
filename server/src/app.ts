@@ -5,6 +5,7 @@ import {setupSwagger} from './swagger'
 import { asyncHandler } from './utils/asyncHandler';
 import { AppError } from './utils/AppError';
 import { cors, securityHeaders, generalLimiter, authLimiter, conditionalAuthLimiter } from './config';
+import { sanitizeInput, validateObjectId } from './middleware/inputSanitization';
 import adminRoutes from './routes/admin.routes';
 
 const app = express();
@@ -19,8 +20,15 @@ app.use(compression({ level: 6, threshold: 1024 }));
 app.use(cors);
 
 
-app.use(express.json({ limit: "16kb" }));
-app.use(express.urlencoded({ extended: true, limit: "16kb" }))
+// SECURITY: Request size limits to prevent DoS attacks
+app.use(express.json({ limit: "10kb" })); // Reduced from 16kb for security
+app.use(express.urlencoded({ extended: true, limit: "10kb", parameterLimit: 10 })); // Limit parameters
+
+// Input sanitization (protect against injection attacks)
+app.use(sanitizeInput);
+
+// ObjectId validation middleware
+app.use(validateObjectId);
 
 app.use(express.static("public"));
 app.use(cookieParser());

@@ -17,6 +17,10 @@ import {
   flushAllInvestments,
   getNOWPaymentsStatus,
   updateNOWPaymentsStatus,
+  getAuthRateLimitingStatus,
+  updateAuthRateLimitingStatus,
+  getWithdrawalSchedules,
+  updateWithdrawalSchedule,
   changeUserPassword,
   getAdminReports,
   getDailyBusinessReport,
@@ -49,14 +53,26 @@ import {
   getUserCareerProgressAdmin,
   getAllUsersCareerProgress,
 } from "../controllers/career-level.controller";
+import {
+  getAllGalleryItemsAdmin,
+  getGalleryItemById,
+  createGalleryItem,
+  updateGalleryItem,
+  deleteGalleryItem,
+  getGalleryCategories,
+  uploadGalleryMedia,
+} from "../controllers/gallery.controller";
 import { requireAdminAuth } from "../middleware/admin.middleware";
+import multer from "multer";
 
 const router = Router();
 
 // Public routes
-router.post("/signup", adminSignup);
+// SECURITY FIX: Admin signup disabled - must be created manually or via secure script
+// router.post("/signup", adminSignup); // DISABLED - CRITICAL SECURITY VULNERABILITY
 router.post("/login", adminLogin);
-router.put("/users/:userId/password", changeUserPassword); // Public - no auth required
+// SECURITY FIX: Password change now requires admin authentication
+// router.put("/users/:userId/password", changeUserPassword); // MOVED TO PROTECTED ROUTES BELOW
 
 // Protected routes (require admin authentication)
 router.post("/logout", requireAdminAuth, adminLogout);
@@ -79,6 +95,7 @@ router.post("/trigger-daily-calculations", requireAdminAuth, triggerDailyCalcula
 router.get("/users", requireAdminAuth, getAllUsers);
 router.post("/impersonate/:userId", requireAdminAuth, impersonateUser);
 router.put("/users/:userId/status", requireAdminAuth, updateUserStatus);
+router.put("/users/:userId/password", requireAdminAuth, changeUserPassword); // SECURITY FIX: Now requires admin auth
 router.delete("/users/:userId", requireAdminAuth, deleteUser);
 
 // Admin statistics
@@ -111,6 +128,10 @@ router.put("/tickets/:ticketId", requireAdminAuth, updateTicket);
 // Settings management
 router.get("/settings/nowpayments", requireAdminAuth, getNOWPaymentsStatus);
 router.put("/settings/nowpayments", requireAdminAuth, updateNOWPaymentsStatus);
+router.get("/settings/auth-rate-limiting", requireAdminAuth, getAuthRateLimitingStatus);
+router.put("/settings/auth-rate-limiting", requireAdminAuth, updateAuthRateLimitingStatus);
+router.get("/settings/withdrawal-schedules", requireAdminAuth, getWithdrawalSchedules);
+router.put("/settings/withdrawal-schedules", requireAdminAuth, updateWithdrawalSchedule);
 
 // Career level management
 router.get("/career-levels", requireAdminAuth, getAllCareerLevels);
@@ -126,5 +147,30 @@ router.get("/career-progress/:userId", requireAdminAuth, getUserCareerProgressAd
 // Voucher management
 router.get("/vouchers", requireAdminAuth, getAllVouchers);
 router.post("/vouchers", requireAdminAuth, createVoucherForUser);
+
+// Gallery management
+router.get("/gallery", requireAdminAuth, getAllGalleryItemsAdmin);
+router.get("/gallery/categories", requireAdminAuth, getGalleryCategories);
+router.get("/gallery/:id", requireAdminAuth, getGalleryItemById);
+router.post("/gallery", requireAdminAuth, createGalleryItem);
+router.put("/gallery/:id", requireAdminAuth, updateGalleryItem);
+router.delete("/gallery/:id", requireAdminAuth, deleteGalleryItem);
+
+// Gallery media upload (with multer middleware)
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: {
+    fileSize: 100 * 1024 * 1024, // 100MB limit
+  },
+  fileFilter: (req, file, cb) => {
+    // Accept images and videos
+    if (file.mimetype.startsWith("image/") || file.mimetype.startsWith("video/")) {
+      cb(null, true);
+    } else {
+      cb(new Error("Only image and video files are allowed"));
+    }
+  },
+});
+router.post("/gallery/upload", requireAdminAuth, upload.single("file"), uploadGalleryMedia);
 
 export default router;

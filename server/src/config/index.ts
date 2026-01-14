@@ -6,5 +6,5 @@
 import corsMiddleware from './cors';
 export { corsOptions } from './cors';
 export const cors = corsMiddleware;
-export { generalLimiter, authLimiter } from './rate-limit';
+export { generalLimiter, authLimiter, conditionalAuthLimiter } from './rate-limit';
 export { securityHeaders } from './security';

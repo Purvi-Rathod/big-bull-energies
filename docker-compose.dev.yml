@@ -29,13 +29,13 @@ services:
       context: ./client
       dockerfile: Dockerfile
       args:
-        - NEXT_PUBLIC_API_URL=http://localhost:8000/api/v1
+        - NEXT_PUBLIC_API_URL=https://api.crownbankers.com/api/v1
     container_name: binary-system-frontend-dev
     ports:
       - "3000:3000"
     environment:
       - NODE_ENV=development
-      - NEXT_PUBLIC_API_URL=http://localhost:8000/api/v1
+      - NEXT_PUBLIC_API_URL=https://api.crownbankers.com/api/v1
     volumes:
       - ./client:/app
       - /app/node_modules

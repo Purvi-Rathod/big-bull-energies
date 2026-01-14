@@ -31,12 +31,12 @@ Ensure your `.env` file has the correct production values:
 
 ```env
 # Backend Configuration
-API_URL=http://199.188.204.202:8000
+API_URL=https://api.crownbankers.com
 NODE_ENV=production
 PORT=8000
 
 # Frontend Configuration  
-NEXT_PUBLIC_API_URL=http://199.188.204.202:8000/api/v1
+NEXT_PUBLIC_API_URL=https://api.crownbankers.com/api/v1
 NODE_ENV=production
 
 # Database (update with your production MongoDB URL)
@@ -98,7 +98,7 @@ docker run -d \
   --name binary-system-frontend \
   -p 3000:3000 \
   --env-file .env \
-  -e NEXT_PUBLIC_API_URL=http://199.188.204.202:8000/api/v1 \
+  -e NEXT_PUBLIC_API_URL=https://api.crownbankers.com/api/v1 \
   binary_system-frontend
 ```
 
@@ -121,7 +121,7 @@ docker compose logs -f frontend
 
 ```bash
 # Backend health check
-curl http://199.188.204.202:8000/health
+curl https://api.crownbankers.com/health
 
 # Frontend (should return HTML)
 curl http://199.188.204.202:3000

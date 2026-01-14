@@ -1,0 +1,33 @@
+{
+  "name": "Crown Bankers - Revolutionary Binary MLM Platform",
+  "short_name": "Crown Bankers",
+  "description": "Build your network, maximize your earnings, and unlock unlimited potential with Crown Bankers' advanced binary system",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#042B19",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/image.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/image.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/image.png",
+      "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["finance", "business", "investment"],
+  "lang": "en-US",
+  "dir": "ltr"
+}

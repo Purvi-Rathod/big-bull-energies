@@ -8,6 +8,7 @@ import {
   getUserTransactions,
   getUserReports,
   createWithdrawal,
+  getWithdrawalSchedule,
   getUserVouchers,
   createVoucher,
   getMinimumVoucherAmount,
@@ -31,6 +32,7 @@ router.get("/investments", requireAuth, getUserInvestments);
 router.get("/binary-tree", requireAuth, getUserBinaryTree);
 router.get("/transactions", requireAuth, getUserTransactions);
 router.get("/reports", requireAuth, getUserReports);
+router.get("/withdrawal-schedule", requireAuth, getWithdrawalSchedule);
 router.post("/withdraw", requireAuth, createWithdrawal);
 router.get("/vouchers", requireAuth, getUserVouchers);
 router.get("/vouchers/minimum-amount", requireAuth, getMinimumVoucherAmount);

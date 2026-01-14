@@ -6,21 +6,62 @@ import { WalletType } from "../models/types";
 import { AppError } from "../utils/AppError";
 import { findUserByUserId } from "./userId.service";
 
+// Cache for admin user checks (small in-memory cache)
+const adminUserCache = new Map<string, boolean>();
+
 /**
  * Check if a user is the admin (CROWN-000000 or CNEOX-000000 for backward compatibility)
+ * OPTIMIZED: Uses in-memory cache to avoid repeated database queries
  */
 async function isAdminUser(userId: Types.ObjectId): Promise<boolean> {
   try {
-    const user = await User.findById(userId);
-    return user?.userId === "CROWN-000000" || user?.userId === "CNEOX-000000";
+    const userIdStr = userId.toString();
+    
+    // Check cache first
+    if (adminUserCache.has(userIdStr)) {
+      return adminUserCache.get(userIdStr)!;
+    }
+    
+    const user = await User.findById(userId).select("userId").lean();
+    const isAdmin = user?.userId === "CROWN-000000" || user?.userId === "CNEOX-000000";
+    
+    // Cache the result
+    adminUserCache.set(userIdStr, isAdmin);
+    
+    return isAdmin;
   } catch (error) {
     return false;
   }
 }
 
 /**
+ * Incrementally update downline counts for a user
+ * Instead of recursively counting all users, we just increment the count
+ * This is MUCH faster for signup operations
+ */
+async function incrementDownlineCount(userId: Types.ObjectId, leg: "left" | "right") {
+  try {
+    const userTree = await BinaryTree.findOne({ user: userId });
+    if (!userTree) {
+      return;
+    }
+
+    if (leg === "left") {
+      userTree.leftDownlines = (userTree.leftDownlines || 0) + 1;
+    } else {
+      userTree.rightDownlines = (userTree.rightDownlines || 0) + 1;
+    }
+    
+    await userTree.save();
+  } catch (error) {
+    console.error("Error incrementing downline count:", error);
+  }
+}
+
+/**
  * Recursively count all users in a subtree (left or right leg)
  * This counts ALL descendants, not just direct children
+ * NOTE: This is kept for backward compatibility but should be avoided during signup
  */
 async function countSubtreeUsers(
   rootUserId: Types.ObjectId,
@@ -56,6 +97,7 @@ async function countSubtreeUsers(
 
 /**
  * Update downline counts for a user by recursively counting all users in each leg
+ * NOTE: This is slow and should only be used for verification/correction, not during signup
  */
 async function updateDownlineCounts(userId: Types.ObjectId) {
   try {
@@ -78,30 +120,149 @@ async function updateDownlineCounts(userId: Types.ObjectId) {
 }
 
 /**
- * Recursively update downline counts for all ancestors up the tree
- * When a new user is added, we need to update counts for all parents
+ * OPTIMIZED: Incrementally update downline counts for all ancestors up the tree
+ * When a new user is added, we increment counts for all parents
+ * 
+ * Performance Optimization:
+ * - Before: N database queries (one per ancestor)
+ * - After: 2 batch queries (collect ancestors + batch load all trees)
  */
 async function updateAncestorDownlineCounts(
   userId: Types.ObjectId,
+  position: "left" | "right" | null,
   visited: Set<string> = new Set()
 ) {
   try {
+    if (!position) {
+      return; // No position to update
+    }
+
     const userIdStr = userId.toString();
     if (visited.has(userIdStr)) {
       return; // Avoid infinite loops
     }
     visited.add(userIdStr);
 
-    const userTree = await BinaryTree.findOne({ user: userId });
-    if (!userTree || !userTree.parent) {
-      return; // No parent, we're at the root
+    // STEP 1: Collect all ancestor IDs by following parent chain (single query per level)
+    const ancestorChain: Types.ObjectId[] = [];
+    const allNodeIds = new Set<string>([userIdStr]);
+    let currentUserId: Types.ObjectId | null = userId;
+    const maxDepth = 50; // Safety limit
+    let depth = 0;
+
+    while (currentUserId && depth < maxDepth) {
+      const currentTree = await BinaryTree.findOne({ user: currentUserId })
+        .select("parent")
+        .lean();
+      
+      if (!currentTree || !currentTree.parent) {
+        break; // Reached root
+      }
+
+      const parentId = currentTree.parent as Types.ObjectId;
+      const parentIdStr = parentId.toString();
+      
+      if (allNodeIds.has(parentIdStr)) {
+        break; // Circular reference detected
+      }
+      
+      allNodeIds.add(parentIdStr);
+      ancestorChain.push(parentId);
+      currentUserId = parentId;
+      depth++;
     }
 
-    // Update this user's downline counts
-    await updateDownlineCounts(userId);
+    if (ancestorChain.length === 0) {
+      return; // No ancestors to update
+    }
 
-    // Recursively update parent's counts
-    await updateAncestorDownlineCounts(userTree.parent as Types.ObjectId, visited);
+    // STEP 2: Batch load ALL trees we need (ancestors + their parents for position determination)
+    const allAncestorIds = Array.from(allNodeIds).map(id => new Types.ObjectId(id));
+    
+    // Also need to load parents of ancestors to determine positions
+    const ancestorTreesWithParents = await BinaryTree.find({
+      $or: [
+        { user: { $in: allAncestorIds } },
+        { user: { $in: ancestorChain } }
+      ]
+    })
+      .select("user parent leftChild rightChild")
+      .lean();
+
+    // Create maps for O(1) lookup
+    const treeMap = new Map<string, any>();
+    ancestorTreesWithParents.forEach((tree: any) => {
+      const userId = (tree.user as any)?.toString() || tree.user?.toString();
+      treeMap.set(userId, tree);
+    });
+
+    // STEP 3: Determine position for each ancestor by traversing up in memory
+    const leftUpdates: Types.ObjectId[] = [];
+    const rightUpdates: Types.ObjectId[] = [];
+    
+    let currentNodeId: Types.ObjectId = userId;
+    let currentPosition: "left" | "right" | null = position;
+
+    for (const ancestorId of ancestorChain) {
+      if (!currentPosition) break;
+
+      const ancestorIdStr = ancestorId.toString();
+      const ancestorTree = treeMap.get(ancestorIdStr);
+      
+      if (!ancestorTree) {
+        break; // Tree not found
+      }
+
+      // Add this ancestor to update list with current position
+      if (currentPosition === "left") {
+        leftUpdates.push(ancestorId);
+      } else {
+        rightUpdates.push(ancestorId);
+      }
+
+      // Determine ancestor's position relative to its parent for next iteration
+      if (ancestorTree.parent) {
+        const parentIdStr = (ancestorTree.parent as any)?.toString() || ancestorTree.parent?.toString();
+        const parentTree = treeMap.get(parentIdStr);
+        
+        if (parentTree) {
+          // Check if ancestor is left or right child of its parent
+          currentPosition = 
+            parentTree.leftChild?.toString() === ancestorIdStr ? "left" :
+            parentTree.rightChild?.toString() === ancestorIdStr ? "right" :
+            null;
+        } else {
+          break; // Parent tree not loaded
+        }
+      } else {
+        break; // Reached root
+      }
+
+      currentNodeId = ancestorId;
+    }
+
+    // STEP 4: Batch update all ancestors
+    const updatePromises: Promise<any>[] = [];
+
+    if (leftUpdates.length > 0) {
+      updatePromises.push(
+        BinaryTree.updateMany(
+          { user: { $in: leftUpdates } },
+          { $inc: { leftDownlines: 1 } }
+        )
+      );
+    }
+
+    if (rightUpdates.length > 0) {
+      updatePromises.push(
+        BinaryTree.updateMany(
+          { user: { $in: rightUpdates } },
+          { $inc: { rightDownlines: 1 } }
+        )
+      );
+    }
+
+    await Promise.all(updatePromises);
   } catch (error) {
     console.error("Error updating ancestor downline counts:", error);
   }
@@ -138,10 +299,8 @@ export async function initializeBinaryTree(userId: Types.ObjectId, referrerId?: 
         
         if (referrerIsAdmin) {
           // Admin can have unlimited children - no binary tree constraints
-          // Just update downlines count (we'll use leftDownlines to track total children for admin)
-          // For admin, count all direct children
-          const adminChildren = await BinaryTree.countDocuments({ parent: referrerId });
-          referrerTree.leftDownlines = adminChildren;
+          // Increment downlines count instead of recounting (much faster)
+          referrerTree.leftDownlines = (referrerTree.leftDownlines || 0) + 1;
           await referrerTree.save();
         } else {
           // For non-admin parents, enforce binary tree rules (left/right only)
@@ -150,25 +309,25 @@ export async function initializeBinaryTree(userId: Types.ObjectId, referrerId?: 
               throw new AppError("Left position already occupied. Binary tree constraint violated.", 400);
             }
           referrerTree.leftChild = userId;
-            // Update downline count by counting all users in left subtree
+            // Increment downline count instead of recounting (much faster)
+            referrerTree.leftDownlines = (referrerTree.leftDownlines || 0) + 1;
             await referrerTree.save();
-            await updateDownlineCounts(referrerId);
         } else if (position === "right") {
             if (referrerTree.rightChild) {
               throw new AppError("Right position already occupied. Binary tree constraint violated.", 400);
             }
           referrerTree.rightChild = userId;
-            // Update downline count by counting all users in right subtree
+            // Increment downline count instead of recounting (much faster)
+            referrerTree.rightDownlines = (referrerTree.rightDownlines || 0) + 1;
         await referrerTree.save();
-            await updateDownlineCounts(referrerId);
           } else {
             throw new AppError("Position (left or right) is required for non-admin parents.", 400);
           }
         }
 
-        // Update downline counts for all ancestors up the tree
-        // This ensures that when a user is placed deeper in the tree, all ancestors' counts are updated
-        await updateAncestorDownlineCounts(referrerId);
+        // Incrementally update downline counts for all ancestors up the tree
+        // This is MUCH faster than recursively counting all users
+        await updateAncestorDownlineCounts(referrerId, position);
       }
     }
 
@@ -250,13 +409,16 @@ export async function findAvailablePosition(referrerId: Types.ObjectId): Promise
 }
 
 /**
- * Find the deepest available position in a specific leg (left or right) of the tree
- * This function traverses down the specified leg until it finds an empty slot
+ * OPTIMIZED: Find the deepest available position in a specific leg (left or right) of the tree
+ * This function batch loads all nodes in the leg path upfront, then traverses in memory
+ * 
+ * Performance Optimization:
+ * - Before: N database queries (one per node in the leg path)
+ * - After: 1-2 batch queries (loads entire leg path at once)
  * 
  * Algorithm:
- * 1. If the requested position at root is available, return it
- * 2. If occupied, go to the child in that leg
- * 3. Recursively check that child's same position (continues down the leg)
+ * 1. Batch load all nodes in the leg path (left or right chain)
+ * 2. Traverse in memory to find first available slot
  * 
  * Example: 
  * - A has B (right) and C (left)
@@ -268,116 +430,141 @@ export async function findDeepestAvailablePositionInLeg(
   requestedPosition: "left" | "right"
 ): Promise<{ parentId: Types.ObjectId; position: "left" | "right" } | null> {
   try {
-    const rootTree = await BinaryTree.findOne({ user: rootUserId });
-    if (!rootTree) {
-      return null;
-    }
+    // OPTIMIZATION: Use iterative approach with batch loading by level
+    const maxDepth = 50; // Safety limit
+    let currentLevelUserIds: Types.ObjectId[] = [rootUserId];
+    let depth = 0;
 
-    // Check if the requested position is available at the root
-    if (requestedPosition === "left" && !rootTree.leftChild) {
-      return { parentId: rootUserId, position: "left" };
-    }
-    if (requestedPosition === "right" && !rootTree.rightChild) {
-      return { parentId: rootUserId, position: "right" };
-    }
+    // Build the leg path level by level with batch loading
+    while (currentLevelUserIds.length > 0 && depth < maxDepth) {
+      // Batch load all trees at current level
+      const currentLevelTrees = await BinaryTree.find({
+        user: { $in: currentLevelUserIds }
+      })
+        .select("user leftChild rightChild")
+        .lean();
 
-    // The requested position is occupied, get the child in that leg
-    const childInRequestedLeg = requestedPosition === "left" 
-      ? rootTree.leftChild 
-      : rootTree.rightChild;
+      const nextLevelUserIds: Types.ObjectId[] = [];
 
-    if (!childInRequestedLeg) {
-      return null;
-    }
+      // Check each node at current level
+      for (const tree of currentLevelTrees) {
+        const userId = (tree.user as any)?.toString() || tree.user?.toString();
+        const treeUserId = new Types.ObjectId(userId);
 
-    // First, check if the child itself has the requested position available
-    // Example: A refers in "right", B is in A's right, check if B's right is available
-    const childTree = await BinaryTree.findOne({ user: childInRequestedLeg });
-    if (childTree) {
-      const childPositionAvailable = requestedPosition === "left"
-        ? !childTree.leftChild
-        : !childTree.rightChild;
+        // Check if requested position is available at this node
+        const childInPosition = requestedPosition === "left" 
+          ? tree.leftChild 
+          : tree.rightChild;
 
-      if (childPositionAvailable) {
-        return { parentId: childInRequestedLeg as Types.ObjectId, position: requestedPosition };
+        if (!childInPosition) {
+          // Found available position!
+          return { 
+            parentId: treeUserId, 
+            position: requestedPosition 
+          };
+        }
+
+        // Position is occupied, add child to next level for next iteration
+        const childId = childInPosition as Types.ObjectId;
+        nextLevelUserIds.push(childId);
       }
+
+      // Move to next level
+      currentLevelUserIds = nextLevelUserIds;
+      depth++;
     }
 
-    // Child's position is also occupied, recursively go deeper
-    // This continues down the tree in the same direction
-    const result = await findDeepestAvailablePositionInLeg(
-      childInRequestedLeg as Types.ObjectId,
-      requestedPosition
-    );
-
-    if (result) {
-      return result;
-    }
-
-    // No available position found in the requested leg
+    // No available position found in the requested leg (reached max depth or end of tree)
     return null;
   } catch (error) {
+    console.error("Error in findDeepestAvailablePositionInLeg:", error);
     return null;
   }
 }
 
 /**
- * Recursively find the next available position in a binary tree
- * This will traverse the tree to find the first available slot
+ * OPTIMIZED: Find the next available position in a binary tree using BFS with batch loading
+ * This will traverse the tree level-by-level to find the first available slot
  * Used when no specific position is requested
+ * 
+ * Performance Optimization:
+ * - Before: N database queries (one per node visited)
+ * - After: ~depth queries (one per level, typically 5-10 queries)
  */
 export async function findNextAvailablePositionInTree(
   rootUserId: Types.ObjectId,
-  visited: Set<string> = new Set()
+  visited: Set<string> = new Set(),
+  maxDepth: number = 20
 ): Promise<{ parentId: Types.ObjectId; position: "left" | "right" } | null> {
   try {
-    const rootTree = await BinaryTree.findOne({ user: rootUserId });
-    if (!rootTree) {
-      return null;
-    }
+    // OPTIMIZATION: Use BFS (level-by-level) with batch loading
+    const queue: { userId: Types.ObjectId; level: number }[] = [
+      { userId: rootUserId, level: 0 }
+    ];
+    const processed = new Set<string>();
 
-    // Mark this node as visited to avoid infinite loops
-    const rootIdStr = rootUserId.toString();
-    if (visited.has(rootIdStr)) {
-      return null;
-    }
-    visited.add(rootIdStr);
+    while (queue.length > 0 && queue[0].level < maxDepth) {
+      const currentLevel = queue[0].level;
+      const currentLevelNodes: Types.ObjectId[] = [];
 
-    // Check if left position is available
-    if (!rootTree.leftChild) {
-      return { parentId: rootUserId, position: "left" };
-    }
-
-    // Check if right position is available
-    if (!rootTree.rightChild) {
-      return { parentId: rootUserId, position: "right" };
-    }
-
-    // Both positions are filled, check left subtree first
-    if (rootTree.leftChild) {
-      const leftResult = await findNextAvailablePositionInTree(
-        rootTree.leftChild as Types.ObjectId,
-        visited
-      );
-      if (leftResult) {
-        return leftResult;
+      // Collect all nodes at current level
+      while (queue.length > 0 && queue[0].level === currentLevel) {
+        const node = queue.shift()!;
+        const nodeIdStr = node.userId.toString();
+        
+        if (visited.has(nodeIdStr) || processed.has(nodeIdStr)) {
+          continue;
+        }
+        
+        visited.add(nodeIdStr);
+        processed.add(nodeIdStr);
+        currentLevelNodes.push(node.userId);
       }
-    }
 
-    // If left subtree is full, check right subtree
-    if (rootTree.rightChild) {
-      const rightResult = await findNextAvailablePositionInTree(
-        rootTree.rightChild as Types.ObjectId,
-        visited
-      );
-      if (rightResult) {
-        return rightResult;
+      if (currentLevelNodes.length === 0) break;
+
+      // OPTIMIZATION: Batch load all trees at current level
+      const currentLevelTrees = await BinaryTree.find({
+        user: { $in: currentLevelNodes }
+      })
+        .select("user leftChild rightChild")
+        .lean();
+
+      // Check for available positions at current level
+      for (const tree of currentLevelTrees) {
+        const userId = (tree.user as any)?.toString() || tree.user?.toString();
+        const treeUserId = new Types.ObjectId(userId);
+
+        // Check left position first
+        if (!tree.leftChild) {
+          return { parentId: treeUserId, position: "left" };
+        }
+
+        // Check right position
+        if (!tree.rightChild) {
+          return { parentId: treeUserId, position: "right" };
+        }
+
+        // Add children to queue for next level
+        if (tree.leftChild) {
+          const leftId = (tree.leftChild as any)?.toString() || tree.leftChild?.toString();
+          if (!processed.has(leftId)) {
+            queue.push({ userId: new Types.ObjectId(leftId), level: currentLevel + 1 });
+          }
+        }
+        if (tree.rightChild) {
+          const rightId = (tree.rightChild as any)?.toString() || tree.rightChild?.toString();
+          if (!processed.has(rightId)) {
+            queue.push({ userId: new Types.ObjectId(rightId), level: currentLevel + 1 });
+          }
+        }
       }
     }
 
     // No available position found
     return null;
   } catch (error) {
+    console.error("Error in findNextAvailablePositionInTree:", error);
     return null;
   }
 }

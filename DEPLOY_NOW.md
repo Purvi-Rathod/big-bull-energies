@@ -14,8 +14,8 @@ docker rm binary-system-frontend binary-system-backend
 
 Your `.env` file should have:
 ```env
-API_URL=http://199.188.204.202:8000
-NEXT_PUBLIC_API_URL=http://199.188.204.202:8000
+API_URL=https://api.crownbankers.com
+NEXT_PUBLIC_API_URL=https://api.crownbankers.com
 NODE_ENV=production
 PORT=8000
 
@@ -65,7 +65,7 @@ docker compose logs -f frontend
 
 ```bash
 # Backend health
-curl http://199.188.204.202:8000/health
+curl https://api.crownbankers.com/health
 
 # Frontend (should return HTML)
 curl http://199.188.204.202:3000
@@ -100,5 +100,5 @@ docker compose logs frontend
 ## Access Your Application
 
 - Frontend: http://199.188.204.202:3000
-- Backend API: http://199.188.204.202:8000
-- API Docs: http://199.188.204.202:8000/api-docs
+- Backend API: https://api.crownbankers.com
+- API Docs: https://api.crownbankers.com/api-docs

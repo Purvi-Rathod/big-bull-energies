@@ -1,9 +1,8 @@
-import Link from "next/link";
 import Image from "next/image";
 
 export default function NewsInsightsSection() {
   const featuredArticle = {
-    date: "JUN 20, 2025",
+    date: "JAN 15, 2025",
     category: "NEWS",
     headline:
       "With Invenergy's Support, Prysmian Doubles Down on U.S. Manufacturing and Domestic Energy Supply Chains",
@@ -12,21 +11,27 @@ export default function NewsInsightsSection() {
 
   const newsArticles = [
     {
-      date: "JUN 12, 2025",
+      date: "JAN 10, 2025",
       category: "NEWS",
       headline:
-        "Invenergy's Pleasant Prairie Solar Energy Center to Start Construction in Franklin County, Ohio",
+        "Crown Bankers Expands Solar Energy Investment Portfolio Across Multiple Regions",
+      description:
+        "Crown Bankers announces significant expansion of its solar energy investment portfolio, with new projects launching in key markets. This expansion strengthens the company's commitment to renewable energy and provides investors with diversified opportunities.",
     },
     {
-      date: "JUN 4, 2025",
-      category: "NEWS",
-      headline: "Invenergy's Hardin III Commences Operations",
+      date: "JAN 5, 2025",
+      category: "ANNOUNCEMENT",
+      headline: "Crown Bankers Reaches Milestone: 10,000 Active Investors Worldwide",
+      description:
+        "Crown Bankers celebrates a major milestone as the platform reaches 10,000 active investors globally. This achievement reflects the growing trust in Crown Bankers' innovative approach to binary investment and sustainable energy.",
     },
     {
-      date: "MAY 7, 2025",
+      date: "DEC 28, 2024",
       category: "NEWS",
       headline:
-        "Grain Belt Express Awards $1.7B to U.S. Contractors Quanta and Kiewit to Build Largest Transmission Line in U.S. History",
+        "New Investment Packages Released: Enhanced Returns for Crown Bankers Members",
+      description:
+        "Crown Bankers introduces new investment packages with enhanced returns and flexible terms. These packages are designed to meet the diverse needs of investors while maintaining the company's commitment to sustainable energy projects.",
     },
   ];
 
@@ -90,54 +95,48 @@ export default function NewsInsightsSection() {
               className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold leading-tight"
               style={{ color: "#042B19" }}
             >
-              <Link
-                href="/news/featured"
-                className="block transition-all duration-300 hover:translate-x-2 hover:opacity-80"
-              >
-                {featuredArticle.headline}
-              </Link>
+              {featuredArticle.headline}
             </h3>
+            <p className="text-sm sm:text-base text-gray-600 mt-3 sm:mt-4 leading-relaxed">
+              {featuredArticle.description}
+            </p>
           </div>
 
           {/* Right Side - News Articles List */}
           <div className="space-y-0">
             {newsArticles.map((article, index) => (
-              <div key={index}>
-                <Link
-                  href={`/news/${article.date
-                    .toLowerCase()
-                    .replace(/\s+/g, "-")}`}
-                  className="block py-4 sm:py-5 md:py-6 transition-all duration-300 hover:translate-x-2 hover:opacity-80"
+              <div key={index} className="py-4 sm:py-5 md:py-6">
+                <div
+                  className="flex items-center gap-2 sm:gap-3 text-xs sm:text-sm mb-2 sm:mb-3"
+                  style={{ color: "#042B19" }}
                 >
-                  <div
-                    className="flex items-center gap-2 sm:gap-3 text-xs sm:text-sm mb-2 sm:mb-3"
-                    style={{ color: "#042B19" }}
+                  <span>{article.date}</span>
+                  <svg
+                    className="w-3 h-3 sm:w-4 sm:h-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
                   >
-                    <span>{article.date}</span>
-                    <svg
-                      className="w-3 h-3 sm:w-4 sm:h-4 transition-transform duration-300 group-hover:translate-x-1"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                      />
-                    </svg>
-                    <span className="uppercase">{article.category}</span>
-                  </div>
-                  <h4
-                    className="text-lg sm:text-xl md:text-2xl font-bold leading-tight transition-colors duration-300"
-                    style={{ color: "#042B19" }}
-                  >
-                    {article.headline}
-                  </h4>
-                </Link>
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                    />
+                  </svg>
+                  <span className="uppercase">{article.category}</span>
+                </div>
+                <h4
+                  className="text-lg sm:text-xl md:text-2xl font-bold leading-tight mb-2 sm:mb-3"
+                  style={{ color: "#042B19" }}
+                >
+                  {article.headline}
+                </h4>
+                <p className="text-sm sm:text-base text-gray-600 leading-relaxed">
+                  {article.description}
+                </p>
                 {index < newsArticles.length - 1 && (
-                  <div className="h-px bg-gray-200"></div>
+                  <div className="h-px bg-gray-200 mt-4 sm:mt-5 md:mt-6"></div>
                 )}
               </div>
             ))}

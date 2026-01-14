@@ -81,14 +81,14 @@ docker run -p 8000:8000 \
 
 ```bash
 # Build frontend image (with standalone mode)
-docker build -t binary-system-frontend --build-arg NEXT_PUBLIC_API_URL=http://localhost:8000/api/v1 ./client
+docker build -t binary-system-frontend --build-arg NEXT_PUBLIC_API_URL=https://api.crownbankers.com/api/v1 ./client
 
 # Or use the simpler Dockerfile (if standalone mode has issues)
-docker build -t binary-system-frontend -f Dockerfile.simple --build-arg NEXT_PUBLIC_API_URL=http://localhost:8000/api/v1 ./client
+docker build -t binary-system-frontend -f Dockerfile.simple --build-arg NEXT_PUBLIC_API_URL=https://api.crownbankers.com/api/v1 ./client
 
 # Run frontend container
 docker run -p 3000:3000 \
-  -e NEXT_PUBLIC_API_URL=http://localhost:8000/api/v1 \
+  -e NEXT_PUBLIC_API_URL=https://api.crownbankers.com/api/v1 \
   binary-system-frontend
 ```
 
@@ -106,13 +106,13 @@ docker run -p 3000:3000 \
 
 ### Frontend Environment Variables
 
-- `NEXT_PUBLIC_API_URL`: Backend API URL (default: http://localhost:8000/api/v1)
+- `NEXT_PUBLIC_API_URL`: Backend API URL (default: https://api.crownbankers.com/api/v1)
 
 ## Accessing the Application
 
 - **Frontend**: http://localhost:3000
-- **Backend API**: http://localhost:8000/api/v1
-- **Health Check**: http://localhost:8000/api/health
+- **Backend API**: https://api.crownbankers.com/api/v1
+- **Health Check**: https://api.crownbankers.com/api/health
 
 ## Useful Docker Commands
 
@@ -121,7 +121,7 @@ docker run -p 3000:3000 \
 docker ps
 
 # View logs
-docker-compose logs -f
+docker compose logs -f
 
 # View logs for specific service
 docker-compose logs -f backend
@@ -135,7 +135,7 @@ docker-compose restart frontend
 docker-compose down
 
 # Stop and remove containers, volumes, and images
-docker-compose down -v --rmi all
+docker ompose down -v --rmi all
 
 # Rebuild without cache
 docker-compose build --no-cache

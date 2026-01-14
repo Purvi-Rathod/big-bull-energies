@@ -1,5 +1,6 @@
 import dotenv from 'dotenv';
-import { execSync } from 'child_process';
+// SECURITY FIX: Removed execSync import - dangerous and not needed
+// import { execSync } from 'child_process';
 import  app  from './app';
 import verifyEnvVariables from './utils/checkURI';
 import connectdb from "./db/index";

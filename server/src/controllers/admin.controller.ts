@@ -1196,6 +1196,202 @@ export const updateNOWPaymentsStatus = asyncHandler(async (req, res) => {
 });
 
 /**
+ * Get Auth Rate Limiting status
+ * GET /api/v1/admin/settings/auth-rate-limiting
+ */
+export const getAuthRateLimitingStatus = asyncHandler(async (req, res) => {
+  try {
+    let setting = await Settings.findOne({ key: "auth_rate_limiting_enabled" });
+    
+    // If setting doesn't exist, create it with default value (true - enabled by default)
+    if (!setting) {
+      setting = await Settings.create({
+        key: "auth_rate_limiting_enabled",
+        value: true,
+        description: "Enable or disable rate limiting for authentication endpoints (signup, login, etc.)",
+      });
+    }
+
+    const response = res as any;
+    response.status(200).json({
+      status: "success",
+      data: {
+        enabled: setting.value === true || setting.value === "true",
+      },
+    });
+  } catch (error: any) {
+    throw new AppError(error.message || "Failed to get auth rate limiting status", 500);
+  }
+});
+
+/**
+ * Update Auth Rate Limiting status
+ * PUT /api/v1/admin/settings/auth-rate-limiting
+ * Body: { enabled: true/false }
+ */
+export const updateAuthRateLimitingStatus = asyncHandler(async (req, res) => {
+  const { enabled } = req.body;
+
+  if (typeof enabled !== "boolean") {
+    throw new AppError("enabled must be a boolean value", 400);
+  }
+
+  try {
+    const setting = await Settings.findOneAndUpdate(
+      { key: "auth_rate_limiting_enabled" },
+      { 
+        value: enabled,
+        description: "Enable or disable rate limiting for authentication endpoints (signup, login, etc.)",
+      },
+      { 
+        upsert: true, 
+        new: true 
+      }
+    );
+
+    const response = res as any;
+    response.status(200).json({
+      status: "success",
+      message: `Auth rate limiting ${enabled ? "enabled" : "disabled"} successfully`,
+      data: {
+        enabled: setting.value === true || setting.value === "true",
+      },
+    });
+  } catch (error: any) {
+    throw new AppError(error.message || "Failed to update auth rate limiting status", 500);
+  }
+});
+
+/**
+ * Get withdrawal schedules for all packages
+ * GET /api/v1/admin/settings/withdrawal-schedules
+ */
+export const getWithdrawalSchedules = asyncHandler(async (req, res) => {
+  try {
+    let setting = await Settings.findOne({ key: "withdrawal_schedules" });
+    
+    // If setting doesn't exist, create it with default schedules
+    if (!setting) {
+      const defaultSchedules: any = {};
+      setting = await Settings.create({
+        key: "withdrawal_schedules",
+        value: defaultSchedules,
+        description: "Custom withdrawal schedules for ROI withdrawals by package name",
+      });
+    }
+
+    // Get all packages to show in admin panel
+    const { Package } = await import("../models/Package");
+    const packages = await Package.find({ status: "Active" })
+      .select("packageName _id")
+      .lean();
+
+    const schedules = setting.value as any || {};
+    const packageSchedules = packages.map((pkg: any) => {
+      const packageName = pkg.packageName;
+      const customSchedule = schedules[packageName];
+      
+      return {
+        packageId: pkg._id.toString(),
+        packageName,
+        hasCustomSchedule: !!customSchedule,
+        schedule: customSchedule || null,
+      };
+    });
+
+    const response = res as any;
+    response.status(200).json({
+      status: "success",
+      data: {
+        schedules: schedules,
+        packageSchedules,
+      },
+    });
+  } catch (error: any) {
+    throw new AppError(error.message || "Failed to get withdrawal schedules", 500);
+  }
+});
+
+/**
+ * Update withdrawal schedule for a package
+ * PUT /api/v1/admin/settings/withdrawal-schedules
+ * Body: { 
+ *   packageName: string,
+ *   schedule: { type: 'days_of_month' | 'day_of_week', values: number[], enabled: boolean } | null
+ * }
+ */
+export const updateWithdrawalSchedule = asyncHandler(async (req, res) => {
+  const { packageName, schedule } = req.body;
+
+  if (!packageName || typeof packageName !== "string") {
+    throw new AppError("packageName is required and must be a string", 400);
+  }
+
+  // Validate schedule if provided
+  if (schedule !== null && schedule !== undefined) {
+    if (!schedule.type || !["days_of_month", "day_of_week"].includes(schedule.type)) {
+      throw new AppError("schedule.type must be 'days_of_month' or 'day_of_week'", 400);
+    }
+    if (!Array.isArray(schedule.values) || schedule.values.length === 0) {
+      throw new AppError("schedule.values must be a non-empty array", 400);
+    }
+    if (schedule.type === "days_of_month") {
+      // Validate days are between 1-31
+      if (!schedule.values.every((d: number) => d >= 1 && d <= 31)) {
+        throw new AppError("Days of month must be between 1 and 31", 400);
+      }
+    } else if (schedule.type === "day_of_week") {
+      // Validate days are between 0-6 (Sunday-Saturday)
+      if (!schedule.values.every((d: number) => d >= 0 && d <= 6)) {
+        throw new AppError("Days of week must be between 0 (Sunday) and 6 (Saturday)", 400);
+      }
+    }
+    if (typeof schedule.enabled !== "boolean") {
+      throw new AppError("schedule.enabled must be a boolean", 400);
+    }
+  }
+
+  try {
+    let setting = await Settings.findOne({ key: "withdrawal_schedules" });
+    const currentSchedules = setting?.value as any || {};
+
+    // Update or remove schedule
+    if (schedule === null || schedule === undefined) {
+      // Remove schedule (use default)
+      delete currentSchedules[packageName];
+    } else {
+      // Update schedule
+      currentSchedules[packageName] = schedule;
+    }
+
+    const updatedSetting = await Settings.findOneAndUpdate(
+      { key: "withdrawal_schedules" },
+      {
+        value: currentSchedules,
+        description: "Custom withdrawal schedules for ROI withdrawals by package name",
+      },
+      {
+        upsert: true,
+        new: true,
+      }
+    );
+
+    const response = res as any;
+    response.status(200).json({
+      status: "success",
+      message: schedule === null 
+        ? `Withdrawal schedule removed for ${packageName}. Using default schedule.`
+        : `Withdrawal schedule updated for ${packageName} successfully`,
+      data: {
+        schedules: updatedSetting.value,
+      },
+    });
+  } catch (error: any) {
+    throw new AppError(error.message || "Failed to update withdrawal schedule", 500);
+  }
+});
+
+/**
  * Change user password by userId (Admin only)
  * PUT /api/v1/admin/users/:userId/password
  */

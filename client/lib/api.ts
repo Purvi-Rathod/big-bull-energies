@@ -1,6 +1,6 @@
 // API utility functions for making requests to the backend
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1';
-
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://api.crownbankers.com/api/v1';
+// const API_BASE_URL = 'http://localhost:8000/api/v1';
 export interface ApiResponse<T = any> {
   status: 'success' | 'error';
   message?: string;
@@ -20,10 +20,13 @@ class ApiClient {
   ): Promise<ApiResponse<T>> {
     const url = `${this.baseURL}${endpoint}`;
     
+    // Check if body is FormData - if so, don't set Content-Type (browser will set it with boundary)
+    const isFormData = options.body instanceof FormData;
+    
     const config: RequestInit = {
       ...options,
       headers: {
-        'Content-Type': 'application/json',
+        ...(isFormData ? {} : { 'Content-Type': 'application/json' }),
         ...options.headers,
       },
       credentials: 'include', // Include cookies
@@ -399,6 +402,22 @@ class ApiClient {
     });
   }
 
+  async getWithdrawalSchedule() {
+    return this.request<{
+      hasActiveInvestment: boolean;
+      packageName?: string;
+      scheduleDescription?: string;
+      canWithdrawToday?: boolean;
+      nextWithdrawalDate?: string;
+      nextWithdrawalDateFormatted?: string;
+      thisMonthDates?: Array<{ date: string; formatted: string }>;
+      nextMonthDates?: Array<{ date: string; formatted: string }>;
+      message?: string;
+    }>('/user/withdrawal-schedule', {
+      method: 'GET',
+    });
+  }
+
   async createWithdrawal(data: { amount: number; walletType: string; method?: string; cryptoType?: string; merchant?: string }) {
     return this.request<{ withdrawal: any }>('/user/withdraw', {
       method: 'POST',
@@ -736,6 +755,32 @@ class ApiClient {
     });
   }
 
+  async getAuthRateLimitingStatus() {
+    return this.request<{ enabled: boolean }>('/admin/settings/auth-rate-limiting', {
+      method: 'GET',
+    });
+  }
+
+  async updateAuthRateLimitingStatus(enabled: boolean) {
+    return this.request<{ enabled: boolean }>('/admin/settings/auth-rate-limiting', {
+      method: 'PUT',
+      body: JSON.stringify({ enabled }),
+    });
+  }
+
+  async getWithdrawalSchedules() {
+    return this.request<{ schedules: any; packageSchedules: Array<{ packageId: string; packageName: string; hasCustomSchedule: boolean; schedule: any }> }>('/admin/settings/withdrawal-schedules', {
+      method: 'GET',
+    });
+  }
+
+  async updateWithdrawalSchedule(packageName: string, schedule: { type: 'days_of_month' | 'day_of_week'; values: number[]; enabled: boolean } | null) {
+    return this.request<{ schedules: any }>('/admin/settings/withdrawal-schedules', {
+      method: 'PUT',
+      body: JSON.stringify({ packageName, schedule }),
+    });
+  }
+
   // Career Level Management (Admin)
   async getAllCareerLevels() {
     return this.request<{ levels: any[] }>('/admin/career-levels', {
@@ -803,6 +848,91 @@ class ApiClient {
   async getUserCareerProgress() {
     return this.request<{ progress: any }>('/user/career-progress', {
       method: 'GET',
+    });
+  }
+
+  // Gallery Management (Admin)
+  async getAllGalleryItemsAdmin(params?: { category?: string; status?: string; page?: number; limit?: number }) {
+    const queryParams = new URLSearchParams();
+    if (params?.category) queryParams.append('category', params.category);
+    if (params?.status) queryParams.append('status', params.status);
+    if (params?.page) queryParams.append('page', params.page.toString());
+    if (params?.limit) queryParams.append('limit', params.limit.toString());
+    
+    const query = queryParams.toString();
+    return this.request<{ items: any[]; categories: string[]; pagination: any }>(
+      `/admin/gallery${query ? `?${query}` : ''}`,
+      { method: 'GET' }
+    );
+  }
+
+  async getGalleryItemById(id: string) {
+    return this.request<{ item: any }>(`/admin/gallery/${id}`, {
+      method: 'GET',
+    });
+  }
+
+  async createGalleryItem(data: {
+    title: string;
+    description?: string;
+    mediaUrl: string;
+    mediaType: 'photo' | 'video';
+    category: string;
+    thumbnailUrl?: string;
+    order?: number;
+    status?: 'Active' | 'InActive';
+  }) {
+    return this.request<{ item: any }>('/admin/gallery', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  }
+
+  async updateGalleryItem(id: string, data: {
+    title?: string;
+    description?: string;
+    mediaUrl?: string;
+    mediaType?: 'photo' | 'video';
+    category?: string;
+    thumbnailUrl?: string;
+    order?: number;
+    status?: 'Active' | 'InActive';
+  }) {
+    return this.request<{ item: any }>(`/admin/gallery/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    });
+  }
+
+  async deleteGalleryItem(id: string) {
+    return this.request(`/admin/gallery/${id}`, {
+      method: 'DELETE',
+    });
+  }
+
+  async getGalleryCategories() {
+    return this.request<{ categories: string[] }>('/admin/gallery/categories', {
+      method: 'GET',
+    });
+  }
+
+  async uploadGalleryMedia(file: File, folder?: string, resourceType?: 'image' | 'video' | 'auto') {
+    const formData = new FormData();
+    formData.append('file', file);
+    if (folder) formData.append('folder', folder);
+    if (resourceType) formData.append('resourceType', resourceType);
+
+    return this.request<{
+      url: string;
+      publicId: string;
+      format: string;
+      width?: number;
+      height?: number;
+      bytes: number;
+      resourceType: string;
+    }>('/admin/gallery/upload', {
+      method: 'POST',
+      body: formData,
     });
   }
 }

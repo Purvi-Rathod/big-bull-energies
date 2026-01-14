@@ -5,7 +5,7 @@ This directory contains API documentation and references.
 ## Interactive API Docs
 
 When the server is running, interactive API documentation is available at:
-- Swagger UI: `http://localhost:8000/api-docs`
+- Swagger UI: `https://api.crownbankers.com/api-docs`
 
 ## API Structure
 

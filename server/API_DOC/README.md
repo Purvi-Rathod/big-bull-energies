@@ -11,7 +11,7 @@ This directory contains API documentation for the Binary System backend.
 
 ### Base URL
 ```
-http://localhost:8000
+https://api.crownbankers.com
 ```
 
 ### API Version
@@ -29,7 +29,7 @@ All documentation includes cURL commands for testing. You can:
 ### Example: Testing Admin Login
 
 ```bash
-curl -X POST http://localhost:8000/api/v1/admin/login \
+curl -X POST https://api.crownbankers.com/api/v1/admin/login \
   -H "Content-Type: application/json" \
   -c cookies.txt \
   -d '{
@@ -43,7 +43,7 @@ curl -X POST http://localhost:8000/api/v1/admin/login \
 After login, you can use saved cookies for authenticated requests:
 
 ```bash
-curl -X GET http://localhost:8000/api/v1/admin/me \
+curl -X GET https://api.crownbankers.com/api/v1/admin/me \
   -b cookies.txt
 ```
 

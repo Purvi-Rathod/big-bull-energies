@@ -109,11 +109,11 @@ export default function ContactPage() {
                 Email
               </h3>
               <a
-                href="mailto:info@crownbanker.com"
+                href="mailto:crownbankers.com@gmail.com"
                 className="text-base md:text-lg transition hover:opacity-70"
                 style={{ color: "#042B19" }}
               >
-                info@crownbanker.com
+                crownbankers.com@gmail.com
               </a>
             </div>
 
@@ -362,10 +362,10 @@ export default function ContactPage() {
                         style={{ color: "#042B19" }}
                       >
                         <a
-                          href="mailto:info@crownbanker.com"
+                          href="mailto:crownbankers.com@gmail.com"
                           className="hover:opacity-70 transition"
                         >
-                          info@crownbanker.com
+                          crownbankers.com@gmail.com
                         </a>
                       </p>
                       <p

@@ -219,7 +219,7 @@ docker compose ps
 
 ```bash
 # Test backend API
-curl http://localhost:8000/api/health
+curl https://api.crownbankers.com/api/health
 # Should return: {"status":"success","message":"API OK"}
 
 # Test frontend (should return HTML)
@@ -563,7 +563,7 @@ sudo chown -R $USER:$USER /opt/binary_system
 | Variable | Description | Default |
 |----------|-------------|---------|
 | `CLIENT_URL` | Frontend URL | `http://localhost:3000` |
-| `API_URL` | Backend API URL | `http://localhost:8000` |
+| `API_URL` | Backend API URL | `https://api.crownbankers.com` |
 | `EMAIL_USER` | Email username | - |
 | `EMAIL_PASS` | Email password | - |
 | `REDIS_HOST` | Redis host | - |
@@ -631,7 +631,7 @@ sudo chown -R $USER:$USER /opt/binary_system
 - [ ] Build Docker images (`docker compose build`)
 - [ ] Start containers (`docker compose up -d`)
 - [ ] Verify containers are running (`docker compose ps`)
-- [ ] Test backend API (`curl http://localhost:8000/api/health`)
+- [ ] Test backend API (`curl https://api.crownbankers.com/api/health`)
 - [ ] Test frontend (`curl http://localhost:3000`)
 - [ ] Configure firewall (if needed)
 - [ ] Setup reverse proxy (optional but recommended)

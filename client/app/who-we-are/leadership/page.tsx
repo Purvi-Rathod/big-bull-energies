@@ -14,6 +14,7 @@ export default function LeadershipPage() {
       description:
         "With nearly two decades of experience in marketing, business operations, and strategic growth, Adrian Cadiz leads Crown Bankers as CEO. His expertise extends to the renewable energy sector, where he has played a key role in integrating financial solutions with solar and EV projects. Under his leadership, Crown Bankers continues to drive innovation, efficiency, and expansion across all operations.",
       image: "/leader1.jpg",
+      facebookUrl: "https://www.facebook.com/adrian.cadiz", // Add actual Facebook URL
     },
     {
       id: 2,
@@ -22,6 +23,7 @@ export default function LeadershipPage() {
       description:
         "As the Chief Marketing Officer, Edward Barrington oversees all marketing initiatives at Crown Bankers. His expertise in brand development and market expansion plays a crucial role in growing the company's global presence.",
       image: "/leader2.png",
+      facebookUrl: null, // No Facebook link
     },
     {
       id: 3,
@@ -30,6 +32,7 @@ export default function LeadershipPage() {
       description:
         "Anee Sandrova manages relations and operations in the Netherlands, particularly overseeing the Crown Bankers solar plant in Groningen. Her role ensures seamless coordination and development of our renewable energy projects.",
       image: "/leader3.png",
+      facebookUrl: "https://www.facebook.com/annee.sandrova", // Add actual Facebook URL
     },
     {
       id: 4,
@@ -38,6 +41,7 @@ export default function LeadershipPage() {
       description:
         "Sophie Taylor and her team handle the financial strategies at Crown Bankers, making critical decisions on investments and resource allocation. Her expertise ensures sustainable financial growth and stability.",
       image: "/leader4.png",
+      facebookUrl: null, // No Facebook link
     },
     {
       id: 5,
@@ -46,6 +50,7 @@ export default function LeadershipPage() {
       description:
         "Joseph Carter leads the administrative division, handling user inquiries and ensuring smooth internal operations. His dedication to efficiency and customer support enhances the overall experience for Crown Bankers members.",
       image: "/leader5.png",
+      facebookUrl: null, // No Facebook link
     },
   ];
 
@@ -195,22 +200,30 @@ export default function LeadershipPage() {
                     >
                       {leader.description}
                     </p>
-                    {/* Yellow Read Button */}
-                    <div className="flex items-center gap-2 sm:gap-3">
-                      <button
-                        className="w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center transition hover:scale-110 flex-shrink-0"
-                        style={{ backgroundColor: "#ffcf0B" }}
-                        aria-label="View Profile"
-                      >
-                        <ArrowRight className="w-5 h-5 sm:w-6 sm:h-6 text-gray-900" />
-                      </button>
-                      <span
-                        className="text-xs sm:text-sm font-medium uppercase tracking-wide"
-                        style={{ color: "#042B19" }}
-                      >
-                        VIEW PROFILE
-                      </span>
-                    </div>
+                    {/* Yellow Read Button - Only for CEO and RM */}
+                    {leader.facebookUrl && (
+                      <div className="flex items-center gap-2 sm:gap-3">
+                        <a
+                          href={leader.facebookUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center transition hover:scale-110 flex-shrink-0"
+                          style={{ backgroundColor: "#ffcf0B" }}
+                          aria-label={`View ${leader.name}'s Facebook Profile`}
+                        >
+                          <ArrowRight className="w-5 h-5 sm:w-6 sm:h-6 text-gray-900" />
+                        </a>
+                        <a
+                          href={leader.facebookUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-xs sm:text-sm font-medium uppercase tracking-wide transition hover:opacity-70"
+                          style={{ color: "#042B19" }}
+                        >
+                          VIEW PROFILE
+                        </a>
+                      </div>
+                    )}
                   </div>
                 </div>
               ))}

@@ -62,7 +62,7 @@ CLIENT_URL=https://your-production-domain.com
 
 3. **Verify:**
    - Check logs: `docker compose logs backend`
-   - Test referral links endpoint: `curl http://localhost:8000/api/v1/user/referral-links` (with auth)
+   - Test referral links endpoint: `curl https://api.crownbankers.com/api/v1/user/referral-links` (with auth)
    - Check dashboard to see if referral links now show production URL
 
 ## Testing

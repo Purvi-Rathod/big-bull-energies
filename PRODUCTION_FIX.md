@@ -38,7 +38,7 @@ docker run -d \
   --name binary-system-frontend \
   --network binary-network \
   -p 3000:3000 \
-  -e NEXT_PUBLIC_API_URL=http://199.188.204.202:8000/api/v1 \
+  -e NEXT_PUBLIC_API_URL=https://api.crownbankers.com/api/v1 \
   -e NODE_ENV=production \
   binary-system-frontend:latest
 ```
@@ -53,13 +53,13 @@ frontend:
     context: ./client
     dockerfile: Dockerfile
     args:
-      - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL:-http://199.188.204.202:8000}/api/v1
+      - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL:-https://api.crownbankers.com}/api/v1
   container_name: binary-system-frontend
   ports:
     - "3000:3000"
   environment:
     - NODE_ENV=production
-    - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL:-http://199.188.204.202:8000}/api/v1
+    - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL:-https://api.crownbankers.com}/api/v1
   depends_on:
     - backend
   restart: unless-stopped

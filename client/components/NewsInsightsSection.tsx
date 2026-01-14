@@ -98,7 +98,7 @@ export default function NewsInsightsSection() {
               {featuredArticle.headline}
             </h3>
             <p className="text-sm sm:text-base text-gray-600 mt-3 sm:mt-4 leading-relaxed">
-              {featuredArticle.description}
+              Crown Bankers announces the launch of its innovative binary investment platform, combining network marketing excellence with sustainable energy investments. The platform offers investors unique opportunities to build wealth while contributing to the global transition to renewable energy.
             </p>
           </div>
 

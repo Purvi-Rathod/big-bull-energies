@@ -577,6 +577,25 @@ class ApiClient {
     });
   }
 
+  async flushAllUserData() {
+    return this.request<{
+      binaryTreesReset: number;
+      walletsReset: number;
+      careerProgressReset: number;
+      investmentsDeleted: number;
+      transactionsDeleted: number;
+      paymentsDeleted: number;
+      preserved: {
+        userAccounts: string;
+        binaryTreeStructure: string;
+        vouchers: string;
+        referrals: string;
+      };
+    }>('/admin/flush-user-data', {
+      method: 'DELETE',
+    });
+  }
+
   async getAdminStatistics() {
     return this.request<{
       totalUsers: number;
@@ -735,9 +754,27 @@ class ApiClient {
   }
 
   async triggerDailyCalculations(data?: { includeROI?: boolean; includeBinary?: boolean; includeReferral?: boolean }) {
-    return this.request<{ roi: any; binary: any; referral: any }>('/admin/trigger-daily-calculations', {
+    return this.request<{ jobId: string; status: string; startedAt: string; includeROI: boolean; includeBinary: boolean; includeReferral: boolean }>('/admin/trigger-daily-calculations', {
       method: 'POST',
       body: JSON.stringify(data || {}),
+    });
+  }
+
+  async getCalculationJobStatus(jobId: string) {
+    return this.request<any>('/admin/calculation-job/' + jobId, {
+      method: 'GET',
+    });
+  }
+
+  async getLatestCalculationJob() {
+    return this.request<any>('/admin/calculation-job/latest', {
+      method: 'GET',
+    });
+  }
+
+  async resumeCalculationJob(jobId: string) {
+    return this.request<any>('/admin/calculation-job/' + jobId + '/resume', {
+      method: 'POST',
     });
   }
 

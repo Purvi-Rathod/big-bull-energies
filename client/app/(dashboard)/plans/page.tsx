@@ -47,7 +47,7 @@ export default function PlansPage() {
       return;
     }
     hasFetchedRef.current = true;
-    
+
     fetchPackages();
 
     // No cleanup - we want to prevent duplicate calls even on remount
@@ -73,7 +73,7 @@ export default function PlansPage() {
     setSelectedVoucherId(null);
     setShowInvestModal(true);
     setError('');
-    
+
     // Fetch available vouchers
     await fetchAvailableVouchers();
   };
@@ -83,7 +83,7 @@ export default function PlansPage() {
       setLoadingVouchers(true);
       const response = await api.getUserVouchers({ status: 'active' });
       console.log('Vouchers response:', response);
-      
+
       if (response.data?.vouchers) {
         // Filter vouchers that are not expired
         const now = new Date();
@@ -160,7 +160,7 @@ export default function PlansPage() {
       processingRef.current = true;
       setCreatingPayment(true);
       setError('');
-      
+
       const response = await api.createPayment({
         packageId: selectedPackage.id,
         amount,
@@ -223,40 +223,40 @@ export default function PlansPage() {
   }
 
   return (
-        <div className="w-full bg-gradient-to-br from-black via-gray-900 to-black min-h-screen py-8 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
-          {/* Decorative background elements */}
-          <div className="fixed inset-0 pointer-events-none opacity-20">
-            <div className="absolute top-0 right-1/4 w-96 h-96 bg-yellow-500/10 rounded-full blur-3xl"></div>
-            <div className="absolute bottom-0 left-1/4 w-96 h-96 bg-yellow-600/10 rounded-full blur-3xl"></div>
+    <div className="w-full bg-gradient-to-br from-black via-gray-900 to-black min-h-screen py-8 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+      {/* Decorative background elements */}
+      <div className="fixed inset-0 pointer-events-none opacity-20">
+        <div className="absolute top-0 right-1/4 w-96 h-96 bg-yellow-500/10 rounded-full blur-3xl"></div>
+        <div className="absolute bottom-0 left-1/4 w-96 h-96 bg-yellow-600/10 rounded-full blur-3xl"></div>
+      </div>
+
+      <div className="relative z-10">
+        {error && (
+          <div className="mb-6 bg-red-900/30 border border-red-500/50 text-red-400 px-4 py-3 rounded-lg backdrop-blur-sm">
+            {error}
           </div>
+        )}
 
-          <div className="relative z-10">
-          {error && (
-            <div className="mb-6 bg-red-900/30 border border-red-500/50 text-red-400 px-4 py-3 rounded-lg backdrop-blur-sm">
-              {error}
+        {packages.length === 0 && !loading && (
+          <div className="px-4 py-6 sm:px-0">
+            <div className="text-center py-12 bg-gradient-to-br from-gray-900/95 to-gray-800/95 backdrop-blur-sm rounded-2xl shadow-2xl border border-yellow-500/30">
+              <p className="text-gray-400 text-lg">No active packages available at the moment.</p>
             </div>
-          )}
+          </div>
+        )}
 
-          {packages.length === 0 && !loading && (
-            <div className="px-4 py-6 sm:px-0">
-              <div className="text-center py-12 bg-gradient-to-br from-gray-900/95 to-gray-800/95 backdrop-blur-sm rounded-2xl shadow-2xl border border-yellow-500/30">
-                <p className="text-gray-400 text-lg">No active packages available at the moment.</p>
-              </div>
+        {packages.length > 0 && (
+          <div className="px-4 py-6 sm:px-0">
+            <div className="mb-8">
+              <h1 className="text-3xl font-extrabold text-white mb-2 flex items-center gap-3">
+                <span className="bg-gradient-to-r from-yellow-300 via-yellow-400 to-yellow-600 bg-clip-text text-transparent drop-shadow-lg">Investment Packages</span>
+              </h1>
+              <p className="text-gray-400 text-sm">
+                Showing {packages.length} active package{packages.length !== 1 ? 's' : ''}
+              </p>
             </div>
-          )}
-
-          {packages.length > 0 && (
-            <div className="px-4 py-6 sm:px-0">
-              <div className="mb-8">
-                <h1 className="text-3xl font-extrabold text-white mb-2 flex items-center gap-3">
-                  <span className="bg-gradient-to-r from-yellow-300 via-yellow-400 to-yellow-600 bg-clip-text text-transparent drop-shadow-lg">Investment Packages</span>
-                </h1>
-                <p className="text-gray-400 text-sm">
-                  Showing {packages.length} active package{packages.length !== 1 ? 's' : ''}
-                </p>
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                {packages.map((pkg) => {
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {packages.map((pkg) => {
                 // Use roi field directly if available (it's already a percentage), otherwise calculate from totalOutputPct
                 const totalOutputPct = pkg.totalOutputPct || (pkg.roi ? pkg.roi * pkg.duration : 225);
                 // roi field is the daily ROI percentage (e.g., 1.5 means 1.5% per day)
@@ -272,19 +272,18 @@ export default function PlansPage() {
                   <div key={pkg.id} className="group relative bg-gradient-to-br from-gray-900/95 via-gray-800/95 to-gray-900/95 backdrop-blur-sm rounded-2xl shadow-2xl border border-yellow-500/30 hover:border-yellow-500/60 hover:shadow-yellow-500/20 transition-all duration-300 overflow-hidden p-6">
                     {/* Animated gradient overlay on hover */}
                     <div className="absolute inset-0 bg-gradient-to-br from-yellow-500/0 via-yellow-500/0 to-yellow-500/0 group-hover:from-yellow-500/5 group-hover:via-yellow-500/10 group-hover:to-yellow-500/5 transition-all duration-500"></div>
-                    
+
                     <div className="relative z-10">
                       <div className="flex justify-between items-start mb-6">
                         <h3 className="text-2xl font-extrabold bg-gradient-to-r from-white via-yellow-100 to-white bg-clip-text text-transparent">{pkg.packageName}</h3>
-                        <span className={`px-4 py-1.5 text-xs font-bold rounded-full shadow-lg ${
-                          status === 'Active' 
-                            ? 'bg-gradient-to-r from-yellow-500/30 to-yellow-600/20 text-yellow-300 border border-yellow-500/50 shadow-yellow-500/20' 
-                            : 'bg-red-900/40 text-red-400 border border-red-500/40'
-                        }`}>
+                        <span className={`px-4 py-1.5 text-xs font-bold rounded-full shadow-lg ${status === 'Active'
+                          ? 'bg-gradient-to-r from-yellow-500/30 to-yellow-600/20 text-yellow-300 border border-yellow-500/50 shadow-yellow-500/20'
+                          : 'bg-red-900/40 text-red-400 border border-red-500/40'
+                          }`}>
                           {status}
                         </span>
                       </div>
-                      
+
                       <div className="space-y-4 mb-6">
                         {/* Investment Amount Range */}
                         <div className="p-4 bg-gradient-to-r from-yellow-500/20 via-yellow-600/15 to-yellow-500/20 rounded-xl border-2 border-yellow-500/40 shadow-lg shadow-yellow-500/10">
@@ -304,8 +303,8 @@ export default function PlansPage() {
                         <div className="flex justify-between items-center py-3 border-b border-yellow-500/20">
                           <span className="text-sm font-semibold text-gray-300">Total Output:</span>
                           <span className="text-lg font-extrabold text-yellow-400">
-                            {pkg.roi !== undefined && pkg.roi !== null 
-                              ? `${(pkg.duration * pkg.roi).toFixed(2)}%` 
+                            {pkg.roi !== undefined && pkg.roi !== null
+                              ? `${(pkg.duration * pkg.roi).toFixed(2)}%`
                               : `${totalOutputPct}%`}
                           </span>
                         </div>
@@ -351,15 +350,15 @@ export default function PlansPage() {
                         {status === 'Active' ? 'Invest Now' : 'Package Inactive'}
                       </button>
                     </div>
-                    
+
                     {/* Shine effect */}
                     <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 bg-gradient-to-r from-transparent via-white/5 to-transparent"></div>
                   </div>
                 );
               })}
-              </div>
             </div>
-          )}
+          </div>
+        )}
 
         {/* Investment Modal */}
         {showInvestModal && selectedPackage && (
@@ -369,7 +368,7 @@ export default function PlansPage() {
                 <h3 className="text-2xl font-extrabold text-white mb-6 flex items-center gap-2">
                   <span className="bg-gradient-to-r from-yellow-300 via-yellow-400 to-yellow-600 bg-clip-text text-transparent">Make Investment</span>
                 </h3>
-                
+
                 <div className="mb-6 p-5 bg-gradient-to-r from-yellow-500/20 via-yellow-600/15 to-yellow-500/20 rounded-xl border-2 border-yellow-500/40 shadow-lg shadow-yellow-500/10">
                   <h4 className="font-extrabold text-white mb-3 text-lg">{selectedPackage.packageName}</h4>
                   <div className="text-sm space-y-2">
@@ -381,9 +380,20 @@ export default function PlansPage() {
                       <span className="text-gray-300 font-semibold">Duration:</span>
                       <span className="font-bold text-white">{selectedPackage.duration} days</span>
                     </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-300 font-semibold">Total Output:</span>
-                      <span className="font-bold text-yellow-400">{(selectedPackage.totalOutputPct || 225)}%</span>
+                    <div className="flex justify-between items-start">
+                      <span className="text-gray-300 font-semibold mt-1">Total Output:</span>
+                      <div className="text-right">
+                        <span className="font-bold text-yellow-400 block">
+                          {selectedPackage.roi !== undefined && selectedPackage.roi !== null
+                            ? (selectedPackage.duration * selectedPackage.roi).toFixed(2)
+                            : (selectedPackage.totalOutputPct || 225)}%
+                        </span>
+                        {selectedPackage.roi !== undefined && selectedPackage.roi !== null && (
+                          <span className="text-xs text-gray-400 block mt-0.5">
+                            ({selectedPackage.roi}% × {selectedPackage.duration} days)
+                          </span>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -426,7 +436,7 @@ export default function PlansPage() {
                         const minimumInvestmentRequired = voucherPurchaseAmount * 2; // Must invest at least 2x purchase amount
                         const meetsMinimumRequirement = investmentAmount >= minimumInvestmentRequired;
                         const remainingAmount = Math.max(0, investmentAmount - voucherInvestmentValue);
-                        
+
                         return (
                           <div className="text-sm space-y-3">
                             <div className="flex justify-between p-2 bg-gray-800/50 rounded-lg">
@@ -518,7 +528,7 @@ export default function PlansPage() {
                     const minimumInvestmentRequired = voucherPurchaseAmount * 2;
                     const investmentAmount = parseFloat(investAmount) || 0;
                     const meetsMinimumRequirement = investmentAmount >= minimumInvestmentRequired;
-                    
+
                     if (!meetsMinimumRequirement && investmentAmount > 0) {
                       return (
                         <div className="mb-6 p-4 bg-yellow-500/10 border border-yellow-500/40 rounded-xl">
@@ -575,8 +585,8 @@ export default function PlansPage() {
             </div>
           </div>
         )}
-          </div>
-        </div>
+      </div>
+    </div>
   );
 }
 

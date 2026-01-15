@@ -112,11 +112,31 @@ export async function calculateDailyBinaryBonuses() {
           }
         }
 
-        // Calculate binary bonus using consumption model
+        // Get user's active investment to find their package-specific capping limit
+        const userInvestment = await Investment.findOne({
+          user: userIdObj,
+          isActive: true,
+        })
+          .populate("packageId")
+          .sort({ startDate: -1 }) // Get most recent active investment
+          .lean();
+
+        // Get user's package-specific capping limit (daily cap)
+        let userDailyCap = defaultPowerCapacity; // Default fallback
+        if (userInvestment?.packageId) {
+          const userPackage = userInvestment.packageId as any;
+          userDailyCap = parseFloat(
+            userPackage?.powerCapacity?.toString() ||
+            userPackage?.cappingLimit?.toString() ||
+            defaultPowerCapacity.toString()
+          );
+        }
+
+        // Calculate binary bonus using consumption model with user's daily cap
         const binaryResult = await calculateBinaryBonus(
           userIdObj,
           defaultBinaryPct,
-          defaultPowerCapacity
+          userDailyCap
         );
 
         // Add binary bonus to user's binary wallet (cashable)
@@ -214,21 +234,23 @@ export async function addBusinessVolume(
 
 /**
  * Calculate and process binary bonus using consumption model
- * This implements the consumption model where matched BV is subtracted from both sides
  * 
- * Formula:
- * - left_available = leftCarry + leftBusiness
- * - right_available = rightCarry + rightBusiness
- * - matched = min(left_available, right_available)
- * - capped_matched = min(matched, power_capacity)
- * - binary_payout = capped_matched * binary_pct/100
- * - Consumption: subtract matched from both sides, leftover goes to carry
+ * CORRECTED FORMULA (per user requirements):
+ * 1. Matching Business = MIN(Left Business, Right Business) - from available volumes
+ * 2. Binary Bonus = Matching Business × 10%
+ * 3. Daily Capping: If Binary Bonus > Daily Cap → Credit only Cap amount (remaining ignored)
+ * 4. Carry Forward = Business Volume - Matching Business (NOT affected by cap)
+ * 
+ * Key Points:
+ * - Capping applies to BONUS amount, not matched volume
+ * - Carry forward is calculated from BUSINESS VOLUME, not bonus
+ * - Daily cap resets every day (user can earn up to cap every day)
  */
 export async function calculateBinaryBonus(
   userId: Types.ObjectId,
   binaryPct: number = 10,
-  powerCapacity: number = 1000
-): Promise<{ binaryBonus: number; matched: number; cappedMatched: number }> {
+  dailyCap: number = 5000
+): Promise<{ binaryBonus: number; matched: number; creditedBonus: number }> {
   try {
     const userTree = await BinaryTree.findOne({ user: userId });
     if (!userTree) {
@@ -246,45 +268,42 @@ export async function calculateBinaryBonus(
     // Calculate available volume for matching
     // left_available = leftCarry + (leftBusiness - leftMatched)
     // right_available = rightCarry + (rightBusiness - rightMatched)
-    // This ensures we only match from unmatched portions
     const leftUnmatchedBusiness = leftBusiness - leftMatched;
     const rightUnmatchedBusiness = rightBusiness - rightMatched;
     const leftAvailable = leftCarry + leftUnmatchedBusiness;
     const rightAvailable = rightCarry + rightUnmatchedBusiness;
 
-    // Find matched volume (minimum of both sides)
+    // Step 1: Find matched volume (minimum of both sides) - this is BUSINESS VOLUME
     const matched = Math.min(leftAvailable, rightAvailable);
 
-    // Apply power_capacity cap
-    const cappedMatched = Math.min(matched, powerCapacity);
+    // Step 2: Calculate full binary bonus from matched business
+    const fullBinaryBonus = matched * (binaryPct / 100);
 
-    // Calculate binary payout: binary_pct * capped_matched
-    const binaryBonus = cappedMatched * (binaryPct / 100);
+    // Step 3: Apply daily capping to BONUS amount (not matched volume)
+    // If bonus > cap, credit only cap amount. Remaining bonus is ignored (not stored).
+    const creditedBonus = Math.min(fullBinaryBonus, dailyCap);
 
-    // Calculate new carry forward using simple formula: available - capped_matched
-    // This matches the rulebook formula: newCarry = available - capped_matched
+    // Step 4: Calculate carry forward from BUSINESS VOLUME (NOT affected by cap)
+    // Carry = Business - Matched Business
+    // This is the key fix: carry is based on volume, not bonus
     let newLeftCarry = 0;
     let newRightCarry = 0;
     let newLeftMatched = leftMatched;
     let newRightMatched = rightMatched;
 
-    if (cappedMatched > 0) {
-      // Simple formula: newCarry = available - capped_matched
-      // The leftover available volume (after subtracting matched amount) becomes the new carry forward
-      newLeftCarry = Math.max(0, leftAvailable - cappedMatched);
-      newRightCarry = Math.max(0, rightAvailable - cappedMatched);
+    if (matched > 0) {
+      // Calculate new carry forward: available - matched (from business volume)
+      newLeftCarry = Math.max(0, leftAvailable - matched);
+      newRightCarry = Math.max(0, rightAvailable - matched);
       
       // Update matched amounts to track what was consumed from business
-      // We need to determine how much was consumed from unmatched business vs carry
       // Consumption priority: carry first, then unmatched business
-      
-      // Calculate consumption from carry
-      const leftConsumedFromCarry = Math.min(leftCarry, cappedMatched);
-      const rightConsumedFromCarry = Math.min(rightCarry, cappedMatched);
+      const leftConsumedFromCarry = Math.min(leftCarry, matched);
+      const rightConsumedFromCarry = Math.min(rightCarry, matched);
       
       // Remaining consumption from unmatched business
-      const leftConsumedFromBusiness = cappedMatched - leftConsumedFromCarry;
-      const rightConsumedFromBusiness = cappedMatched - rightConsumedFromCarry;
+      const leftConsumedFromBusiness = matched - leftConsumedFromCarry;
+      const rightConsumedFromBusiness = matched - rightConsumedFromCarry;
       
       // Update matched amounts (only track what was consumed from business, not from carry)
       newLeftMatched = leftMatched + leftConsumedFromBusiness;
@@ -316,9 +335,9 @@ export async function calculateBinaryBonus(
     }
 
     return {
-      binaryBonus,
-      matched: cappedMatched,
-      cappedMatched,
+      binaryBonus: creditedBonus, // Return the credited (capped) bonus
+      matched: matched, // Return actual matched business volume
+      creditedBonus: creditedBonus, // Explicitly return credited amount
     };
   } catch (error) {
     if (error instanceof AppError) {

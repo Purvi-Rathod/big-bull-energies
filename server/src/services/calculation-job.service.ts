@@ -492,12 +492,31 @@ async function calculateDailyBinaryBonusesResumable(job: ICalculationJob) {
           }
         }
 
-        // Use imported functions
+        // Get user's active investment to find their package-specific capping limit
+        const userInvestment = await Investment.findOne({
+          user: userIdObj,
+          isActive: true,
+        })
+          .populate("packageId")
+          .sort({ startDate: -1 }) // Get most recent active investment
+          .lean();
 
+        // Get user's package-specific capping limit (daily cap)
+        let userDailyCap = defaultPowerCapacity; // Default fallback
+        if (userInvestment?.packageId) {
+          const userPackage = userInvestment.packageId as any;
+          userDailyCap = parseFloat(
+            userPackage?.powerCapacity?.toString() ||
+            userPackage?.cappingLimit?.toString() ||
+            defaultPowerCapacity.toString()
+          );
+        }
+
+        // Calculate binary bonus using consumption model with user's daily cap
         const binaryResult = await calculateBinaryBonus(
           userIdObj,
           defaultBinaryPct,
-          defaultPowerCapacity
+          userDailyCap
         );
 
         if (binaryResult.binaryBonus > 0) {

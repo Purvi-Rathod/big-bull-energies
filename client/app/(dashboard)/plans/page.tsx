@@ -303,7 +303,11 @@ export default function PlansPage() {
                         {/* Total Output Percentage */}
                         <div className="flex justify-between items-center py-3 border-b border-yellow-500/20">
                           <span className="text-sm font-semibold text-gray-300">Total Output:</span>
-                          <span className="text-lg font-extrabold text-yellow-400">{totalOutputPct}%</span>
+                          <span className="text-lg font-extrabold text-yellow-400">
+                            {pkg.roi !== undefined && pkg.roi !== null 
+                              ? `${(pkg.duration * pkg.roi).toFixed(2)}%` 
+                              : `${totalOutputPct}%`}
+                          </span>
                         </div>
 
                         {/* Daily ROI Rate */}

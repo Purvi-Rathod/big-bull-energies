@@ -157,6 +157,12 @@ const CustomNode = memo(({ data }: { data: CustomNodeData }) => {
                   <strong>Right Downlines:</strong> {user.rightDownlines || 0}
                 </div>
                 <div className="popup-item" style={{ marginTop: '8px', paddingTop: '8px', borderTop: '1px solid #eab308' }}>
+                  <strong>Daily Binary Business:</strong> ${parseFloat(user.dailyBinaryBusiness || '0').toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                </div>
+                <div className="popup-item">
+                  <strong>Capping Limit:</strong> ${parseFloat(user.cappingLimit || '0').toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}/day
+                </div>
+                <div className="popup-item" style={{ marginTop: '8px', paddingTop: '8px', borderTop: '1px solid #eab308' }}>
                   <strong>Total Investment:</strong> ${parseFloat(user.totalInvestment || '0').toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                 </div>
               </>

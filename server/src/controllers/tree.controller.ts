@@ -325,6 +325,57 @@ export const getMyTree = asyncHandler(async (req, res) => {
     }
   ]);
 
+  // Calculate daily binary business (investments created today that added business to each user's tree)
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const tomorrow = new Date(today);
+  tomorrow.setDate(tomorrow.getDate() + 1);
+
+  // Get all investments created today by users in the tree
+  const todayInvestments = await Investment.find({
+    user: { $in: userIdsArray },
+    createdAt: {
+      $gte: today,
+      $lt: tomorrow,
+    },
+  })
+    .select("user investedAmount")
+    .lean();
+
+  // Calculate daily business for each user (sum of investments created today)
+  const dailyBusinessMap = new Map<string, number>();
+  todayInvestments.forEach((inv: any) => {
+    const userIdStr = inv.user?.toString() || inv.user;
+    const amount = parseFloat(inv.investedAmount?.toString() || "0");
+    const current = dailyBusinessMap.get(userIdStr) || 0;
+    dailyBusinessMap.set(userIdStr, current + amount);
+  });
+
+  // Get capping limits for all users (from their active investments)
+  const activeInvestments = await Investment.find({
+    user: { $in: userIdsArray },
+    isActive: true,
+  })
+    .populate("packageId", "powerCapacity cappingLimit")
+    .sort({ startDate: -1 })
+    .lean();
+
+  // Create map of user to their capping limit (from most recent active investment)
+  const cappingLimitMap = new Map<string, number>();
+  activeInvestments.forEach((inv: any) => {
+    const userIdStr = inv.user?.toString() || inv.user;
+    // Only set if not already set (to get most recent active investment)
+    if (!cappingLimitMap.has(userIdStr) && inv.packageId) {
+      const pkg = inv.packageId as any;
+      const cappingLimit = parseFloat(
+        pkg?.powerCapacity?.toString() ||
+        pkg?.cappingLimit?.toString() ||
+        "0"
+      );
+      cappingLimitMap.set(userIdStr, cappingLimit);
+    }
+  });
+
   // Create lookup maps for O(1) access (no more DB queries)
   const userMap = new Map<string, any>();
   users.forEach((user: any) => {
@@ -397,6 +448,10 @@ export const getMyTree = asyncHandler(async (req, res) => {
       if (treeInfo.rightChild) children.push(treeInfo.rightChild);
     }
 
+    // Get daily binary business and capping limit for this user
+    const dailyBinaryBusiness = dailyBusinessMap.get(nodeIdStr) || 0;
+    const cappingLimit = cappingLimitMap.get(nodeIdStr) || 0;
+
     treeData.push({
       ...userInfo,
       ...treeInfo,
@@ -409,6 +464,8 @@ export const getMyTree = asyncHandler(async (req, res) => {
       allChildren: children,
       level,
       totalInvestment: totalInvestment.toString(),
+      dailyBinaryBusiness: dailyBinaryBusiness.toString(), // Business volume added today
+      cappingLimit: cappingLimit.toString(), // Daily binary bonus capping limit
     });
 
     // Recursively process children (using pre-loaded data, no DB queries)

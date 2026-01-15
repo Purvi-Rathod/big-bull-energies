@@ -309,9 +309,14 @@ async function calculateDailyROIResumable(job: ICalculationJob) {
 
         // Calculate daily ROI amount: principal * daily_roi_percentage
         // Formula: dailyROI = Principal × (Daily ROI % / 100)
+        // Example: $100 × 1.5% = $100 × 0.015 = $1.50
         const dailyRoiAmount = currentPrincipal * dailyRoiPct;
-        const renewablePart = dailyRoiAmount * (renewablePrinciplePct / 100);
-        const cashablePart = dailyRoiAmount - renewablePart;
+        
+        // FIXED: Credit FULL ROI amount to ROI wallet balance
+        // The full daily ROI percentage (e.g., 1.5%) should be credited to the wallet
+        // No splitting into renewable/cashable - full amount is withdrawable
+        const cashablePart = dailyRoiAmount; // Full amount is cashable
+        const renewablePart = 0; // No renewable portion
 
         // Use imported functions
 
@@ -330,30 +335,6 @@ async function calculateDailyROIResumable(job: ICalculationJob) {
           }
         }
 
-        if (renewablePart > 0) {
-          // Update renewable principal - get ROI wallet and update renewablePrincipal field
-          let wallet = await Wallet.findOne({ 
-            user: investment.user as Types.ObjectId, 
-            type: WalletType.ROI 
-          });
-          
-          if (!wallet) {
-            wallet = await Wallet.create({
-              user: investment.user as Types.ObjectId,
-              type: WalletType.ROI,
-              balance: Types.Decimal128.fromString("0"),
-              renewablePrincipal: Types.Decimal128.fromString("0"),
-              reserved: Types.Decimal128.fromString("0"),
-              currency: "USD",
-            });
-          }
-
-          const currentRenewable = parseFloat(wallet.renewablePrincipal?.toString() || "0");
-          const newRenewable = currentRenewable + renewablePart;
-          wallet.renewablePrincipal = Types.Decimal128.fromString(newRenewable.toString());
-          await wallet.save();
-        }
-
         await createROITransaction(
           investment.user as Types.ObjectId,
           dailyRoiAmount,
@@ -368,8 +349,9 @@ async function calculateDailyROIResumable(job: ICalculationJob) {
         const daysElapsed = investment.daysElapsed || 0;
         const durationDays = investment.durationDays || pkg.duration || 150;
 
-        const newTotalRoi = totalRoiEarned + cashablePart;
-        const newTotalReinvested = totalReinvested + renewablePart;
+        // FIXED: Track full ROI amount as earned (no renewable portion)
+        const newTotalRoi = totalRoiEarned + dailyRoiAmount; // Full amount is earned
+        const newTotalReinvested = totalReinvested; // No renewable portion
         const newDaysElapsed = daysElapsed + 1;
         const newDaysRemaining = Math.max(0, durationDays - newDaysElapsed);
         const isExpired = newDaysElapsed >= durationDays;

@@ -181,17 +181,16 @@ export async function calculateDailyROI() {
 
         // Calculate daily ROI amount: principal * daily_roi_percentage
         // Formula: dailyROI = Principal × (Daily ROI % / 100)
-        // Example: $5000 × 1.75% = $5000 × 0.0175 = $87.50
+        // Example: $100 × 1.5% = $100 × 0.015 = $1.50
         const dailyRoiAmount = currentPrincipal * dailyRoiPct;
 
-        // Split into renewable and cashable portions (per rule book)
-        // renewablePart = daily_roi_amount * renewable_principle_pct/100
-        const renewablePart = dailyRoiAmount * (renewablePrinciplePct / 100);
-        
-        // cashablePart = daily_roi_amount - renewablePart
-        const cashablePart = dailyRoiAmount - renewablePart;
+        // FIXED: Credit FULL ROI amount to ROI wallet balance
+        // The full daily ROI percentage (e.g., 1.5%) should be credited to the wallet
+        // No splitting into renewable/cashable - full amount is withdrawable
+        const cashablePart = dailyRoiAmount; // Full amount is cashable
+        const renewablePart = 0; // No renewable portion
 
-        // Add cashable part to user's ROI wallet (cashable balance)
+        // Add full ROI amount to user's ROI wallet balance
         if (cashablePart > 0) {
           try {
             const updatedWallet = await updateWallet(
@@ -205,15 +204,6 @@ export async function calculateDailyROI() {
             console.error(`[ROI Cron] Failed to update ROI wallet for user ${investment.user}:`, walletError);
             throw walletError; // Re-throw to be caught by outer catch block
           }
-        }
-
-        // Add renewable part to user's renewable principal (non-withdrawable)
-        if (renewablePart > 0) {
-          await updateRenewablePrincipal(
-            investment.user as Types.ObjectId,
-            renewablePart,
-            "add"
-          );
         }
 
         // Create ROI transaction record
@@ -233,8 +223,9 @@ export async function calculateDailyROI() {
         const daysElapsed = investment.daysElapsed || 0;
         const durationDays = investment.durationDays || pkg.duration || 150;
 
-        const newTotalRoi = totalRoiEarned + cashablePart;
-        const newTotalReinvested = totalReinvested + renewablePart; // Track renewable separately
+        // FIXED: Track full ROI amount as earned (no renewable portion)
+        const newTotalRoi = totalRoiEarned + dailyRoiAmount; // Full amount is earned
+        const newTotalReinvested = totalReinvested; // No renewable portion
         const newDaysElapsed = daysElapsed + 1;
         const newDaysRemaining = Math.max(0, durationDays - newDaysElapsed);
 

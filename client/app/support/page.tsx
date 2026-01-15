@@ -1,14 +1,9 @@
-'use client';
+"use client";
 
 import Link from "next/link";
-import Image from "next/image";
-import { useAuth } from "@/contexts/AuthContext";
-import PublicHeader from "@/components/PublicHeader";
+import Footer from "@/components/Footer";
 
 export default function SupportPage() {
-  const { user, admin } = useAuth();
-  // Removed redirects - allow logged-in users to access this page
-
   const supportTopics = [
     {
       icon: "📚",
@@ -92,184 +87,313 @@ export default function SupportPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-black">
-      <PublicHeader />
-
+    <main className="min-h-screen w-full overflow-x-hidden pt-24 sm:pt-28 md:pt-32 lg:pt-[126px]">
       {/* Hero Section */}
-      <section className="relative py-20 px-6">
-        <div className="max-w-4xl mx-auto text-center">
-          <h1 className="text-5xl sm:text-6xl font-extrabold text-white mb-6">
-            24/7 <span className="bg-gradient-to-r from-yellow-400 to-yellow-600 bg-clip-text text-transparent">Support</span>
-          </h1>
-          <p className="text-xl text-white/80 leading-relaxed">
-            We're here to help you succeed. Get instant support through our integrated ticket system
-          </p>
+      <section className="relative w-full bg-[#E8F5F0] py-12 sm:py-16 md:py-20 lg:py-24">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="max-w-4xl mx-auto text-center">
+            <div className="flex items-center justify-center gap-2 sm:gap-3 mb-4 sm:mb-6">
+              <div className="h-px w-8 sm:w-12" style={{ backgroundColor: "#042B19" }}></div>
+              <span
+                className="text-xs font-medium uppercase tracking-wide"
+                style={{ color: "#042B19" }}
+              >
+                SUPPORT
+              </span>
+            </div>
+            <h1
+              className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl 2xl:text-7xl font-normal leading-tight mb-4 sm:mb-6 px-2"
+              style={{
+                color: "#042B19",
+                fontFamily: "var(--font-font4), sans-serif",
+              }}
+            >
+              24/7 Support
+            </h1>
+            <p
+              className="text-sm sm:text-base md:text-lg lg:text-xl leading-relaxed max-w-2xl mx-auto px-2"
+              style={{
+                color: "#042B19",
+                fontFamily: "var(--font-font4), sans-serif",
+              }}
+            >
+              We're here to help you succeed. Get instant support through our integrated ticket system
+            </p>
+          </div>
         </div>
       </section>
 
       {/* Main Content */}
-      <section className="relative py-12 px-6 bg-gray-900">
-        <div className="max-w-6xl mx-auto space-y-12">
-          {/* Support Overview */}
-          <div className="p-8 bg-yellow-500/5 backdrop-blur-md rounded-2xl border border-yellow-500/20">
-            <h2 className="text-3xl font-bold text-white mb-6">Our Support System</h2>
-            <p className="text-white/80 text-lg leading-relaxed mb-6">
-              CROWN provides comprehensive 24/7 support through our integrated ticket system. Once you're logged in, 
-              you can create support tickets for any questions, issues, or assistance you need. Our support team 
-              responds promptly to ensure you have the best experience on our platform.
-            </p>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
-              <div className="text-center p-6 bg-yellow-500/5 rounded-xl">
-                <div className="text-4xl mb-4">⚡</div>
-                <div className="text-xl font-bold text-yellow-400 mb-2">Fast Response</div>
-                <div className="text-white/70 text-sm">Quick resolution times</div>
-              </div>
-              <div className="text-center p-6 bg-yellow-500/5 rounded-xl">
-                <div className="text-4xl mb-4">🔄</div>
-                <div className="text-xl font-bold text-yellow-500 mb-2">24/7 Available</div>
-                <div className="text-white/70 text-sm">Support whenever you need it</div>
-              </div>
-              <div className="text-center p-6 bg-yellow-500/5 rounded-xl">
-                <div className="text-4xl mb-4">💬</div>
-                <div className="text-xl font-bold text-yellow-400 mb-2">Ticket System</div>
-                <div className="text-white/70 text-sm">Track all conversations</div>
-              </div>
-            </div>
-          </div>
-
-          {/* How to Get Support */}
-          <div className="p-8 bg-yellow-500/5 backdrop-blur-md rounded-2xl border border-yellow-500/20">
-            <h2 className="text-3xl font-bold text-white mb-6">How to Get Support</h2>
-            <div className="space-y-6">
-              <div className="p-6 bg-yellow-500/5 rounded-xl">
-                <h3 className="text-xl font-bold text-white mb-4">Step 1: Log In to Your Account</h3>
-                <p className="text-white/70">
-                  Access your CROWN dashboard by logging in with your credentials. Support tickets are available 
-                  to all registered users.
-                </p>
-              </div>
-
-              <div className="p-6 bg-yellow-500/5 rounded-xl">
-                <h3 className="text-xl font-bold text-white mb-4">Step 2: Navigate to Support Tickets</h3>
-                <p className="text-white/70 mb-4">
-                  Click on "Support Tickets" in your dashboard navigation menu. This will take you to the support section.
-                </p>
-              </div>
-
-              <div className="p-6 bg-yellow-500/5 rounded-xl">
-                <h3 className="text-xl font-bold text-white mb-4">Step 3: Create a New Ticket</h3>
-                <p className="text-white/70 mb-4">
-                  Click "Create Ticket" and fill in the following information:
-                </p>
-                <ul className="space-y-2 text-white/70 ml-6">
-                  <li>• Subject: Brief description of your question or issue</li>
-                  <li>• Category: Select the most appropriate category</li>
-                  <li>• Message: Provide detailed information about your request</li>
-                </ul>
-              </div>
-
-              <div className="p-6 bg-yellow-500/5 rounded-xl">
-                <h3 className="text-xl font-bold text-white mb-4">Step 4: Track Your Tickets</h3>
-                <p className="text-white/70">
-                  View all your support tickets, their status (open, pending, resolved), and responses from our 
-                  support team. You can reply to tickets and continue conversations as needed.
-                </p>
-              </div>
-            </div>
-          </div>
-
-          {/* Support Topics */}
-          <div className="p-8 bg-yellow-500/5 backdrop-blur-md rounded-2xl border border-yellow-500/20">
-            <h2 className="text-3xl font-bold text-white mb-8 text-center">Common Support Topics</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {supportTopics.map((topic, index) => (
-                <Link
-                  key={index}
-                  href={topic.link}
-                  className="p-6 bg-yellow-500/5 rounded-xl hover:bg-white/10 transition-all border border-yellow-500/20 hover:border-white/30"
-                >
-                  <div className="text-4xl mb-4">{topic.icon}</div>
-                  <h3 className="text-xl font-bold text-white mb-3">{topic.title}</h3>
-                  <p className="text-white/70 text-sm leading-relaxed">{topic.description}</p>
-                </Link>
-              ))}
-            </div>
-          </div>
-
-          {/* FAQ Section */}
-          <div className="p-8 bg-yellow-500/5 backdrop-blur-md rounded-2xl border border-yellow-500/20">
-            <h2 className="text-3xl font-bold text-white mb-8 text-center">Frequently Asked Questions</h2>
-            <div className="space-y-6">
-              {faqs.map((faq, index) => (
-                <div key={index} className="p-6 bg-yellow-500/5 rounded-xl">
-                  <h3 className="text-lg font-bold text-yellow-400 mb-3">{faq.question}</h3>
-                  <p className="text-white/70 leading-relaxed">{faq.answer}</p>
+      <section className="relative w-full bg-white py-12 sm:py-16 md:py-20 lg:py-24">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="max-w-6xl mx-auto space-y-12">
+            {/* Support Overview */}
+            <div className="p-8 sm:p-10 border border-gray-200" style={{ borderColor: "#E5E7EB" }}>
+              <h2
+                className="text-2xl sm:text-3xl md:text-4xl font-normal mb-6"
+                style={{
+                  color: "#042B19",
+                  fontFamily: "var(--font-font4), sans-serif",
+                }}
+              >
+                Our Support System
+              </h2>
+              <p className="text-base sm:text-lg text-gray-700 leading-relaxed mb-6">
+                CROWN provides comprehensive 24/7 support through our integrated ticket system. Once you're logged in, 
+                you can create support tickets for any questions, issues, or assistance you need. Our support team 
+                responds promptly to ensure you have the best experience on our platform.
+              </p>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
+                <div className="text-center p-6 border border-gray-200" style={{ borderColor: "#E5E7EB" }}>
+                  <div className="text-4xl mb-4">⚡</div>
+                  <div
+                    className="text-xl font-semibold mb-2"
+                    style={{ color: "#042B19" }}
+                  >
+                    Fast Response
+                  </div>
+                  <div className="text-gray-600 text-sm">Quick resolution times</div>
                 </div>
-              ))}
+                <div className="text-center p-6 border border-gray-200" style={{ borderColor: "#E5E7EB" }}>
+                  <div className="text-4xl mb-4">🔄</div>
+                  <div
+                    className="text-xl font-semibold mb-2"
+                    style={{ color: "#042B19" }}
+                  >
+                    24/7 Available
+                  </div>
+                  <div className="text-gray-600 text-sm">Support whenever you need it</div>
+                </div>
+                <div className="text-center p-6 border border-gray-200" style={{ borderColor: "#E5E7EB" }}>
+                  <div className="text-4xl mb-4">💬</div>
+                  <div
+                    className="text-xl font-semibold mb-2"
+                    style={{ color: "#042B19" }}
+                  >
+                    Ticket System
+                  </div>
+                  <div className="text-gray-600 text-sm">Track all conversations</div>
+                </div>
+              </div>
             </div>
-          </div>
 
-          {/* Before Contacting Support */}
-          <div className="p-8 bg-gradient-to-br from-blue-500/20 via-cyan-500/20 to-teal-500/20 backdrop-blur-md rounded-2xl border border-white/20">
-            <h2 className="text-3xl font-bold text-white mb-6">Before Contacting Support</h2>
-            <p className="text-white/80 text-lg mb-6">
-              Many questions can be answered by exploring our comprehensive documentation:
-            </p>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <Link href="/how-it-works" className="p-4 bg-white/10 rounded-lg hover:bg-white/15 transition-all">
-                <div className="font-semibold text-white mb-1">How It Works</div>
-                <div className="text-white/70 text-sm">Complete guide to CROWN features</div>
-              </Link>
-              <Link href="/how-to-start" className="p-4 bg-white/10 rounded-lg hover:bg-white/15 transition-all">
-                <div className="font-semibold text-white mb-1">Getting Started Guide</div>
-                <div className="text-white/70 text-sm">Step-by-step instructions</div>
-              </Link>
-              <Link href="/binary-investment-system" className="p-4 bg-white/10 rounded-lg hover:bg-white/15 transition-all">
-                <div className="font-semibold text-white mb-1">Binary System</div>
-                <div className="text-white/70 text-sm">Understanding binary bonuses</div>
-              </Link>
-              <Link href="/daily-roi-payouts" className="p-4 bg-white/10 rounded-lg hover:bg-white/15 transition-all">
-                <div className="font-semibold text-white mb-1">Daily ROI</div>
-                <div className="text-white/70 text-sm">ROI calculation details</div>
-              </Link>
+            {/* How to Get Support */}
+            <div className="p-8 sm:p-10 border border-gray-200" style={{ borderColor: "#E5E7EB" }}>
+              <h2
+                className="text-2xl sm:text-3xl md:text-4xl font-normal mb-6"
+                style={{
+                  color: "#042B19",
+                  fontFamily: "var(--font-font4), sans-serif",
+                }}
+              >
+                How to Get Support
+              </h2>
+              <div className="space-y-6">
+                <div className="p-6 bg-gray-50 border border-gray-200" style={{ borderColor: "#E5E7EB" }}>
+                  <h3
+                    className="text-xl font-semibold mb-4"
+                    style={{ color: "#042B19" }}
+                  >
+                    Step 1: Log In to Your Account
+                  </h3>
+                  <p className="text-gray-600 leading-relaxed">
+                    Access your CROWN dashboard by logging in with your credentials. Support tickets are available 
+                    to all registered users.
+                  </p>
+                </div>
+
+                <div className="p-6 bg-gray-50 border border-gray-200" style={{ borderColor: "#E5E7EB" }}>
+                  <h3
+                    className="text-xl font-semibold mb-4"
+                    style={{ color: "#042B19" }}
+                  >
+                    Step 2: Navigate to Support Tickets
+                  </h3>
+                  <p className="text-gray-600 leading-relaxed">
+                    Click on "Support Tickets" in your dashboard navigation menu. This will take you to the support section.
+                  </p>
+                </div>
+
+                <div className="p-6 bg-gray-50 border border-gray-200" style={{ borderColor: "#E5E7EB" }}>
+                  <h3
+                    className="text-xl font-semibold mb-4"
+                    style={{ color: "#042B19" }}
+                  >
+                    Step 3: Create a New Ticket
+                  </h3>
+                  <p className="text-gray-600 mb-4 leading-relaxed">
+                    Click "Create Ticket" and fill in the following information:
+                  </p>
+                  <ul className="space-y-2 text-gray-600 ml-6">
+                    <li>• Subject: Brief description of your question or issue</li>
+                    <li>• Category: Select the most appropriate category</li>
+                    <li>• Message: Provide detailed information about your request</li>
+                  </ul>
+                </div>
+
+                <div className="p-6 bg-gray-50 border border-gray-200" style={{ borderColor: "#E5E7EB" }}>
+                  <h3
+                    className="text-xl font-semibold mb-4"
+                    style={{ color: "#042B19" }}
+                  >
+                    Step 4: Track Your Tickets
+                  </h3>
+                  <p className="text-gray-600 leading-relaxed">
+                    View all your support tickets, their status (open, pending, resolved), and responses from our 
+                    support team. You can reply to tickets and continue conversations as needed.
+                  </p>
+                </div>
+              </div>
             </div>
-          </div>
 
-          {/* CTA */}
-          <div className="text-center p-8 bg-gradient-to-br from-green-500/20 via-emerald-500/20 to-cyan-500/20 backdrop-blur-md rounded-2xl border border-white/20">
-            <h2 className="text-3xl font-bold text-white mb-4">Need Help? We're Here for You</h2>
-            <p className="text-white/80 mb-6 text-lg">
-              Sign up to access our 24/7 support ticket system
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link
-                href="/signup"
-                className="px-8 py-3 bg-gradient-to-r from-yellow-500 to-yellow-600 text-black rounded-xl font-semibold hover:from-green-600 hover:to-emerald-600 transition-all shadow-lg"
+            {/* Support Topics */}
+            <div className="p-8 sm:p-10 border border-gray-200" style={{ borderColor: "#E5E7EB" }}>
+              <h2
+                className="text-2xl sm:text-3xl md:text-4xl font-normal mb-8 text-center"
+                style={{
+                  color: "#042B19",
+                  fontFamily: "var(--font-font4), sans-serif",
+                }}
               >
-                Sign Up for Support Access
-              </Link>
-              <Link
-                href="/login"
-                className="px-8 py-3 bg-yellow-500/10 backdrop-blur-sm text-white rounded-xl font-semibold border-2 border-yellow-500/30 hover:bg-yellow-500/20 transition-all"
+                Common Support Topics
+              </h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {supportTopics.map((topic, index) => (
+                  <Link
+                    key={index}
+                    href={topic.link}
+                    className="p-6 border border-gray-200 hover:shadow-lg transition-all"
+                    style={{ borderColor: "#E5E7EB" }}
+                  >
+                    <div className="text-4xl mb-4">{topic.icon}</div>
+                    <h3
+                      className="text-xl font-semibold mb-3"
+                      style={{ color: "#042B19" }}
+                    >
+                      {topic.title}
+                    </h3>
+                    <p className="text-gray-600 text-sm leading-relaxed">{topic.description}</p>
+                  </Link>
+                ))}
+              </div>
+            </div>
+
+            {/* FAQ Section */}
+            <div className="p-8 sm:p-10 border border-gray-200" style={{ borderColor: "#E5E7EB" }}>
+              <h2
+                className="text-2xl sm:text-3xl md:text-4xl font-normal mb-8 text-center"
+                style={{
+                  color: "#042B19",
+                  fontFamily: "var(--font-font4), sans-serif",
+                }}
               >
-                Already Have an Account? Login
-              </Link>
+                Frequently Asked Questions
+              </h2>
+              <div className="space-y-6">
+                {faqs.map((faq, index) => (
+                  <div key={index} className="p-6 bg-gray-50 border border-gray-200" style={{ borderColor: "#E5E7EB" }}>
+                    <h3
+                      className="text-lg font-semibold mb-3"
+                      style={{ color: "#042B19" }}
+                    >
+                      {faq.question}
+                    </h3>
+                    <p className="text-gray-600 leading-relaxed">{faq.answer}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Before Contacting Support */}
+            <div className="p-8 sm:p-10 bg-[#E8F5F0] border border-gray-200" style={{ borderColor: "#E5E7EB" }}>
+              <h2
+                className="text-2xl sm:text-3xl md:text-4xl font-normal mb-6"
+                style={{
+                  color: "#042B19",
+                  fontFamily: "var(--font-font4), sans-serif",
+                }}
+              >
+                Before Contacting Support
+              </h2>
+              <p className="text-base sm:text-lg text-gray-700 mb-6">
+                Many questions can be answered by exploring our comprehensive documentation:
+              </p>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <Link href="/how-it-works" className="p-4 bg-white border border-gray-200 hover:shadow-md transition-all" style={{ borderColor: "#E5E7EB" }}>
+                  <div
+                    className="font-semibold mb-1"
+                    style={{ color: "#042B19" }}
+                  >
+                    How It Works
+                  </div>
+                  <div className="text-gray-600 text-sm">Complete guide to CROWN features</div>
+                </Link>
+                <Link href="/how-to-start" className="p-4 bg-white border border-gray-200 hover:shadow-md transition-all" style={{ borderColor: "#E5E7EB" }}>
+                  <div
+                    className="font-semibold mb-1"
+                    style={{ color: "#042B19" }}
+                  >
+                    Getting Started Guide
+                  </div>
+                  <div className="text-gray-600 text-sm">Step-by-step instructions</div>
+                </Link>
+                <Link href="/binary-investment-system" className="p-4 bg-white border border-gray-200 hover:shadow-md transition-all" style={{ borderColor: "#E5E7EB" }}>
+                  <div
+                    className="font-semibold mb-1"
+                    style={{ color: "#042B19" }}
+                  >
+                    Binary System
+                  </div>
+                  <div className="text-gray-600 text-sm">Understanding binary bonuses</div>
+                </Link>
+                <Link href="/daily-roi-payouts" className="p-4 bg-white border border-gray-200 hover:shadow-md transition-all" style={{ borderColor: "#E5E7EB" }}>
+                  <div
+                    className="font-semibold mb-1"
+                    style={{ color: "#042B19" }}
+                  >
+                    Daily ROI
+                  </div>
+                  <div className="text-gray-600 text-sm">ROI calculation details</div>
+                </Link>
+              </div>
+            </div>
+
+            {/* CTA */}
+            <div className="text-center p-8 sm:p-10 bg-gray-50 border border-gray-200" style={{ borderColor: "#E5E7EB" }}>
+              <h2
+                className="text-2xl sm:text-3xl md:text-4xl font-normal mb-4"
+                style={{
+                  color: "#042B19",
+                  fontFamily: "var(--font-font4), sans-serif",
+                }}
+              >
+                Need Help? We're Here for You
+              </h2>
+              <p className="text-base sm:text-lg text-gray-600 mb-6">
+                Sign up to access our 24/7 support ticket system
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <Link
+                  href="/signup"
+                  className="inline-block bg-[#ffcf0B] text-gray-900 font-bold px-6 sm:px-8 py-3 sm:py-4 transition hover:opacity-90 uppercase text-sm sm:text-base"
+                  style={{ borderRadius: "0" }}
+                >
+                  Sign Up for Support Access
+                </Link>
+                <Link
+                  href="/login"
+                  className="inline-block bg-transparent border-2 text-gray-900 font-bold px-6 sm:px-8 py-3 sm:py-4 transition hover:bg-[#042B19] hover:text-white uppercase text-sm sm:text-base"
+                  style={{ borderColor: "#042B19", color: "#042B19", borderRadius: "0" }}
+                >
+                  Already Have an Account? Login
+                </Link>
+              </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="relative z-10 border-t border-yellow-500/20 mt-20 bg-gray-900">
-        <div className="max-w-7xl mx-auto px-6 py-8 text-center text-white/70">
-          <p>&copy; {new Date().getFullYear()} CROWN. All rights reserved.</p>
-          <div className="mt-4 flex justify-center gap-6">
-            <Link href="/about-us" className="hover:text-white transition-colors">About Us</Link>
-            <Link href="/policy" className="hover:text-white transition-colors">Privacy & Terms</Link>
-            <Link href="/support" className="hover:text-white transition-colors">Support</Link>
-          </div>
-        </div>
-      </footer>
-    </div>
+      <Footer />
+    </main>
   );
 }

@@ -262,7 +262,7 @@ export default function PlansPage() {
                 // roi field is the daily ROI percentage (e.g., 1.5 means 1.5% per day)
                 // If roi exists, use it directly; otherwise calculate from totalOutputPct
                 const dailyRoiRate = pkg.roi ? pkg.roi / 100 : (totalOutputPct / 100) / pkg.duration;
-                const renewablePrinciplePct = pkg.renewablePrinciplePct || pkg.principleReturn || 50;
+                const renewablePrinciplePct = pkg.renewablePrinciplePct || pkg.principleReturn || 60;
                 const referralPct = pkg.referralPct || pkg.levelOneReferral || 7;
                 const binaryPct = pkg.binaryPct || pkg.binaryBonus || 10;
                 const powerCapacity = pkg.powerCapacity || pkg.cappingLimit || 1000;
@@ -304,7 +304,7 @@ export default function PlansPage() {
                           <span className="text-sm font-semibold text-gray-300">Total Output:</span>
                           <span className="text-lg font-extrabold text-yellow-400">
                             {pkg.roi !== undefined && pkg.roi !== null
-                              ? `${(pkg.duration * pkg.roi).toFixed(2)}%`
+                              ? `${((pkg.duration * pkg.roi) + renewablePrinciplePct).toFixed(2)}%`
                               : `${totalOutputPct}%`}
                           </span>
                         </div>
@@ -384,13 +384,16 @@ export default function PlansPage() {
                       <span className="text-gray-300 font-semibold mt-1">Total Output:</span>
                       <div className="text-right">
                         <span className="font-bold text-yellow-400 block">
-                          {selectedPackage.roi !== undefined && selectedPackage.roi !== null
-                            ? (selectedPackage.duration * selectedPackage.roi).toFixed(2)
-                            : (selectedPackage.totalOutputPct || 225)}%
+                          {(() => {
+                            const renewablePct = selectedPackage.renewablePrinciplePct || selectedPackage.principleReturn || 60;
+                            return selectedPackage.roi !== undefined && selectedPackage.roi !== null
+                              ? ((selectedPackage.duration * selectedPackage.roi) + renewablePct).toFixed(2)
+                              : (selectedPackage.totalOutputPct || 225);
+                          })()}%
                         </span>
                         {selectedPackage.roi !== undefined && selectedPackage.roi !== null && (
                           <span className="text-xs text-gray-400 block mt-0.5">
-                            ({selectedPackage.roi}% × {selectedPackage.duration} days)
+                            ({selectedPackage.roi}% × {selectedPackage.duration} days + {(selectedPackage.renewablePrinciplePct || selectedPackage.principleReturn || 60)}% Capital Back)
                           </span>
                         )}
                       </div>

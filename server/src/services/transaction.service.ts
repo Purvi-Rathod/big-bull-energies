@@ -30,12 +30,16 @@ export async function createWalletTransaction(
       });
     }
 
+    // Get current wallet balance (wallet should already be updated by updateWallet before this is called)
+    // This function only creates transaction records, it doesn't update wallet balance
     const balanceBefore = parseFloat(wallet.balance.toString());
     const balanceAfter = type === "credit" 
       ? balanceBefore + amount 
       : balanceBefore - amount;
 
     // Create transaction record
+    // NOTE: Wallet balance should already be updated by updateWallet() before this is called
+    // This function only creates the transaction record for audit/reporting purposes
     const transaction = await WalletTransaction.create({
       user: userId,
       wallet: wallet._id,
@@ -59,6 +63,9 @@ export async function createWalletTransaction(
 
 /**
  * Create ROI transaction with cashable and renewable portions
+ * NOTE: Wallet balance should already be updated by updateWallet() before this is called
+ * This function only creates the transaction record for audit/reporting
+ * Transaction amount should be cashableAmount (what was actually added to wallet balance)
  */
 export async function createROITransaction(
   userId: Types.ObjectId,
@@ -67,20 +74,45 @@ export async function createROITransaction(
   renewableAmount: number,
   investmentId?: string
 ) {
-  return createWalletTransaction(
-    userId,
-    WalletType.ROI,
-    "credit",
-    totalAmount,
-    investmentId,
-    { 
+  // Get wallet (should already exist and be updated by updateWallet)
+  let wallet = await Wallet.findOne({ user: userId, type: WalletType.ROI });
+  if (!wallet) {
+    // This shouldn't happen if updateWallet was called first, but handle it
+    wallet = await Wallet.create({
+      user: userId,
+      type: WalletType.ROI,
+      balance: Types.Decimal128.fromString("0"),
+      reserved: Types.Decimal128.fromString("0"),
+      currency: "USD",
+    });
+  }
+
+  // Calculate balance before this transaction (current balance minus cashableAmount that was just added)
+  const currentBalance = parseFloat(wallet.balance.toString());
+  const balanceBefore = currentBalance - cashableAmount; // Balance before this transaction
+  const balanceAfter = currentBalance; // Current balance (already includes cashableAmount)
+
+  // Create transaction record for the cashable amount (what was actually added to wallet)
+  const transaction = await WalletTransaction.create({
+    user: userId,
+    wallet: wallet._id,
+    type: "credit",
+    amount: Types.Decimal128.fromString(cashableAmount.toString()), // Transaction amount = cashable amount
+    currency: wallet.currency || "USD",
+    balanceBefore: Types.Decimal128.fromString(balanceBefore.toString()),
+    balanceAfter: Types.Decimal128.fromString(balanceAfter.toString()),
+    status: TxnStatus.COMPLETED,
+    txRef: investmentId,
+    meta: { 
       type: "roi_payout", 
       source: "daily_cron",
       cashableAmount,
       renewableAmount,
-      totalAmount
-    }
-  );
+      totalAmount // Store total for reference
+    },
+  });
+
+  return transaction;
 }
 
 /**

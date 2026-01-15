@@ -316,12 +316,18 @@ async function calculateDailyROIResumable(job: ICalculationJob) {
         // Use imported functions
 
         if (cashablePart > 0) {
-          await updateWallet(
-            investment.user as Types.ObjectId,
-            WalletType.ROI,
-            cashablePart,
-            "add"
-          );
+          try {
+            const updatedWallet = await updateWallet(
+              investment.user as Types.ObjectId,
+              WalletType.ROI,
+              cashablePart,
+              "add"
+            );
+            console.log(`[Calculation Job] Updated ROI wallet for user ${investment.user}: added $${cashablePart.toFixed(2)}, new balance: $${parseFloat(updatedWallet.balance.toString()).toFixed(2)}`);
+          } catch (walletError: any) {
+            console.error(`[Calculation Job] Failed to update ROI wallet for user ${investment.user}:`, walletError);
+            throw walletError; // Re-throw to be caught by outer catch block
+          }
         }
 
         if (renewablePart > 0) {

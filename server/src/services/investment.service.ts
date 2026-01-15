@@ -408,7 +408,19 @@ export async function updateWallet(
     wallet.balance = Types.Decimal128.fromString(newBalance.toString());
     await wallet.save();
 
-    return wallet;
+    // Verify the save was successful by reloading the wallet
+    const savedWallet = await Wallet.findById(wallet._id);
+    if (!savedWallet) {
+      throw new AppError("Failed to save wallet - wallet not found after save", 500);
+    }
+    
+    const savedBalance = parseFloat(savedWallet.balance.toString());
+    if (Math.abs(savedBalance - newBalance) > 0.01) {
+      console.error(`[updateWallet] Balance mismatch! Expected: ${newBalance}, Saved: ${savedBalance}`);
+      throw new AppError(`Wallet balance not saved correctly. Expected: ${newBalance}, Got: ${savedBalance}`, 500);
+    }
+
+    return savedWallet;
   } catch (error) {
     if (error instanceof AppError) {
       throw error;

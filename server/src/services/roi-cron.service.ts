@@ -193,12 +193,18 @@ export async function calculateDailyROI() {
 
         // Add cashable part to user's ROI wallet (cashable balance)
         if (cashablePart > 0) {
-          await updateWallet(
-            investment.user as Types.ObjectId,
-            WalletType.ROI,
-            cashablePart,
-            "add"
-          );
+          try {
+            const updatedWallet = await updateWallet(
+              investment.user as Types.ObjectId,
+              WalletType.ROI,
+              cashablePart,
+              "add"
+            );
+            console.log(`[ROI Cron] Updated ROI wallet for user ${investment.user}: added $${cashablePart.toFixed(2)}, new balance: $${parseFloat(updatedWallet.balance.toString()).toFixed(2)}`);
+          } catch (walletError: any) {
+            console.error(`[ROI Cron] Failed to update ROI wallet for user ${investment.user}:`, walletError);
+            throw walletError; // Re-throw to be caught by outer catch block
+          }
         }
 
         // Add renewable part to user's renewable principal (non-withdrawable)
@@ -210,7 +216,9 @@ export async function calculateDailyROI() {
           );
         }
 
-        // Create ROI transaction with both amounts
+        // Create ROI transaction record
+        // NOTE: Wallet balance is already updated by updateWallet() above
+        // This creates the transaction record for reporting/audit purposes
         await createROITransaction(
           investment.user as Types.ObjectId,
           dailyRoiAmount,

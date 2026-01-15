@@ -532,8 +532,20 @@ export async function processInvestment(
     const totalOutputPct = pkg.totalOutputPct || pkg.roi || 225;
     const renewablePrinciplePct = pkg.renewablePrinciplePct || pkg.principleReturn || 50;
     
-    // Calculate daily ROI rate: (totalOutputPct/100) / durationDays
-    const dailyRoiRate = (totalOutputPct / 100) / durationDays;
+    // FIXED: Store daily ROI percentage from package.roi (daily percentage)
+    // Package.roi is the DAILY ROI percentage (e.g., 1.75 means 1.75% per day)
+    // Store as decimal for calculation (1.75% = 0.0175)
+    let dailyRoiRate: number;
+    if (pkg.roi && pkg.roi > 0) {
+      // Use package.roi as daily percentage (convert to decimal)
+      dailyRoiRate = pkg.roi / 100; // 1.75% = 0.0175
+    } else if (pkg.totalOutputPct && pkg.totalOutputPct > 0) {
+      // Fallback: calculate from totalOutputPct if roi not available
+      dailyRoiRate = (pkg.totalOutputPct / 100) / durationDays;
+    } else {
+      // Default fallback
+      dailyRoiRate = 0.0175; // 1.75% default
+    }
     
     // Calculate dates
     const startDate = new Date();

@@ -156,20 +156,33 @@ export async function calculateDailyROI() {
         // Use principal (current principal, changes with reinvest)
         const currentPrincipal = parseFloat(investment.principal?.toString() || investment.investedAmount.toString());
         
-        // Use dailyRoiRate from investment (pre-calculated) or calculate from package
-        let dailyRoiRate: number;
-        if (investment.dailyRoiRate) {
-          dailyRoiRate = investment.dailyRoiRate;
-        } else {
-          // Fallback: calculate from package
+        // FIXED: Get daily ROI percentage directly from package
+        // The package.roi field is the DAILY ROI percentage (e.g., 1.75% = 0.0175)
+        // Package is the source of truth - always use package.roi if available
+        let dailyRoiPct: number;
+        
+        // Priority 1: Get from package.roi (daily percentage) - this is the source of truth
+        if (pkg.roi && pkg.roi > 0) {
+          // Package.roi is the DAILY percentage (e.g., 1.75 means 1.75% per day)
+          dailyRoiPct = pkg.roi / 100; // Convert percentage to decimal (1.75% = 0.0175)
+        } else if (pkg.totalOutputPct && pkg.totalOutputPct > 0) {
+          // Fallback: calculate from totalOutputPct if roi not available
           const durationDays = investment.durationDays || pkg.duration || 150;
-          const totalOutputPct = investment.totalOutputPct || pkg.totalOutputPct || pkg.roi || 225;
-          dailyRoiRate = (totalOutputPct / 100) / durationDays;
+          dailyRoiPct = (pkg.totalOutputPct / 100) / durationDays;
+        } else if (investment.dailyRoiRate && investment.dailyRoiRate > 0) {
+          // Last resort: use stored value (might be incorrect for old investments)
+          // If dailyRoiRate is stored as a decimal (0.0175), use it directly
+          // If it's stored as percentage (1.75), convert to decimal
+          dailyRoiPct = investment.dailyRoiRate > 1 ? investment.dailyRoiRate / 100 : investment.dailyRoiRate;
+        } else {
+          // Default fallback
+          dailyRoiPct = 0.0175; // 1.75% default
         }
 
-        // Calculate daily ROI amount: principal * daily_roi_rate
-        // Formula: dailyROI = P * TO / D = P * (totalOutputPct/100) / durationDays
-        const dailyRoiAmount = currentPrincipal * dailyRoiRate;
+        // Calculate daily ROI amount: principal * daily_roi_percentage
+        // Formula: dailyROI = Principal × (Daily ROI % / 100)
+        // Example: $5000 × 1.75% = $5000 × 0.0175 = $87.50
+        const dailyRoiAmount = currentPrincipal * dailyRoiPct;
 
         // Split into renewable and cashable portions (per rule book)
         // renewablePart = daily_roi_amount * renewable_principle_pct/100

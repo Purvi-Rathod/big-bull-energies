@@ -38,6 +38,8 @@ interface TreeUser {
   rightDownlines: number;
   level: number;
   totalInvestment?: string;
+  dailyBinaryBusiness?: string;
+  cappingLimit?: string;
 }
 
 interface TreeData {

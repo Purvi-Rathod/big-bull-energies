@@ -6,6 +6,9 @@ import {
   getAdminProfile,
   triggerROI,
   triggerDailyCalculations,
+  getCalculationJobStatus,
+  resumeCalculationJob,
+  getLatestCalculationJob,
   getAllUsers,
   impersonateUser,
   getAdminStatistics,
@@ -90,6 +93,9 @@ router.post("/trigger-roi", requireAdminAuth, triggerROI);
 
 // Daily calculations trigger (ROI, Binary, Referral) - admin only
 router.post("/trigger-daily-calculations", requireAdminAuth, triggerDailyCalculations);
+router.get("/calculation-job/latest", requireAdminAuth, getLatestCalculationJob);
+router.get("/calculation-job/:jobId", requireAdminAuth, getCalculationJobStatus);
+router.post("/calculation-job/:jobId/resume", requireAdminAuth, resumeCalculationJob);
 
 // User management (admin only)
 router.get("/users", requireAdminAuth, getAllUsers);

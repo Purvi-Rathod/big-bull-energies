@@ -22,6 +22,9 @@ export default function SettingsPage() {
   
   // Trigger Daily Calculations
   const [cronLoading, setCronLoading] = useState(false);
+  const [jobStatus, setJobStatus] = useState<any>(null);
+  const [checkingStatus, setCheckingStatus] = useState(false);
+  const [pollingInterval, setPollingInterval] = useState<NodeJS.Timeout | null>(null);
   
   // Flush Investments
   const [flushLoading, setFlushLoading] = useState(false);
@@ -63,11 +66,34 @@ export default function SettingsPage() {
     }
   }, [user, admin]);
 
+  // Check job status
+  const checkJobStatus = async () => {
+    try {
+      setCheckingStatus(true);
+      const response = await api.getLatestCalculationJob();
+      if (response.data) {
+        setJobStatus(response.data);
+        
+        // Stop polling if job is completed or failed
+        if (response.data.status === 'completed' || response.data.status === 'failed') {
+          if (pollingInterval) {
+            clearInterval(pollingInterval);
+            setPollingInterval(null);
+          }
+        }
+      }
+    } catch (err: any) {
+      console.error('Error checking job status:', err);
+    } finally {
+      setCheckingStatus(false);
+    }
+  };
+
   // Trigger Daily Calculations
   const handleTriggerCron = async () => {
     const confirmed = await confirm({
       title: 'Trigger Daily Calculations',
-      message: 'Are you sure you want to trigger the daily calculations (ROI, Binary, Referral)?',
+      message: 'Are you sure you want to trigger the daily calculations (ROI, Binary, Referral)?\n\nThis will start a background job that processes calculations. You can check the status below.',
       variant: 'info',
       confirmText: 'Yes, Trigger',
       cancelText: 'Cancel',
@@ -84,7 +110,49 @@ export default function SettingsPage() {
       });
       
       if (response.data) {
-        toast.success('Daily calculations triggered successfully!');
+        toast.success('Daily calculations started in background! Processing will continue...', { duration: 5000 });
+        setJobStatus({
+          _id: response.data.jobId,
+          status: response.data.status,
+          startedAt: response.data.startedAt,
+          processedItems: 0,
+          totalItems: 0,
+        });
+        
+        // Clear any existing polling interval
+        if (pollingInterval) {
+          clearInterval(pollingInterval);
+        }
+        
+        // Start polling for status updates
+        const interval = setInterval(async () => {
+          try {
+            const latestResponse = await api.getLatestCalculationJob();
+            if (latestResponse.data) {
+              setJobStatus(latestResponse.data);
+              
+              if (latestResponse.data.status === 'completed' || latestResponse.data.status === 'failed') {
+                clearInterval(interval);
+                setPollingInterval(null);
+                if (latestResponse.data.status === 'completed') {
+                  toast.success('Daily calculations completed successfully!', { duration: 5000 });
+                } else if (latestResponse.data.status === 'failed') {
+                  toast.error('Daily calculations failed. You can resume the job.', { duration: 5000 });
+                }
+              }
+            }
+          } catch (err) {
+            console.error('Error checking job status:', err);
+          }
+        }, 5000); // Check every 5 seconds
+        
+        setPollingInterval(interval);
+        
+        // Stop polling after 10 minutes
+        setTimeout(() => {
+          clearInterval(interval);
+          setPollingInterval(null);
+        }, 600000);
       }
     } catch (err: any) {
       toast.error(err.message || 'Failed to trigger daily calculations');
@@ -93,6 +161,83 @@ export default function SettingsPage() {
       setCronLoading(false);
     }
   };
+
+  // Resume failed job
+  const handleResumeJob = async (jobId: string) => {
+    const confirmed = await confirm({
+      title: 'Resume Calculation Job',
+      message: 'Are you sure you want to resume this calculation job? It will continue from where it left off.',
+      variant: 'info',
+      confirmText: 'Yes, Resume',
+      cancelText: 'Cancel',
+    });
+
+    if (!confirmed) return;
+
+    try {
+      setCronLoading(true);
+      const response = await api.resumeCalculationJob(jobId);
+      if (response.data) {
+        toast.success('Calculation job resumed! Processing will continue...', { duration: 5000 });
+        setJobStatus(response.data);
+        
+        // Clear any existing polling interval
+        if (pollingInterval) {
+          clearInterval(pollingInterval);
+        }
+        
+        // Start polling for status updates
+        const interval = setInterval(async () => {
+          try {
+            const latestResponse = await api.getLatestCalculationJob();
+            if (latestResponse.data) {
+              setJobStatus(latestResponse.data);
+              
+              if (latestResponse.data.status === 'completed' || latestResponse.data.status === 'failed') {
+                clearInterval(interval);
+                setPollingInterval(null);
+                if (latestResponse.data.status === 'completed') {
+                  toast.success('Daily calculations completed successfully!', { duration: 5000 });
+                } else if (latestResponse.data.status === 'failed') {
+                  toast.error('Daily calculations failed. You can resume the job.', { duration: 5000 });
+                }
+              }
+            }
+          } catch (err) {
+            console.error('Error checking job status:', err);
+          }
+        }, 5000);
+        
+        setPollingInterval(interval);
+        setTimeout(() => {
+          clearInterval(interval);
+          setPollingInterval(null);
+        }, 600000);
+      }
+    } catch (err: any) {
+      toast.error(err.message || 'Failed to resume calculation job');
+      console.error('Error resuming job:', err);
+    } finally {
+      setCronLoading(false);
+    }
+  };
+
+  // Check status on mount and when user/admin changes
+  useEffect(() => {
+    const isAdminUser = user?.userId === 'CROWN-000000' || user?.userId === 'CNEOX-000000';
+    const isAdminAccount = !!admin;
+
+    if (isAdminUser || isAdminAccount) {
+      checkJobStatus();
+    }
+    
+    // Cleanup polling interval on unmount
+    return () => {
+      if (pollingInterval) {
+        clearInterval(pollingInterval);
+      }
+    };
+  }, [user, admin]);
 
   // Flush All Investments
   const handleFlushInvestments = async () => {
@@ -430,20 +575,126 @@ export default function SettingsPage() {
       <div className="bg-white rounded-lg shadow p-6">
         <h2 className="text-xl font-semibold text-gray-900 mb-4">System Actions</h2>
         <div className="space-y-4">
-          <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
-            <div>
-              <h3 className="text-lg font-medium text-gray-900">Trigger Daily Calculations</h3>
-              <p className="text-sm text-gray-600 mt-1">
-                Manually trigger daily calculations for ROI, Binary, and Referral bonuses
-              </p>
+          <div className="space-y-4">
+            <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+              <div>
+                <h3 className="text-lg font-medium text-gray-900">Trigger Daily Calculations</h3>
+                <p className="text-sm text-gray-600 mt-1">
+                  Manually trigger daily calculations for ROI, Binary, and Referral bonuses. 
+                  Calculations run in the background and can be resumed if interrupted.
+                </p>
+              </div>
+              <div className="flex gap-2">
+                <button
+                  onClick={checkJobStatus}
+                  disabled={checkingStatus}
+                  className="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                >
+                  {checkingStatus ? 'Checking...' : 'Check Status'}
+                </button>
+                <button
+                  onClick={handleTriggerCron}
+                  disabled={cronLoading}
+                  className="px-6 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                >
+                  {cronLoading ? 'Starting...' : 'Trigger Daily Calculations'}
+                </button>
+              </div>
             </div>
-            <button
-              onClick={handleTriggerCron}
-              disabled={cronLoading}
-              className="px-6 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-            >
-              {cronLoading ? 'Processing...' : 'Trigger Daily Calculations'}
-            </button>
+
+            {/* Job Status Display */}
+            {jobStatus && (
+              <div className={`p-4 border rounded-lg ${
+                jobStatus.status === 'completed' ? 'border-green-200 bg-green-50' :
+                jobStatus.status === 'failed' ? 'border-red-200 bg-red-50' :
+                jobStatus.status === 'processing' ? 'border-blue-200 bg-blue-50' :
+                'border-gray-200 bg-gray-50'
+              }`}>
+                <div className="flex items-start justify-between">
+                  <div className="flex-1">
+                    <h4 className="font-semibold text-gray-900 mb-2">
+                      Job Status: <span className={`${
+                        jobStatus.status === 'completed' ? 'text-green-600' :
+                        jobStatus.status === 'failed' ? 'text-red-600' :
+                        jobStatus.status === 'processing' ? 'text-blue-600' :
+                        'text-gray-600'
+                      }`}>
+                        {jobStatus.status.toUpperCase()}
+                      </span>
+                      {jobStatus.status === 'processing' && (
+                        <span className="ml-2 inline-block animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></span>
+                      )}
+                    </h4>
+                    {jobStatus.totalItems > 0 && (
+                      <div className="mt-2">
+                        <div className="flex justify-between text-sm text-gray-600 mb-1">
+                          <span>Progress: {jobStatus.processedItems || 0} / {jobStatus.totalItems}</span>
+                          <span>{Math.round(((jobStatus.processedItems || 0) / jobStatus.totalItems) * 100)}%</span>
+                        </div>
+                        <div className="w-full bg-gray-200 rounded-full h-2">
+                          <div
+                            className={`h-2 rounded-full transition-all ${
+                              jobStatus.status === 'completed' ? 'bg-green-600' :
+                              jobStatus.status === 'failed' ? 'bg-red-600' :
+                              'bg-blue-600'
+                            }`}
+                            style={{ width: `${Math.min(100, ((jobStatus.processedItems || 0) / jobStatus.totalItems) * 100)}%` }}
+                          ></div>
+                        </div>
+                      </div>
+                    )}
+                    {jobStatus.status === 'failed' && jobStatus.lastError && (
+                      <div className="mt-2 p-2 bg-red-100 border border-red-300 rounded text-sm text-red-700">
+                        <strong>Error:</strong> {jobStatus.lastError}
+                      </div>
+                    )}
+                    {jobStatus.results && (
+                      <div className="mt-2 text-sm text-gray-600 space-y-1">
+                        {jobStatus.results.roi && (
+                          <div>
+                            <strong>ROI:</strong> {jobStatus.results.roi.processed || 0} processed, {jobStatus.results.roi.errors || 0} errors
+                            {jobStatus.results.roi.total > 0 && ` (out of ${jobStatus.results.roi.total} total)`}
+                            {jobStatus.results.roi.error && <span className="text-red-600 ml-2">- {jobStatus.results.roi.error}</span>}
+                          </div>
+                        )}
+                        {jobStatus.results.binary && (
+                          <div>
+                            <strong>Binary:</strong> {jobStatus.results.binary.processed || 0} processed, {jobStatus.results.binary.errors || 0} errors
+                            {jobStatus.results.binary.total > 0 && ` (out of ${jobStatus.results.binary.total} total)`}
+                            {jobStatus.results.binary.totalBinaryPaid > 0 && ` - $${jobStatus.results.binary.totalBinaryPaid.toFixed(2)} paid`}
+                            {jobStatus.results.binary.error && <span className="text-red-600 ml-2">- {jobStatus.results.binary.error}</span>}
+                          </div>
+                        )}
+                        {jobStatus.results.referral && (
+                          <div>
+                            <strong>Referral:</strong> {jobStatus.results.referral.message || 'N/A'}
+                          </div>
+                        )}
+                      </div>
+                    )}
+                    {jobStatus.completedAt && (
+                      <div className="mt-2 text-xs text-gray-500">
+                        Completed at: {new Date(jobStatus.completedAt).toLocaleString()}
+                      </div>
+                    )}
+                    {jobStatus.startedAt && jobStatus.status === 'processing' && (
+                      <div className="mt-2 text-xs text-gray-500">
+                        Started at: {new Date(jobStatus.startedAt).toLocaleString()}
+                      </div>
+                    )}
+                  </div>
+                  {jobStatus.status === 'failed' && (
+                    <button
+                      onClick={() => handleResumeJob(jobStatus._id)}
+                      disabled={cronLoading}
+                      className="ml-4 px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm"
+                    >
+                      Resume Job
+                    </button>
+                  )}
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>

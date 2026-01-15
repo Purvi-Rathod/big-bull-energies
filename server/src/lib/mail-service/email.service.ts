@@ -406,3 +406,100 @@ export const sendTicketStatusUpdateEmail = async ({
   }
 };
 
+interface SendCalculationFailureEmailParams {
+  to: string;
+  jobId: string;
+  jobType: string;
+  error: string;
+  processedItems: number;
+  totalItems: number;
+}
+
+/**
+ * Send calculation job failure notification email
+ */
+export const sendCalculationFailureEmail = async ({
+  to,
+  jobId,
+  jobType,
+  error,
+  processedItems,
+  totalItems,
+}: SendCalculationFailureEmailParams): Promise<void> => {
+  try {
+    const emailHtml = `
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <meta charset="utf-8">
+          <style>
+            body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+            .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+            .header { background-color: #dc2626; color: white; padding: 20px; text-align: center; }
+            .content { background-color: #f9fafb; padding: 20px; border: 1px solid #e5e7eb; }
+            .error-box { background-color: #fee2e2; border-left: 4px solid #dc2626; padding: 15px; margin: 15px 0; }
+            .info-box { background-color: #dbeafe; border-left: 4px solid #2563eb; padding: 15px; margin: 15px 0; }
+            .footer { text-align: center; padding: 20px; color: #6b7280; font-size: 12px; }
+            .button { display: inline-block; padding: 10px 20px; background-color: #2563eb; color: white; text-decoration: none; border-radius: 5px; margin-top: 10px; }
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <div class="header">
+              <h1>⚠️ Calculation Job Failed</h1>
+            </div>
+            <div class="content">
+              <p>Dear Admin,</p>
+              <p>A daily calculation job has failed and requires your attention.</p>
+              
+              <div class="error-box">
+                <h3>Error Details</h3>
+                <p><strong>Job ID:</strong> ${jobId}</p>
+                <p><strong>Job Type:</strong> ${jobType}</p>
+                <p><strong>Error:</strong> ${error}</p>
+              </div>
+              
+              <div class="info-box">
+                <h3>Progress Information</h3>
+                <p><strong>Processed Items:</strong> ${processedItems}</p>
+                <p><strong>Total Items:</strong> ${totalItems}</p>
+                <p><strong>Progress:</strong> ${totalItems > 0 ? Math.round((processedItems / totalItems) * 100) : 0}%</p>
+              </div>
+              
+              <p><strong>Action Required:</strong></p>
+              <ul>
+                <li>Review the error details above</li>
+                <li>Check server logs for more information</li>
+                <li>You can resume the job from the admin panel if it was partially completed</li>
+                <li>The job will continue from where it left off, skipping already processed items</li>
+              </ul>
+              
+              <p style="margin-top: 20px;">
+                <a href="${process.env.CLIENT_URL || 'https://crownbankers.com'}/admin/settings" class="button">
+                  View Admin Panel
+                </a>
+              </p>
+            </div>
+            <div class="footer">
+              <p>This is an automated notification from Crown Bankers System</p>
+              <p>Please do not reply to this email</p>
+            </div>
+          </div>
+        </body>
+      </html>
+    `;
+
+    const mailOptions = {
+      from: process.env.EMAIL_USER || 'noreply@crownbankers.com',
+      to,
+      subject: `⚠️ Calculation Job Failed - ${jobType}`,
+      html: emailHtml,
+    };
+
+    await auth.sendMail(mailOptions);
+    console.log(`✅ Calculation failure email sent to ${to}`);
+  } catch (error: any) {
+    console.error(`❌ Failed to send calculation failure email to ${to}:`, error.message);
+  }
+};
+

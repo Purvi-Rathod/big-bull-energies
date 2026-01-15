@@ -3,6 +3,7 @@ import { User } from "../models/User";
 import { BinaryTree } from "../models/BinaryTree";
 import { Investment } from "../models/Investment";
 import { Wallet } from "../models/Wallet";
+import { WalletTransaction } from "../models/WalletTransaction";
 import { Package } from "../models/Package";
 import { WalletType } from "../models/types";
 import { AppError } from "../utils/AppError";
@@ -80,6 +81,35 @@ export async function calculateDailyBinaryBonuses() {
         // Skip if no volume available for matching
         if (leftAvailable <= 0 && rightAvailable <= 0) {
           continue;
+        }
+
+        // CRITICAL: Check if binary bonus was already calculated today to prevent duplicates
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const tomorrow = new Date(today);
+        tomorrow.setDate(tomorrow.getDate() + 1);
+
+        // Get user's binary wallet
+        const binaryWallet = await Wallet.findOne({ user: userIdObj, type: WalletType.BINARY });
+        
+        if (binaryWallet) {
+          // Check if binary transaction was already created today
+          const existingBinaryTransaction = await WalletTransaction.findOne({
+            user: userIdObj,
+            wallet: binaryWallet._id,
+            type: "credit",
+            "meta.type": "binary",
+            createdAt: {
+              $gte: today,
+              $lt: tomorrow,
+            },
+          });
+
+          if (existingBinaryTransaction) {
+            // Binary bonus already calculated today, skip to prevent duplicate
+            console.log(`[Binary Cron] Binary bonus already calculated today for user ${userIdObj}, skipping`);
+            continue;
+          }
         }
 
         // Calculate binary bonus using consumption model

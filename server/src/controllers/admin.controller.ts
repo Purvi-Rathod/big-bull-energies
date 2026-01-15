@@ -235,77 +235,111 @@ export const triggerROI = asyncHandler(async (req, res) => {
  * 
  * NOTE: Referral bonuses are NOT calculated in cron jobs.
  * They are paid immediately when investments are activated (one-time payment).
+ * 
+ * This endpoint now starts a background job and returns immediately.
+ * Use GET /api/v1/admin/calculation-job/:jobId to check status.
  */
 export const triggerDailyCalculations = asyncHandler(async (req, res) => {
   try {
     const body = (req as any).body;
     const { includeROI = true, includeBinary = true, includeReferral = true } = body;
+    const triggeredBy = (req as any).user?._id;
 
-    const results: any = {
-      roi: null,
-      binary: null,
-      referral: null,
-    };
+    // Import the calculation job service
+    const { startCalculationJob } = await import("../services/calculation-job.service");
+    
+    // Start background job
+    const job = await startCalculationJob(
+      includeROI,
+      includeBinary,
+      includeReferral,
+      triggeredBy
+    );
 
-    // 1. Trigger ROI calculation
-    if (includeROI) {
-      try {
-        await deactivateExpiredInvestments();
-        const roiResult = await calculateDailyROI();
-        results.roi = {
-          success: true,
-          processed: roiResult.processed,
-          errors: roiResult.errors,
-          total: roiResult.total,
-        };
-      } catch (error: any) {
-        results.roi = {
-          success: false,
-          error: error.message || "ROI calculation failed",
-        };
-      }
-    }
-
-    // 2. Calculate daily binary bonuses (consumption model)
-    if (includeBinary) {
-      try {
-        const binaryResult = await calculateDailyBinaryBonuses();
-        results.binary = {
-          success: true,
-          processed: binaryResult.processed,
-          errors: binaryResult.errors,
-          totalBinaryPaid: binaryResult.totalBinaryPaid,
-          total: binaryResult.total,
-        };
-      } catch (error: any) {
-        results.binary = {
-          success: false,
-          error: error.message || "Binary calculation failed",
-        };
-      }
-    }
-
-    // NOTE: Referral bonuses are NOT calculated in cron jobs
-    // Referral bonuses are paid IMMEDIATELY when investments are activated (one-time payment)
-    // They should NOT be recalculated daily like ROI or binary bonuses
-    if (includeReferral) {
-      results.referral = {
-        success: true,
-        message: "Referral bonuses are paid immediately at investment activation, not in daily cron",
-        processed: 0,
-        errors: 0,
-        total: 0,
-      };
-    }
-
-    const response = res as any;
-    response.status(200).json({
+    // Return immediately with job info
+    res.status(202).json({
       status: "success",
-      message: "Daily calculations triggered successfully",
-      data: results,
+      message: "Daily calculations started in background. Processing will continue...",
+      data: {
+        jobId: job._id.toString(),
+        status: job.status,
+        startedAt: job.startedAt,
+        includeROI,
+        includeBinary,
+        includeReferral,
+      },
     });
   } catch (error: any) {
     throw new AppError(error.message || "Failed to trigger daily calculations", 500);
+  }
+});
+
+/**
+ * Get calculation job status
+ * GET /api/v1/admin/calculation-job/:jobId
+ */
+export const getCalculationJobStatus = asyncHandler(async (req, res) => {
+  try {
+    const { jobId } = req.params;
+    const { getCalculationJobStatus } = await import("../services/calculation-job.service");
+    
+    const job = await getCalculationJobStatus(jobId);
+    
+    if (!job) {
+      throw new AppError("Calculation job not found", 404);
+    }
+
+    res.status(200).json({
+      status: "success",
+      data: job,
+    });
+  } catch (error: any) {
+    throw new AppError(error.message || "Failed to get job status", 500);
+  }
+});
+
+/**
+ * Resume a failed calculation job
+ * POST /api/v1/admin/calculation-job/:jobId/resume
+ */
+export const resumeCalculationJob = asyncHandler(async (req, res) => {
+  try {
+    const { jobId } = req.params;
+    const { resumeCalculationJob } = await import("../services/calculation-job.service");
+    
+    const job = await resumeCalculationJob(jobId);
+
+    res.status(200).json({
+      status: "success",
+      message: "Calculation job resumed. Processing will continue...",
+      data: {
+        jobId: job._id.toString(),
+        status: job.status,
+        processedItems: job.processedItems,
+        totalItems: job.totalItems,
+      },
+    });
+  } catch (error: any) {
+    throw new AppError(error.message || "Failed to resume job", 500);
+  }
+});
+
+/**
+ * Get latest calculation job
+ * GET /api/v1/admin/calculation-job/latest
+ */
+export const getLatestCalculationJob = asyncHandler(async (req, res) => {
+  try {
+    const { getLatestCalculationJob } = await import("../services/calculation-job.service");
+    
+    const job = await getLatestCalculationJob();
+
+    res.status(200).json({
+      status: "success",
+      data: job,
+    });
+  } catch (error: any) {
+    throw new AppError(error.message || "Failed to get latest job", 500);
   }
 });
 

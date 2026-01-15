@@ -18,6 +18,7 @@ import {
   updateUserStatus,
   deleteUser,
   flushAllInvestments,
+  flushAllUserData,
   getNOWPaymentsStatus,
   updateNOWPaymentsStatus,
   getAuthRateLimitingStatus,
@@ -126,6 +127,7 @@ router.post("/withdrawals/:id/reject", requireAdminAuth, rejectWithdrawal);
 // Investment management
 router.post("/investments/create", requireAdminAuth, adminCreateInvestment);
 router.delete("/investments/flush-all", requireAdminAuth, flushAllInvestments);
+router.delete("/flush-user-data", requireAdminAuth, flushAllUserData);
 
 // Ticket management
 router.get("/tickets", requireAdminAuth, getAllTickets);

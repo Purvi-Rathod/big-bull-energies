@@ -29,6 +29,7 @@ export default function SettingsPage() {
   // Flush Investments
   const [flushLoading, setFlushLoading] = useState(false);
   const [flushTransactionsLoading, setFlushTransactionsLoading] = useState(false);
+  const [flushUserDataLoading, setFlushUserDataLoading] = useState(false);
   const [error, setError] = useState('');
   
   // Payment Gateway Settings
@@ -275,6 +276,56 @@ export default function SettingsPage() {
       console.error('Error flushing investments:', err);
     } finally {
       setFlushLoading(false);
+    }
+  };
+
+  // Flush All User Data (Reset for Testing)
+  const handleFlushUserData = async () => {
+    const confirmed = await confirm({
+      title: '⚠️ WARNING: Flush All User Data',
+      message: 'This will reset ALL user data to zero for testing purposes!\n\n' +
+        'This action will:\n' +
+        '• Reset BinaryTree: Left Business, Right Business, Left Carry, Right Carry, Matching Due\n' +
+        '• Reset all wallet balances: ROI, Binary, Referral, Investment, Career Level\n' +
+        '• Reset Career Level progress for all users\n' +
+        '• Delete all Investments\n' +
+        '• Delete all Transactions/Reports\n' +
+        '• Delete all Payment history\n\n' +
+        'PRESERVED (NOT DELETED):\n' +
+        '• User accounts (users remain)\n' +
+        '• Binary tree structure (parent/child relationships)\n' +
+        '• Vouchers\n' +
+        '• Referrals (referrer relationships)\n\n' +
+        'This action CANNOT be undone. Are you absolutely sure?',
+      variant: 'danger',
+      confirmText: 'Yes, Flush All User Data',
+      cancelText: 'Cancel',
+    });
+
+    if (!confirmed) return;
+
+    try {
+      setFlushUserDataLoading(true);
+      setError('');
+      const response = await api.flushAllUserData();
+      
+      if (response.data) {
+        toast.success(
+          `All user data flushed successfully! ` +
+          `Binary Trees: ${response.data.binaryTreesReset}, ` +
+          `Wallets: ${response.data.walletsReset}, ` +
+          `Career Progress: ${response.data.careerProgressReset}, ` +
+          `Investments: ${response.data.investmentsDeleted}, ` +
+          `Transactions: ${response.data.transactionsDeleted}`,
+          { duration: 8000 }
+        );
+      }
+    } catch (err: any) {
+      setError(err.message || 'Failed to flush user data');
+      toast.error(err.message || 'Failed to flush user data');
+      console.error('Error flushing user data:', err);
+    } finally {
+      setFlushUserDataLoading(false);
     }
   };
 
@@ -713,6 +764,26 @@ export default function SettingsPage() {
           </p>
         </div>
         <div className="space-y-4">
+          <div className="flex items-center justify-between p-4 border border-red-200 rounded-lg bg-red-50">
+            <div className="flex-1">
+              <h3 className="text-lg font-medium text-red-900">Flush All User Data (Reset for Testing)</h3>
+              <p className="text-sm text-red-700 mt-1">
+                ⚠️ WARNING: This will reset ALL user data to zero for testing!
+              </p>
+              <div className="text-xs text-red-600 mt-2 space-y-1">
+                <p><strong>Will Reset:</strong> Left Business, Right Business, Left Carry, Right Carry, Matching Due, All Wallet Balances, Career Progress, Investments, Transactions</p>
+                <p><strong>Will Preserve:</strong> User Accounts, Binary Tree Structure, Vouchers, Referrals</p>
+              </div>
+            </div>
+            <button
+              onClick={handleFlushUserData}
+              disabled={flushUserDataLoading}
+              className="ml-4 px-6 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors whitespace-nowrap"
+            >
+              {flushUserDataLoading ? 'Flushing...' : 'Flush All User Data'}
+            </button>
+          </div>
+
           <div className="flex items-center justify-between p-4 border border-red-200 rounded-lg bg-red-50">
             <div>
               <h3 className="text-lg font-medium text-red-900">Flush All Investments</h3>

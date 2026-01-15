@@ -20,6 +20,7 @@ import { triggerDailyCalculations as triggerDailyCalculationsCron } from "../cro
 import { Voucher } from "../models/Voucher";
 import { Ticket } from "../models/Ticket";
 import { Settings } from "../models/Settings";
+import { UserCareerProgress } from "../models/UserCareerProgress";
 import { sendWithdrawalApprovedEmail, sendWithdrawalRejectedEmail } from "../lib/mail-service/email.service";
 import { getMinimumVoucherAmount as getMinVoucherAmount } from "../services/package.service";
 import bcrypt from "bcryptjs";
@@ -1159,6 +1160,150 @@ export const flushAllInvestments = asyncHandler(async (req, res) => {
     });
   } catch (error: any) {
     throw new AppError(error.message || "Failed to flush investments", 500);
+  }
+});
+
+/**
+ * Flush All User Data for Testing (Reset to Zero)
+ * DELETE /api/v1/admin/flush-user-data
+ * 
+ * This will reset the following for ALL users:
+ * - Left Business, Right Business, Left Carry, Right Carry, Matching Due (BinaryTree)
+ * - Binary Bonus wallet balance
+ * - All wallet balances (ROI, Binary, Referral, Investment, Career Level)
+ * - Career Level progress
+ * - All Investments
+ * - All Transactions/Reports
+ * 
+ * PRESERVES:
+ * - User accounts (not deleted)
+ * - Binary tree structure (parent/child relationships)
+ * - Vouchers
+ * - Referrals (referrer relationships)
+ */
+export const flushAllUserData = asyncHandler(async (req, res) => {
+  try {
+    const results: any = {
+      binaryTreesReset: 0,
+      walletsReset: 0,
+      careerProgressReset: 0,
+      investmentsDeleted: 0,
+      transactionsDeleted: 0,
+      paymentsDeleted: 0,
+    };
+
+    // 1. Reset BinaryTree fields (Left Business, Right Business, Left Carry, Right Carry, Matching Due)
+    // PRESERVE: parent, leftChild, rightChild, leftDownlines, rightDownlines (tree structure)
+    const binaryTreeResult = await BinaryTree.updateMany(
+      {},
+      {
+        $set: {
+          leftBusiness: Types.Decimal128.fromString("0"),
+          rightBusiness: Types.Decimal128.fromString("0"),
+          leftCarry: Types.Decimal128.fromString("0"),
+          rightCarry: Types.Decimal128.fromString("0"),
+          leftMatched: Types.Decimal128.fromString("0"),
+          rightMatched: Types.Decimal128.fromString("0"),
+          matchingDue: Types.Decimal128.fromString("0"),
+        },
+      }
+    );
+    results.binaryTreesReset = binaryTreeResult.modifiedCount || 0;
+
+    // 2. Reset all wallet balances (ROI, Binary, Referral, Investment, Career Level)
+    // PRESERVE: Wallet records themselves (just reset balances)
+    const walletResult = await Wallet.updateMany(
+      {
+        type: {
+          $in: [
+            WalletType.ROI,
+            WalletType.BINARY,
+            WalletType.REFERRAL,
+            WalletType.INVESTMENT,
+            WalletType.CAREER_LEVEL,
+          ],
+        },
+      },
+      {
+        $set: {
+          balance: Types.Decimal128.fromString("0"),
+          renewablePrincipal: Types.Decimal128.fromString("0"),
+          reserved: Types.Decimal128.fromString("0"),
+        },
+      }
+    );
+    results.walletsReset = walletResult.modifiedCount || 0;
+
+    // 3. Reset Career Level Progress for all users
+    // PRESERVE: UserCareerProgress records (just reset progress fields)
+    const careerProgressResult = await UserCareerProgress.updateMany(
+      {},
+      {
+        $set: {
+          currentLevel: null,
+          currentLevelName: null,
+          levelInvestment: Types.Decimal128.fromString("0"),
+          totalBusinessVolume: Types.Decimal128.fromString("0"),
+          completedLevels: [],
+          totalRewardsEarned: Types.Decimal128.fromString("0"),
+          lastCheckedAt: null,
+        },
+      }
+    );
+    results.careerProgressReset = careerProgressResult.modifiedCount || 0;
+
+    // 4. Delete all Investments
+    const investmentsResult = await Investment.deleteMany({});
+    results.investmentsDeleted = investmentsResult.deletedCount || 0;
+
+    // 5. Delete all NOWPayments history (Payment records)
+    const { Payment } = await import("../models/Payment");
+    const paymentsResult = await Payment.deleteMany({});
+    results.paymentsDeleted = paymentsResult.deletedCount || 0;
+
+    // 6. Delete all wallet transactions (Reports)
+    // Get all wallet IDs for ROI, Binary, Referral, Investment, Career Level wallets
+    const walletIds = await Wallet.find({
+      type: {
+        $in: [
+          WalletType.ROI,
+          WalletType.BINARY,
+          WalletType.REFERRAL,
+          WalletType.INVESTMENT,
+          WalletType.CAREER_LEVEL,
+        ],
+      },
+    })
+      .select("_id")
+      .lean();
+
+    const walletIdArray = walletIds.map((w) => w._id);
+    const transactionsResult = await WalletTransaction.deleteMany({
+      wallet: { $in: walletIdArray },
+    });
+    results.transactionsDeleted = transactionsResult.deletedCount || 0;
+
+    // 7. Delete all Withdrawals (optional - user might want to keep withdrawal history)
+    // Uncomment if you want to delete withdrawals too
+    // const withdrawalsResult = await Withdrawal.deleteMany({});
+    // results.withdrawalsDeleted = withdrawalsResult.deletedCount || 0;
+
+    const response = res as any;
+    response.status(200).json({
+      status: "success",
+      message: "All user data flushed successfully. User accounts, binary tree structure, vouchers, and referrals preserved.",
+      data: {
+        ...results,
+        preserved: {
+          userAccounts: "All user accounts preserved",
+          binaryTreeStructure: "Parent/child relationships preserved",
+          vouchers: "All vouchers preserved",
+          referrals: "Referrer relationships preserved",
+        },
+      },
+    });
+  } catch (error: any) {
+    throw new AppError(error.message || "Failed to flush user data", 500);
   }
 });
 

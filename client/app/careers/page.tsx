@@ -61,7 +61,7 @@ export default function CareersPage() {
       {/* Hero Section */}
       <section className="relative w-full h-[50vh] md:h-[60vh] overflow-hidden">
         <Image
-          src="/CTA.webp"
+          src="/event.jpeg"
           alt="Careers at Crown Bankers"
           fill
           className="object-cover"

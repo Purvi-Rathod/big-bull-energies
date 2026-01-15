@@ -6,7 +6,7 @@ export default function NewsInsightsSection() {
     category: "NEWS",
     headline:
       "With Invenergy's Support, Prysmian Doubles Down on U.S. Manufacturing and Domestic Energy Supply Chains",
-    image: "/CTA1.png",
+    image: "/event.jpeg",
   };
 
   const newsArticles = [

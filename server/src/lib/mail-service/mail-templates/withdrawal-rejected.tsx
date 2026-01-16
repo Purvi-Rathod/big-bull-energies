@@ -8,7 +8,6 @@ import {
   Row,
   Section,
   Text,
-  Button,
   Container,
 } from '@react-email/components';
 
@@ -110,7 +109,7 @@ const WithdrawalRejectedEmail: React.FC<WithdrawalRejectedEmailProps> = ({
           </Text>
         </Row>
         <Row style={{ textAlign: 'center', marginBottom: '24px' }}>
-          <Button
+          <a
             href={dashboardLink}
             style={{
               backgroundColor: '#4f46e5',
@@ -124,7 +123,7 @@ const WithdrawalRejectedEmail: React.FC<WithdrawalRejectedEmailProps> = ({
             }}
           >
             View Wallet Balance
-          </Button>
+          </a>
         </Row>
         <Row>
           <Text style={{ color: '#6b7280', fontSize: '14px', lineHeight: '20px', marginTop: '24px' }}>

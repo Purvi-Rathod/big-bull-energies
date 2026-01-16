@@ -8,7 +8,6 @@ import {
   Row,
   Section,
   Text,
-  Button,
   Container,
 } from '@react-email/components';
 
@@ -61,7 +60,7 @@ const SignupWelcomeEmail: React.FC<SignupWelcomeEmailProps> = ({
           </Text>
         </Row>
         <Row style={{ textAlign: 'center', marginBottom: '24px' }}>
-          <Button
+          <a
             href={loginLink}
             style={{
               backgroundColor: '#4f46e5',
@@ -75,7 +74,7 @@ const SignupWelcomeEmail: React.FC<SignupWelcomeEmailProps> = ({
             }}
           >
             Login to Dashboard
-          </Button>
+          </a>
         </Row>
         <Row>
           <Text style={{ color: '#6b7280', fontSize: '14px', lineHeight: '20px', marginBottom: '8px' }}>

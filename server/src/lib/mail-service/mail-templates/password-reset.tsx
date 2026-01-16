@@ -8,7 +8,6 @@ import {
   Row,
   Section,
   Text,
-  Button,
   Container,
 } from '@react-email/components';
 
@@ -58,7 +57,23 @@ const PasswordResetEmail: React.FC<PasswordResetEmailProps> = ({
             Click the button below to reset your password:
           </Text>
         </Row>
-       
+        <Row style={{ textAlign: 'center', marginBottom: '24px' }}>
+          <a
+            href={resetLink}
+            style={{
+              backgroundColor: '#4f46e5',
+              color: '#ffffff',
+              padding: '12px 24px',
+              borderRadius: '6px',
+              textDecoration: 'none',
+              display: 'inline-block',
+              fontSize: '16px',
+              fontWeight: 'bold',
+            }}
+          >
+            Reset Password
+          </a>
+        </Row>
         <Row>
           <Text style={{ color: '#6b7280', fontSize: '14px', lineHeight: '20px', marginBottom: '8px' }}>
             Or copy and paste this link into your browser:

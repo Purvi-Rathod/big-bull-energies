@@ -55,36 +55,16 @@ const SignupWelcomeEmail: React.FC<SignupWelcomeEmailProps> = ({
           </Text>
         </Row>
         <Row>
-          <Text style={{ color: '#374151', fontSize: '16px', lineHeight: '24px', marginBottom: '24px' }}>
-            Click the button below to login to your account and access your dashboard:
-          </Text>
-        </Row>
-        <Row style={{ textAlign: 'center', marginBottom: '24px' }}>
-          <a
-            href={loginLink}
-            style={{
-              backgroundColor: '#4f46e5',
-              color: '#ffffff',
-              padding: '12px 24px',
-              borderRadius: '6px',
-              textDecoration: 'none',
-              display: 'inline-block',
-              fontSize: '16px',
-              fontWeight: 'bold',
-            }}
-          >
-            Login to Dashboard
-          </a>
-        </Row>
-        <Row>
-          <Text style={{ color: '#6b7280', fontSize: '14px', lineHeight: '20px', marginBottom: '8px' }}>
-            Or copy and paste this link into your browser:
+          <Text style={{ color: '#374151', fontSize: '16px', lineHeight: '24px', marginBottom: '16px' }}>
+            Click the link below to login to your account and access your dashboard (or copy and paste it into your browser):
           </Text>
         </Row>
         <Row>
-          <Text style={{ color: '#4f46e5', fontSize: '14px', lineHeight: '20px', wordBreak: 'break-all', marginBottom: '24px' }}>
-            {loginLink}
-          </Text>
+          <div style={{ backgroundColor: '#f0f9ff', border: '2px solid #3b82f6', borderRadius: '8px', padding: '16px', marginBottom: '24px', textAlign: 'center' }}>
+            <Text style={{ color: '#4f46e5', fontSize: '16px', lineHeight: '24px', wordBreak: 'break-all', fontWeight: 'bold', margin: '0' }}>
+              {loginLink}
+            </Text>
+          </div>
         </Row>
         <Row>
           <Text style={{ color: '#6b7280', fontSize: '14px', lineHeight: '20px', marginTop: '24px' }}>

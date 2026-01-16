@@ -90,26 +90,21 @@ const WithdrawalApprovedEmail: React.FC<WithdrawalApprovedEmailProps> = ({
           </div>
         </Row>
         <Row>
-          <Text style={{ color: '#374151', fontSize: '16px', lineHeight: '24px', marginBottom: '24px' }}>
+          <Text style={{ color: '#374151', fontSize: '16px', lineHeight: '24px', marginBottom: '16px' }}>
             The funds have been deducted from your wallet and will be transferred to your registered payment method. Please allow 1-3 business days for the funds to reflect in your account.
           </Text>
         </Row>
-        <Row style={{ textAlign: 'center', marginBottom: '24px' }}>
-          <a
-            href={dashboardLink}
-            style={{
-              backgroundColor: '#4f46e5',
-              color: '#ffffff',
-              padding: '12px 24px',
-              borderRadius: '6px',
-              textDecoration: 'none',
-              display: 'inline-block',
-              fontSize: '16px',
-              fontWeight: 'bold',
-            }}
-          >
-            View Transaction History
-          </a>
+        <Row>
+          <Text style={{ color: '#374151', fontSize: '16px', lineHeight: '24px', marginBottom: '16px' }}>
+            Click the link below to view your transaction history (or copy and paste it into your browser):
+          </Text>
+        </Row>
+        <Row>
+          <div style={{ backgroundColor: '#f0f9ff', border: '2px solid #3b82f6', borderRadius: '8px', padding: '16px', marginBottom: '24px', textAlign: 'center' }}>
+            <Text style={{ color: '#4f46e5', fontSize: '16px', lineHeight: '24px', wordBreak: 'break-all', fontWeight: 'bold', margin: '0' }}>
+              {dashboardLink}
+            </Text>
+          </div>
         </Row>
         <Row>
           <Text style={{ color: '#6b7280', fontSize: '14px', lineHeight: '20px', marginTop: '24px' }}>

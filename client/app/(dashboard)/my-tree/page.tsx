@@ -295,7 +295,7 @@ export default function MyTreePage() {
       if (response.data?.tree) {
         // Merge new tree data with existing data
         setTreeData(prev => {
-          if (!prev) return null;
+          if (!prev || !response.data?.tree) return prev;
           
           // Use userId for deduplication (more reliable than id)
           const existingUserIds = new Set(prev.tree.map(u => u.userId));

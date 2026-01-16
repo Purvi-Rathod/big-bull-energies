@@ -35,6 +35,7 @@ interface TreeUser {
   rightCarry: string;
   leftDownlines: number;
   rightDownlines: number;
+  level?: number; // Level in the tree (0 = root)
 }
 
 interface TreeData {
@@ -50,11 +51,15 @@ interface CustomNodeData {
   user: TreeUser;
   isRoot: boolean;
   onHover: (user: TreeUser | null) => void;
+  onExpand?: (userId: string) => void;
+  isExpanded?: boolean;
+  isLoading?: boolean;
+  hasMoreDownlines?: boolean;
 }
 
 // Custom Node Component with hover popup - Memoized for performance
 const CustomNode = memo(({ data }: { data: CustomNodeData }) => {
-  const { user, isRoot, onHover } = data;
+  const { user, isRoot, onHover, onExpand, isExpanded, isLoading, hasMoreDownlines } = data;
   const [showPopup, setShowPopup] = useState(false);
 
   const handleMouseEnter = useCallback(() => {
@@ -66,6 +71,13 @@ const CustomNode = memo(({ data }: { data: CustomNodeData }) => {
     setShowPopup(false);
     onHover(null);
   }, [onHover]);
+
+  const handleExpand = useCallback((e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (onExpand && !isExpanded && !isLoading && hasMoreDownlines) {
+      onExpand(user.userId);
+    }
+  }, [onExpand, isExpanded, isLoading, hasMoreDownlines, user.userId]);
 
   // Check if this is admin node (not a binary node)
   const isAdmin = user.userId === "CROWN-000000" || user.userId === "CROWN-000000";
@@ -110,6 +122,43 @@ const CustomNode = memo(({ data }: { data: CustomNodeData }) => {
             </>
           )}
         </div>
+        {/* Expand button for nodes with downlines */}
+        {hasMoreDownlines && !isExpanded && (
+          <button
+            onClick={handleExpand}
+            disabled={isLoading}
+            className="expand-button"
+            style={{
+              marginTop: '8px',
+              padding: '6px 12px',
+              backgroundColor: 'rgba(255, 255, 255, 0.2)',
+              border: '2px solid rgba(255, 255, 255, 0.5)',
+              borderRadius: '8px',
+              color: 'white',
+              cursor: isLoading ? 'not-allowed' : 'pointer',
+              fontSize: '0.75em',
+              fontWeight: 600,
+              width: '100%',
+              transition: 'all 0.2s',
+            }}
+            onMouseEnter={(e) => {
+              if (!isLoading) {
+                e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.3)';
+                e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.7)';
+              }
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.2)';
+              e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.5)';
+            }}
+          >
+            {isLoading ? 'Loading...' : (
+              isAdmin 
+                ? `View Downlines (${totalChildren || 0})`
+                : `View Downlines (L:${user.leftDownlines || 0} R:${user.rightDownlines || 0})`
+            )}
+          </button>
+        )}
       </div>
       <Handle type="source" position={Position.Bottom} />
       {showPopup && (
@@ -196,27 +245,48 @@ export default function TreePage() {
   const [hoveredUser, setHoveredUser] = useState<TreeUser | null>(null);
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
-  const [maxDepth, setMaxDepth] = useState<number>(5); // Limit initial depth for performance
-  const [showAllNodes, setShowAllNodes] = useState(true); // Show all nodes by default
+  const [maxDepth, setMaxDepth] = useState<number>(2); // Initial depth limit for lazy loading (2 levels only)
+  const [showAllNodes, setShowAllNodes] = useState(false); // Start with limited nodes for performance
   const [searchTerm, setSearchTerm] = useState('');
   const [searchError, setSearchError] = useState<string | null>(null);
   const [highlightedNodeId, setHighlightedNodeId] = useState<string | null>(null);
+  const [expandedNodes, setExpandedNodes] = useState<Set<string>>(new Set());
+  const [loadingNodes, setLoadingNodes] = useState<Set<string>>(new Set());
   const reactFlowInstance = useRef<ReactFlowInstance | null>(null);
 
-  // Fetch tree data
+  // Fetch tree data - initially load limited depth (user's own tree)
   useEffect(() => {
     const fetchTreeData = async () => {
       try {
         setLoading(true);
-        // Use same default as API client: local backend in development,
-        // overrideable via NEXT_PUBLIC_API_URL in staging/production.
-        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://api.crownbankers.com/api/v1';
-        const response = await fetch(`${apiUrl}/tree/view`);
-        if (!response.ok) {
-          throw new Error('Failed to fetch tree data');
+        // Use the user's own tree endpoint with limited initial depth (2 levels only)
+        const { api } = await import('@/lib/api');
+        const initialDepth = maxDepth; // Use the state value (2 levels)
+        const response = await api.getMyTree(initialDepth); // Request initial depth
+        
+        if (response.data?.tree) {
+          // Filter nodes to only show up to initial depth (in case API returns more)
+          // Also ensure we only show nodes that are actually loaded
+          const filteredTree = response.data.tree.filter((u: TreeUser) => {
+            const nodeLevel = u.level !== undefined ? u.level : 0;
+            return nodeLevel <= initialDepth;
+          });
+          
+          // Convert the response to match TreeData format
+          setTreeData({
+            tree: filteredTree,
+            statistics: {
+              totalUsers: filteredTree.length,
+              activeUsers: filteredTree.filter((u: TreeUser) => u.status === 'active').length,
+              totalDownlines: filteredTree.reduce(
+                (sum: number, u: TreeUser) => sum + (u.leftDownlines || 0) + (u.rightDownlines || 0),
+                0
+              ),
+            },
+          });
+        } else {
+          throw new Error('Invalid response format');
         }
-        const data = await response.json();
-        setTreeData(data.data);
       } catch (err: any) {
         setError(err.message || 'Failed to load tree data');
       } finally {
@@ -225,7 +295,57 @@ export default function TreePage() {
     };
 
     fetchTreeData();
-  }, []);
+  }, [maxDepth]); // Re-fetch if maxDepth changes
+
+  // Handle node expansion - load downlines for a specific node
+  const handleExpandNode = useCallback(async (userId: string) => {
+    if (expandedNodes.has(userId) || loadingNodes.has(userId)) return;
+
+    try {
+      setLoadingNodes(prev => new Set(prev).add(userId));
+      
+      const { api } = await import('@/lib/api');
+      const response = await api.getNodeDownlines(userId, 10); // Load up to 10 levels deep
+      
+      if (response.data?.tree) {
+        // Merge new tree data with existing data
+        setTreeData(prev => {
+          if (!prev) return null;
+          
+          // Use userId for deduplication (more reliable than id)
+          const existingUserIds = new Set(prev.tree.map(u => u.userId));
+          const newUsers = response.data.tree.filter((u: TreeUser) => !existingUserIds.has(u.userId));
+          
+          // Update statistics
+          const updatedTree = [...prev.tree, ...newUsers];
+          const totalDownlines = updatedTree.reduce(
+            (sum: number, u: TreeUser) => sum + (u.leftDownlines || 0) + (u.rightDownlines || 0),
+            0
+          );
+          
+          return {
+            tree: updatedTree,
+            statistics: {
+              totalUsers: updatedTree.length,
+              activeUsers: updatedTree.filter((u: TreeUser) => u.status === 'active').length,
+              totalDownlines,
+            },
+          };
+        });
+        
+        setExpandedNodes(prev => new Set(prev).add(userId));
+      }
+    } catch (err: any) {
+      console.error('Error expanding node:', err);
+      setError(err.message || 'Failed to load downlines');
+    } finally {
+      setLoadingNodes(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(userId);
+        return newSet;
+      });
+    }
+  }, [expandedNodes, loadingNodes]);
 
   // Build optimized tree map for O(1) lookups
   const treeMap = useMemo(() => {
@@ -267,11 +387,25 @@ export default function TreePage() {
       }
     });
 
-    const addToLevel = (user: TreeUser, level: number) => {
+    const addToLevel = (user: TreeUser, level: number, parentExpanded: boolean = false) => {
       if (!user || processed.has(user.id)) return;
       
+      // Get the actual level from node data if available, otherwise use calculated level
+      const nodeLevel = user.level !== undefined ? user.level : level;
+      
       // Limit depth for performance if not showing all nodes
-      if (!showAllNodes && level > maxDepth) return;
+      // But allow expanded nodes to show their children
+      if (!showAllNodes && nodeLevel > maxDepth) {
+        // If parent is expanded, allow children to be shown
+        if (!parentExpanded) {
+          return;
+        }
+      }
+      
+      // Also check if this node exists in treeData (might have been filtered out)
+      if (!treeMap.has(user.id)) {
+        return;
+      }
 
       if (!levels[level]) levels[level] = [];
       levels[level].push(user);
@@ -304,14 +438,15 @@ export default function TreePage() {
       }
 
       // Add all children to next level
+      const isExpanded = expandedNodes.has(user.userId);
       childrenSet.forEach(child => {
         if (child && !processed.has(child.id)) {
-          addToLevel(child, level + 1);
+          addToLevel(child, level + 1, isExpanded);
         }
       });
     };
 
-    addToLevel(root, 0);
+    addToLevel(root, 0, true); // Root is always "expanded"
 
     // Ensure all nodes are included (fallback for disconnected nodes)
     if (showAllNodes) {
@@ -353,6 +488,20 @@ export default function TreePage() {
     // Create nodes
     levels.forEach((levelUsers, levelIndex) => {
       levelUsers.forEach((user) => {
+        // Get actual level from node data or use calculated levelIndex
+        const nodeLevel = (user as TreeUser & { level?: number }).level !== undefined 
+          ? (user as TreeUser & { level?: number }).level 
+          : levelIndex;
+        
+        // Skip nodes beyond maxDepth if not showing all nodes and not expanded
+        if (!showAllNodes && nodeLevel > maxDepth) {
+          const parentUser = user.parent ? treeMap.get(user.parent) : null;
+          const parentExpanded = parentUser ? expandedNodes.has(parentUser.userId) : false;
+          if (!parentExpanded) {
+            return; // Skip this node
+          }
+        }
+        
         const isRoot = levelIndex === 0;
         const position = nodePositions.get(user.id) || { x: 0, y: 0 };
         
@@ -364,6 +513,36 @@ export default function TreePage() {
           userWithChildren.allChildren = adminChildren.map(c => c.id);
         }
 
+        // Check if this node has more downlines that aren't loaded yet
+        // For normal users (binary tree):
+        // - If at max depth and has downlines > 0, show expand button
+        // - If has downlines count > loaded direct children, show expand button
+        // - If has downlines but no children loaded yet, show expand button
+        const totalDownlines = (user.leftDownlines || 0) + (user.rightDownlines || 0);
+        const leftDownlinesCount = user.leftDownlines || 0;
+        const rightDownlinesCount = user.rightDownlines || 0;
+        
+        // Count loaded direct children
+        const hasLeftChildLoaded = user.leftChild && treeMap.has(user.leftChild);
+        const hasRightChildLoaded = user.rightChild && treeMap.has(user.rightChild);
+        const loadedChildrenCount = (hasLeftChildLoaded ? 1 : 0) + (hasRightChildLoaded ? 1 : 0);
+        
+        // Check if node is at max depth
+        const isAtMaxDepth = !showAllNodes && nodeLevel >= maxDepth;
+        
+        // For normal users: show expand if:
+        // 1. Not already expanded
+        // 2. Has downlines (left or right)
+        // 3. Either at max depth OR has more downlines than loaded children OR no children loaded but has downlines
+        const hasMoreDownlines = !expandedNodes.has(user.userId) && 
+          totalDownlines > 0 && 
+          (
+            isAtMaxDepth || // At max depth - definitely has more to load
+            totalDownlines > loadedChildrenCount || // More downlines than direct children loaded
+            (!hasLeftChildLoaded && leftDownlinesCount > 0) || // Has left downlines but no left child loaded
+            (!hasRightChildLoaded && rightDownlinesCount > 0) // Has right downlines but no right child loaded
+          );
+
         const node: Node = {
           id: user.id,
           type: 'custom',
@@ -372,6 +551,10 @@ export default function TreePage() {
             user: userWithChildren,
             isRoot,
             onHover: setHoveredUser,
+            onExpand: handleExpandNode,
+            isExpanded: expandedNodes.has(user.userId),
+            isLoading: loadingNodes.has(user.userId),
+            hasMoreDownlines: hasMoreDownlines && (user.leftDownlines > 0 || user.rightDownlines > 0),
           },
         };
 
@@ -423,7 +606,7 @@ export default function TreePage() {
       nodes: Array.from(nodeMap.values()),
       edges: edgeList,
     };
-  }, [treeData, treeMap, maxDepth, showAllNodes]);
+  }, [treeData, treeMap, maxDepth, showAllNodes, expandedNodes, loadingNodes, handleExpandNode]);
 
   // Update nodes and edges when computed values change
   useEffect(() => {

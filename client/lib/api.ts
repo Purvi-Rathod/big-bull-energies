@@ -396,10 +396,28 @@ class ApiClient {
     );
   }
 
-  async getMyTree() {
-    return this.request<{ tree: any[]; rootUserId: string; rootName: string }>('/tree/my-tree', {
-      method: 'GET',
-    });
+  async getMyTree(depth?: number) {
+    const params = new URLSearchParams();
+    if (depth) params.append('depth', depth.toString());
+    const query = params.toString();
+    return this.request<{ tree: any[]; rootUserId: string; rootName: string; totalNodes: number; maxDepth: number }>(
+      `/tree/my-tree${query ? `?${query}` : ''}`,
+      {
+        method: 'GET',
+      }
+    );
+  }
+
+  async getNodeDownlines(userId: string, maxDepth?: number) {
+    const params = new URLSearchParams();
+    if (maxDepth) params.append('maxDepth', maxDepth.toString());
+    const query = params.toString();
+    return this.request<{ tree: any[]; rootUserId: string; rootName: string; totalNodes: number; maxDepth: number }>(
+      `/tree/node/${encodeURIComponent(userId)}/downlines${query ? `?${query}` : ''}`,
+      {
+        method: 'GET',
+      }
+    );
   }
 
   async getWithdrawalSchedule() {

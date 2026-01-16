@@ -502,3 +502,251 @@ export const getMyTree = asyncHandler(async (req, res) => {
   const response = res as any;
   response.status(200).json(responseData);
 });
+
+/**
+ * Get downlines for a specific user node (for lazy loading/expansion)
+ * GET /api/v1/tree/node/:userId/downlines
+ * Query params: maxDepth (default: 10, max: 20)
+ */
+export const getNodeDownlines = asyncHandler(async (req, res) => {
+  const requestingUserId = (req as any).user?.id;
+  if (!requestingUserId) {
+    throw new AppError("User not authenticated", 401);
+  }
+
+  const targetUserId = req.params.userId;
+  if (!targetUserId) {
+    throw new AppError("User ID is required", 400);
+  }
+
+  // Get depth limit from query params (default: 10 levels, max: 20)
+  const maxDepth = Math.min(parseInt(req.query.maxDepth as string) || 10, 20);
+
+  // Find target user by userId (not _id)
+  const targetUser = await User.findOne({ userId: targetUserId })
+    .select("_id userId name email phone status")
+    .lean();
+  
+  if (!targetUser) {
+    throw new AppError("User not found", 404);
+  }
+
+  // Convert _id to ObjectId (lean() returns plain object)
+  const targetUserObjId = new Types.ObjectId((targetUser._id as any).toString());
+  const isAdmin = (targetUser as any).userId === "CROWN-000000" || (targetUser as any).userId === "CNEOX-000000";
+
+  // Collect all descendant user IDs efficiently using level-by-level batch loading
+  const allTreeUserIds = new Set<string>([targetUserObjId.toString()]);
+  const queue: { userId: Types.ObjectId; level: number }[] = [{ userId: targetUserObjId, level: 0 }];
+  const visited = new Set<string>();
+  
+  // Level-by-level BFS with batch loading
+  while (queue.length > 0) {
+    const currentLevel = queue[0].level;
+    if (currentLevel >= maxDepth) break;
+    
+    // Get all nodes at current level
+    const currentLevelNodes = queue.filter(n => n.level === currentLevel);
+    queue.splice(0, currentLevelNodes.length);
+    
+    if (currentLevelNodes.length === 0) break;
+    
+    const currentLevelIds = currentLevelNodes.map(n => n.userId);
+    
+    // Batch load all trees for current level in ONE query
+    const currentLevelTrees = await BinaryTree.find({ user: { $in: currentLevelIds } })
+      .select("user leftChild rightChild parent")
+      .lean();
+    
+    // Process each tree and collect children
+    const nextLevelUserIds: Types.ObjectId[] = [];
+    
+    currentLevelTrees.forEach((tree: any) => {
+      const treeUserId = tree.user?.toString() || tree.user;
+      if (!treeUserId || visited.has(treeUserId)) return;
+      
+      visited.add(treeUserId);
+      allTreeUserIds.add(treeUserId);
+      
+      const treeUserObjId = new Types.ObjectId(treeUserId);
+      const nodeIsAdmin = isAdmin && treeUserObjId.equals(targetUserObjId);
+      
+      if (nodeIsAdmin && currentLevel === 0) {
+        // For admin root, load all direct children
+        // This will be handled below
+      } else {
+        // For regular users, collect left/right children
+        if (tree.leftChild) {
+          const leftId = (tree.leftChild as any)?.toString() || tree.leftChild.toString();
+          if (!visited.has(leftId)) {
+            nextLevelUserIds.push(new Types.ObjectId(leftId));
+          }
+        }
+        if (tree.rightChild) {
+          const rightId = (tree.rightChild as any)?.toString() || tree.rightChild.toString();
+          if (!visited.has(rightId)) {
+            nextLevelUserIds.push(new Types.ObjectId(rightId));
+          }
+        }
+      }
+    });
+    
+    // For admin root, load all direct children
+    if (isAdmin && currentLevel === 0) {
+      const adminChildren = await BinaryTree.find({ parent: targetUserObjId })
+        .select("user")
+        .lean();
+      adminChildren.forEach((child: any) => {
+        const childId = child.user?.toString() || child.user;
+        if (childId && !visited.has(childId)) {
+          nextLevelUserIds.push(new Types.ObjectId(childId));
+        }
+      });
+    }
+    
+    // Add next level nodes to queue
+    nextLevelUserIds.forEach(childId => {
+      if (!visited.has(childId.toString())) {
+        queue.push({ userId: childId, level: currentLevel + 1 });
+      }
+    });
+  }
+
+  const userIdsArray = Array.from(allTreeUserIds).map(id => new Types.ObjectId(id));
+
+  // Batch load all users in ONE query
+  const users = await User.find({ _id: { $in: userIdsArray } })
+    .select("userId name email phone status")
+    .lean();
+
+  // Batch load all binary trees in ONE query with population
+  const binaryTrees = await BinaryTree.find({ user: { $in: userIdsArray } })
+    .populate("parent", "userId name")
+    .populate("leftChild", "userId name")
+    .populate("rightChild", "userId name")
+    .lean();
+
+  // Batch calculate investments using aggregation (ONE query)
+  const investmentAggregation = await Investment.aggregate([
+    {
+      $match: { user: { $in: userIdsArray } }
+    },
+    {
+      $group: {
+        _id: "$user",
+        totalInvestment: {
+          $sum: { $toDouble: "$investedAmount" }
+        }
+      }
+    }
+  ]);
+
+  // Create lookup maps for O(1) access
+  const userMap = new Map<string, any>();
+  users.forEach((user: any) => {
+    userMap.set(user._id.toString(), {
+      id: user._id.toString(),
+      userId: user.userId || "N/A",
+      name: user.name || "Unknown",
+      email: user.email || "",
+      phone: user.phone || "",
+      status: user.status,
+    });
+  });
+
+  const treeMap = new Map<string, any>();
+  binaryTrees.forEach((tree: any) => {
+    const userIdStr = tree.user?._id?.toString() || tree.user?.toString();
+    treeMap.set(userIdStr, {
+      parent: (tree.parent as any)?._id?.toString() || (tree.parent as any)?.toString() || null,
+      parentUserId: (tree.parent as any)?.userId || null,
+      parentName: (tree.parent as any)?.name || null,
+      leftChild: (tree.leftChild as any)?._id?.toString() || (tree.leftChild as any)?.toString() || null,
+      leftChildUserId: (tree.leftChild as any)?.userId || null,
+      rightChild: (tree.rightChild as any)?._id?.toString() || (tree.rightChild as any)?.toString() || null,
+      rightChildUserId: (tree.rightChild as any)?.userId || null,
+      leftBusiness: parseFloat(tree.leftBusiness?.toString() || "0"),
+      rightBusiness: parseFloat(tree.rightBusiness?.toString() || "0"),
+      leftCarry: parseFloat(tree.leftCarry?.toString() || "0"),
+      rightCarry: parseFloat(tree.rightCarry?.toString() || "0"),
+      leftMatched: parseFloat(tree.leftMatched?.toString() || "0"),
+      rightMatched: parseFloat(tree.rightMatched?.toString() || "0"),
+      leftDownlines: tree.leftDownlines || 0,
+      rightDownlines: tree.rightDownlines || 0,
+    });
+  });
+
+  const investmentMap = new Map<string, number>();
+  investmentAggregation.forEach((inv: any) => {
+    investmentMap.set(inv._id.toString(), inv.totalInvestment || 0);
+  });
+
+  // Build tree structure efficiently using pre-loaded data
+  const treeData: any[] = [];
+  const processed = new Set<string>();
+
+  const buildTreeFromNode = (nodeUserId: Types.ObjectId, level: number = 0) => {
+    const nodeIdStr = nodeUserId.toString();
+    if (processed.has(nodeIdStr) || level > maxDepth) return;
+    if (!userMap.has(nodeIdStr) || !treeMap.has(nodeIdStr)) return;
+
+    processed.add(nodeIdStr);
+
+    const userInfo = userMap.get(nodeIdStr);
+    const treeInfo = treeMap.get(nodeIdStr);
+    const totalInvestment = investmentMap.get(nodeIdStr) || 0;
+
+    const nodeIsAdmin = userInfo.userId === "CROWN-000000" || userInfo.userId === "CNEOX-000000";
+    let children: string[] = [];
+
+    if (nodeIsAdmin) {
+      // For admin, get all children from pre-loaded binaryTrees
+      binaryTrees.forEach((tree: any) => {
+        const treeUserId = tree.user?._id?.toString() || tree.user?.toString();
+        const treeParentId = (tree.parent as any)?._id?.toString() || (tree.parent as any)?.toString();
+        if (treeParentId === nodeIdStr && treeUserId !== nodeIdStr) {
+          children.push(treeUserId);
+        }
+      });
+    } else {
+      if (treeInfo.leftChild) children.push(treeInfo.leftChild);
+      if (treeInfo.rightChild) children.push(treeInfo.rightChild);
+    }
+
+    treeData.push({
+      ...userInfo,
+      ...treeInfo,
+      leftBusiness: treeInfo.leftBusiness.toString(),
+      rightBusiness: treeInfo.rightBusiness.toString(),
+      leftCarry: treeInfo.leftCarry.toString(),
+      rightCarry: treeInfo.rightCarry.toString(),
+      leftMatched: treeInfo.leftMatched.toString(),
+      rightMatched: treeInfo.rightMatched.toString(),
+      allChildren: children,
+      level,
+      totalInvestment: totalInvestment.toString(),
+    });
+
+    // Recursively process children (using pre-loaded data, no DB queries)
+    for (const childId of children) {
+      if (!processed.has(childId) && level < maxDepth) {
+        buildTreeFromNode(new Types.ObjectId(childId), level + 1);
+      }
+    }
+  };
+
+  // Start building from target user (all data already loaded)
+  buildTreeFromNode(targetUserObjId, 0);
+
+  const response = res as any;
+  response.status(200).json({
+    status: "success",
+    data: {
+      tree: treeData,
+      rootUserId: (targetUser as any).userId,
+      rootName: (targetUser as any).name,
+      totalNodes: treeData.length,
+      maxDepth: Math.max(...treeData.map((n: any) => n.level), 0),
+    },
+  });
+});

@@ -310,7 +310,7 @@ export default function TreePage() {
       if (response.data?.tree) {
         // Merge new tree data with existing data
         setTreeData(prev => {
-          if (!prev) return null;
+          if (!prev || !response.data?.tree) return prev;
           
           // Use userId for deduplication (more reliable than id)
           const existingUserIds = new Set(prev.tree.map(u => u.userId));
@@ -494,7 +494,7 @@ export default function TreePage() {
           : levelIndex;
         
         // Skip nodes beyond maxDepth if not showing all nodes and not expanded
-        if (!showAllNodes && nodeLevel > maxDepth) {
+        if (!showAllNodes && nodeLevel !== undefined && nodeLevel > maxDepth) {
           const parentUser = user.parent ? treeMap.get(user.parent) : null;
           const parentExpanded = parentUser ? expandedNodes.has(parentUser.userId) : false;
           if (!parentExpanded) {
@@ -528,7 +528,7 @@ export default function TreePage() {
         const loadedChildrenCount = (hasLeftChildLoaded ? 1 : 0) + (hasRightChildLoaded ? 1 : 0);
         
         // Check if node is at max depth
-        const isAtMaxDepth = !showAllNodes && nodeLevel >= maxDepth;
+        const isAtMaxDepth = !showAllNodes && nodeLevel !== undefined && nodeLevel >= maxDepth;
         
         // For normal users: show expand if:
         // 1. Not already expanded

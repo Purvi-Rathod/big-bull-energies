@@ -7,6 +7,7 @@ import axios from 'axios';
 
 const NOWPAYMENTS_API_URL = process.env.NOWPAYMENTS_API_URL || 'https://api.nowpayments.io/v1';
 const NOWPAYMENTS_API_KEY = process.env.NOWPAYMENTS_API_KEY || '';
+const NOWPAYMENTS_IPN_SECRET = process.env.NOWPAYMENTS_IPN_SECRET || '';
 
 export interface NOWPaymentsInvoiceRequest {
   price_amount: number;
@@ -272,19 +273,53 @@ export async function getNOWPaymentsPaymentStatus(
 }
 
 /**
- * Verify NOWPayments callback signature
- * Note: NOWPayments may use IPN (Instant Payment Notification) with signature verification
- * Check their documentation for signature verification method
+ * Verify NOWPayments callback signature using IPN secret key
+ * NOWPayments signs webhooks with HMAC-SHA512 using the IPN secret key
  */
-export function verifyNOWPaymentsCallback(callback: NOWPaymentsCallback): boolean {
-  // TODO: Implement signature verification if NOWPayments provides it
-  // For now, we'll verify the callback structure
-  return !!(
-    callback.payment_id &&
-    callback.payment_status &&
-    callback.price_amount &&
-    callback.pay_amount
-  );
+export function verifyNOWPaymentsCallback(
+  callback: NOWPaymentsCallback,
+  signature?: string,
+  rawBody?: string
+): boolean {
+  // First, verify callback structure
+  if (!callback.payment_id || !callback.payment_status || !callback.price_amount || !callback.pay_amount) {
+    return false;
+  }
+
+  // If IPN secret is configured, verify signature
+  if (NOWPAYMENTS_IPN_SECRET && signature && rawBody) {
+    try {
+      const crypto = require('crypto');
+      const expectedSignature = crypto
+        .createHmac('sha512', NOWPAYMENTS_IPN_SECRET)
+        .update(rawBody)
+        .digest('hex');
+      
+      // Compare signatures (use constant-time comparison to prevent timing attacks)
+      const isValid = crypto.timingSafeEqual(
+        Buffer.from(signature),
+        Buffer.from(expectedSignature)
+      );
+      
+      if (!isValid) {
+        console.error('[NOWPayments] Invalid webhook signature');
+        return false;
+      }
+      
+      console.log('[NOWPayments] Webhook signature verified successfully');
+      return true;
+    } catch (error) {
+      console.error('[NOWPayments] Error verifying signature:', error);
+      return false;
+    }
+  }
+
+  // If no IPN secret configured, just verify structure (less secure but works)
+  if (!NOWPAYMENTS_IPN_SECRET) {
+    console.warn('[NOWPayments] IPN secret not configured - skipping signature verification');
+  }
+  
+  return true;
 }
 
 /**

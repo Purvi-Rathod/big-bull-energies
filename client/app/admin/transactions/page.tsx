@@ -45,6 +45,26 @@ interface Withdrawal {
   createdAt: string;
 }
 
+interface Payment {
+  id: string;
+  userId: string;
+  userName: string;
+  userEmail: string;
+  orderId: string;
+  paymentId: string;
+  amount: number;
+  currency: string;
+  status: string;
+  payCurrency?: string;
+  actuallyPaid?: number;
+  paymentUrl?: string;
+  packageName: string;
+  investmentId?: string;
+  meta?: any;
+  createdAt: string;
+  updatedAt: string;
+}
+
 interface Pagination {
   page: number;
   limit: number;
@@ -59,9 +79,10 @@ export default function AllTransactionsPage() {
   const [referralTransactions, setReferralTransactions] = useState<Transaction[]>([]);
   const [investmentTransactions, setInvestmentTransactions] = useState<Transaction[]>([]);
   const [withdrawals, setWithdrawals] = useState<Withdrawal[]>([]);
+  const [payments, setPayments] = useState<Payment[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [activeTab, setActiveTab] = useState<'roi' | 'binary' | 'referral' | 'investment' | 'withdrawal'>('roi');
+  const [activeTab, setActiveTab] = useState<'roi' | 'binary' | 'referral' | 'investment' | 'withdrawal' | 'payment'>('roi');
   
   // Separate counts for each tab
   const [tabCounts, setTabCounts] = useState({
@@ -70,6 +91,7 @@ export default function AllTransactionsPage() {
     referral: 0,
     investment: 0,
     withdrawal: 0,
+    payment: 0,
   });
   
   // Pagination state
@@ -107,6 +129,9 @@ export default function AllTransactionsPage() {
               break;
             case 'withdrawal':
               setWithdrawals(response.data.transactions);
+              break;
+            case 'payment':
+              setPayments(response.data.transactions);
               break;
           }
           
@@ -152,7 +177,7 @@ export default function AllTransactionsPage() {
   // Fetch counts for all tabs (background, no loading state)
   const fetchTabCounts = async () => {
     try {
-      const tabs: Array<'roi' | 'binary' | 'referral' | 'investment' | 'withdrawal'> = ['roi', 'binary', 'referral', 'investment', 'withdrawal'];
+      const tabs: Array<'roi' | 'binary' | 'referral' | 'investment' | 'withdrawal' | 'payment'> = ['roi', 'binary', 'referral', 'investment', 'withdrawal', 'payment'];
       
       // Fetch counts in parallel
       const countPromises = tabs.map(async (tab) => {
@@ -201,7 +226,7 @@ export default function AllTransactionsPage() {
     }, 100);
     
     // Load other tabs in background if not already loaded
-    const tabs: Array<'roi' | 'binary' | 'referral' | 'investment' | 'withdrawal'> = ['roi', 'binary', 'referral', 'investment', 'withdrawal'];
+    const tabs: Array<'roi' | 'binary' | 'referral' | 'investment' | 'withdrawal' | 'payment'> = ['roi', 'binary', 'referral', 'investment', 'withdrawal', 'payment'];
     tabs.forEach((tab) => {
       if (tab !== activeTab && !loadedTabs.has(tab)) {
         // Load first page of each tab in background
@@ -230,7 +255,7 @@ export default function AllTransactionsPage() {
   }, [pagination.total, activeTab]);
 
   // Reset to page 1 when tab changes
-  const handleTabChange = (tab: 'roi' | 'binary' | 'referral' | 'investment' | 'withdrawal') => {
+  const handleTabChange = (tab: 'roi' | 'binary' | 'referral' | 'investment' | 'withdrawal' | 'payment') => {
     setActiveTab(tab);
     setPage(1);
     
@@ -241,7 +266,8 @@ export default function AllTransactionsPage() {
       (tab === 'binary' && binaryTransactions.length > 0) ||
       (tab === 'referral' && referralTransactions.length > 0) ||
       (tab === 'investment' && investmentTransactions.length > 0) ||
-      (tab === 'withdrawal' && withdrawals.length > 0);
+      (tab === 'withdrawal' && withdrawals.length > 0) ||
+      (tab === 'payment' && payments.length > 0);
     
     if (hasData && tabCounts[tab] > 0) {
       // Update pagination based on loaded data
@@ -250,7 +276,8 @@ export default function AllTransactionsPage() {
         tab === 'binary' ? binaryTransactions.length :
         tab === 'referral' ? referralTransactions.length :
         tab === 'investment' ? investmentTransactions.length :
-        withdrawals.length;
+        tab === 'withdrawal' ? withdrawals.length :
+        payments.length;
       
       setPagination({
         page: 1,
@@ -829,6 +856,154 @@ export default function AllTransactionsPage() {
     </div>
   );
 
+  const renderPaymentTable = () => (
+    <div className="bg-white rounded-lg shadow overflow-hidden">
+      <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
+        <h3 className="text-lg font-semibold text-gray-900">NOWPayments Transactions</h3>
+        <div className="flex items-center gap-4">
+          {/* Items per page selector */}
+          <div className="flex items-center gap-2">
+            <label className="text-sm text-gray-600">Show:</label>
+            <select
+              value={limit}
+              onChange={(e) => {
+                setLimit(Number(e.target.value));
+                setPage(1);
+              }}
+              className="px-3 py-1.5 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            >
+              <option value={25}>25</option>
+              <option value={50}>50</option>
+              <option value={100}>100</option>
+              <option value={200}>200</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div className="overflow-x-auto">
+        <table className="w-full divide-y divide-gray-200">
+          <thead className="bg-gray-50">
+            <tr>
+              <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase w-[140px]">Date</th>
+              <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase w-[130px]">User ID</th>
+              <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase w-[120px]">User Name</th>
+              <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase w-[150px]">Order ID</th>
+              <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase w-[150px]">Payment ID</th>
+              <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase w-[100px]">Amount</th>
+              <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase w-[100px]">Package</th>
+              <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase w-[90px]">Pay Currency</th>
+              <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase w-[100px]">Actually Paid</th>
+              <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase w-[90px]">Status</th>
+            </tr>
+          </thead>
+          <tbody className="bg-white divide-y divide-gray-200">
+            {payments.length === 0 ? (
+              <tr>
+                <td colSpan={10} className="px-6 py-4 text-center text-gray-500">
+                  No payment transactions found
+                </td>
+              </tr>
+            ) : (
+              payments.map((pmt) => (
+                <tr key={pmt.id} className="hover:bg-gray-50">
+                  <td className="px-3 py-3">
+                    <div className="text-xs text-gray-500">{new Date(pmt.createdAt).toLocaleString()}</div>
+                  </td>
+                  <td className="px-3 py-3">
+                    <div className="text-xs font-mono text-gray-600 truncate max-w-[130px]" title={pmt.userId}>{pmt.userId}</div>
+                  </td>
+                  <td className="px-3 py-3">
+                    <div className="text-xs text-gray-900 truncate max-w-[120px]" title={pmt.userName}>{pmt.userName}</div>
+                  </td>
+                  <td className="px-3 py-3">
+                    <div className="text-xs font-mono text-gray-600 truncate max-w-[150px]" title={pmt.orderId}>{pmt.orderId}</div>
+                  </td>
+                  <td className="px-3 py-3">
+                    <div className="text-xs font-mono text-gray-600 truncate max-w-[150px]" title={pmt.paymentId}>{pmt.paymentId}</div>
+                  </td>
+                  <td className="px-3 py-3">
+                    <div className="text-xs font-medium text-gray-900">${pmt.amount.toFixed(2)} {pmt.currency}</div>
+                  </td>
+                  <td className="px-3 py-3">
+                    <div className="text-xs text-gray-500 truncate max-w-[100px]" title={pmt.packageName}>{pmt.packageName}</div>
+                  </td>
+                  <td className="px-3 py-3">
+                    <div className="text-xs text-gray-500">{pmt.payCurrency || 'N/A'}</div>
+                  </td>
+                  <td className="px-3 py-3">
+                    <div className="text-xs font-medium text-gray-900">{pmt.actuallyPaid ? `${pmt.actuallyPaid.toFixed(8)} ${pmt.payCurrency || ''}` : 'N/A'}</div>
+                  </td>
+                  <td className="px-3 py-3">
+                    <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                      pmt.status === 'completed' ? 'bg-green-100 text-green-800' :
+                      pmt.status === 'pending' || pmt.status === 'processing' ? 'bg-yellow-100 text-yellow-800' :
+                      'bg-red-100 text-red-800'
+                    }`}>
+                      {pmt.status}
+                    </span>
+                  </td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
+      </div>
+      
+      {/* Pagination */}
+      {pagination.pages > 1 && (
+        <div className="px-6 py-4 border-t border-gray-200 flex items-center justify-between">
+          <div className="text-sm text-gray-500">
+            Showing {((pagination.page - 1) * pagination.limit) + 1} to {Math.min(pagination.page * pagination.limit, pagination.total)} of {pagination.total} payments
+          </div>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setPage((p) => Math.max(1, p - 1))}
+              disabled={page === 1 || loading}
+              className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              Previous
+            </button>
+            <div className="flex items-center gap-1">
+              {Array.from({ length: Math.min(5, pagination.pages) }, (_, i) => {
+                let pageNum: number;
+                if (pagination.pages <= 5) {
+                  pageNum = i + 1;
+                } else if (pagination.page <= 3) {
+                  pageNum = i + 1;
+                } else if (pagination.page >= pagination.pages - 2) {
+                  pageNum = pagination.pages - 4 + i;
+                } else {
+                  pageNum = pagination.page - 2 + i;
+                }
+                return (
+                  <button
+                    key={pageNum}
+                    onClick={() => setPage(pageNum)}
+                    disabled={loading}
+                    className={`px-3 py-2 text-sm font-medium rounded-md ${
+                      page === pageNum
+                        ? 'bg-indigo-600 text-white'
+                        : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
+                    } disabled:opacity-50 disabled:cursor-not-allowed`}
+                  >
+                    {pageNum}
+                  </button>
+                );
+              })}
+            </div>
+            <button
+              onClick={() => setPage((p) => Math.min(pagination.pages, p + 1))}
+              disabled={page === pagination.pages || loading}
+              className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              Next
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+
   if (loading) {
     return (
       <div className="flex items-center justify-center py-12">
@@ -859,13 +1034,14 @@ export default function AllTransactionsPage() {
         <div className="mb-6">
           <div className="border-b border-gray-200">
             <nav className="-mb-px flex space-x-8">
-              {(['roi', 'binary', 'referral', 'investment', 'withdrawal'] as const).map((tab) => {
+              {(['roi', 'binary', 'referral', 'investment', 'withdrawal', 'payment'] as const).map((tab) => {
                 // Get count for this specific tab
                 const count = tabCounts[tab] || (tab === 'roi' ? roiTransactions.length :
                                                  tab === 'binary' ? binaryTransactions.length :
                                                  tab === 'referral' ? referralTransactions.length :
                                                  tab === 'investment' ? investmentTransactions.length :
-                                                 withdrawals.length);
+                                                 tab === 'withdrawal' ? withdrawals.length :
+                                                 payments.length);
                 
                 return (
                   <button
@@ -891,6 +1067,7 @@ export default function AllTransactionsPage() {
         {activeTab === 'referral' && renderTransactionTable(referralTransactions, 'Referral Bonus Transactions')}
         {activeTab === 'investment' && renderInvestmentTable()}
         {activeTab === 'withdrawal' && renderWithdrawalTable()}
+        {activeTab === 'payment' && renderPaymentTable()}
       </div>
     </div>
   );

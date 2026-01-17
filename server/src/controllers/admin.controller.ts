@@ -1579,8 +1579,10 @@ export const updateWithdrawalSchedule = asyncHandler(async (req, res) => {
  * GET /api/v1/admin/reports
  */
 export const getAdminReports = asyncHandler(async (req, res) => {
+  const { Payment } = await import("../models/Payment");
+  
   const { 
-    type = 'all', // 'roi', 'binary', 'referral', 'investment', 'withdrawal', 'all'
+    type = 'all', // 'roi', 'binary', 'referral', 'investment', 'withdrawal', 'payment', 'all'
     page = 1, 
     limit = 50 
   } = req.query;
@@ -1651,6 +1653,26 @@ export const getAdminReports = asyncHandler(async (req, res) => {
     createdAt: wd.createdAt,
   });
 
+  const formatPayment = (pmt: any) => ({
+    id: pmt._id,
+    userId: (pmt.user as any)?.userId || "N/A",
+    userName: (pmt.user as any)?.name || "Unknown",
+    userEmail: (pmt.user as any)?.email || "N/A",
+    orderId: pmt.orderId,
+    paymentId: pmt.paymentId,
+    amount: parseFloat(pmt.amount.toString()),
+    currency: pmt.currency || "USD",
+    status: pmt.status,
+    payCurrency: pmt.payCurrency,
+    actuallyPaid: pmt.actuallyPaid ? parseFloat(pmt.actuallyPaid.toString()) : null,
+    paymentUrl: pmt.paymentUrl,
+    packageName: (pmt.package as any)?.packageName || "N/A",
+    investmentId: pmt.investmentId,
+    meta: pmt.meta,
+    createdAt: pmt.createdAt,
+    updatedAt: pmt.updatedAt,
+  });
+
   // If type is 'all', return all types with pagination (for backward compatibility)
   if (type === 'all') {
     // Get all transactions with user info (with pagination)
@@ -1703,6 +1725,16 @@ export const getAdminReports = asyncHandler(async (req, res) => {
       .limit(limitNum)
       .lean();
 
+    // Get payments with pagination
+    const totalPayments = await Payment.countDocuments({});
+    const payments = await Payment.find({})
+      .populate("user", "userId name email")
+      .populate("package", "packageName")
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limitNum)
+      .lean();
+
     const totalTransactions = await WalletTransaction.countDocuments({
       wallet: { $in: walletIds },
     });
@@ -1716,6 +1748,7 @@ export const getAdminReports = asyncHandler(async (req, res) => {
         referral: referralTransactions.map(formatTransaction),
         investment: investmentTransactions.map((tx) => formatInvestmentTransaction(tx, investmentMap)),
         withdrawals: withdrawals.map(formatWithdrawal),
+        payments: payments.map(formatPayment),
         pagination: {
           page: Number(page),
           limit: limitNum,
@@ -1801,6 +1834,17 @@ export const getAdminReports = asyncHandler(async (req, res) => {
       .lean();
 
     result = withdrawals.map(formatWithdrawal);
+  } else if (type === 'payment') {
+    total = await Payment.countDocuments({});
+    const payments = await Payment.find({})
+      .populate("user", "userId name email")
+      .populate("package", "packageName")
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limitNum)
+      .lean();
+
+    result = payments.map(formatPayment);
   }
 
   const response = res as any;

@@ -4,7 +4,7 @@ import compression from 'compression';
 import {setupSwagger} from './swagger'
 import { asyncHandler } from './utils/asyncHandler';
 import { AppError } from './utils/AppError';
-import { cors, securityHeaders, generalLimiter, authLimiter, conditionalAuthLimiter } from './config';
+import { cors, webhookCors, securityHeaders, generalLimiter, authLimiter, conditionalAuthLimiter } from './config';
 import { sanitizeInput, validateObjectId } from './middleware/inputSanitization';
 import adminRoutes from './routes/admin.routes';
 
@@ -16,12 +16,24 @@ app.use(securityHeaders);
 // Compression middleware (should be early in the stack)
 app.use(compression({ level: 6, threshold: 1024 }));
 
-// CORS configuration
+// CORS configuration - apply webhook CORS for payment callbacks BEFORE global CORS
+app.use('/api/v1/payment/callback', webhookCors);
+
+// Middleware to capture raw body for webhook signature verification (MUST be before express.json)
+app.use('/api/v1/payment/callback', express.raw({ type: 'application/json', limit: '10kb' }));
+
+// Global CORS configuration (applied after webhook-specific routes)
 app.use(cors);
 
-
 // SECURITY: Request size limits to prevent DoS attacks
-app.use(express.json({ limit: "10kb" })); // Reduced from 16kb for security
+// JSON parser middleware (skip for callback route which uses raw body)
+const jsonParser = express.json({ limit: "10kb" });
+app.use((req, res, next) => {
+  if (req.path === '/api/v1/payment/callback' || req.originalUrl === '/api/v1/payment/callback') {
+    return next(); // Skip JSON parsing for callback route
+  }
+  jsonParser(req, res, next);
+});
 app.use(express.urlencoded({ extended: true, limit: "10kb", parameterLimit: 10 })); // Limit parameters
 
 // Input sanitization (protect against injection attacks)

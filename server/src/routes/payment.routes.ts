@@ -19,6 +19,7 @@ router.get("/status/:paymentId", requireAuth, getPaymentStatus);
 router.get("/order/:orderId", requireAuth, getPaymentByOrderId);
 
 // Payment callback/webhook (no auth required - NOWPayments will call this)
+// Note: webhookCors is applied at app level in app.ts before global CORS
 router.post("/callback", handlePaymentCallback);
 
 export default router;

@@ -42,3 +42,19 @@ export const corsOptions: CorsOptions = {
 };
 
 export default cors(corsOptions);
+
+/**
+ * CORS Configuration for Webhooks
+ * Allows requests without Origin header (for payment gateway webhooks)
+ */
+export const webhookCorsOptions: CorsOptions = {
+  origin: true, // Allow all origins for webhooks (they may not send Origin header)
+  credentials: false, // Webhooks don't need credentials
+  methods: ['POST', 'GET'], // Only POST for webhooks, GET for verification
+  allowedHeaders: ['Content-Type', 'X-Requested-With', 'Accept', 'Origin', 'x-api-key'],
+  exposedHeaders: ['Content-Length'],
+  maxAge: 3600,
+  optionsSuccessStatus: 200
+};
+
+export const webhookCors = cors(webhookCorsOptions);

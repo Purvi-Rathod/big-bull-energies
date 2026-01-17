@@ -285,8 +285,9 @@ export const userLogin = asyncHandler(async (req, res) => {
     throw new AppError("Invalid credentials", 401);
   }
 
-  // Check if user account is active
-  if (user.status !== "active") {
+  // Block suspended, blocked, or suspected users from logging in
+  // Allow inactive users to login (they can activate by investing)
+  if (user.status === "suspended" || user.status === "blocked" || user.status === "suspected") {
     throw new AppError(`Account is ${user.status}. Please contact support.`, 403);
   }
 
@@ -412,8 +413,9 @@ export const verifyLoginToken = asyncHandler(async (req, res) => {
       throw new AppError("User not found", 404);
     }
 
-    // Check if user account is active
-    if (user.status !== "active") {
+    // Block suspended, blocked, or suspected users from logging in
+    // Allow inactive users to login (they can activate by investing)
+    if (user.status === "suspended" || user.status === "blocked" || user.status === "suspected") {
       throw new AppError(`User account is ${user.status}`, 403);
     }
 

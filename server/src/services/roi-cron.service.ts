@@ -1,6 +1,7 @@
 import { Investment } from "../models/Investment";
 import { Package } from "../models/Package";
 import { Wallet } from "../models/Wallet";
+import { User } from "../models/User";
 import { WalletType } from "../models/types";
 import { Types } from "mongoose";
 import { AppError } from "../utils/AppError";
@@ -300,3 +301,70 @@ export async function deactivateExpiredInvestments() {
   }
 }
 
+/**
+ * Mark users as inactive if all their investments are expired
+ * This runs after deactivating expired investments
+ */
+export async function deactivateUsersWithAllExpiredInvestments() {
+  try {
+    console.log(`[ROI Cron] Checking users with all expired investments...`);
+
+    // Get all users who have at least one investment
+    const usersWithInvestments = await Investment.distinct("user");
+    
+    if (usersWithInvestments.length === 0) {
+      console.log(`[ROI Cron] No users with investments found`);
+      return { deactivated: 0 };
+    }
+
+    console.log(`[ROI Cron] Found ${usersWithInvestments.length} users with investments`);
+
+    let deactivatedCount = 0;
+    const userIdsToDeactivate: Types.ObjectId[] = [];
+
+    // Check each user
+    for (const userId of usersWithInvestments) {
+      try {
+        // Count active investments for this user
+        const activeInvestmentsCount = await Investment.countDocuments({
+          user: userId,
+          isActive: true,
+        });
+
+        // Count total investments for this user
+        const totalInvestmentsCount = await Investment.countDocuments({
+          user: userId,
+        });
+
+        // If user has investments but none are active, mark user as inactive
+        if (totalInvestmentsCount > 0 && activeInvestmentsCount === 0) {
+          const user = await User.findById(userId);
+          if (user && user.status === "active") {
+            // Only deactivate if user is currently active (preserve other statuses like suspended, blocked)
+            userIdsToDeactivate.push(userId);
+            console.log(`[ROI Cron] User ${user.userId} (${user.name}) has all expired investments - will be marked inactive`);
+          }
+        }
+      } catch (error) {
+        console.error(`[ROI Cron] Error checking user ${userId}:`, error);
+      }
+    }
+
+    // Batch update users to inactive
+    if (userIdsToDeactivate.length > 0) {
+      const updateResult = await User.updateMany(
+        { _id: { $in: userIdsToDeactivate }, status: "active" },
+        { status: "inactive" }
+      );
+      deactivatedCount = updateResult.modifiedCount;
+      console.log(`[ROI Cron] Marked ${deactivatedCount} users as inactive (all investments expired)`);
+    } else {
+      console.log(`[ROI Cron] No users need to be deactivated`);
+    }
+
+    return { deactivated: deactivatedCount };
+  } catch (error) {
+    console.error("[ROI Cron] Error deactivating users with expired investments:", error);
+    throw error;
+  }
+}

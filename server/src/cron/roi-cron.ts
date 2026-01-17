@@ -1,5 +1,5 @@
 import cron from "node-cron";
-import { calculateDailyROI, deactivateExpiredInvestments } from "../services/roi-cron.service";
+import { calculateDailyROI, deactivateExpiredInvestments, deactivateUsersWithAllExpiredInvestments } from "../services/roi-cron.service";
 import { calculateDailyBinaryBonuses } from "../services/investment.service";
 
 /**
@@ -20,6 +20,9 @@ export function setupROICron() {
     try {
       // Step 1: Deactivate expired investments
       await deactivateExpiredInvestments();
+      
+      // Step 1.5: Mark users as inactive if all their investments are expired
+      await deactivateUsersWithAllExpiredInvestments();
       
       // Step 2: Calculate binary bonuses FIRST (per rule book: binary before ROI)
       // This aggregates daily business volumes from active principals and calculates binary matching
@@ -62,6 +65,9 @@ export async function triggerDailyCalculations() {
     // Step 1: Deactivate expired investments
     await deactivateExpiredInvestments();
     
+    // Step 1.5: Mark users as inactive if all their investments are expired
+    const userDeactivationResult = await deactivateUsersWithAllExpiredInvestments();
+    
     // Step 2: Calculate binary bonuses FIRST (aggregates daily business from active principals)
     const binaryResult = await calculateDailyBinaryBonuses();
     
@@ -69,6 +75,7 @@ export async function triggerDailyCalculations() {
     const roiResult = await calculateDailyROI();
     
     return {
+      usersDeactivated: userDeactivationResult,
       binary: binaryResult,
       roi: roiResult,
     };

@@ -41,17 +41,7 @@ export const validateReferrer = asyncHandler(async (req, res) => {
     });
   }
 
-  if (referrer.status !== "active") {
-    const response = res as any;
-    return response.status(200).json({
-      status: "success",
-      data: {
-        valid: false,
-        message: "Referrer account is not active",
-      },
-    });
-  }
-
+  // Allow inactive users to refer downlines - removed status check
   const response = res as any;
   response.status(200).json({
     status: "success",
@@ -61,6 +51,7 @@ export const validateReferrer = asyncHandler(async (req, res) => {
       referrer: {
         userId: referrer.userId,
         name: referrer.name,
+        status: referrer.status, // Include status in response for frontend info
       },
     },
   });
@@ -129,9 +120,7 @@ export const userSignup = asyncHandler(async (req, res) => {
     if (!referrer) {
       throw new AppError(`Invalid referrer userId: ${referrerUserId}`, 400);
     }
-    if (referrer.status !== "active") {
-      throw new AppError("Referrer account is not active", 400);
-    }
+    // Allow inactive users to refer downlines - removed status check
   } else if (referrerId) {
     // Check if referrerId is a userId format (CROWN-XXXXXX or CNEOX-XXXXXX) or MongoDB ObjectId
     if (typeof referrerId === 'string' && (referrerId.startsWith('CROWN-') || referrerId.startsWith('CNEOX-'))) {
@@ -147,9 +136,7 @@ export const userSignup = asyncHandler(async (req, res) => {
       throw new AppError("Invalid referrer ID", 400);
       }
     }
-    if (referrer.status !== "active") {
-      throw new AppError("Referrer account is not active", 400);
-    }
+    // Allow inactive users to refer downlines - removed status check
   }
 
   // Validate position if provided

@@ -23,6 +23,7 @@ import {
   updateNOWPaymentsStatus,
   getAuthRateLimitingStatus,
   updateAuthRateLimitingStatus,
+  deactivateAllUsers,
   getWithdrawalSchedules,
   updateWithdrawalSchedule,
   changeUserPassword,
@@ -138,6 +139,7 @@ router.get("/settings/nowpayments", requireAdminAuth, getNOWPaymentsStatus);
 router.put("/settings/nowpayments", requireAdminAuth, updateNOWPaymentsStatus);
 router.get("/settings/auth-rate-limiting", requireAdminAuth, getAuthRateLimitingStatus);
 router.put("/settings/auth-rate-limiting", requireAdminAuth, updateAuthRateLimitingStatus);
+router.post("/settings/deactivate-all-users", requireAdminAuth, deactivateAllUsers);
 router.get("/settings/withdrawal-schedules", requireAdminAuth, getWithdrawalSchedules);
 router.put("/settings/withdrawal-schedules", requireAdminAuth, updateWithdrawalSchedule);
 

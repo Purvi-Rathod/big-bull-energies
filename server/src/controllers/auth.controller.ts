@@ -174,7 +174,7 @@ export const userSignup = asyncHandler(async (req, res) => {
   // Generate userId in format CROWN-XXXXXX
   const userId = await generateNextUserId();
 
-  // Create user
+  // Create user with inactive status by default (will be activated when they invest)
   const user = await User.create({
     userId,
     name,
@@ -184,7 +184,7 @@ export const userSignup = asyncHandler(async (req, res) => {
     country: country || undefined,
     referrer: referrer?._id || null,
     position: finalPosition || null,
-    status: "active",
+    status: "inactive", // New users are inactive until they invest
   });
 
   // Initialize binary tree and wallets

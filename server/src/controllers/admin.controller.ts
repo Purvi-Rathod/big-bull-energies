@@ -1375,6 +1375,37 @@ export const updateNOWPaymentsStatus = asyncHandler(async (req, res) => {
 });
 
 /**
+ * Deactivate all users (mark all users as inactive)
+ * POST /api/v1/admin/settings/deactivate-all-users
+ */
+export const deactivateAllUsers = asyncHandler(async (req, res) => {
+  try {
+    // Prevent deactivating admin users
+    const result = await User.updateMany(
+      { 
+        userId: { $nin: ["CROWN-000000", "CNEOX-000000"] },
+        status: { $ne: "inactive" } // Only update users who are not already inactive
+      },
+      { 
+        status: "inactive" 
+      }
+    );
+
+    const response = res as any;
+    response.status(200).json({
+      status: "success",
+      message: `Successfully deactivated ${result.modifiedCount} user(s)`,
+      data: {
+        usersDeactivated: result.modifiedCount,
+        totalUsers: result.matchedCount,
+      },
+    });
+  } catch (error: any) {
+    throw new AppError(error.message || "Failed to deactivate all users", 500);
+  }
+});
+
+/**
  * Get Auth Rate Limiting status
  * GET /api/v1/admin/settings/auth-rate-limiting
  */

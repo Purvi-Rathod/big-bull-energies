@@ -40,6 +40,9 @@ export default function SettingsPage() {
   const [rateLimitingEnabled, setRateLimitingEnabled] = useState<boolean | null>(null);
   const [rateLimitingLoading, setRateLimitingLoading] = useState(false);
   
+  // Deactivate All Users
+  const [deactivateAllLoading, setDeactivateAllLoading] = useState(false);
+  
   // ROI Withdrawal Schedules
   const [packages, setPackages] = useState<PackageSchedule[]>([]);
   const [schedulesLoading, setSchedulesLoading] = useState(true);
@@ -893,6 +896,79 @@ export default function SettingsPage() {
             </p>
           </div>
         )}
+      </div>
+
+      {/* User Management */}
+      <div className="bg-white rounded-lg shadow p-6 border-2 border-orange-200">
+        <div className="mb-4">
+          <h2 className="text-xl font-semibold text-orange-900 flex items-center gap-2">
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+            </svg>
+            User Management
+          </h2>
+          <p className="text-sm text-orange-700 mt-1">
+            Manage user account statuses. All new signups are inactive by default and will be activated when they invest.
+          </p>
+        </div>
+        <div className="flex items-center justify-between p-4 border border-orange-200 rounded-lg bg-orange-50">
+          <div className="flex-1">
+            <h3 className="text-lg font-medium text-orange-900">Deactivate All Users</h3>
+            <p className="text-sm text-orange-700 mt-1">
+              ⚠️ WARNING: This will mark ALL users (except admin accounts) as inactive!
+            </p>
+            <div className="text-xs text-orange-600 mt-2 space-y-1">
+              <p><strong>Will Deactivate:</strong> All user accounts except CROWN-000000 and CNEOX-000000</p>
+              <p><strong>Note:</strong> Users will become active again automatically when they invest in a plan</p>
+              <p><strong>Use Case:</strong> Useful for resetting all user statuses or enforcing investment requirement</p>
+            </div>
+          </div>
+          <button
+            onClick={async () => {
+              const confirmed = await confirm({
+                title: '⚠️ WARNING: Deactivate All Users',
+                message: 'This will mark ALL users (except admin accounts) as inactive!\n\n' +
+                  'This action will:\n' +
+                  '• Mark all users as "inactive" status\n' +
+                  '• Admin accounts (CROWN-000000, CNEOX-000000) will NOT be affected\n' +
+                  '• Users will become active again automatically when they invest\n\n' +
+                  'This is useful for:\n' +
+                  '• Enforcing investment requirement for all users\n' +
+                  '• Resetting user statuses\n' +
+                  '• Requiring users to invest before accessing the platform\n\n' +
+                  'Are you sure you want to proceed?',
+                variant: 'warning',
+                confirmText: 'Yes, Deactivate All',
+                cancelText: 'Cancel',
+              });
+
+              if (!confirmed) return;
+
+              try {
+                setDeactivateAllLoading(true);
+                setError('');
+                const response = await api.deactivateAllUsers();
+                
+                if (response.data) {
+                  toast.success(
+                    `Successfully deactivated ${response.data.usersDeactivated} user(s)!`,
+                    { duration: 5000 }
+                  );
+                }
+              } catch (err: any) {
+                setError(err.message || 'Failed to deactivate all users');
+                toast.error(err.message || 'Failed to deactivate all users');
+                console.error('Error deactivating all users:', err);
+              } finally {
+                setDeactivateAllLoading(false);
+              }
+            }}
+            disabled={deactivateAllLoading}
+            className="ml-4 px-6 py-2 bg-orange-600 text-white rounded-md hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-orange-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors whitespace-nowrap"
+          >
+            {deactivateAllLoading ? 'Deactivating...' : 'Deactivate All Users'}
+          </button>
+        </div>
       </div>
 
       {/* ROI Withdrawal Schedules */}

@@ -446,6 +446,13 @@ export async function processInvestment(
       throw new AppError("User not found", 404);
     }
 
+    // Activate user if they are inactive (users become active when they invest)
+    if (user.status === "inactive") {
+      user.status = "active";
+      await user.save();
+      console.log(`[Investment] User ${user.userId} activated after investment`);
+    }
+
     const pkg = await Package.findById(packageId);
     if (!pkg) {
       throw new AppError("Package not found", 404);

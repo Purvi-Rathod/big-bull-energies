@@ -823,6 +823,12 @@ class ApiClient {
     });
   }
 
+  async deactivateAllUsers() {
+    return this.request<{ usersDeactivated: number; totalUsers: number }>('/admin/settings/deactivate-all-users', {
+      method: 'POST',
+    });
+  }
+
   async getWithdrawalSchedules() {
     return this.request<{ schedules: any; packageSchedules: Array<{ packageId: string; packageName: string; hasCustomSchedule: boolean; schedule: any }> }>('/admin/settings/withdrawal-schedules', {
       method: 'GET',

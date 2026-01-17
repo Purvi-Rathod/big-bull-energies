@@ -100,24 +100,55 @@ app.use((req, res, next) => {
 app.use(cors);
 
 // SECURITY: Request size limits to prevent DoS attacks
+// Helper function to check if request is a callback route
+const isCallbackRoute = (req: express.Request): boolean => {
+  const originalUrl = req.originalUrl || '';
+  const path = req.path || '';
+  return originalUrl.includes('/payment/callback') || 
+         originalUrl === '/api/v1/payment/callback' ||
+         path === '/callback';
+};
+
+// Helper function to check if request is root POST
+const isRootPost = (req: express.Request): boolean => {
+  return req.method === 'POST' && (req.path === '/' || req.originalUrl === '/');
+};
+
 // JSON parser middleware (skip for callback route and root POST which use raw body)
 const jsonParser = express.json({ limit: "10kb" });
 app.use((req, res, next) => {
-  const isCallbackRoute = req.path === '/callback' || req.originalUrl === '/api/v1/payment/callback';
-  const isRootPost = req.method === 'POST' && (req.path === '/' || req.originalUrl === '/');
-  
-  if (isCallbackRoute || isRootPost) {
+  if (isCallbackRoute(req) || isRootPost(req)) {
     return next(); // Skip JSON parsing for callback routes (they use raw body)
   }
   jsonParser(req, res, next);
 });
-app.use(express.urlencoded({ extended: true, limit: "10kb", parameterLimit: 10 })); // Limit parameters
+
+// URL-encoded parser middleware (skip for callback routes and root POST)
+const urlencodedParser = express.urlencoded({ extended: true, limit: "10kb", parameterLimit: 100 });
+app.use((req, res, next) => {
+  if (isCallbackRoute(req) || isRootPost(req)) {
+    return next(); // Skip URL-encoded parsing for callback routes (they use raw body)
+  }
+  urlencodedParser(req, res, next);
+});
 
 // Input sanitization (protect against injection attacks)
-app.use(sanitizeInput);
+// Skip sanitization for callback routes (webhooks need exact data structure)
+app.use((req, res, next) => {
+  if (isCallbackRoute(req) || isRootPost(req)) {
+    return next(); // Skip sanitization for callback routes (webhooks need exact data)
+  }
+  sanitizeInput(req, res, next);
+});
 
 // ObjectId validation middleware
-app.use(validateObjectId);
+// Skip validation for callback routes (webhooks don't use ObjectIds in body)
+app.use((req, res, next) => {
+  if (isCallbackRoute(req) || isRootPost(req)) {
+    return next(); // Skip ObjectId validation for callback routes
+  }
+  validateObjectId(req, res, next);
+});
 
 app.use(express.static("public"));
 app.use(cookieParser());

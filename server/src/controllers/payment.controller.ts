@@ -166,9 +166,20 @@ export const createPayment = asyncHandler(async (req, res) => {
 
   // Get callback URLs from environment
   const baseUrl = process.env.CLIENT_URL || process.env.FRONTEND_URL || 'http://localhost:3000';
-  const callbackUrl = process.env.NOWPAYMENTS_CALLBACK_URL || `${process.env.API_URL || 'https://api.crownbankers.com'}/api/v1/payment/callback`;
+  const apiUrl = process.env.API_URL || 'https://api.crownbankers.com';
+  const callbackUrl = process.env.NOWPAYMENTS_CALLBACK_URL || `${apiUrl}/api/v1/payment/callback`;
   const successUrl = `${baseUrl}/invest/success?orderId=${orderId}`;
   const cancelUrl = `${baseUrl}/invest/cancel?orderId=${orderId}`;
+  
+  console.log(`[Payment Create] 📋 Payment Configuration:`);
+  console.log(`[Payment Create]   - Order ID: ${orderId}`);
+  console.log(`[Payment Create]   - Amount: $${investmentAmount}`);
+  console.log(`[Payment Create]   - Package: ${pkg.packageName}`);
+  console.log(`[Payment Create]   - User ID: ${userId}`);
+  console.log(`[Payment Create]   - API URL: ${apiUrl}`);
+  console.log(`[Payment Create]   - Callback URL: ${callbackUrl}`);
+  console.log(`[Payment Create]   - Success URL: ${successUrl}`);
+  console.log(`[Payment Create]   - Cancel URL: ${cancelUrl}`);
 
   // Check if NOWPayments is enabled
   const nowpaymentsSetting = await Settings.findOne({ key: "nowpayments_enabled" });
@@ -223,6 +234,14 @@ export const createPayment = asyncHandler(async (req, res) => {
       ? `Investment in ${pkg.packageName} - $${investmentAmount} (Voucher: $${voucherInvestmentValue}, Remaining: $${remainingAmount})`
       : `Investment in ${pkg.packageName} - $${investmentAmount}`;
 
+    console.log(`[Payment Create] 📤 Sending invoice request to NOWPayments:`);
+    console.log(`[Payment Create]   - price_amount: ${paymentAmount}`);
+    console.log(`[Payment Create]   - price_currency: ${currency.toUpperCase()}`);
+    console.log(`[Payment Create]   - order_id: ${orderId}`);
+    console.log(`[Payment Create]   - ipn_callback_url: ${callbackUrl}`);
+    console.log(`[Payment Create]   - success_url: ${successUrl}`);
+    console.log(`[Payment Create]   - cancel_url: ${cancelUrl}`);
+    
     const invoiceResponse = await createNOWPaymentsInvoice({
       price_amount: paymentAmount,
       price_currency: currency.toUpperCase(),
@@ -233,6 +252,11 @@ export const createPayment = asyncHandler(async (req, res) => {
       cancel_url: cancelUrl,
       customer_email: customerEmail,
     });
+    
+    console.log(`[Payment Create] ✅ Invoice created successfully!`);
+    console.log(`[Payment Create]   - Invoice ID: ${invoiceResponse.id || invoiceResponse.token || 'N/A'}`);
+    console.log(`[Payment Create]   - Invoice URL: ${invoiceResponse.invoice_url || 'N/A'}`);
+    console.log(`[Payment Create]   - Full Response:`, JSON.stringify(invoiceResponse, null, 2));
 
     // Construct invoice URL if not provided
     // Invoice URL format: https://nowpayments.io/invoice/?iid={invoice_id}

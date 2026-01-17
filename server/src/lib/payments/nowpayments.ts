@@ -324,9 +324,10 @@ export function verifyNOWPaymentsCallback(
 
 /**
  * Check if payment status indicates completion
+ * Note: 'partially_paid' is handled separately and is not considered completed
  */
 export function isPaymentCompleted(status: string): boolean {
-  const completedStatuses = ['finished', 'confirmed', 'sending', 'partially_paid'];
+  const completedStatuses = ['finished', 'confirmed', 'sending'];
   return completedStatuses.includes(status.toLowerCase());
 }
 

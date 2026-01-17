@@ -331,26 +331,65 @@ export const createPayment = asyncHandler(async (req, res) => {
  * POST /api/v1/payment/callback
  */
 export const handlePaymentCallback = asyncHandler(async (req, res) => {
-  console.log(`[NOWPayments Callback] ✅ Callback received at ${new Date().toISOString()}`);
+  console.log(`\n${'='.repeat(80)}`);
+  console.log(`[NOWPayments Callback] ✅✅✅ CALLBACK HANDLER STARTED ✅✅✅`);
+  console.log(`[NOWPayments Callback] Timestamp: ${new Date().toISOString()}`);
   console.log(`[NOWPayments Callback] Request URL: ${req.originalUrl}`);
-  console.log(`[NOWPayments Callback] Request method: ${req.method}`);
-  console.log(`[NOWPayments Callback] Request headers:`, JSON.stringify(req.headers, null, 2));
+  console.log(`[NOWPayments Callback] Request Path: ${req.path}`);
+  console.log(`[NOWPayments Callback] Request Method: ${req.method}`);
+  console.log(`[NOWPayments Callback] Request Protocol: ${req.protocol}`);
+  console.log(`[NOWPayments Callback] Request Host: ${req.get('host')}`);
+  console.log(`[NOWPayments Callback] Request IP: ${req.ip}`);
+  console.log(`[NOWPayments Callback] Remote Address: ${req.socket.remoteAddress}`);
+  console.log(`[NOWPayments Callback] X-Forwarded-For: ${req.get('x-forwarded-for') || 'N/A'}`);
+  console.log(`[NOWPayments Callback] X-Real-IP: ${req.get('x-real-ip') || 'N/A'}`);
+  console.log(`[NOWPayments Callback] User-Agent: ${req.get('user-agent') || 'N/A'}`);
+  console.log(`[NOWPayments Callback] Content-Type: ${req.get('content-type') || 'N/A'}`);
+  console.log(`[NOWPayments Callback] Content-Length: ${req.get('content-length') || 'N/A'}`);
+  console.log(`[NOWPayments Callback] All Headers:`, JSON.stringify(req.headers, null, 2));
   
   // Parse body (may be raw Buffer or already parsed JSON)
   let callback: NOWPaymentsCallback;
   let rawBody: string;
   
+  console.log(`[NOWPayments Callback] Body Type: ${Buffer.isBuffer(req.body) ? 'Buffer (raw)' : typeof req.body}`);
+  
   if (Buffer.isBuffer(req.body)) {
     // Raw body from express.raw middleware
     rawBody = req.body.toString('utf8');
-    callback = JSON.parse(rawBody);
+    console.log(`[NOWPayments Callback] Raw Body (string): ${rawBody}`);
+    console.log(`[NOWPayments Callback] Raw Body Length: ${rawBody.length} characters`);
+    try {
+      callback = JSON.parse(rawBody);
+      console.log(`[NOWPayments Callback] ✅ Successfully parsed JSON from raw body`);
+    } catch (parseError: any) {
+      console.error(`[NOWPayments Callback] ❌ Failed to parse JSON:`, parseError.message);
+      throw new AppError("Invalid JSON in callback body", 400);
+    }
   } else {
     // Already parsed JSON
     callback = req.body as NOWPaymentsCallback;
     rawBody = JSON.stringify(req.body);
+    console.log(`[NOWPayments Callback] Body already parsed as JSON`);
   }
   
-  console.log(`[NOWPayments Callback] Request body:`, JSON.stringify(callback, null, 2));
+  console.log(`[NOWPayments Callback] Parsed Callback Data:`, JSON.stringify(callback, null, 2));
+  console.log(`[NOWPayments Callback] Callback Fields:`);
+  console.log(`[NOWPayments Callback]   - payment_id: ${callback.payment_id || 'N/A'}`);
+  console.log(`[NOWPayments Callback]   - invoice_id: ${callback.invoice_id || 'N/A'}`);
+  console.log(`[NOWPayments Callback]   - payment_status: ${callback.payment_status || 'N/A'}`);
+  console.log(`[NOWPayments Callback]   - order_id: ${callback.order_id || 'N/A'}`);
+  console.log(`[NOWPayments Callback]   - price_amount: ${callback.price_amount || 'N/A'}`);
+  console.log(`[NOWPayments Callback]   - price_currency: ${callback.price_currency || 'N/A'}`);
+  console.log(`[NOWPayments Callback]   - pay_amount: ${callback.pay_amount || 'N/A'}`);
+  console.log(`[NOWPayments Callback]   - pay_currency: ${callback.pay_currency || 'N/A'}`);
+  console.log(`[NOWPayments Callback]   - actually_paid: ${callback.actually_paid || 'N/A'}`);
+  console.log(`[NOWPayments Callback]   - pay_address: ${callback.pay_address || 'N/A'}`);
+  console.log(`[NOWPayments Callback]   - outcome_amount: ${callback.outcome_amount || 'N/A'}`);
+  console.log(`[NOWPayments Callback]   - outcome_currency: ${callback.outcome_currency || 'N/A'}`);
+  console.log(`[NOWPayments Callback]   - network: ${callback.network || 'N/A'}`);
+  console.log(`[NOWPayments Callback]   - created_at: ${callback.created_at || 'N/A'}`);
+  console.log(`[NOWPayments Callback]   - updated_at: ${callback.updated_at || 'N/A'}`);
   
   // Get signature from headers (NOWPayments may send it in different header names)
   const signature = (req.headers['x-nowpayments-sig'] || 
@@ -358,19 +397,54 @@ export const handlePaymentCallback = asyncHandler(async (req, res) => {
                      req.headers['x-signature'] ||
                      req.headers['signature']) as string | undefined;
 
+  console.log(`[NOWPayments Callback] Signature Headers Check:`);
+  console.log(`[NOWPayments Callback]   - x-nowpayments-sig: ${req.headers['x-nowpayments-sig'] || 'N/A'}`);
+  console.log(`[NOWPayments Callback]   - x-nowpayments-signature: ${req.headers['x-nowpayments-signature'] || 'N/A'}`);
+  console.log(`[NOWPayments Callback]   - x-signature: ${req.headers['x-signature'] || 'N/A'}`);
+  console.log(`[NOWPayments Callback]   - signature: ${req.headers['signature'] || 'N/A'}`);
+  console.log(`[NOWPayments Callback]   - Selected Signature: ${signature || 'N/A'}`);
+  console.log(`[NOWPayments Callback]   - Raw Body Length: ${rawBody.length} characters`);
+
   // Verify callback
+  console.log(`[NOWPayments Callback] Verifying callback...`);
   if (!verifyNOWPaymentsCallback(callback, signature, rawBody)) {
-    console.error("[NOWPayments Callback] ❌ Invalid callback data or signature:", callback);
+    console.error(`[NOWPayments Callback] ❌❌❌ CALLBACK VERIFICATION FAILED ❌❌❌`);
+    console.error(`[NOWPayments Callback] Invalid callback data or signature`);
+    console.error(`[NOWPayments Callback] Callback Data:`, JSON.stringify(callback, null, 2));
+    console.error(`[NOWPayments Callback] Signature: ${signature || 'N/A'}`);
+    console.error(`[NOWPayments Callback] Raw Body: ${rawBody.substring(0, 200)}...`);
     throw new AppError("Invalid callback data or signature", 400);
   }
   
-  console.log(`[NOWPayments Callback] ✅ Callback verified successfully. Payment ID: ${callback.payment_id}, Order ID: ${callback.order_id}, Status: ${callback.payment_status}`);
+  console.log(`[NOWPayments Callback] ✅✅✅ CALLBACK VERIFIED SUCCESSFULLY ✅✅✅`);
+  console.log(`[NOWPayments Callback] Payment ID: ${callback.payment_id}`);
+  console.log(`[NOWPayments Callback] Order ID: ${callback.order_id}`);
+  console.log(`[NOWPayments Callback] Payment Status: ${callback.payment_status}`);
+  console.log(`[NOWPayments Callback] Price Amount: ${callback.price_amount} ${callback.price_currency}`);
+  console.log(`[NOWPayments Callback] Actually Paid: ${callback.actually_paid} ${callback.pay_currency || ''}`);
 
-  // Extract order ID and user info
+  // Extract order ID and invoice ID
   const orderId = callback.order_id;
+  const invoiceId = callback.invoice_id;
+  
+  console.log(`[NOWPayments Callback] Processing Order ID: ${orderId || 'N/A'}`);
+  console.log(`[NOWPayments Callback] Processing Invoice ID: ${invoiceId || 'N/A'}`);
+  console.log(`[NOWPayments Callback] Order ID Type: ${orderId ? (orderId.startsWith('VCH_') ? 'Voucher' : orderId.startsWith('INV_') ? 'Investment' : 'Unknown') : 'N/A'}`);
+  
+  // Validate crypto type - reject LTCT (Litecoin Testnet) like old implementation
+  const cryptoType = callback.pay_currency;
+  if (cryptoType === "LTCT") {
+    console.error(`[NOWPayments Callback] ❌ Rejecting LTCT (Litecoin Testnet) payment`);
+    const response = res as any;
+    return response.status(400).json({
+      status: "error",
+      message: "LTCT (Litecoin Testnet) is not supported",
+    });
+  }
   
   // Handle voucher purchase callbacks (VCH_ prefix)
   if (orderId && orderId.startsWith("VCH_")) {
+    console.log(`[NOWPayments Callback] 📦 Processing VOUCHER purchase callback`);
     const { Voucher } = await import("../models/Voucher");
     const orderParts = orderId.split("_");
     if (orderParts.length < 2) {
@@ -439,26 +513,53 @@ export const handlePaymentCallback = asyncHandler(async (req, res) => {
 
   // Handle investment payment callbacks (INV_ prefix)
   if (!orderId || !orderId.startsWith("INV_")) {
-    console.error("Invalid order ID in callback:", orderId);
+    console.error(`[NOWPayments Callback] ❌ Invalid order ID: ${orderId}`);
+    console.error(`[NOWPayments Callback] Order ID must start with 'INV_' for investment payments`);
     throw new AppError("Invalid order ID", 400);
   }
+
+  console.log(`[NOWPayments Callback] 💰 Processing INVESTMENT payment callback`);
 
   // Parse order ID to get user ID and package info
   // Format: INV_{userId}_{timestamp}_{random}
   const orderParts = orderId.split("_");
+  console.log(`[NOWPayments Callback] Order ID Parts:`, orderParts);
+  
   if (orderParts.length < 2) {
+    console.error(`[NOWPayments Callback] ❌ Invalid order ID format - not enough parts`);
     throw new AppError("Invalid order ID format", 400);
   }
 
   const userId = orderParts[1];
+  console.log(`[NOWPayments Callback] Extracted User ID: ${userId}`);
+  
   if (!Types.ObjectId.isValid(userId)) {
+    console.error(`[NOWPayments Callback] ❌ Invalid user ID format: ${userId}`);
     throw new AppError("Invalid user ID in order", 400);
   }
 
-  // Find payment record
-  const payment = await Payment.findOne({ orderId });
+  // Find payment record - try orderId first, then invoice_id (like old implementation)
+  console.log(`[NOWPayments Callback] Searching for payment record with orderId: ${orderId}`);
+  let payment = await Payment.findOne({ orderId }).populate('user', 'userId name email').populate('package', 'packageName');
+  
+  // If not found by orderId, try invoice_id (old implementation pattern)
+  if (!payment && invoiceId) {
+    console.log(`[NOWPayments Callback] Payment not found by orderId, trying invoice_id: ${invoiceId}`);
+    payment = await Payment.findOne({ paymentId: invoiceId }).populate('user', 'userId name email').populate('package', 'packageName');
+  }
+  
+  // If still not found, try payment_id
+  if (!payment && callback.payment_id) {
+    console.log(`[NOWPayments Callback] Payment not found by invoice_id, trying payment_id: ${callback.payment_id}`);
+    payment = await Payment.findOne({ paymentId: callback.payment_id }).populate('user', 'userId name email').populate('package', 'packageName');
+  }
+  
   if (!payment) {
-    console.error(`Payment not found for order ${orderId}`);
+    console.error(`[NOWPayments Callback] ❌ Payment not found for order ${orderId}, invoice ${invoiceId}, or payment ${callback.payment_id}`);
+    console.error(`[NOWPayments Callback] This might indicate:`);
+    console.error(`[NOWPayments Callback]   1. Payment was not created properly`);
+    console.error(`[NOWPayments Callback]   2. Order ID/Invoice ID mismatch`);
+    console.error(`[NOWPayments Callback]   3. Database issue`);
     // Still return 200 to NOWPayments
     const response = res as any;
     return response.status(200).json({
@@ -466,41 +567,166 @@ export const handlePaymentCallback = asyncHandler(async (req, res) => {
       message: "Payment record not found",
     });
   }
+  
+  console.log(`[NOWPayments Callback] ✅ Payment record found!`);
+  console.log(`[NOWPayments Callback] Payment Details:`);
+  console.log(`[NOWPayments Callback]   - Payment ID: ${payment._id}`);
+  console.log(`[NOWPayments Callback]   - Payment Status: ${payment.status}`);
+  console.log(`[NOWPayments Callback]   - Amount: $${parseFloat(payment.amount.toString())}`);
+  console.log(`[NOWPayments Callback]   - Currency: ${payment.currency}`);
+  console.log(`[NOWPayments Callback]   - User: ${(payment.user as any)?.userId || 'N/A'} (${(payment.user as any)?.name || 'N/A'})`);
+  console.log(`[NOWPayments Callback]   - Package: ${(payment.package as any)?.packageName || 'N/A'}`);
+  console.log(`[NOWPayments Callback]   - Existing Investment ID: ${payment.investmentId || 'N/A'}`);
+
+  // Check if payment is already finished (prevent duplicate processing - like old implementation)
+  if (payment.status === "completed") {
+    console.log(`[NOWPayments Callback] ⚠️ Payment already completed (status: ${payment.status})`);
+    console.log(`[NOWPayments Callback] This callback is likely a duplicate. Returning success.`);
+    
+    // Still update callback data for record keeping
+    payment.callbackData = callback;
+    payment.actuallyPaid = callback.actually_paid
+      ? Types.Decimal128.fromString(callback.actually_paid.toString())
+      : undefined;
+    await payment.save();
+    
+    const response = res as any;
+    console.log(`[NOWPayments Callback] ✅✅✅ CALLBACK PROCESSING COMPLETE (DUPLICATE) ✅✅✅`);
+    console.log(`${'='.repeat(80)}\n`);
+    return response.status(200).json({
+      status: "success",
+      message: "Payment already processed - duplicate callback",
+    });
+  }
+
+  // Handle partially_paid status separately (like old implementation)
+  if (callback.payment_status === "partially_paid") {
+    console.log(`[NOWPayments Callback] ⚠️ PARTIALLY PAID STATUS DETECTED`);
+    console.log(`[NOWPayments Callback] Actually Paid: ${callback.actually_paid} ${callback.pay_currency || ''}`);
+    console.log(`[NOWPayments Callback] Price Amount: ${callback.price_amount} ${callback.price_currency || ''}`);
+    console.log(`[NOWPayments Callback] Order ID: ${orderId || invoiceId || 'N/A'}`);
+    
+    // Update payment record
+    payment.status = "processing";
+    payment.callbackData = callback;
+    payment.actuallyPaid = callback.actually_paid
+      ? Types.Decimal128.fromString(callback.actually_paid.toString())
+      : undefined;
+    await payment.save();
+    
+    // Log partial payment (like old implementation sent notifications)
+    console.log(`[NOWPayments Callback] ⚠️ PARTIAL PAYMENT RECEIVED ⚠️`);
+    console.log(`[NOWPayments Callback] Partial payment received for order ${orderId || invoiceId || 'N/A'}`);
+    console.log(`[NOWPayments Callback] Amount Paid: $${callback.actually_paid || 0}`);
+    console.log(`[NOWPayments Callback] Amount Expected: $${callback.price_amount || 0}`);
+    console.log(`[NOWPayments Callback] Waiting for full payment...`);
+    
+    const response = res as any;
+    console.log(`[NOWPayments Callback] ✅✅✅ PARTIAL PAYMENT CALLBACK PROCESSED ✅✅✅`);
+    console.log(`${'='.repeat(80)}\n`);
+    return response.status(200).json({
+      status: "success",
+      message: "Partial payment callback processed - waiting for full payment",
+    });
+  }
 
   // Update payment with callback data
+  console.log(`[NOWPayments Callback] Updating payment record with callback data...`);
   payment.callbackData = callback;
   payment.actuallyPaid = callback.actually_paid
     ? Types.Decimal128.fromString(callback.actually_paid.toString())
     : undefined;
+  
+  console.log(`[NOWPayments Callback] Payment updated with:`);
+  console.log(`[NOWPayments Callback]   - Actually Paid: ${callback.actually_paid || 'N/A'}`);
+  console.log(`[NOWPayments Callback]   - Callback Data: Stored`);
 
   // Get payment status from NOWPayments to verify
+  console.log(`[NOWPayments Callback] Fetching payment status from NOWPayments API...`);
+  console.log(`[NOWPayments Callback] Payment ID to check: ${callback.payment_id}`);
+  
   try {
     const paymentStatus = await getNOWPaymentsPaymentStatus(callback.payment_id);
+    console.log(`[NOWPayments Callback] ✅ Payment status fetched from NOWPayments`);
+    console.log(`[NOWPayments Callback] Payment Status Response:`, JSON.stringify(paymentStatus, null, 2));
 
     // Update payment status
-    if (isPaymentCompleted(paymentStatus.payment_status)) {
+    const paymentStatusStr = paymentStatus.payment_status;
+    const isCompleted = isPaymentCompleted(paymentStatusStr);
+    const isFailed = isPaymentFailed(paymentStatusStr);
+    
+    console.log(`[NOWPayments Callback] Payment Status Analysis:`);
+    console.log(`[NOWPayments Callback]   - Status from API: ${paymentStatusStr}`);
+    console.log(`[NOWPayments Callback]   - Is Completed: ${isCompleted}`);
+    console.log(`[NOWPayments Callback]   - Is Failed: ${isFailed}`);
+    
+    if (isCompleted) {
       payment.status = "completed";
       await payment.save();
       
-      console.log(`[NOWPayments Callback] ✅ Payment ${callback.payment_id} marked as completed for order ${orderId}`);
-      console.log(`[NOWPayments Callback] Payment details - Amount: ${callback.price_amount} ${callback.price_currency}, Actually Paid: ${callback.actually_paid} ${callback.pay_currency}`);
+      console.log(`[NOWPayments Callback] ✅✅✅ PAYMENT COMPLETED ✅✅✅`);
+      console.log(`[NOWPayments Callback] Payment ${callback.payment_id} marked as completed for order ${orderId}`);
+      console.log(`[NOWPayments Callback] Payment Summary:`);
+      console.log(`[NOWPayments Callback]   - Payment ID: ${callback.payment_id}`);
+      console.log(`[NOWPayments Callback]   - Order ID: ${orderId}`);
+      console.log(`[NOWPayments Callback]   - Price Amount: ${callback.price_amount} ${callback.price_currency}`);
+      console.log(`[NOWPayments Callback]   - Actually Paid: ${callback.actually_paid} ${callback.pay_currency || ''}`);
+      console.log(`[NOWPayments Callback]   - Pay Address: ${callback.pay_address || 'N/A'}`);
+      console.log(`[NOWPayments Callback]   - Network: ${callback.network || 'N/A'}`);
+      console.log(`[NOWPayments Callback]   - User ID: ${userId}`);
       console.log(`[NOWPayments Callback] Processing investment for user ${userId}...`);
+      
+      // Check for duplicate investment (like old implementation)
+      // Old implementation checked by txn_id, we check by paymentId stored in voucherId field
+      const txnId = callback.payment_id || invoiceId || payment.paymentId;
+      console.log(`[NOWPayments Callback] Checking for duplicate investment by payment ID: ${txnId}`);
+      
+      const existingInvestment = await Investment.findOne({ 
+        voucherId: txnId // paymentId is stored in voucherId field
+      });
+      
+      if (existingInvestment) {
+        console.log(`[NOWPayments Callback] ⚠️ Investment already exists for payment ID ${txnId}`);
+        console.log(`[NOWPayments Callback] Existing Investment ID: ${existingInvestment._id}`);
+        console.log(`[NOWPayments Callback] This is a duplicate callback. Returning success.`);
+        
+        // Link investment to payment if not already linked
+        if (!payment.investmentId) {
+          payment.investmentId = existingInvestment._id as Types.ObjectId;
+          await payment.save();
+          console.log(`[NOWPayments Callback] ✅ Linked existing investment to payment record`);
+        }
+        
+        const response = res as any;
+        console.log(`[NOWPayments Callback] ✅✅✅ CALLBACK PROCESSING COMPLETE (DUPLICATE INVESTMENT) ✅✅✅`);
+        console.log(`${'='.repeat(80)}\n`);
+        return response.status(200).json({
+          status: "success",
+          message: "Investment already exists - duplicate callback",
+        });
+      }
       
       // Auto-create investment if it doesn't exist yet
       if (!payment.investmentId) {
+        console.log(`[NOWPayments Callback] 💼 Investment does not exist, creating now...`);
         try {
           // Extract voucherId from payment meta if available
           const voucherId = payment.meta && (payment.meta as any).voucherId 
             ? (payment.meta as any).voucherId 
             : undefined;
           
-          console.log(`[NOWPayments Callback] Creating investment - User: ${userId}, Package: ${payment.package}, Amount: ${payment.amount}, Voucher: ${voucherId || 'none'}`);
+          console.log(`[NOWPayments Callback] Investment Creation Parameters:`);
+          console.log(`[NOWPayments Callback]   - User ID: ${userId}`);
+          console.log(`[NOWPayments Callback]   - Package ID: ${payment.package}`);
+          console.log(`[NOWPayments Callback]   - Amount: $${parseFloat(payment.amount.toString())}`);
+          console.log(`[NOWPayments Callback]   - Payment ID: ${txnId}`);
+          console.log(`[NOWPayments Callback]   - Voucher ID: ${voucherId || 'none'}`);
           
           const investment = await processInvestment(
             new Types.ObjectId(userId),
             payment.package as Types.ObjectId,
             parseFloat(payment.amount.toString()),
-            payment.paymentId, // Use NOWPayments payment ID
+            txnId, // Use payment_id/invoice_id as transaction ID (like old implementation)
             voucherId
           );
           
@@ -508,34 +734,50 @@ export const handlePaymentCallback = asyncHandler(async (req, res) => {
           payment.investmentId = investment._id as Types.ObjectId;
           await payment.save();
           
-          console.log(`[NOWPayments Callback] ✅ Investment created successfully!`);
-          console.log(`[NOWPayments Callback] Investment ID: ${investment._id}`);
-          console.log(`[NOWPayments Callback] Investment Amount: ${parseFloat(payment.amount.toString())}`);
-          console.log(`[NOWPayments Callback] Payment ID: ${callback.payment_id}`);
-          console.log(`[NOWPayments Callback] Order ID: ${orderId}`);
-          console.log(`[NOWPayments Callback] User ID: ${userId}`);
+          console.log(`[NOWPayments Callback] ✅✅✅ INVESTMENT CREATED SUCCESSFULLY ✅✅✅`);
+          console.log(`[NOWPayments Callback] Investment Details:`);
+          console.log(`[NOWPayments Callback]   - Investment ID: ${investment._id}`);
+          console.log(`[NOWPayments Callback]   - Investment Amount: $${parseFloat(payment.amount.toString())}`);
+          console.log(`[NOWPayments Callback]   - Payment ID: ${txnId}`);
+          console.log(`[NOWPayments Callback]   - Order ID: ${orderId}`);
+          console.log(`[NOWPayments Callback]   - User ID: ${userId}`);
+          console.log(`[NOWPayments Callback]   - Package: ${(payment.package as any)?.packageName || 'N/A'}`);
+          console.log(`[NOWPayments Callback]   - Linked to Payment Record: ✅`);
         } catch (investmentError: any) {
-          console.error(`[NOWPayments Callback] ❌ Error creating investment for payment ${callback.payment_id}:`, investmentError);
-          console.error(`[NOWPayments Callback] Error details:`, investmentError.message);
-          console.error(`[NOWPayments Callback] Stack trace:`, investmentError.stack);
+          console.error(`[NOWPayments Callback] ❌❌❌ INVESTMENT CREATION FAILED ❌❌❌`);
+          console.error(`[NOWPayments Callback] Payment ID: ${txnId}`);
+          console.error(`[NOWPayments Callback] Order ID: ${orderId}`);
+          console.error(`[NOWPayments Callback] User ID: ${userId}`);
+          console.error(`[NOWPayments Callback] Error Message: ${investmentError.message}`);
+          console.error(`[NOWPayments Callback] Error Stack:`, investmentError.stack);
+          console.error(`[NOWPayments Callback] Full Error:`, JSON.stringify(investmentError, null, 2));
           // Don't fail the callback - investment can be created manually later
           // The success page will also try to create it
         }
       } else {
-        console.log(`[NOWPayments Callback] ℹ️ Investment already exists for payment ${callback.payment_id}: ${payment.investmentId}`);
+        console.log(`[NOWPayments Callback] ℹ️ Investment already exists for payment ${txnId}`);
+        console.log(`[NOWPayments Callback] Existing Investment ID: ${payment.investmentId}`);
       }
       
       const response = res as any;
-      console.log(`[NOWPayments Callback] ✅ Callback processed successfully - returning success response`);
+      console.log(`[NOWPayments Callback] ✅✅✅ CALLBACK PROCESSING COMPLETE ✅✅✅`);
+      console.log(`[NOWPayments Callback] Returning success response to NOWPayments`);
+      console.log(`${'='.repeat(80)}\n`);
       return response.status(200).json({
         status: "success",
         message: "Payment callback processed - payment confirmed and investment processed",
       });
-    } else if (isPaymentFailed(paymentStatus.payment_status)) {
+    } else if (isFailed) {
       payment.status = "failed";
       await payment.save();
       
-      console.log(`Payment ${callback.payment_id} failed for order ${orderId}`);
+      console.log(`[NOWPayments Callback] ❌❌❌ PAYMENT FAILED ❌❌❌`);
+      console.log(`[NOWPayments Callback] Payment ${callback.payment_id} failed for order ${orderId}`);
+      console.log(`[NOWPayments Callback] Payment Status: ${paymentStatusStr}`);
+      console.log(`[NOWPayments Callback] Order ID: ${orderId}`);
+      console.log(`[NOWPayments Callback] User ID: ${userId}`);
+      console.log(`[NOWPayments Callback] Payment record updated to 'failed' status`);
+      console.log(`${'='.repeat(80)}\n`);
       
       const response = res as any;
       return response.status(200).json({
@@ -547,7 +789,14 @@ export const handlePaymentCallback = asyncHandler(async (req, res) => {
       payment.status = "processing";
       await payment.save();
       
-      console.log(`Payment ${callback.payment_id} is pending for order ${orderId}`);
+      console.log(`[NOWPayments Callback] ⏳ PAYMENT PENDING`);
+      console.log(`[NOWPayments Callback] Payment ${callback.payment_id} is pending for order ${orderId}`);
+      console.log(`[NOWPayments Callback] Payment Status: ${paymentStatusStr}`);
+      console.log(`[NOWPayments Callback] Order ID: ${orderId}`);
+      console.log(`[NOWPayments Callback] User ID: ${userId}`);
+      console.log(`[NOWPayments Callback] Payment record updated to 'processing' status`);
+      console.log(`[NOWPayments Callback] Will process investment when payment is completed`);
+      console.log(`${'='.repeat(80)}\n`);
       
       const response = res as any;
       return response.status(200).json({
@@ -556,9 +805,20 @@ export const handlePaymentCallback = asyncHandler(async (req, res) => {
       });
     }
   } catch (error: any) {
-    console.error("Error processing payment callback:", error);
+    console.error(`[NOWPayments Callback] ❌❌❌ ERROR PROCESSING CALLBACK ❌❌❌`);
+    console.error(`[NOWPayments Callback] Payment ID: ${callback.payment_id}`);
+    console.error(`[NOWPayments Callback] Order ID: ${orderId}`);
+    console.error(`[NOWPayments Callback] User ID: ${userId}`);
+    console.error(`[NOWPayments Callback] Error Message: ${error.message}`);
+    console.error(`[NOWPayments Callback] Error Stack:`, error.stack);
+    console.error(`[NOWPayments Callback] Full Error:`, JSON.stringify(error, null, 2));
+    
     payment.status = "processing";
     await payment.save();
+    
+    console.log(`[NOWPayments Callback] Payment record updated to 'processing' status`);
+    console.log(`[NOWPayments Callback] Returning 200 to NOWPayments to prevent retries`);
+    console.log(`${'='.repeat(80)}\n`);
     
     // Still return 200 to NOWPayments so they don't retry
     const response = res as any;

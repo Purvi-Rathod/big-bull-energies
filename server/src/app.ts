@@ -10,11 +10,81 @@ import adminRoutes from './routes/admin.routes';
 
 const app = express();
 
+// Trust proxy setting (required when behind reverse proxy/load balancer)
+// This allows express-rate-limit to correctly identify client IPs
+app.set('trust proxy', true);
+
 // Security headers middleware
 app.use(securityHeaders);
 
 // Compression middleware (should be early in the stack)
 app.use(compression({ level: 6, threshold: 1024 }));
+
+// Detailed logging middleware for callback routes (applied before body parsing)
+const callbackLogger = (req: express.Request, res: express.Response, next: express.NextFunction) => {
+  const isCallbackRoute = req.originalUrl === '/api/v1/payment/callback' || 
+                          (req.method === 'POST' && req.originalUrl === '/');
+  
+  if (req.method === 'POST' && isCallbackRoute) {
+    console.log(`\n${'='.repeat(80)}`);
+    console.log(`[CALLBACK LOGGER] 📥 POST Request Received`);
+    console.log(`[CALLBACK LOGGER] Timestamp: ${new Date().toISOString()}`);
+    console.log(`[CALLBACK LOGGER] Route: ${req.originalUrl}`);
+    console.log(`[CALLBACK LOGGER] Path: ${req.path}`);
+    console.log(`[CALLBACK LOGGER] Base URL: ${req.baseUrl}`);
+    console.log(`[CALLBACK LOGGER] Method: ${req.method}`);
+    console.log(`[CALLBACK LOGGER] Protocol: ${req.protocol}`);
+    console.log(`[CALLBACK LOGGER] Secure: ${req.secure}`);
+    console.log(`[CALLBACK LOGGER] Host: ${req.get('host')}`);
+    console.log(`[CALLBACK LOGGER] IP Address: ${req.ip}`);
+    console.log(`[CALLBACK LOGGER] Remote Address: ${req.socket.remoteAddress}`);
+    console.log(`[CALLBACK LOGGER] X-Forwarded-For: ${req.get('x-forwarded-for') || 'N/A'}`);
+    console.log(`[CALLBACK LOGGER] X-Real-IP: ${req.get('x-real-ip') || 'N/A'}`);
+    console.log(`[CALLBACK LOGGER] User-Agent: ${req.get('user-agent') || 'N/A'}`);
+    console.log(`[CALLBACK LOGGER] Content-Type: ${req.get('content-type') || 'N/A'}`);
+    console.log(`[CALLBACK LOGGER] Content-Length: ${req.get('content-length') || 'N/A'}`);
+    console.log(`[CALLBACK LOGGER] All Headers:`, JSON.stringify(req.headers, null, 2));
+    
+    // Log query parameters
+    if (Object.keys(req.query).length > 0) {
+      console.log(`[CALLBACK LOGGER] Query Parameters:`, JSON.stringify(req.query, null, 2));
+    }
+    
+    // Log response when it's sent
+    const originalSend = res.send;
+    const originalJson = res.json;
+    const originalEnd = res.end;
+    
+    res.send = function(body: any) {
+      console.log(`[CALLBACK LOGGER] 📤 Response Sent`);
+      console.log(`[CALLBACK LOGGER] Status Code: ${res.statusCode}`);
+      console.log(`[CALLBACK LOGGER] Response Body:`, typeof body === 'string' ? body : JSON.stringify(body, null, 2));
+      console.log(`${'='.repeat(80)}\n`);
+      return originalSend.call(this, body);
+    };
+    
+    res.json = function(body: any) {
+      console.log(`[CALLBACK LOGGER] 📤 JSON Response Sent`);
+      console.log(`[CALLBACK LOGGER] Status Code: ${res.statusCode}`);
+      console.log(`[CALLBACK LOGGER] Response Body:`, JSON.stringify(body, null, 2));
+      console.log(`${'='.repeat(80)}\n`);
+      return originalJson.call(this, body);
+    };
+    
+    res.end = function(chunk?: any, encoding?: any) {
+      if (chunk) {
+        console.log(`[CALLBACK LOGGER] 📤 Response Ended`);
+        console.log(`[CALLBACK LOGGER] Status Code: ${res.statusCode}`);
+      }
+      return originalEnd.call(this, chunk, encoding);
+    };
+  }
+  next();
+};
+
+// Apply logging to callback routes (before body parsing)
+app.use('/api/v1/payment/callback', callbackLogger);
+app.use('/', callbackLogger);
 
 // Middleware to capture raw body for webhook signature verification (MUST be before express.json)
 app.use('/api/v1/payment/callback', express.raw({ type: 'application/json', limit: '10kb' }));
@@ -100,30 +170,103 @@ app.use("/api/v1/gallery", generalLimiter, galleryRoutes);
 
 // Handle NOWPayments callbacks that might come to root path
 // This is a fallback in case NOWPayments sends webhooks to wrong URL
+// NOTE: We filter out Next.js Server Actions (multipart/form-data with next-action header)
 app.post('/', asyncHandler(async (req, res, next) => {
-    console.log(`[WEBHOOK FALLBACK] ⚠️ POST request received at root path (/)`);
-    console.log(`[WEBHOOK FALLBACK] Headers:`, JSON.stringify(req.headers, null, 2));
+    console.log(`\n${'='.repeat(80)}`);
+    console.log(`[ROOT POST] 📥 POST Request Received at Root Path (/)`);
+    console.log(`[ROOT POST] Timestamp: ${new Date().toISOString()}`);
+    console.log(`[ROOT POST] ==========================================`);
+    
+    const contentType = req.headers['content-type'] || '';
+    const hasNextAction = req.headers['next-action'];
+    
+    console.log(`[ROOT POST] Request Details:`);
+    console.log(`[ROOT POST]   - Original URL: ${req.originalUrl}`);
+    console.log(`[ROOT POST]   - Path: ${req.path}`);
+    console.log(`[ROOT POST]   - Method: ${req.method}`);
+    console.log(`[ROOT POST]   - Protocol: ${req.protocol}`);
+    console.log(`[ROOT POST]   - Host: ${req.get('host')}`);
+    console.log(`[ROOT POST]   - IP: ${req.ip}`);
+    console.log(`[ROOT POST]   - Remote Address: ${req.socket.remoteAddress}`);
+    console.log(`[ROOT POST]   - X-Forwarded-For: ${req.get('x-forwarded-for') || 'N/A'}`);
+    console.log(`[ROOT POST]   - X-Real-IP: ${req.get('x-real-ip') || 'N/A'}`);
+    console.log(`[ROOT POST]   - User-Agent: ${req.get('user-agent') || 'N/A'}`);
+    console.log(`[ROOT POST]   - Content-Type: ${contentType}`);
+    console.log(`[ROOT POST]   - Content-Length: ${req.get('content-length') || 'N/A'}`);
+    console.log(`[ROOT POST]   - Has Next-Action Header: ${hasNextAction ? 'YES' : 'NO'}`);
+    console.log(`[ROOT POST] All Headers:`, JSON.stringify(req.headers, null, 2));
+    
+    // Skip Next.js Server Actions (they use multipart/form-data and next-action header)
+    if (contentType.includes('multipart/form-data') || hasNextAction) {
+        console.log(`[ROOT POST] ⏭️ Skipping Next.js Server Action request`);
+        console.log(`[ROOT POST] Reason: ${contentType.includes('multipart/form-data') ? 'multipart/form-data content-type' : 'next-action header present'}`);
+        console.log(`${'='.repeat(80)}\n`);
+        const response = res as any;
+        return response.status(404).json({
+            status: 'error',
+            message: `Route ${req.method} ${req.originalUrl} not found`
+        });
+    }
+    
+    console.log(`[ROOT POST] ⚠️ Processing as potential webhook...`);
+    
+    // Only process JSON content-type requests as potential webhooks
+    if (!contentType.includes('application/json')) {
+        console.log(`[ROOT POST] ❌ Not JSON content-type (${contentType}), skipping webhook check`);
+        console.log(`${'='.repeat(80)}\n`);
+        const response = res as any;
+        return response.status(404).json({
+            status: 'error',
+            message: `Route ${req.method} ${req.originalUrl} not found`
+        });
+    }
     
     // Parse body if it's raw Buffer
     let body = req.body || {};
+    console.log(`[ROOT POST] Body Type: ${Buffer.isBuffer(req.body) ? 'Buffer (raw)' : typeof req.body}`);
+    
     if (Buffer.isBuffer(req.body)) {
+        const rawBodyString = req.body.toString('utf8');
+        console.log(`[ROOT POST] Raw Body (first 500 chars): ${rawBodyString.substring(0, 500)}`);
+        console.log(`[ROOT POST] Raw Body Length: ${rawBodyString.length} characters`);
         try {
-            body = JSON.parse(req.body.toString('utf8'));
-            console.log(`[WEBHOOK FALLBACK] Parsed raw body:`, JSON.stringify(body, null, 2));
-        } catch (e) {
-            console.error(`[WEBHOOK FALLBACK] Failed to parse raw body:`, e);
+            body = JSON.parse(rawBodyString);
+            console.log(`[ROOT POST] ✅ Successfully parsed JSON from raw body`);
+            console.log(`[ROOT POST] Parsed Body:`, JSON.stringify(body, null, 2));
+        } catch (e: any) {
+            console.error(`[ROOT POST] ❌ Failed to parse raw body:`, e.message);
+            console.error(`[ROOT POST] Raw Body: ${rawBodyString}`);
+            console.log(`${'='.repeat(80)}\n`);
+            const response = res as any;
+            return response.status(400).json({
+                status: 'error',
+                message: 'Invalid JSON body'
+            });
         }
     } else {
-        console.log(`[WEBHOOK FALLBACK] Body:`, JSON.stringify(body, null, 2));
+        console.log(`[ROOT POST] Body (already parsed):`, JSON.stringify(body, null, 2));
     }
     
-    // Check if this looks like a NOWPayments callback
-    if (body.payment_id || body.order_id || body.payment_status) {
-        console.log(`[WEBHOOK FALLBACK] ✅ NOWPayments callback detected at root path (/)`);
-        console.log(`[WEBHOOK FALLBACK] Payment ID: ${body.payment_id || 'N/A'}`);
-        console.log(`[WEBHOOK FALLBACK] Order ID: ${body.order_id || 'N/A'}`);
-        console.log(`[WEBHOOK FALLBACK] Status: ${body.payment_status || 'N/A'}`);
-        console.log(`[WEBHOOK FALLBACK] Forwarding to callback handler...`);
+    // Check if this looks like a NOWPayments callback (check for invoice_id too, like old implementation)
+    const hasPaymentId = !!body.payment_id;
+    const hasInvoiceId = !!body.invoice_id;
+    const hasOrderId = !!body.order_id;
+    const hasPaymentStatus = !!body.payment_status;
+    
+    console.log(`[ROOT POST] Webhook Detection:`);
+    console.log(`[ROOT POST]   - Has payment_id: ${hasPaymentId} (${body.payment_id || 'N/A'})`);
+    console.log(`[ROOT POST]   - Has invoice_id: ${hasInvoiceId} (${body.invoice_id || 'N/A'})`);
+    console.log(`[ROOT POST]   - Has order_id: ${hasOrderId} (${body.order_id || 'N/A'})`);
+    console.log(`[ROOT POST]   - Has payment_status: ${hasPaymentStatus} (${body.payment_status || 'N/A'})`);
+    
+    if (hasPaymentId || hasInvoiceId || hasOrderId || hasPaymentStatus) {
+        console.log(`[ROOT POST] ✅✅✅ NOWPayments CALLBACK DETECTED ✅✅✅`);
+        console.log(`[ROOT POST] Payment ID: ${body.payment_id || 'N/A'}`);
+        console.log(`[ROOT POST] Invoice ID: ${body.invoice_id || 'N/A'}`);
+        console.log(`[ROOT POST] Order ID: ${body.order_id || 'N/A'}`);
+        console.log(`[ROOT POST] Status: ${body.payment_status || 'N/A'}`);
+        console.log(`[ROOT POST] Forwarding to callback handler...`);
+        console.log(`${'='.repeat(80)}\n`);
         
         // Update req.body to parsed body for callback handler
         req.body = body;
@@ -133,7 +276,9 @@ app.post('/', asyncHandler(async (req, res, next) => {
     }
     
     // Not a webhook, return 404
-    console.log(`[WEBHOOK FALLBACK] ❌ Not a NOWPayments callback, returning 404`);
+    console.log(`[ROOT POST] ❌ Not a NOWPayments callback - no payment_id, order_id, or payment_status found`);
+    console.log(`[ROOT POST] Body keys: ${Object.keys(body).join(', ')}`);
+    console.log(`${'='.repeat(80)}\n`);
     const response = res as any;
     response.status(404).json({
         status: 'error',

@@ -440,23 +440,34 @@ export async function processInvestment(
   voucherId?: string
 ) {
   try {
+    console.log(`[Investment Service] 🚀 Starting investment processing...`);
+    console.log(`[Investment Service] User ID: ${userId}`);
+    console.log(`[Investment Service] Package ID: ${packageId}`);
+    console.log(`[Investment Service] Amount: $${amount}`);
+    console.log(`[Investment Service] Payment ID: ${paymentId || 'none'}`);
+    console.log(`[Investment Service] Voucher ID: ${voucherId || 'none'}`);
+    
     // Get user and package
     const user = await User.findById(userId);
     if (!user) {
       throw new AppError("User not found", 404);
     }
 
+    console.log(`[Investment Service] User found: ${user.userId} (${user.name}), Status: ${user.status}`);
+
     // Activate user if they are inactive (users become active when they invest)
     if (user.status === "inactive") {
       user.status = "active";
       await user.save();
-      console.log(`[Investment] User ${user.userId} activated after investment`);
+      console.log(`[Investment Service] ✅ User ${user.userId} activated after investment`);
     }
 
     const pkg = await Package.findById(packageId);
     if (!pkg) {
       throw new AppError("Package not found", 404);
     }
+    
+    console.log(`[Investment Service] Package found: ${pkg.packageName}, ROI: ${pkg.roi}%, Duration: ${pkg.duration} days`);
 
     // Handle voucher if provided
     let voucher = null;
@@ -573,6 +584,7 @@ export async function processInvestment(
     const expiresOn = endDate; // Legacy field
 
     // Create investment record (PackageInstance)
+    console.log(`[Investment Service] Creating investment record...`);
     const investment = await Investment.create({
       user: userId,
       sponsor: user.referrer || undefined,
@@ -598,15 +610,32 @@ export async function processInvestment(
       isActive: true,
     });
 
+    console.log(`[Investment Service] ✅ Investment record created successfully!`);
+    console.log(`[Investment Service] Investment ID: ${investment._id}`);
+    console.log(`[Investment Service] Investment Details:`);
+    console.log(`[Investment Service]   - User: ${user.userId} (${user.name})`);
+    console.log(`[Investment Service]   - Package: ${pkg.packageName}`);
+    console.log(`[Investment Service]   - Amount: $${amount}`);
+    console.log(`[Investment Service]   - Duration: ${durationDays} days`);
+    console.log(`[Investment Service]   - Daily ROI Rate: ${(dailyRoiRate * 100).toFixed(2)}%`);
+    console.log(`[Investment Service]   - Start Date: ${startDate.toISOString()}`);
+    console.log(`[Investment Service]   - End Date: ${endDate.toISOString()}`);
+    console.log(`[Investment Service]   - Payment ID: ${paymentId || 'none'}`);
+    console.log(`[Investment Service]   - Voucher ID: ${voucherId || 'none'}`);
+
     // Add investment amount to user's investment wallet
+    console.log(`[Investment Service] Updating investment wallet...`);
     await updateWallet(userId, WalletType.INVESTMENT, amount, "add");
+    console.log(`[Investment Service] ✅ Investment wallet updated`);
     
     // Create investment transaction
+    console.log(`[Investment Service] Creating investment transaction...`);
     await createInvestmentTransaction(
       userId,
       amount,
       investment._id.toString()
     );
+    console.log(`[Investment Service] ✅ Investment transaction created`);
 
     // Process referral bonus for direct sponsor (level 1) - one-time per USER (not per investment)
     // Referral bonus is paid IMMEDIATELY when investment is activated
@@ -632,29 +661,43 @@ export async function processInvestment(
       if (existingInvestments === 0) {
         // This is the user's first investment, pay referral bonus to their direct referrer (sponsor)
         // Note: user.referrer is the person who invited them, not the binary tree parent
+        console.log(`[Investment Service] Processing referral bonus for first investment...`);
+        console.log(`[Investment Service] Referrer ID: ${user.referrer}`);
         await processReferralBonus(user.referrer, amount, pkg, investment._id.toString(), userId);
         
         // Mark this investment as having referral bonus paid (for tracking)
         investment.referralPaid = true;
         await investment.save();
+        console.log(`[Investment Service] ✅ Referral bonus processed successfully`);
       } else {
         // User has made investments before, referral bonus already paid - skip
-        console.log(`[Investment] User ${userId} has existing investments, skipping referral bonus (already paid on first investment)`);
+        console.log(`[Investment Service] ℹ️ User ${userId} has existing investments, skipping referral bonus (already paid on first investment)`);
       }
     }
 
     // Add business volume up the tree (binary bonuses will be calculated daily via cron)
     // This only adds BV to parent's business volume, does NOT calculate bonuses immediately
     // Binary bonuses are calculated at end of day via cron job (just like ROI)
+    console.log(`[Investment Service] Adding business volume up the tree...`);
     await addBusinessVolumeUpTree(
       userId, 
       amount, 
       position
     );
+    console.log(`[Investment Service] ✅ Business volume added to parent tree`);
 
     // Mark investment as binary updated (BV added, but bonus calculation happens in daily cron)
     investment.isBinaryUpdated = true;
     await investment.save();
+
+    console.log(`[Investment Service] ✅✅✅ Investment processing completed successfully! ✅✅✅`);
+    console.log(`[Investment Service] Summary:`);
+    console.log(`[Investment Service]   - Investment ID: ${investment._id}`);
+    console.log(`[Investment Service]   - User: ${user.userId} (${user.name})`);
+    console.log(`[Investment Service]   - Amount: $${amount}`);
+    console.log(`[Investment Service]   - Status: Active`);
+    console.log(`[Investment Service]   - User Status: ${user.status}`);
+    console.log(`[Investment Service] ==========================================`);
 
     return investment;
   } catch (error) {

@@ -307,7 +307,9 @@ export const createPayment = asyncHandler(async (req, res) => {
  * POST /api/v1/payment/callback
  */
 export const handlePaymentCallback = asyncHandler(async (req, res) => {
-  console.log(`[NOWPayments Callback] Received callback at ${new Date().toISOString()}`);
+  console.log(`[NOWPayments Callback] ✅ Callback received at ${new Date().toISOString()}`);
+  console.log(`[NOWPayments Callback] Request URL: ${req.originalUrl}`);
+  console.log(`[NOWPayments Callback] Request method: ${req.method}`);
   console.log(`[NOWPayments Callback] Request headers:`, JSON.stringify(req.headers, null, 2));
   
   // Parse body (may be raw Buffer or already parsed JSON)
@@ -334,11 +336,11 @@ export const handlePaymentCallback = asyncHandler(async (req, res) => {
 
   // Verify callback
   if (!verifyNOWPaymentsCallback(callback, signature, rawBody)) {
-    console.error("[NOWPayments Callback] Invalid callback data or signature:", callback);
+    console.error("[NOWPayments Callback] ❌ Invalid callback data or signature:", callback);
     throw new AppError("Invalid callback data or signature", 400);
   }
   
-  console.log(`[NOWPayments Callback] Callback verified. Payment ID: ${callback.payment_id}, Order ID: ${callback.order_id}`);
+  console.log(`[NOWPayments Callback] ✅ Callback verified successfully. Payment ID: ${callback.payment_id}, Order ID: ${callback.order_id}, Status: ${callback.payment_status}`);
 
   // Extract order ID and user info
   const orderId = callback.order_id;
@@ -456,7 +458,9 @@ export const handlePaymentCallback = asyncHandler(async (req, res) => {
       payment.status = "completed";
       await payment.save();
       
-      console.log(`Payment ${callback.payment_id} completed for order ${orderId}. Processing investment...`);
+      console.log(`[NOWPayments Callback] ✅ Payment ${callback.payment_id} marked as completed for order ${orderId}`);
+      console.log(`[NOWPayments Callback] Payment details - Amount: ${callback.price_amount} ${callback.price_currency}, Actually Paid: ${callback.actually_paid} ${callback.pay_currency}`);
+      console.log(`[NOWPayments Callback] Processing investment for user ${userId}...`);
       
       // Auto-create investment if it doesn't exist yet
       if (!payment.investmentId) {
@@ -465,6 +469,8 @@ export const handlePaymentCallback = asyncHandler(async (req, res) => {
           const voucherId = payment.meta && (payment.meta as any).voucherId 
             ? (payment.meta as any).voucherId 
             : undefined;
+          
+          console.log(`[NOWPayments Callback] Creating investment - User: ${userId}, Package: ${payment.package}, Amount: ${payment.amount}, Voucher: ${voucherId || 'none'}`);
           
           const investment = await processInvestment(
             new Types.ObjectId(userId),
@@ -478,17 +484,25 @@ export const handlePaymentCallback = asyncHandler(async (req, res) => {
           payment.investmentId = investment._id as Types.ObjectId;
           await payment.save();
           
-          console.log(`Investment ${investment._id} created successfully for payment ${callback.payment_id}`);
+          console.log(`[NOWPayments Callback] ✅ Investment created successfully!`);
+          console.log(`[NOWPayments Callback] Investment ID: ${investment._id}`);
+          console.log(`[NOWPayments Callback] Investment Amount: ${parseFloat(payment.amount.toString())}`);
+          console.log(`[NOWPayments Callback] Payment ID: ${callback.payment_id}`);
+          console.log(`[NOWPayments Callback] Order ID: ${orderId}`);
+          console.log(`[NOWPayments Callback] User ID: ${userId}`);
         } catch (investmentError: any) {
-          console.error(`Error creating investment for payment ${callback.payment_id}:`, investmentError);
+          console.error(`[NOWPayments Callback] ❌ Error creating investment for payment ${callback.payment_id}:`, investmentError);
+          console.error(`[NOWPayments Callback] Error details:`, investmentError.message);
+          console.error(`[NOWPayments Callback] Stack trace:`, investmentError.stack);
           // Don't fail the callback - investment can be created manually later
           // The success page will also try to create it
         }
       } else {
-        console.log(`Investment already exists for payment ${callback.payment_id}: ${payment.investmentId}`);
+        console.log(`[NOWPayments Callback] ℹ️ Investment already exists for payment ${callback.payment_id}: ${payment.investmentId}`);
       }
       
       const response = res as any;
+      console.log(`[NOWPayments Callback] ✅ Callback processed successfully - returning success response`);
       return response.status(200).json({
         status: "success",
         message: "Payment callback processed - payment confirmed and investment processed",

@@ -13,6 +13,7 @@ export default function ConditionalNavbar() {
     "/binary",
     "/investments",
     "/my-tree",
+    "/genealogy",
     "/referrals",
     "/reports",
     "/tickets",

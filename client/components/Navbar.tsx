@@ -70,6 +70,7 @@ export default function Navbar() {
     "/binary",
     "/investments",
     "/my-tree",
+    "/genealogy",
     "/referrals",
     "/reports",
     "/tickets",

@@ -4,7 +4,7 @@ import compression from 'compression';
 import {setupSwagger} from './swagger'
 import { asyncHandler } from './utils/asyncHandler';
 import { AppError } from './utils/AppError';
-import { cors, webhookCors, securityHeaders, generalLimiter, authLimiter, conditionalAuthLimiter } from './config';
+import { cors, securityHeaders, generalLimiter, authLimiter, conditionalAuthLimiter } from './config';
 import { sanitizeInput, validateObjectId } from './middleware/inputSanitization';
 import adminRoutes from './routes/admin.routes';
 
@@ -16,24 +16,11 @@ app.use(securityHeaders);
 // Compression middleware (should be early in the stack)
 app.use(compression({ level: 6, threshold: 1024 }));
 
-// CORS configuration - apply webhook CORS for payment callbacks BEFORE global CORS
-app.use('/api/v1/payment/callback', webhookCors);
-
 // Middleware to capture raw body for webhook signature verification (MUST be before express.json)
 app.use('/api/v1/payment/callback', express.raw({ type: 'application/json', limit: '10kb' }));
 
-// Global CORS configuration (skip callback route - it uses webhookCors above)
-app.use((req, res, next) => {
-  // Skip CORS for payment callback route (uses webhookCors instead)
-  // Check both originalUrl (full path) and path (relative to mount point)
-  const isCallbackRoute = req.originalUrl && req.originalUrl.includes('/payment/callback');
-  
-  if (isCallbackRoute) {
-    console.log(`[CORS] Skipping global CORS for callback route: ${req.originalUrl}`);
-    return next();
-  }
-  cors(req, res, next);
-});
+// Global CORS configuration - Allow all origins (no restrictions)
+app.use(cors);
 
 // SECURITY: Request size limits to prevent DoS attacks
 // JSON parser middleware (skip for callback route which uses raw body)

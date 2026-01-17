@@ -15,29 +15,12 @@ const allowedOrigins = process.env.ALLOWED_ORIGINS
     ];
 
 export const corsOptions: CorsOptions = {
-  origin: (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
-    // SECURITY: In production, reject requests with no origin (prevents CSRF from curl/Postman)
-    if (!origin) {
-      if (process.env.NODE_ENV === 'development') {
-        return callback(null, true); // Allow in development for testing
-      }
-      return callback(new Error('Origin header required'));
-    }
-    
-    // SECURITY: Strict origin checking
-    if (allowedOrigins.indexOf(origin) !== -1) {
-      callback(null, true);
-    } else {
-      // Log blocked origins for security monitoring
-      console.warn(`[SECURITY] Blocked CORS request from origin: ${origin}`);
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
+  origin: true, // Allow all origins - no restrictions
   credentials: true, // Allow cookies/auth headers
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'], // Only allow necessary methods
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin'],
-  exposedHeaders: ['Content-Length'], // Minimize exposed headers
-  maxAge: 3600, // SECURITY: Reduced from 24h to 1h for better security
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'], // Allow all necessary methods
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin', 'x-api-key', 'x-nowpayments-sig', 'x-nowpayments-signature', 'x-signature', 'signature'], // Allow all necessary headers including webhook headers
+  exposedHeaders: ['Content-Length'], // Expose headers
+  maxAge: 3600,
   optionsSuccessStatus: 200 // Some legacy browsers choke on 204
 };
 

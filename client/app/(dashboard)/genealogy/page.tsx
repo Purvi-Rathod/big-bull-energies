@@ -149,9 +149,9 @@ export default function UserGenealogyPage() {
       return (
         <div
           key={`empty-${level}-${position}`}
-          className="flex flex-col items-center justify-center w-24 h-20 border-2 border-dashed border-gray-200 rounded-lg bg-gradient-to-br from-gray-50 to-gray-100 opacity-60"
+          className="flex flex-col items-center justify-center w-16 md:w-24 h-16 md:h-20 border-2 border-dashed border-gray-200 rounded-lg bg-gradient-to-br from-gray-50 to-gray-100 opacity-60"
         >
-          <div className="text-gray-400 text-[9px] font-medium">Empty</div>
+          <div className="text-gray-400 text-[8px] md:text-[9px] font-medium">Empty</div>
         </div>
       );
     }
@@ -162,11 +162,11 @@ export default function UserGenealogyPage() {
       <div
         key={node.userId}
         className={`flex flex-col items-center transition-all duration-300 ${
-          isRoot ? 'scale-110' : 'hover:scale-110'
+          isRoot ? 'scale-105 md:scale-110' : 'hover:scale-105 md:hover:scale-110'
         }`}
       >
         <div
-          className={`w-28 p-2 rounded-xl border-2 shadow-xl cursor-pointer transition-all duration-300 backdrop-blur-sm ${
+          className={`w-20 md:w-28 p-1.5 md:p-2 rounded-lg md:rounded-xl border-2 shadow-xl cursor-pointer transition-all duration-300 backdrop-blur-sm ${
             isRoot
               ? 'bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-600 border-indigo-400 text-white shadow-indigo-500/50 ring-2 ring-indigo-300/50'
               : 'bg-gradient-to-br from-white to-gray-50 border-gray-200 hover:border-indigo-400 hover:shadow-2xl hover:shadow-indigo-200/50 hover:ring-2 hover:ring-indigo-100'
@@ -174,29 +174,29 @@ export default function UserGenealogyPage() {
           onClick={() => !isRoot && handleNodeClick(node.userId)}
         >
           <div className="text-center">
-            <div className={`font-bold text-[11px] mb-0.5 truncate w-full ${isRoot ? 'text-white drop-shadow-sm' : 'text-gray-900'}`}>
+            <div className={`font-bold text-[9px] md:text-[11px] mb-0.5 truncate w-full ${isRoot ? 'text-white drop-shadow-sm' : 'text-gray-900'}`}>
               {node.name || 'Unknown'}
             </div>
-            <div className={`text-[9px] mb-1 font-mono ${isRoot ? 'text-indigo-100' : 'text-gray-500'}`}>
-              {node.userId}
+            <div className={`text-[7px] md:text-[9px] mb-1 font-mono ${isRoot ? 'text-indigo-100' : 'text-gray-500'}`}>
+              {node.userId.substring(0, 8)}...
             </div>
-            <div className={`text-[8px] px-1.5 py-0.5 rounded-full inline-block mb-1 font-semibold ${
+            <div className={`text-[7px] md:text-[8px] px-1 md:px-1.5 py-0.5 rounded-full inline-block mb-1 font-semibold ${
               node.status === 'active'
                 ? isRoot ? 'bg-emerald-400/90 text-white shadow-sm' : 'bg-emerald-100 text-emerald-700 border border-emerald-200'
                 : isRoot ? 'bg-gray-400/80 text-white' : 'bg-gray-100 text-gray-600 border border-gray-200'
             }`}>
               {node.status}
             </div>
-            <div className="flex gap-1 mt-1">
-              <div className={`flex-1 text-center p-0.5 rounded-lg ${isRoot ? 'bg-blue-500/30 backdrop-blur-sm' : 'bg-blue-50 border border-blue-100'}`}>
-                <div className={`text-[8px] font-semibold ${isRoot ? 'text-blue-100' : 'text-blue-600'}`}>L</div>
-                <div className={`text-[9px] font-bold ${isRoot ? 'text-white' : 'text-blue-900'}`}>
+            <div className="flex gap-0.5 md:gap-1 mt-1">
+              <div className={`flex-1 text-center p-0.5 rounded-md md:rounded-lg ${isRoot ? 'bg-blue-500/30 backdrop-blur-sm' : 'bg-blue-50 border border-blue-100'}`}>
+                <div className={`text-[7px] md:text-[8px] font-semibold ${isRoot ? 'text-blue-100' : 'text-blue-600'}`}>L</div>
+                <div className={`text-[8px] md:text-[9px] font-bold ${isRoot ? 'text-white' : 'text-blue-900'}`}>
                   {node.leftDownlines || 0}
                 </div>
               </div>
-              <div className={`flex-1 text-center p-0.5 rounded-lg ${isRoot ? 'bg-pink-500/30 backdrop-blur-sm' : 'bg-pink-50 border border-pink-100'}`}>
-                <div className={`text-[8px] font-semibold ${isRoot ? 'text-pink-100' : 'text-pink-600'}`}>R</div>
-                <div className={`text-[9px] font-bold ${isRoot ? 'text-white' : 'text-pink-900'}`}>
+              <div className={`flex-1 text-center p-0.5 rounded-md md:rounded-lg ${isRoot ? 'bg-pink-500/30 backdrop-blur-sm' : 'bg-pink-50 border border-pink-100'}`}>
+                <div className={`text-[7px] md:text-[8px] font-semibold ${isRoot ? 'text-pink-100' : 'text-pink-600'}`}>R</div>
+                <div className={`text-[8px] md:text-[9px] font-bold ${isRoot ? 'text-white' : 'text-pink-900'}`}>
                   {node.rightDownlines || 0}
                 </div>
               </div>
@@ -207,7 +207,7 @@ export default function UserGenealogyPage() {
                 setSelectedBusinessNode(node);
                 setShowBusinessModal(true);
               }}
-              className={`mt-1 w-full py-0.5 px-1 rounded-lg text-[9px] font-semibold transition-all duration-200 ${
+              className={`mt-1 w-full py-0.5 px-1 rounded-md md:rounded-lg text-[8px] md:text-[9px] font-semibold transition-all duration-200 ${
                 isRoot
                   ? 'bg-white/95 text-indigo-600 hover:bg-white hover:shadow-lg hover:scale-105'
                   : 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white hover:from-indigo-700 hover:to-purple-700 hover:shadow-lg hover:scale-105'
@@ -304,33 +304,33 @@ export default function UserGenealogyPage() {
   const treeStructure = buildTreeStructure();
 
   return (
-    <div className="w-full h-full">
+    <div className="w-full h-full px-2 sm:px-0">
       {/* Header Section */}
-      <div className="mb-6">
-        <h1 className="text-4xl font-bold bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
+      <div className="mb-4 md:mb-6">
+        <h1 className="text-2xl md:text-4xl font-bold bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
           My Genealogy
         </h1>
-        <p className="mt-2 text-sm text-gray-600">Explore your binary referral tree and downlines</p>
+        <p className="mt-1 md:mt-2 text-xs md:text-sm text-gray-600">Explore your binary referral tree and downlines</p>
       </div>
 
       {/* Navigation Controls */}
       {treeData && (
-        <div className="bg-gradient-to-r from-white via-indigo-50/50 to-white rounded-xl shadow-lg border border-indigo-100 p-4 mb-6 flex gap-3 items-center">
+        <div className="bg-gradient-to-r from-white via-indigo-50/50 to-white rounded-lg md:rounded-xl shadow-lg border border-indigo-100 p-3 md:p-4 mb-4 md:mb-6 flex flex-col sm:flex-row gap-3 items-stretch sm:items-center">
           <button
             onClick={handleReset}
             disabled={!originalRootUserId || treeData.rootUserId === originalRootUserId}
-            className="px-4 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg hover:from-indigo-700 hover:to-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-md hover:shadow-lg flex items-center gap-2 font-medium"
+            className="px-3 md:px-4 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg hover:from-indigo-700 hover:to-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2 text-xs md:text-sm font-medium"
           >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-3 h-3 md:w-4 md:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
             </svg>
             Reset to My Tree
           </button>
-          <div className="flex-1"></div>
-          <div className="text-sm text-gray-600 flex items-center gap-2 bg-white/80 px-4 py-2 rounded-lg border border-gray-200">
+          <div className="hidden sm:block flex-1"></div>
+          <div className="text-xs md:text-sm text-gray-600 flex flex-col sm:flex-row items-start sm:items-center gap-1 sm:gap-2 bg-white/80 px-3 md:px-4 py-2 rounded-lg border border-gray-200">
             <span className="font-medium">Current Root:</span>
-            <span className="font-bold text-indigo-700">{treeData.rootName}</span>
-            <span className="text-gray-500 font-mono text-xs">({treeData.rootUserId})</span>
+            <span className="font-bold text-indigo-700 truncate">{treeData.rootName}</span>
+            <span className="text-gray-500 font-mono text-[10px] md:text-xs truncate">({treeData.rootUserId})</span>
           </div>
         </div>
       )}
@@ -360,24 +360,24 @@ export default function UserGenealogyPage() {
 
       {/* Tree Visualization */}
       {treeStructure && !loading && (
-        <div className="bg-gradient-to-br from-gray-50 via-white to-indigo-50/30 rounded-xl shadow-2xl p-6 overflow-x-auto transition-all duration-300 border border-gray-100">
-          <div className="tree-container mx-auto" style={{ maxWidth: '1000px', position: 'relative' }}>
+        <div className="bg-gradient-to-br from-gray-50 via-white to-indigo-50/30 rounded-lg md:rounded-xl shadow-2xl p-3 md:p-6 overflow-x-auto transition-all duration-300 border border-gray-100">
+          <div className="tree-container mx-auto" style={{ maxWidth: '1000px', position: 'relative', minHeight: '400px' }}>
             {/* Level 0: Root */}
-            <div className="flex justify-center mb-12 relative">
+            <div className="flex justify-center mb-6 md:mb-12 relative">
               <div className="relative z-20">
                 {renderNode(treeStructure.root, 0, 'root')}
               </div>
               {/* Vertical line down from root with gradient */}
-              <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-1 h-6 bg-gradient-to-b from-indigo-400 to-indigo-300 rounded-full" style={{ zIndex: 1 }}></div>
+              <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0.5 md:w-1 h-4 md:h-6 bg-gradient-to-b from-indigo-400 to-indigo-300 rounded-full" style={{ zIndex: 1 }}></div>
             </div>
 
             {/* Level 1: Direct Children */}
-            <div className="flex justify-center gap-24 mb-10 relative">
+            <div className="flex justify-center gap-8 md:gap-24 mb-6 md:mb-10 relative">
               {/* Horizontal line connecting level 1 with gradient */}
-              <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-full h-1 bg-gradient-to-r from-transparent via-indigo-300 to-transparent rounded-full" style={{ width: '320px' }}></div>
+              <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-full h-0.5 md:h-1 bg-gradient-to-r from-transparent via-indigo-300 to-transparent rounded-full hidden sm:block" style={{ width: 'clamp(200px, 320px, 100%)' }}></div>
               {/* Vertical lines down to level 1 nodes */}
-              <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-1 h-6 bg-gradient-to-b from-indigo-300 to-indigo-200 rounded-full" style={{ marginLeft: '-160px' }}></div>
-              <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-1 h-6 bg-gradient-to-b from-indigo-300 to-indigo-200 rounded-full" style={{ marginLeft: '160px' }}></div>
+              <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-0.5 md:w-1 h-4 md:h-6 bg-gradient-to-b from-indigo-300 to-indigo-200 rounded-full hidden sm:block" style={{ marginLeft: 'clamp(-100px, -160px, -80px)' }}></div>
+              <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-0.5 md:w-1 h-4 md:h-6 bg-gradient-to-b from-indigo-300 to-indigo-200 rounded-full hidden sm:block" style={{ marginLeft: 'clamp(100px, 160px, 80px)' }}></div>
               
               <div className="relative z-20">
                 {renderNode(treeStructure.level1.left, 1, 'left')}
@@ -388,14 +388,14 @@ export default function UserGenealogyPage() {
             </div>
 
             {/* Level 2: Grandchildren */}
-            <div className="flex justify-center gap-12 relative">
+            <div className="flex justify-center gap-4 md:gap-12 relative flex-wrap sm:flex-nowrap">
               {/* Horizontal lines connecting level 2 */}
-              <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-full h-0.5 bg-gradient-to-r from-transparent via-purple-200 to-transparent rounded-full" style={{ width: '600px' }}></div>
+              <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-full h-0.5 bg-gradient-to-r from-transparent via-purple-200 to-transparent rounded-full hidden md:block" style={{ width: 'clamp(300px, 600px, 100%)' }}></div>
               {/* Vertical lines down to level 2 nodes */}
               {[-225, -75, 75, 225].map((offset) => (
                 <div
                   key={offset}
-                  className="absolute top-0 left-1/2 transform -translate-x-1/2 w-0.5 h-5 bg-gradient-to-b from-purple-200 to-purple-100 rounded-full"
+                  className="absolute top-0 left-1/2 transform -translate-x-1/2 w-0.5 h-4 md:h-5 bg-gradient-to-b from-purple-200 to-purple-100 rounded-full hidden md:block"
                   style={{ marginLeft: `${offset}px` }}
                 ></div>
               ))}
@@ -430,28 +430,28 @@ export default function UserGenealogyPage() {
 
       {/* View Business Modal */}
       {showBusinessModal && selectedBusinessNode && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
-              <h2 className="text-2xl font-bold text-gray-900">User Business Details</h2>
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-2 md:p-4">
+          <div className="bg-white rounded-lg md:rounded-xl shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="sticky top-0 bg-white border-b border-gray-200 px-4 md:px-6 py-3 md:py-4 flex items-center justify-between">
+              <h2 className="text-lg md:text-2xl font-bold text-gray-900">User Business Details</h2>
               <button
                 onClick={() => {
                   setShowBusinessModal(false);
                   setSelectedBusinessNode(null);
                 }}
-                className="text-gray-400 hover:text-gray-600 transition-colors"
+                className="text-gray-400 hover:text-gray-600 transition-colors flex-shrink-0"
               >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                 </svg>
               </button>
             </div>
 
-            <div className="p-6 space-y-6">
+            <div className="p-4 md:p-6 space-y-4 md:space-y-6">
               {/* User Profile Section */}
               <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">User Profile</h3>
-                <div className="grid grid-cols-2 gap-4">
+                <h3 className="text-base md:text-lg font-semibold text-gray-900 mb-3 md:mb-4">User Profile</h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4">
                   <div>
                     <label className="text-sm font-medium text-gray-500">User ID</label>
                     <p className="mt-1 text-sm text-gray-900">{selectedBusinessNode.userId}</p>
@@ -508,8 +508,8 @@ export default function UserGenealogyPage() {
 
               {/* Binary Business Section */}
               <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Binary Business</h3>
-                <div className="grid grid-cols-2 gap-4">
+                <h3 className="text-base md:text-lg font-semibold text-gray-900 mb-3 md:mb-4">Binary Business</h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4">
                   <div className="bg-blue-50 rounded-lg p-4">
                     <div className="flex items-center justify-between mb-2">
                       <span className="text-sm font-medium text-blue-900">Left Business</span>
@@ -537,8 +537,8 @@ export default function UserGenealogyPage() {
 
               {/* Carry Forward Section */}
               <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Carry Forward</h3>
-                <div className="grid grid-cols-2 gap-4">
+                <h3 className="text-base md:text-lg font-semibold text-gray-900 mb-3 md:mb-4">Carry Forward</h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4">
                   <div className="bg-orange-50 rounded-lg p-4">
                     <div className="flex items-center justify-between">
                       <span className="text-sm font-medium text-orange-900">Left Carry</span>
@@ -560,9 +560,9 @@ export default function UserGenealogyPage() {
 
               {/* Downline Counts Summary */}
               <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Downline Summary</h3>
-                <div className="bg-indigo-50 rounded-lg p-4">
-                  <div className="grid grid-cols-2 gap-4">
+                <h3 className="text-base md:text-lg font-semibold text-gray-900 mb-3 md:mb-4">Downline Summary</h3>
+                <div className="bg-indigo-50 rounded-lg p-3 md:p-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4">
                     <div>
                       <span className="text-sm text-indigo-700">Total Left Downlines:</span>
                       <span className="ml-2 text-lg font-bold text-indigo-900">{selectedBusinessNode.leftDownlines || 0}</span>
@@ -582,13 +582,13 @@ export default function UserGenealogyPage() {
               </div>
             </div>
 
-            <div className="sticky bottom-0 bg-gray-50 border-t border-gray-200 px-6 py-4 flex justify-end">
+            <div className="sticky bottom-0 bg-gray-50 border-t border-gray-200 px-4 md:px-6 py-3 md:py-4 flex justify-end">
               <button
                 onClick={() => {
                   setShowBusinessModal(false);
                   setSelectedBusinessNode(null);
                 }}
-                className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
+                className="px-4 md:px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors text-sm md:text-base w-full sm:w-auto"
               >
                 Close
               </button>

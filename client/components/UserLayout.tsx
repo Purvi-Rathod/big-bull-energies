@@ -175,13 +175,19 @@ export default function UserLayout({
         </div>
 
         {/* Navigation */}
-        <nav className="flex-1 px-3 py-2 space-y-1 overflow-hidden">
+        <nav className="flex-1 px-3 py-2 space-y-1 overflow-y-auto overflow-x-hidden">
           {navigation.map((item) => {
             const active = isActive(item.href);
             return (
               <Link
                 key={item.name}
                 href={item.href}
+                onClick={() => {
+                  // Close sidebar on mobile when navigating
+                  if (window.innerWidth < 768) {
+                    setSidebarOpen(false);
+                  }
+                }}
                 className={`group flex items-center gap-2 px-2 py-1.5 rounded-lg text-sm font-semibold transition-all duration-200 relative ${
                   active
                     ? 'bg-gradient-to-r from-yellow-500/30 via-yellow-500/20 to-yellow-500/10 text-yellow-400 border border-yellow-500/40 shadow-lg shadow-yellow-500/10'
@@ -196,7 +202,7 @@ export default function UserLayout({
                 <span className={`flex-shrink-0 transition-colors ${active ? 'text-yellow-400' : 'text-gray-500 group-hover:text-yellow-400'}`}>
                   {item.icon}
                 </span>
-                {sidebarOpen && <span className="transition-colors">{item.name}</span>}
+                {sidebarOpen && <span className="transition-colors truncate">{item.name}</span>}
               </Link>
             );
           })}
@@ -225,7 +231,7 @@ export default function UserLayout({
       </aside>
 
       {/* Main Content */}
-      <div className={`flex-1 transition-all duration-300 ${sidebarOpen ? 'md:ml-64' : 'md:ml-20'}`}>
+      <div className={`flex-1 transition-all duration-300 ${sidebarOpen ? 'md:ml-64' : 'md:ml-20'} pb-20 md:pb-0`}>
         {/* Mobile menu button */}
         <div className="md:hidden fixed top-4 left-4 z-10">
           <button
@@ -242,6 +248,44 @@ export default function UserLayout({
           {children}
         </main>
       </div>
+
+      {/* Mobile Bottom Navigation */}
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-gradient-to-t from-gray-900 via-gray-900 to-black border-t border-yellow-500/30 shadow-2xl safe-area-inset-bottom">
+        <div className="flex items-center justify-around px-1 py-2 overflow-x-auto max-w-full">
+          {/* Show first 5 most important tabs on mobile */}
+          {navigation.slice(0, 5).map((item) => {
+            const active = isActive(item.href);
+            return (
+              <Link
+                key={item.name}
+                href={item.href}
+                onClick={() => setSidebarOpen(false)}
+                className={`flex flex-col items-center justify-center gap-0.5 px-2 py-2 rounded-lg min-w-[56px] max-w-[80px] flex-1 transition-all duration-200 ${
+                  active
+                    ? 'bg-gradient-to-b from-yellow-500/30 to-yellow-500/10 text-yellow-400'
+                    : 'text-gray-400 active:text-yellow-300'
+                }`}
+              >
+                <span className={`${active ? 'text-yellow-400' : 'text-gray-500'}`}>
+                  {item.icon}
+                </span>
+                <span className="text-[9px] md:text-[10px] font-semibold truncate w-full text-center leading-tight">{item.name}</span>
+              </Link>
+            );
+          })}
+          {/* More button to open sidebar */}
+          <button
+            onClick={() => setSidebarOpen(true)}
+            className={`flex flex-col items-center justify-center gap-0.5 px-2 py-2 rounded-lg min-w-[56px] max-w-[80px] flex-1 transition-all duration-200 text-gray-400 active:text-yellow-300`}
+            aria-label="More menu"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
+            </svg>
+            <span className="text-[9px] md:text-[10px] font-semibold leading-tight">More</span>
+          </button>
+        </div>
+      </nav>
     </div>
   );
 }

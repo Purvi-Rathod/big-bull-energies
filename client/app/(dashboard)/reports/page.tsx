@@ -172,272 +172,284 @@ export default function ReportsPage() {
 
   const renderTransactionTable = (transactions: Transaction[], title: string, showExport: boolean = true, isReferral: boolean = false) => (
     <div className="bg-gradient-to-br from-gray-900/95 via-gray-800/95 to-gray-900/95 backdrop-blur-sm rounded-2xl shadow-2xl border border-yellow-500/30 overflow-hidden">
-      <div className="px-6 py-5 border-b border-yellow-500/20 bg-gradient-to-r from-gray-800 via-gray-800/90 to-gray-800 flex justify-between items-center">
-        <h3 className="text-xl font-extrabold text-white">{title}</h3>
+      <div className="px-4 md:px-6 py-4 md:py-5 border-b border-yellow-500/20 bg-gradient-to-r from-gray-800 via-gray-800/90 to-gray-800 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+        <h3 className="text-lg md:text-xl font-extrabold text-white">{title}</h3>
         {showExport && transactions.length > 0 && (
           <button
             onClick={() => exportTransactions(transactions, title)}
-            className="px-6 py-2.5 bg-gradient-to-r from-yellow-500 to-yellow-600 text-black text-sm font-bold rounded-xl hover:from-yellow-400 hover:to-yellow-500 focus:outline-none focus:ring-2 focus:ring-yellow-500/50 transition-all shadow-lg shadow-yellow-500/30 hover:shadow-yellow-500/50 hover:scale-105 active:scale-95"
+            className="px-4 md:px-6 py-2 md:py-2.5 bg-gradient-to-r from-yellow-500 to-yellow-600 text-black text-xs md:text-sm font-bold rounded-xl hover:from-yellow-400 hover:to-yellow-500 focus:outline-none focus:ring-2 focus:ring-yellow-500/50 transition-all shadow-lg shadow-yellow-500/30 hover:shadow-yellow-500/50 hover:scale-105 active:scale-95 w-full sm:w-auto"
           >
             Export CSV
           </button>
         )}
       </div>
-      <div className="overflow-x-auto">
-        <table className="min-w-full divide-y divide-yellow-500/10">
-          <thead className="bg-gradient-to-r from-gray-800 via-gray-800/90 to-gray-800">
-            <tr>
-              <th className="px-6 py-5 text-left text-xs font-bold text-yellow-400 uppercase tracking-wider">Date & Time</th>
-              <th className="px-6 py-5 text-left text-xs font-bold text-yellow-400 uppercase tracking-wider">Type</th>
-              <th className="px-6 py-5 text-left text-xs font-bold text-yellow-400 uppercase tracking-wider">Amount</th>
-              {isReferral && (
-                <th className="px-6 py-5 text-left text-xs font-bold text-yellow-400 uppercase tracking-wider">Source</th>
-              )}
-              <th className="px-6 py-5 text-left text-xs font-bold text-yellow-400 uppercase tracking-wider">Status</th>
-              <th className="px-6 py-5 text-left text-xs font-bold text-yellow-400 uppercase tracking-wider">Transaction ID</th>
-            </tr>
-          </thead>
-          <tbody className="bg-gray-900/50 divide-y divide-yellow-500/10">
-            {transactions.length === 0 ? (
-              <tr>
-                <td colSpan={isReferral ? 6 : 5} className="px-6 py-12 text-center text-gray-400 text-lg">
-                  No transactions found
-                </td>
-              </tr>
-            ) : (
-              transactions.map((tx) => {
-                const { date, time } = formatDateTime(tx.createdAt);
-                return (
-                  <tr key={tx.id} className="hover:bg-gradient-to-r hover:from-yellow-500/5 hover:via-yellow-500/10 hover:to-transparent transition-all duration-300 group">
-                    <td className="px-6 py-5 whitespace-nowrap text-sm">
-                      <div className="text-white font-bold group-hover:text-yellow-100 transition-colors">{date}</div>
-                      <div className="text-gray-400 text-xs mt-1">{time}</div>
-                    </td>
-                    <td className="px-6 py-5 whitespace-nowrap text-sm">
-                      <span className={`px-4 py-1.5 inline-flex text-xs leading-5 font-bold rounded-full shadow-lg ${
-                        tx.type === 'credit' 
-                          ? 'bg-gradient-to-r from-yellow-500/30 to-yellow-600/20 text-yellow-300 border border-yellow-500/50 shadow-yellow-500/20' 
-                          : 'bg-red-900/40 text-red-400 border border-red-500/40'
-                      }`}>
-                        {tx.type.toUpperCase()}
-                      </span>
-                    </td>
-                    <td className="px-6 py-5 whitespace-nowrap text-sm font-extrabold text-yellow-400 group-hover:text-yellow-300 transition-colors">
-                      ${tx.amount.toFixed(2)}
-                    </td>
-                    {isReferral && (
-                      <td className="px-6 py-5 text-sm">
-                        {tx.referralSource && tx.packageInfo ? (
-                          <div className="space-y-2">
-                            <div className="font-bold text-white">
-                              {tx.referralSource.name} <span className="text-yellow-400 font-mono">({tx.referralSource.userId})</span>
-                            </div>
-                            <div className="text-xs text-gray-400">
-                              activated <span className="text-yellow-400 font-semibold">${tx.packageInfo.investedAmount.toFixed(2)}</span> package
-                            </div>
-                            <div className="text-xs text-gray-300">
-                              You got <span className="text-yellow-400 font-bold">${tx.amount.toFixed(2)}</span> referral income <span className="text-yellow-300">({tx.referralPercentage?.toFixed(1) || tx.packageInfo.referralPct?.toFixed(1) || 'N/A'}%)</span>
-                            </div>
-                          </div>
-                        ) : (
-                          <span className="text-gray-500 italic">Source information unavailable</span>
-                        )}
-                      </td>
-                    )}
-                    <td className="px-6 py-5 whitespace-nowrap text-sm">
-                      <span className={`px-4 py-1.5 inline-flex text-xs leading-5 font-bold rounded-full shadow-lg ${
-                        tx.status === 'completed' 
-                          ? 'bg-gradient-to-r from-yellow-500/30 to-yellow-600/20 text-yellow-300 border border-yellow-500/50 shadow-yellow-500/20'
-                          : tx.status === 'pending' 
-                          ? 'bg-gray-700/50 text-yellow-200 border border-yellow-500/30'
-                          : 'bg-red-900/40 text-red-400 border border-red-500/40'
-                      }`}>
-                        {tx.status}
-                      </span>
-                    </td>
-                    <td className="px-6 py-5 whitespace-nowrap text-sm font-mono text-yellow-400 font-semibold">
-                      {tx.txRef || tx.id.substring(0, 8) || 'N/A'}
+      <div className="overflow-x-auto -mx-4 sm:mx-0">
+        <div className="inline-block min-w-full align-middle">
+          <div className="overflow-hidden">
+            <table className="min-w-full divide-y divide-yellow-500/10">
+              <thead className="bg-gradient-to-r from-gray-800 via-gray-800/90 to-gray-800">
+                <tr>
+                  <th className="px-3 md:px-6 py-3 md:py-5 text-left text-xs font-bold text-yellow-400 uppercase tracking-wider">Date & Time</th>
+                  <th className="px-3 md:px-6 py-3 md:py-5 text-left text-xs font-bold text-yellow-400 uppercase tracking-wider">Type</th>
+                  <th className="px-3 md:px-6 py-3 md:py-5 text-left text-xs font-bold text-yellow-400 uppercase tracking-wider">Amount</th>
+                  {isReferral && (
+                    <th className="px-3 md:px-6 py-3 md:py-5 text-left text-xs font-bold text-yellow-400 uppercase tracking-wider">Source</th>
+                  )}
+                  <th className="px-3 md:px-6 py-3 md:py-5 text-left text-xs font-bold text-yellow-400 uppercase tracking-wider">Status</th>
+                  <th className="px-3 md:px-6 py-3 md:py-5 text-left text-xs font-bold text-yellow-400 uppercase tracking-wider">Transaction ID</th>
+                </tr>
+              </thead>
+              <tbody className="bg-gray-900/50 divide-y divide-yellow-500/10">
+                {transactions.length === 0 ? (
+                  <tr>
+                    <td colSpan={isReferral ? 6 : 5} className="px-3 md:px-6 py-8 md:py-12 text-center text-gray-400 text-base md:text-lg">
+                      No transactions found
                     </td>
                   </tr>
-                );
-              })
-            )}
-          </tbody>
-        </table>
+                ) : (
+                  transactions.map((tx) => {
+                    const { date, time } = formatDateTime(tx.createdAt);
+                    return (
+                      <tr key={tx.id} className="hover:bg-gradient-to-r hover:from-yellow-500/5 hover:via-yellow-500/10 hover:to-transparent transition-all duration-300 group">
+                        <td className="px-3 md:px-6 py-3 md:py-5 whitespace-nowrap text-xs md:text-sm">
+                          <div className="text-white font-bold group-hover:text-yellow-100 transition-colors">{date}</div>
+                          <div className="text-gray-400 text-[10px] md:text-xs mt-1">{time}</div>
+                        </td>
+                        <td className="px-3 md:px-6 py-3 md:py-5 whitespace-nowrap text-xs md:text-sm">
+                          <span className={`px-2 md:px-4 py-1 md:py-1.5 inline-flex text-[10px] md:text-xs leading-5 font-bold rounded-full shadow-lg ${
+                            tx.type === 'credit' 
+                              ? 'bg-gradient-to-r from-yellow-500/30 to-yellow-600/20 text-yellow-300 border border-yellow-500/50 shadow-yellow-500/20' 
+                              : 'bg-red-900/40 text-red-400 border border-red-500/40'
+                          }`}>
+                            {tx.type.toUpperCase()}
+                          </span>
+                        </td>
+                        <td className="px-3 md:px-6 py-3 md:py-5 whitespace-nowrap text-xs md:text-sm font-extrabold text-yellow-400 group-hover:text-yellow-300 transition-colors">
+                          ${tx.amount.toFixed(2)}
+                        </td>
+                        {isReferral && (
+                          <td className="px-3 md:px-6 py-3 md:py-5 text-xs md:text-sm">
+                            {tx.referralSource && tx.packageInfo ? (
+                              <div className="space-y-1 md:space-y-2">
+                                <div className="font-bold text-white text-xs md:text-sm">
+                                  {tx.referralSource.name} <span className="text-yellow-400 font-mono text-[10px] md:text-xs">({tx.referralSource.userId})</span>
+                                </div>
+                                <div className="text-[10px] md:text-xs text-gray-400">
+                                  activated <span className="text-yellow-400 font-semibold">${tx.packageInfo.investedAmount.toFixed(2)}</span> package
+                                </div>
+                                <div className="text-[10px] md:text-xs text-gray-300">
+                                  You got <span className="text-yellow-400 font-bold">${tx.amount.toFixed(2)}</span> referral income <span className="text-yellow-300">({tx.referralPercentage?.toFixed(1) || tx.packageInfo.referralPct?.toFixed(1) || 'N/A'}%)</span>
+                                </div>
+                              </div>
+                            ) : (
+                              <span className="text-gray-500 italic text-xs">Source information unavailable</span>
+                            )}
+                          </td>
+                        )}
+                        <td className="px-3 md:px-6 py-3 md:py-5 whitespace-nowrap text-xs md:text-sm">
+                          <span className={`px-2 md:px-4 py-1 md:py-1.5 inline-flex text-[10px] md:text-xs leading-5 font-bold rounded-full shadow-lg ${
+                            tx.status === 'completed' 
+                              ? 'bg-gradient-to-r from-yellow-500/30 to-yellow-600/20 text-yellow-300 border border-yellow-500/50 shadow-yellow-500/20'
+                              : tx.status === 'pending' 
+                              ? 'bg-gray-700/50 text-yellow-200 border border-yellow-500/30'
+                              : 'bg-red-900/40 text-red-400 border border-red-500/40'
+                          }`}>
+                            {tx.status}
+                          </span>
+                        </td>
+                        <td className="px-3 md:px-6 py-3 md:py-5 whitespace-nowrap text-xs md:text-sm font-mono text-yellow-400 font-semibold">
+                          {tx.txRef || tx.id.substring(0, 8) || 'N/A'}
+                        </td>
+                      </tr>
+                    );
+                  })
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
       </div>
     </div>
   );
 
   const renderInvestmentTable = () => (
     <div className="bg-gradient-to-br from-gray-900/95 via-gray-800/95 to-gray-900/95 backdrop-blur-sm rounded-2xl shadow-2xl border border-yellow-500/30 overflow-hidden">
-      <div className="px-6 py-5 border-b border-yellow-500/20 bg-gradient-to-r from-gray-800 via-gray-800/90 to-gray-800 flex justify-between items-center">
-        <h3 className="text-xl font-extrabold text-white">Investment Transactions</h3>
+      <div className="px-4 md:px-6 py-4 md:py-5 border-b border-yellow-500/20 bg-gradient-to-r from-gray-800 via-gray-800/90 to-gray-800 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+        <h3 className="text-lg md:text-xl font-extrabold text-white">Investment Transactions</h3>
         {investmentTransactions.length > 0 && (
           <button
             onClick={() => exportInvestmentTransactions(investmentTransactions)}
-            className="px-6 py-2.5 bg-gradient-to-r from-yellow-500 to-yellow-600 text-black text-sm font-bold rounded-xl hover:from-yellow-400 hover:to-yellow-500 focus:outline-none focus:ring-2 focus:ring-yellow-500/50 transition-all shadow-lg shadow-yellow-500/30 hover:shadow-yellow-500/50 hover:scale-105 active:scale-95"
+            className="px-4 md:px-6 py-2 md:py-2.5 bg-gradient-to-r from-yellow-500 to-yellow-600 text-black text-xs md:text-sm font-bold rounded-xl hover:from-yellow-400 hover:to-yellow-500 focus:outline-none focus:ring-2 focus:ring-yellow-500/50 transition-all shadow-lg shadow-yellow-500/30 hover:shadow-yellow-500/50 hover:scale-105 active:scale-95 w-full sm:w-auto"
           >
             Export CSV
           </button>
         )}
       </div>
-      <div className="overflow-x-auto">
-        <table className="min-w-full divide-y divide-yellow-500/10">
-          <thead className="bg-gradient-to-r from-gray-800 via-gray-800/90 to-gray-800">
-            <tr>
-              <th className="px-6 py-5 text-left text-xs font-bold text-yellow-400 uppercase tracking-wider">Date & Time</th>
-              <th className="px-6 py-5 text-left text-xs font-bold text-yellow-400 uppercase tracking-wider">Type</th>
-              <th className="px-6 py-5 text-left text-xs font-bold text-yellow-400 uppercase tracking-wider">Amount</th>
-              <th className="px-6 py-5 text-left text-xs font-bold text-yellow-400 uppercase tracking-wider">Package</th>
-              <th className="px-6 py-5 text-left text-xs font-bold text-yellow-400 uppercase tracking-wider">ROI %</th>
-              <th className="px-6 py-5 text-left text-xs font-bold text-yellow-400 uppercase tracking-wider">Invested Amount</th>
-              <th className="px-6 py-5 text-left text-xs font-bold text-yellow-400 uppercase tracking-wider">Duration</th>
-              <th className="px-6 py-5 text-left text-xs font-bold text-yellow-400 uppercase tracking-wider">Status</th>
-              <th className="px-6 py-5 text-left text-xs font-bold text-yellow-400 uppercase tracking-wider">Transaction ID</th>
-            </tr>
-          </thead>
-          <tbody className="bg-gray-900/50 divide-y divide-yellow-500/10">
-            {investmentTransactions.length === 0 ? (
-              <tr>
-                <td colSpan={9} className="px-6 py-12 text-center text-gray-400 text-lg">
-                  No investment transactions found
-                </td>
-              </tr>
-            ) : (
-              investmentTransactions.map((tx) => {
-                const { date, time } = formatDateTime(tx.createdAt);
-                return (
-                  <tr key={tx.id} className="hover:bg-gradient-to-r hover:from-yellow-500/5 hover:via-yellow-500/10 hover:to-transparent transition-all duration-300 group">
-                    <td className="px-6 py-5 whitespace-nowrap text-sm">
-                      <div className="text-white font-bold group-hover:text-yellow-100 transition-colors">{date}</div>
-                      <div className="text-gray-400 text-xs mt-1">{time}</div>
-                    </td>
-                    <td className="px-6 py-5 whitespace-nowrap text-sm">
-                      <span className={`px-4 py-1.5 inline-flex text-xs leading-5 font-bold rounded-full shadow-lg ${
-                        tx.type === 'credit' 
-                          ? 'bg-gradient-to-r from-yellow-500/30 to-yellow-600/20 text-yellow-300 border border-yellow-500/50 shadow-yellow-500/20' 
-                          : 'bg-red-900/40 text-red-400 border border-red-500/40'
-                      }`}>
-                        {tx.type.toUpperCase()}
-                      </span>
-                    </td>
-                    <td className="px-6 py-5 whitespace-nowrap text-sm font-extrabold text-yellow-400 group-hover:text-yellow-300 transition-colors">
-                      ${tx.amount.toFixed(2)}
-                    </td>
-                    <td className="px-6 py-5 whitespace-nowrap text-sm text-white font-bold group-hover:text-yellow-100 transition-colors">
-                      {tx.investment?.packageName || 'N/A'}
-                    </td>
-                    <td className="px-6 py-5 whitespace-nowrap text-sm text-gray-300 font-semibold">
-                      {tx.investment?.roi || 0}%
-                    </td>
-                    <td className="px-6 py-5 whitespace-nowrap text-sm font-bold text-white">
-                      ${tx.investment?.investedAmount.toFixed(2) || '0.00'}
-                    </td>
-                    <td className="px-6 py-5 whitespace-nowrap text-sm text-gray-300 font-semibold">
-                      {tx.investment?.duration || 0} days
-                    </td>
-                    <td className="px-6 py-5 whitespace-nowrap text-sm">
-                      <span className={`px-4 py-1.5 inline-flex text-xs leading-5 font-bold rounded-full shadow-lg ${
-                        tx.status === 'completed' 
-                          ? 'bg-gradient-to-r from-yellow-500/30 to-yellow-600/20 text-yellow-300 border border-yellow-500/50 shadow-yellow-500/20'
-                          : tx.status === 'pending' 
-                          ? 'bg-gray-700/50 text-yellow-200 border border-yellow-500/30'
-                          : 'bg-red-900/40 text-red-400 border border-red-500/40'
-                      }`}>
-                        {tx.status}
-                      </span>
-                    </td>
-                    <td className="px-6 py-5 whitespace-nowrap text-sm font-mono text-yellow-400 font-semibold">
-                      {tx.txRef || tx.id.substring(0, 8) || 'N/A'}
+      <div className="overflow-x-auto -mx-4 sm:mx-0">
+        <div className="inline-block min-w-full align-middle">
+          <div className="overflow-hidden">
+            <table className="min-w-full divide-y divide-yellow-500/10">
+              <thead className="bg-gradient-to-r from-gray-800 via-gray-800/90 to-gray-800">
+                <tr>
+                  <th className="px-3 md:px-6 py-3 md:py-5 text-left text-xs font-bold text-yellow-400 uppercase tracking-wider">Date & Time</th>
+                  <th className="px-3 md:px-6 py-3 md:py-5 text-left text-xs font-bold text-yellow-400 uppercase tracking-wider">Type</th>
+                  <th className="px-3 md:px-6 py-3 md:py-5 text-left text-xs font-bold text-yellow-400 uppercase tracking-wider">Amount</th>
+                  <th className="px-3 md:px-6 py-3 md:py-5 text-left text-xs font-bold text-yellow-400 uppercase tracking-wider">Package</th>
+                  <th className="px-3 md:px-6 py-3 md:py-5 text-left text-xs font-bold text-yellow-400 uppercase tracking-wider">ROI %</th>
+                  <th className="px-3 md:px-6 py-3 md:py-5 text-left text-xs font-bold text-yellow-400 uppercase tracking-wider">Invested Amount</th>
+                  <th className="px-3 md:px-6 py-3 md:py-5 text-left text-xs font-bold text-yellow-400 uppercase tracking-wider">Duration</th>
+                  <th className="px-3 md:px-6 py-3 md:py-5 text-left text-xs font-bold text-yellow-400 uppercase tracking-wider">Status</th>
+                  <th className="px-3 md:px-6 py-3 md:py-5 text-left text-xs font-bold text-yellow-400 uppercase tracking-wider">Transaction ID</th>
+                </tr>
+              </thead>
+              <tbody className="bg-gray-900/50 divide-y divide-yellow-500/10">
+                {investmentTransactions.length === 0 ? (
+                  <tr>
+                    <td colSpan={9} className="px-3 md:px-6 py-8 md:py-12 text-center text-gray-400 text-base md:text-lg">
+                      No investment transactions found
                     </td>
                   </tr>
-                );
-              })
-            )}
-          </tbody>
-        </table>
+                ) : (
+                  investmentTransactions.map((tx) => {
+                    const { date, time } = formatDateTime(tx.createdAt);
+                    return (
+                      <tr key={tx.id} className="hover:bg-gradient-to-r hover:from-yellow-500/5 hover:via-yellow-500/10 hover:to-transparent transition-all duration-300 group">
+                        <td className="px-3 md:px-6 py-3 md:py-5 whitespace-nowrap text-xs md:text-sm">
+                          <div className="text-white font-bold group-hover:text-yellow-100 transition-colors">{date}</div>
+                          <div className="text-gray-400 text-[10px] md:text-xs mt-1">{time}</div>
+                        </td>
+                        <td className="px-3 md:px-6 py-3 md:py-5 whitespace-nowrap text-xs md:text-sm">
+                          <span className={`px-2 md:px-4 py-1 md:py-1.5 inline-flex text-[10px] md:text-xs leading-5 font-bold rounded-full shadow-lg ${
+                            tx.type === 'credit' 
+                              ? 'bg-gradient-to-r from-yellow-500/30 to-yellow-600/20 text-yellow-300 border border-yellow-500/50 shadow-yellow-500/20' 
+                              : 'bg-red-900/40 text-red-400 border border-red-500/40'
+                          }`}>
+                            {tx.type.toUpperCase()}
+                          </span>
+                        </td>
+                        <td className="px-3 md:px-6 py-3 md:py-5 whitespace-nowrap text-xs md:text-sm font-extrabold text-yellow-400 group-hover:text-yellow-300 transition-colors">
+                          ${tx.amount.toFixed(2)}
+                        </td>
+                        <td className="px-3 md:px-6 py-3 md:py-5 whitespace-nowrap text-xs md:text-sm text-white font-bold group-hover:text-yellow-100 transition-colors">
+                          {tx.investment?.packageName || 'N/A'}
+                        </td>
+                        <td className="px-3 md:px-6 py-3 md:py-5 whitespace-nowrap text-xs md:text-sm text-gray-300 font-semibold">
+                          {tx.investment?.roi || 0}%
+                        </td>
+                        <td className="px-3 md:px-6 py-3 md:py-5 whitespace-nowrap text-xs md:text-sm font-bold text-white">
+                          ${tx.investment?.investedAmount.toFixed(2) || '0.00'}
+                        </td>
+                        <td className="px-3 md:px-6 py-3 md:py-5 whitespace-nowrap text-xs md:text-sm text-gray-300 font-semibold">
+                          {tx.investment?.duration || 0} days
+                        </td>
+                        <td className="px-3 md:px-6 py-3 md:py-5 whitespace-nowrap text-xs md:text-sm">
+                          <span className={`px-2 md:px-4 py-1 md:py-1.5 inline-flex text-[10px] md:text-xs leading-5 font-bold rounded-full shadow-lg ${
+                            tx.status === 'completed' 
+                              ? 'bg-gradient-to-r from-yellow-500/30 to-yellow-600/20 text-yellow-300 border border-yellow-500/50 shadow-yellow-500/20'
+                              : tx.status === 'pending' 
+                              ? 'bg-gray-700/50 text-yellow-200 border border-yellow-500/30'
+                              : 'bg-red-900/40 text-red-400 border border-red-500/40'
+                          }`}>
+                            {tx.status}
+                          </span>
+                        </td>
+                        <td className="px-3 md:px-6 py-3 md:py-5 whitespace-nowrap text-xs md:text-sm font-mono text-yellow-400 font-semibold">
+                          {tx.txRef || tx.id.substring(0, 8) || 'N/A'}
+                        </td>
+                      </tr>
+                    );
+                  })
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
       </div>
     </div>
   );
 
   const renderWithdrawalTable = () => (
     <div className="bg-gradient-to-br from-gray-900/95 via-gray-800/95 to-gray-900/95 backdrop-blur-sm rounded-2xl shadow-2xl border border-yellow-500/30 overflow-hidden">
-      <div className="px-6 py-5 border-b border-yellow-500/20 bg-gradient-to-r from-gray-800 via-gray-800/90 to-gray-800 flex justify-between items-center">
-        <h3 className="text-xl font-extrabold text-white">Withdrawal History</h3>
+      <div className="px-4 md:px-6 py-4 md:py-5 border-b border-yellow-500/20 bg-gradient-to-r from-gray-800 via-gray-800/90 to-gray-800 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+        <h3 className="text-lg md:text-xl font-extrabold text-white">Withdrawal History</h3>
         {withdrawals.length > 0 && (
           <button
             onClick={() => exportWithdrawals(withdrawals)}
-            className="px-6 py-2.5 bg-gradient-to-r from-yellow-500 to-yellow-600 text-black text-sm font-bold rounded-xl hover:from-yellow-400 hover:to-yellow-500 focus:outline-none focus:ring-2 focus:ring-yellow-500/50 transition-all shadow-lg shadow-yellow-500/30 hover:shadow-yellow-500/50 hover:scale-105 active:scale-95"
+            className="px-4 md:px-6 py-2 md:py-2.5 bg-gradient-to-r from-yellow-500 to-yellow-600 text-black text-xs md:text-sm font-bold rounded-xl hover:from-yellow-400 hover:to-yellow-500 focus:outline-none focus:ring-2 focus:ring-yellow-500/50 transition-all shadow-lg shadow-yellow-500/30 hover:shadow-yellow-500/50 hover:scale-105 active:scale-95 w-full sm:w-auto"
           >
             Export CSV
           </button>
         )}
       </div>
-      <div className="overflow-x-auto">
-        <table className="min-w-full divide-y divide-yellow-500/10">
-          <thead className="bg-gradient-to-r from-gray-800 via-gray-800/90 to-gray-800">
-            <tr>
-              <th className="px-6 py-5 text-left text-xs font-bold text-yellow-400 uppercase tracking-wider">Date & Time</th>
-              <th className="px-6 py-5 text-left text-xs font-bold text-yellow-400 uppercase tracking-wider">Withdrawal ID</th>
-              <th className="px-6 py-5 text-left text-xs font-bold text-yellow-400 uppercase tracking-wider">Amount</th>
-              <th className="px-6 py-5 text-left text-xs font-bold text-yellow-400 uppercase tracking-wider">Charges</th>
-              <th className="px-6 py-5 text-left text-xs font-bold text-yellow-400 uppercase tracking-wider">Final Amount</th>
-              <th className="px-6 py-5 text-left text-xs font-bold text-yellow-400 uppercase tracking-wider">Wallet Type</th>
-              <th className="px-6 py-5 text-left text-xs font-bold text-yellow-400 uppercase tracking-wider">Method</th>
-              <th className="px-6 py-5 text-left text-xs font-bold text-yellow-400 uppercase tracking-wider">Status</th>
-            </tr>
-          </thead>
-          <tbody className="bg-gray-900/50 divide-y divide-yellow-500/10">
-            {withdrawals.length === 0 ? (
-              <tr>
-                <td colSpan={8} className="px-6 py-12 text-center text-gray-400 text-lg">
-                  No withdrawals found
-                </td>
-              </tr>
-            ) : (
-              withdrawals.map((wd) => {
-                const { date, time } = formatDateTime(wd.createdAt);
-                return (
-                  <tr key={wd.id} className="hover:bg-gradient-to-r hover:from-yellow-500/5 hover:via-yellow-500/10 hover:to-transparent transition-all duration-300 group">
-                    <td className="px-6 py-5 whitespace-nowrap text-sm">
-                      <div className="text-white font-bold group-hover:text-yellow-100 transition-colors">{date}</div>
-                      <div className="text-gray-400 text-xs mt-1">{time}</div>
-                    </td>
-                    <td className="px-6 py-5 whitespace-nowrap text-sm font-mono text-yellow-400 font-semibold">
-                      {wd.withdrawalId || wd.id.substring(0, 8)}
-                    </td>
-                    <td className="px-6 py-5 whitespace-nowrap text-sm font-bold text-white">
-                      ${wd.amount.toFixed(2)}
-                    </td>
-                    <td className="px-6 py-5 whitespace-nowrap text-sm text-gray-400 font-semibold">
-                      ${wd.charges.toFixed(2)}
-                    </td>
-                    <td className="px-6 py-5 whitespace-nowrap text-sm font-extrabold text-yellow-400 group-hover:text-yellow-300 transition-colors">
-                      ${wd.finalAmount.toFixed(2)}
-                    </td>
-                    <td className="px-6 py-5 whitespace-nowrap text-sm text-gray-300 capitalize font-semibold">
-                      {wd.walletType}
-                    </td>
-                    <td className="px-6 py-5 whitespace-nowrap text-sm text-gray-300 capitalize font-semibold">
-                      {wd.method || 'crypto'}
-                    </td>
-                    <td className="px-6 py-5 whitespace-nowrap text-sm">
-                      <span className={`px-4 py-1.5 inline-flex text-xs leading-5 font-bold rounded-full shadow-lg ${
-                        wd.status === 'approved' 
-                          ? 'bg-gradient-to-r from-yellow-500/30 to-yellow-600/20 text-yellow-300 border border-yellow-500/50 shadow-yellow-500/20'
-                          : wd.status === 'pending' 
-                          ? 'bg-gray-700/50 text-yellow-200 border border-yellow-500/30'
-                          : 'bg-red-900/40 text-red-400 border border-red-500/40'
-                      }`}>
-                        {wd.status}
-                      </span>
+      <div className="overflow-x-auto -mx-4 sm:mx-0">
+        <div className="inline-block min-w-full align-middle">
+          <div className="overflow-hidden">
+            <table className="min-w-full divide-y divide-yellow-500/10">
+              <thead className="bg-gradient-to-r from-gray-800 via-gray-800/90 to-gray-800">
+                <tr>
+                  <th className="px-3 md:px-6 py-3 md:py-5 text-left text-xs font-bold text-yellow-400 uppercase tracking-wider">Date & Time</th>
+                  <th className="px-3 md:px-6 py-3 md:py-5 text-left text-xs font-bold text-yellow-400 uppercase tracking-wider">Withdrawal ID</th>
+                  <th className="px-3 md:px-6 py-3 md:py-5 text-left text-xs font-bold text-yellow-400 uppercase tracking-wider">Amount</th>
+                  <th className="px-3 md:px-6 py-3 md:py-5 text-left text-xs font-bold text-yellow-400 uppercase tracking-wider">Charges</th>
+                  <th className="px-3 md:px-6 py-3 md:py-5 text-left text-xs font-bold text-yellow-400 uppercase tracking-wider">Final Amount</th>
+                  <th className="px-3 md:px-6 py-3 md:py-5 text-left text-xs font-bold text-yellow-400 uppercase tracking-wider">Wallet Type</th>
+                  <th className="px-3 md:px-6 py-3 md:py-5 text-left text-xs font-bold text-yellow-400 uppercase tracking-wider">Method</th>
+                  <th className="px-3 md:px-6 py-3 md:py-5 text-left text-xs font-bold text-yellow-400 uppercase tracking-wider">Status</th>
+                </tr>
+              </thead>
+              <tbody className="bg-gray-900/50 divide-y divide-yellow-500/10">
+                {withdrawals.length === 0 ? (
+                  <tr>
+                    <td colSpan={8} className="px-3 md:px-6 py-8 md:py-12 text-center text-gray-400 text-base md:text-lg">
+                      No withdrawals found
                     </td>
                   </tr>
-                );
-              })
-            )}
-          </tbody>
-        </table>
+                ) : (
+                  withdrawals.map((wd) => {
+                    const { date, time } = formatDateTime(wd.createdAt);
+                    return (
+                      <tr key={wd.id} className="hover:bg-gradient-to-r hover:from-yellow-500/5 hover:via-yellow-500/10 hover:to-transparent transition-all duration-300 group">
+                        <td className="px-3 md:px-6 py-3 md:py-5 whitespace-nowrap text-xs md:text-sm">
+                          <div className="text-white font-bold group-hover:text-yellow-100 transition-colors">{date}</div>
+                          <div className="text-gray-400 text-[10px] md:text-xs mt-1">{time}</div>
+                        </td>
+                        <td className="px-3 md:px-6 py-3 md:py-5 whitespace-nowrap text-xs md:text-sm font-mono text-yellow-400 font-semibold">
+                          {wd.withdrawalId || wd.id.substring(0, 8)}
+                        </td>
+                        <td className="px-3 md:px-6 py-3 md:py-5 whitespace-nowrap text-xs md:text-sm font-bold text-white">
+                          ${wd.amount.toFixed(2)}
+                        </td>
+                        <td className="px-3 md:px-6 py-3 md:py-5 whitespace-nowrap text-xs md:text-sm text-gray-400 font-semibold">
+                          ${wd.charges.toFixed(2)}
+                        </td>
+                        <td className="px-3 md:px-6 py-3 md:py-5 whitespace-nowrap text-xs md:text-sm font-extrabold text-yellow-400 group-hover:text-yellow-300 transition-colors">
+                          ${wd.finalAmount.toFixed(2)}
+                        </td>
+                        <td className="px-3 md:px-6 py-3 md:py-5 whitespace-nowrap text-xs md:text-sm text-gray-300 capitalize font-semibold">
+                          {wd.walletType}
+                        </td>
+                        <td className="px-3 md:px-6 py-3 md:py-5 whitespace-nowrap text-xs md:text-sm text-gray-300 capitalize font-semibold">
+                          {wd.method || 'crypto'}
+                        </td>
+                        <td className="px-3 md:px-6 py-3 md:py-5 whitespace-nowrap text-xs md:text-sm">
+                          <span className={`px-2 md:px-4 py-1 md:py-1.5 inline-flex text-[10px] md:text-xs leading-5 font-bold rounded-full shadow-lg ${
+                            wd.status === 'approved' 
+                              ? 'bg-gradient-to-r from-yellow-500/30 to-yellow-600/20 text-yellow-300 border border-yellow-500/50 shadow-yellow-500/20'
+                              : wd.status === 'pending' 
+                              ? 'bg-gray-700/50 text-yellow-200 border border-yellow-500/30'
+                              : 'bg-red-900/40 text-red-400 border border-red-500/40'
+                          }`}>
+                            {wd.status}
+                          </span>
+                        </td>
+                      </tr>
+                    );
+                  })
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
       </div>
     </div>
   );
@@ -468,25 +480,40 @@ export default function ReportsPage() {
 
       <div>
           {/* Tabs */}
-          <div className="mb-8">
+          <div className="mb-6 md:mb-8">
             <div className="border-b border-yellow-500/20">
-              <nav className="-mb-px flex space-x-8 overflow-x-auto">
+              <nav className="-mb-px flex space-x-2 md:space-x-8 overflow-x-auto scrollbar-hide pb-1">
+                {/* Add scroll padding for mobile */}
+                <style jsx>{`
+                  .scrollbar-hide::-webkit-scrollbar {
+                    display: none;
+                  }
+                  .scrollbar-hide {
+                    -ms-overflow-style: none;
+                    scrollbar-width: none;
+                  }
+                `}</style>
                   {(['roi', 'binary', 'referral', 'careerLevel', 'investment', 'withdrawal'] as const).map((tab) => (
                   <button
                     key={tab}
                       onClick={() => setActiveTab(tab)}
                     className={`${
                       activeTab === tab
-                        ? 'border-yellow-500 text-yellow-400'
+                        ? 'border-yellow-500 text-yellow-400 bg-yellow-500/10'
                         : 'border-transparent text-gray-400 hover:text-yellow-300 hover:border-yellow-500/50'
-                    } whitespace-nowrap py-4 px-1 border-b-2 font-bold text-sm capitalize transition-all duration-200`}
+                    } whitespace-nowrap py-3 md:py-4 px-2 md:px-1 border-b-2 font-bold text-xs md:text-sm capitalize transition-all duration-200 rounded-t-lg flex-shrink-0 min-w-fit`}
                   >
-                      {tab === 'careerLevel' ? 'Career Level' : tab} {tab === 'roi' && `(${roiTransactions.length})`}
-                      {tab === 'binary' && `(${binaryTransactions.length})`}
-                      {tab === 'referral' && `(${referralTransactions.length})`}
-                      {tab === 'careerLevel' && `(${careerLevelTransactions.length})`}
-                      {tab === 'investment' && `(${investmentTransactions.length})`}
-                      {tab === 'withdrawal' && `(${withdrawals.length})`}
+                      <span className="block md:inline">
+                        {tab === 'careerLevel' ? 'Career Level' : tab.charAt(0).toUpperCase() + tab.slice(1)}
+                      </span>
+                      <span className="ml-1 md:ml-0">
+                        {tab === 'roi' && `(${roiTransactions.length})`}
+                        {tab === 'binary' && `(${binaryTransactions.length})`}
+                        {tab === 'referral' && `(${referralTransactions.length})`}
+                        {tab === 'careerLevel' && `(${careerLevelTransactions.length})`}
+                        {tab === 'investment' && `(${investmentTransactions.length})`}
+                        {tab === 'withdrawal' && `(${withdrawals.length})`}
+                      </span>
                   </button>
                 ))}
               </nav>

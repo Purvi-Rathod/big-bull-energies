@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Play, Image as ImageIcon, Video, Filter } from "lucide-react";
 import Footer from "@/components/Footer";
+import { table } from "console";
 
 interface GalleryItem {
   _id?: string;
@@ -38,6 +39,7 @@ export default function GalleryPage() {
       const data = await response.json();
       
       if (data.status === "success" && data.data) {
+        console.table(data.data.items);
         setItems(data.data.items || []);
         if (data.data.categories) {
           setCategories(data.data.categories);

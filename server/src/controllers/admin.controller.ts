@@ -453,9 +453,9 @@ export const impersonateUser = asyncHandler(async (req, res) => {
     }
 
     // Check if user account is active
-    if (user.status !== "active") {
-      throw new AppError(`User account is ${user.status}`, 403);
-    }
+    // if (user.status !== "active") {
+    //   throw new AppError(`User account is ${user.status}`, 403);
+    // }
 
     // Generate user JWT token (not admin token)
     const token = signAuthToken({

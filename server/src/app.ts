@@ -317,7 +317,7 @@ app.post('/', asyncHandler(async (req, res, next) => {
     });
 }));
 
-app.get('/health', asyncHandler(async (req, res) => {
+app.get('/api/v1/health', asyncHandler(async (req, res) => {
     // Type assertion needed due to TypeScript type inference limitation with asyncHandler wrapper
     // The response object is correctly typed at runtime, but TypeScript needs help here
     const response = res as any;

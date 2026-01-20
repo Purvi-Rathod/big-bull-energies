@@ -38,14 +38,18 @@ export default function UserGenealogyPage() {
   const [treeData, setTreeData] = useState<TreeData | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  
+
   // Navigation history for reset functionality (only downlines, no upline)
   const [navigationHistory, setNavigationHistory] = useState<string[]>([]);
   const [originalRootUserId, setOriginalRootUserId] = useState<string | null>(null);
-  
+
   // View Business Modal state
   const [showBusinessModal, setShowBusinessModal] = useState(false);
   const [selectedBusinessNode, setSelectedBusinessNode] = useState<TreeNode | null>(null);
+
+  const [searchTerm, setSearchTerm] = useState('');
+  const [searchResults, setSearchResults] = useState<TreeNode[]>([]);
+  const [searchLoading, setSearchLoading] = useState(false);
 
   // Fetch tree data for a specific user with depth=2 (only downlines)
   const fetchTreeData = useCallback(async (userId: string, isInitialLoad = false) => {
@@ -55,12 +59,12 @@ export default function UserGenealogyPage() {
       setLoading(true);
       setError(null);
 
-      // Use getNodeDownlines API with depth=2 (only 2 levels below root)
+      // Use getNodeDownlines API with depth=2 (only 3 levels below root)
       const response = await api.getNodeDownlines(userId, 3);
-      
+
       if (response.data?.tree) {
         const rootUser = response.data.tree.find((u: TreeNode) => u.userId === userId);
-        
+
         if (!rootUser) {
           throw new Error('User not found in tree data');
         }
@@ -89,6 +93,7 @@ export default function UserGenealogyPage() {
     }
   }, []);
 
+
   // Load user's own tree by default on mount
   useEffect(() => {
     if (user?.userId) {
@@ -96,17 +101,36 @@ export default function UserGenealogyPage() {
     }
   }, [user?.userId, fetchTreeData]);
 
+  const handleSearch = async () => {
+    if (!searchTerm.trim()) {
+      toast.error('Enter something to search');
+      return;
+    }
+
+    try {
+      setSearchLoading(true);
+
+
+      await fetchTreeData(searchTerm, false);
+    } catch (err) {
+      toast.error('Search failed');
+    } finally {
+      setSearchLoading(false);
+    }
+  };
+
+
   // Handle clicking on a node to make it the new root (only if it's a downline)
   const handleNodeClick = (userId: string) => {
     if (userId === treeData?.rootUserId) return; // Already root
-    
+
     // Verify this is a downline (exists in current tree data)
     const nodeExists = treeData?.tree.some(n => n.userId === userId);
     if (!nodeExists) {
       toast.error('You can only view your downlines');
       return;
     }
-    
+
     fetchTreeData(userId, false);
   };
 
@@ -136,6 +160,25 @@ export default function UserGenealogyPage() {
     return map;
   }, [treeData]);
 
+  useEffect(() => {
+    if (!searchTerm.trim()) {
+      setSearchResults([]);
+      return;
+    }
+
+    const term = searchTerm.toLowerCase();
+
+    const results = treeData?.tree.filter((node) =>
+      node.name?.toLowerCase().includes(term) ||
+      node.userId?.toLowerCase().includes(term) ||
+      node.email?.toLowerCase().includes(term) ||
+      node.phone?.toLowerCase().includes(term)
+    );
+
+    setSearchResults(results || []);
+  }, [searchTerm, treeData]);
+
+
   // Get root node
   const rootNode = useMemo(() => {
     if (!treeData) return null;
@@ -161,16 +204,14 @@ export default function UserGenealogyPage() {
     return (
       <div
         key={node.userId}
-        className={`flex flex-col items-center transition-all duration-300 ${
-          isRoot ? 'scale-105 md:scale-110' : 'hover:scale-105 md:hover:scale-110'
-        }`}
+        className={`flex flex-col items-center transition-all duration-300 ${isRoot ? 'scale-105 md:scale-110' : 'hover:scale-105 md:hover:scale-110'
+          }`}
       >
         <div
-          className={`w-20 md:w-28 p-1.5 md:p-2 rounded-lg md:rounded-xl border-2 shadow-xl cursor-pointer transition-all duration-300 backdrop-blur-sm ${
-            isRoot
-              ? 'bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-600 border-indigo-400 text-white shadow-indigo-500/50 ring-2 ring-indigo-300/50'
-              : 'bg-gradient-to-br from-white to-gray-50 border-gray-200 hover:border-indigo-400 hover:shadow-2xl hover:shadow-indigo-200/50 hover:ring-2 hover:ring-indigo-100'
-          }`}
+          className={`w-20 md:w-28 p-1.5 md:p-2 rounded-lg md:rounded-xl border-2 shadow-xl cursor-pointer transition-all duration-300 backdrop-blur-sm ${isRoot
+            ? 'bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-600 border-indigo-400 text-white shadow-indigo-500/50 ring-2 ring-indigo-300/50'
+            : 'bg-gradient-to-br from-white to-gray-50 border-gray-200 hover:border-indigo-400 hover:shadow-2xl hover:shadow-indigo-200/50 hover:ring-2 hover:ring-indigo-100'
+            }`}
           onClick={() => !isRoot && handleNodeClick(node.userId)}
         >
           <div className="text-center">
@@ -180,11 +221,10 @@ export default function UserGenealogyPage() {
             <div className={`text-[7px] md:text-[9px] mb-1 font-mono ${isRoot ? 'text-indigo-100' : 'text-gray-500'}`}>
               {node.userId.substring(0, 8)}...
             </div>
-            <div className={`text-[7px] md:text-[8px] px-1 md:px-1.5 py-0.5 rounded-full inline-block mb-1 font-semibold ${
-              node.status === 'active'
-                ? isRoot ? 'bg-emerald-400/90 text-white shadow-sm' : 'bg-emerald-100 text-emerald-700 border border-emerald-200'
-                : isRoot ? 'bg-gray-400/80 text-white' : 'bg-gray-100 text-gray-600 border border-gray-200'
-            }`}>
+            <div className={`text-[7px] md:text-[8px] px-1 md:px-1.5 py-0.5 rounded-full inline-block mb-1 font-semibold ${node.status === 'active'
+              ? isRoot ? 'bg-emerald-400/90 text-white shadow-sm' : 'bg-emerald-100 text-emerald-700 border border-emerald-200'
+              : isRoot ? 'bg-gray-400/80 text-white' : 'bg-gray-100 text-gray-600 border border-gray-200'
+              }`}>
               {node.status}
             </div>
             <div className="flex gap-0.5 md:gap-1 mt-1">
@@ -207,11 +247,10 @@ export default function UserGenealogyPage() {
                 setSelectedBusinessNode(node);
                 setShowBusinessModal(true);
               }}
-              className={`mt-1 w-full py-0.5 px-1 rounded-md md:rounded-lg text-[8px] md:text-[9px] font-semibold transition-all duration-200 ${
-                isRoot
-                  ? 'bg-white/95 text-indigo-600 hover:bg-white hover:shadow-lg hover:scale-105'
-                  : 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white hover:from-indigo-700 hover:to-purple-700 hover:shadow-lg hover:scale-105'
-              }`}
+              className={`mt-1 w-full py-0.5 px-1 rounded-md md:rounded-lg text-[8px] md:text-[9px] font-semibold transition-all duration-200 ${isRoot
+                ? 'bg-white/95 text-indigo-600 hover:bg-white hover:shadow-lg hover:scale-105'
+                : 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white hover:from-indigo-700 hover:to-purple-700 hover:shadow-lg hover:scale-105'
+                }`}
             >
               View
             </button>
@@ -250,7 +289,7 @@ export default function UserGenealogyPage() {
     if (rootNode.leftChild) {
       structure.level1.left = treeMap.get(rootNode.leftChild) || null;
     }
-    
+
     if (rootNode.rightChild) {
       structure.level1.right = treeMap.get(rootNode.rightChild) || null;
     }
@@ -278,7 +317,7 @@ export default function UserGenealogyPage() {
         structure.level2.rightRight = treeMap.get(rightChildId) || null;
       }
     }
-    
+
     // Debug: Log tree structure to console
     if (process.env.NODE_ENV === 'development') {
       console.log('Tree Structure:', {
@@ -326,6 +365,45 @@ export default function UserGenealogyPage() {
             </svg>
             Reset to My Tree
           </button>
+
+          <div className="relative w-full sm:w-96 flex gap-2">
+
+            <input
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              placeholder="Search downline (Name / ID / Email)"
+              className="flex-1 px-4 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none"
+            />
+
+            <button
+              onClick={handleSearch}
+              disabled={searchLoading}
+              className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 text-sm"
+            >
+              {searchLoading ? 'Searching...' : 'Search'}
+            </button>
+
+            {/* Result Dropdown */}
+            {searchResults.length > 0 && (
+              <div className="absolute top-full left-0 z-50 bg-white w-full mt-1 rounded-lg shadow-lg max-h-60 overflow-y-auto border">
+                {searchResults.map((node) => (
+                  <div
+                    key={node.userId}
+                    onClick={() => {
+                      handleNodeClick(node.userId);
+                      setSearchTerm('');
+                      setSearchResults([]);
+                    }}
+                    className="px-4 py-2 hover:bg-indigo-50 cursor-pointer"
+                  >
+                    <p className="text-sm font-medium">{node.name}</p>
+                    <p className="text-xs text-gray-500">{node.userId}</p>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
           <div className="hidden sm:block flex-1"></div>
           <div className="text-xs md:text-sm text-gray-600 flex flex-col sm:flex-row items-start sm:items-center gap-1 sm:gap-2 bg-white/80 px-3 md:px-4 py-2 rounded-lg border border-gray-200">
             <span className="font-medium">Current Root:</span>
@@ -378,7 +456,7 @@ export default function UserGenealogyPage() {
               {/* Vertical lines down to level 1 nodes */}
               <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-0.5 md:w-1 h-4 md:h-6 bg-gradient-to-b from-indigo-300 to-indigo-200 rounded-full hidden sm:block" style={{ marginLeft: 'clamp(-100px, -160px, -80px)' }}></div>
               <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-0.5 md:w-1 h-4 md:h-6 bg-gradient-to-b from-indigo-300 to-indigo-200 rounded-full hidden sm:block" style={{ marginLeft: 'clamp(100px, 160px, 80px)' }}></div>
-              
+
               <div className="relative z-20">
                 {renderNode(treeStructure.level1.left, 1, 'left')}
               </div>
@@ -399,7 +477,7 @@ export default function UserGenealogyPage() {
                   style={{ marginLeft: `${offset}px` }}
                 ></div>
               ))}
-              
+
               <div className="relative z-20">
                 {renderNode(treeStructure.level2.leftLeft, 2, 'left')}
               </div>
@@ -470,11 +548,10 @@ export default function UserGenealogyPage() {
                   </div>
                   <div>
                     <label className="text-sm font-medium text-gray-500">Status</label>
-                    <span className={`mt-1 inline-block px-2 py-1 rounded-full text-xs font-medium ${
-                      selectedBusinessNode.status === 'active'
-                        ? 'bg-green-100 text-green-800'
-                        : 'bg-gray-100 text-gray-800'
-                    }`}>
+                    <span className={`mt-1 inline-block px-2 py-1 rounded-full text-xs font-medium ${selectedBusinessNode.status === 'active'
+                      ? 'bg-green-100 text-green-800'
+                      : 'bg-gray-100 text-gray-800'
+                      }`}>
                       {selectedBusinessNode.status}
                     </span>
                   </div>
@@ -496,9 +573,9 @@ export default function UserGenealogyPage() {
                       {selectedBusinessNode.parentName && selectedBusinessNode.parentUserId
                         ? `${selectedBusinessNode.parentName} (${selectedBusinessNode.parentUserId})`
                         : (() => {
-                            const parentNode = treeData?.tree.find(n => n.id === selectedBusinessNode.parent);
-                            return parentNode ? `${parentNode.name} (${parentNode.userId})` : (selectedBusinessNode.parentUserId || 'Parent ID: ' + selectedBusinessNode.parent);
-                          })()}
+                          const parentNode = treeData?.tree.find(n => n.id === selectedBusinessNode.parent);
+                          return parentNode ? `${parentNode.name} (${parentNode.userId})` : (selectedBusinessNode.parentUserId || 'Parent ID: ' + selectedBusinessNode.parent);
+                        })()}
                     </p>
                   </div>
                 ) : (

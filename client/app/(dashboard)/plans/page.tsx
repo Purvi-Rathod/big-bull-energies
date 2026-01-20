@@ -303,9 +303,10 @@ export default function PlansPage() {
                         <div className="flex justify-between items-center py-3 border-b border-yellow-500/20">
                           <span className="text-sm font-semibold text-gray-300">Total Output:</span>
                           <span className="text-lg font-extrabold text-yellow-400">
-                            {pkg.roi !== undefined && pkg.roi !== null
+                            {/* {pkg.roi !== undefined && pkg.roi !== null
                               ? `${((pkg.duration * pkg.roi) + renewablePrinciplePct).toFixed(2)}%`
-                              : `${totalOutputPct}%`}
+                              : `${totalOutputPct}%`} */}
+                            {(pkg.packageName == "Solar Starter") ? "360%" : (pkg.packageName == "Elite Energy") ? "460%" : "412%"}
                           </span>
                         </div>
 

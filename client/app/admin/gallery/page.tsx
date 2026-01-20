@@ -329,7 +329,7 @@ export default function GalleryPage() {
           className={`px-4 py-2 rounded-md text-sm font-medium transition ${
             selectedCategory === ''
               ? 'bg-indigo-600 text-white'
-              : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+              : 'bg-gray-200 text-gray-900 hover:bg-gray-300'
           }`}
         >
           All Categories
@@ -341,7 +341,7 @@ export default function GalleryPage() {
             className={`px-4 py-2 rounded-md text-sm font-medium transition ${
               selectedCategory === cat
                 ? 'bg-indigo-600 text-white'
-                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                : 'bg-gray-200 text-gray-900 hover:bg-gray-300'
             }`}
           >
             {cat}
@@ -490,17 +490,17 @@ export default function GalleryPage() {
             <button
               onClick={() => setPage(Math.max(1, page - 1))}
               disabled={page === 1}
-              className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-4 py-2 text-sm font-medium text-gray-900 bg-white border text-gray-900 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Previous
             </button>
-            <span className="text-sm text-gray-700">
+            <span className="text-sm text-gray-900">
               Page {page} of {totalPages}
             </span>
             <button
               onClick={() => setPage(Math.min(totalPages, page + 1))}
               disabled={page === totalPages}
-              className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-4 py-2 text-sm font-medium text-gray-900 bg-white border text-gray-900 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Next
             </button>
@@ -518,38 +518,38 @@ export default function GalleryPage() {
               </h2>
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-gray-900 mb-1">
                     Title *
                   </label>
                   <input
                     type="text"
                     value={formData.title}
                     onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    className="w-full px-3 py-2 border text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
                     required
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-gray-900 mb-1">
                     Description
                   </label>
                   <textarea
                     value={formData.description}
                     onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    className="w-full px-3 py-2 border text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
                     rows={3}
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-gray-900 mb-1">
                     Media Type *
                   </label>
                   <select
                     value={formData.mediaType}
                     onChange={(e) => setFormData({ ...formData, mediaType: e.target.value as 'photo' | 'video' })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    className="w-full px-3 py-2 border text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
                     required
                   >
                     <option value="photo">Photo</option>
@@ -558,7 +558,7 @@ export default function GalleryPage() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-gray-900 mb-1">
                     Media URL/Link *
                   </label>
                   
@@ -576,7 +576,7 @@ export default function GalleryPage() {
                           className="hidden"
                           disabled={uploading}
                         />
-                        <div className="px-4 py-2 border-2 border-dashed border-gray-300 rounded-md hover:border-indigo-500 transition text-center">
+                        <div className="px-4 py-2 border-2 border-dashed text-gray-900 rounded-md hover:border-indigo-500 transition text-center">
                           <Upload className="w-5 h-5 mx-auto mb-1 text-gray-400" />
                           <span className="text-sm text-gray-600">Choose File</span>
                         </div>
@@ -595,7 +595,7 @@ export default function GalleryPage() {
                             type="button"
                             onClick={handleRemoveFile}
                             disabled={uploading}
-                            className="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 disabled:opacity-50 text-sm"
+                            className="px-4 py-2 bg-gray-200 text-gray-900 rounded-md hover:bg-gray-300 disabled:opacity-50 text-sm"
                           >
                             <X className="w-4 h-4" />
                           </button>
@@ -614,13 +614,13 @@ export default function GalleryPage() {
                               <img
                                 src={uploadPreview}
                                 alt="Preview"
-                                className="max-w-full h-32 object-contain rounded border border-gray-300"
+                                className="max-w-full h-32 object-contain rounded border text-gray-900"
                               />
                             ) : (
                               <video
                                 src={uploadPreview}
                                 controls
-                                className="max-w-full h-32 rounded border border-gray-300"
+                                className="max-w-full h-32 rounded border text-gray-900"
                               />
                             )}
                           </div>
@@ -645,7 +645,7 @@ export default function GalleryPage() {
                     type="url"
                     value={formData.mediaUrl}
                     onChange={(e) => setFormData({ ...formData, mediaUrl: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    className="w-full px-3 py-2 border text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
                     placeholder="https://example.com/image.jpg or https://youtube.com/watch?v=..."
                     required
                   />
@@ -656,28 +656,28 @@ export default function GalleryPage() {
 
                 {formData.mediaType === 'video' && (
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-gray-900 mb-1">
                       Thumbnail URL (Optional)
                     </label>
                     <input
                       type="url"
                       value={formData.thumbnailUrl}
                       onChange={(e) => setFormData({ ...formData, thumbnailUrl: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                      className="w-full px-3 py-2 border text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
                       placeholder="https://example.com/thumbnail.jpg"
                     />
                   </div>
                 )}
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-gray-900 mb-1">
                     Category *
                   </label>
                   <input
                     type="text"
                     value={formData.category}
                     onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    className="w-full px-3 py-2 border text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
                     placeholder="e.g., Office Video, Solar Plant 1, Solar Plant 2, Events"
                     list="categories"
                     required
@@ -694,26 +694,26 @@ export default function GalleryPage() {
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-gray-900 mb-1">
                       Display Order
                     </label>
                     <input
                       type="number"
                       value={formData.order}
                       onChange={(e) => setFormData({ ...formData, order: parseInt(e.target.value) || 0 })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                      className="w-full px-3 py-2 border text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
                       min="0"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-gray-900 mb-1">
                       Status *
                     </label>
                     <select
                       value={formData.status}
                       onChange={(e) => setFormData({ ...formData, status: e.target.value as 'Active' | 'InActive' })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                      className="w-full px-3 py-2 border text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
                       required
                     >
                       <option value="Active">Active</option>
@@ -732,7 +732,7 @@ export default function GalleryPage() {
                   <button
                     type="button"
                     onClick={() => setShowModal(false)}
-                    className="flex-1 px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500"
+                    className="flex-1 px-4 py-2 bg-gray-200 text-gray-900 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500"
                   >
                     Cancel
                   </button>

@@ -62,7 +62,7 @@ export default function CountryBusinessReportPage() {
       <div className="flex items-center justify-center py-12">
         <div className="text-center">
           <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-slate-600"></div>
-          <p className="mt-4 text-gray-600">Loading report...</p>
+          <p className="mt-4 text-black">Loading report...</p>
         </div>
       </div>
     );
@@ -81,15 +81,15 @@ export default function CountryBusinessReportPage() {
           {/* Summary Cards */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
             <div className="bg-white rounded-lg shadow p-6">
-              <h3 className="text-sm font-medium text-gray-500 mb-2">Total Countries</h3>
-              <p className="text-2xl font-bold text-gray-900">{report.summary.totalCountries}</p>
+              <h3 className="text-sm font-medium text-black mb-2">Total Countries</h3>
+              <p className="text-2xl font-bold text-black">{report.summary.totalCountries}</p>
             </div>
             <div className="bg-white rounded-lg shadow p-6">
-              <h3 className="text-sm font-medium text-gray-500 mb-2">Total Users</h3>
+              <h3 className="text-sm font-medium text-black mb-2">Total Users</h3>
               <p className="text-2xl font-bold text-indigo-600">{report.summary.totalUsers}</p>
             </div>
             <div className="bg-white rounded-lg shadow p-6">
-              <h3 className="text-sm font-medium text-gray-500 mb-2">Total Business</h3>
+              <h3 className="text-sm font-medium text-black mb-2">Total Business</h3>
               <p className="text-2xl font-bold text-green-600">
                 ${report.summary.totalBusiness.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
               </p>
@@ -99,7 +99,7 @@ export default function CountryBusinessReportPage() {
           {/* Countries Table */}
           <div className="bg-white rounded-lg shadow overflow-hidden mb-6">
             <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
-              <h3 className="text-lg font-semibold text-gray-900">Business by Country ({report.countries.length})</h3>
+              <h3 className="text-lg font-semibold text-black">Business by Country ({report.countries.length})</h3>
               {report.countries.length > 0 && (
                 <button
                   onClick={exportToCSV}
@@ -111,34 +111,34 @@ export default function CountryBusinessReportPage() {
             </div>
             <div className="overflow-x-auto">
               <table className="w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
+                <thead className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white">
                   <tr>
-                    <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase">Country</th>
-                    <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase">Total Investment</th>
-                    <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase">Investment Count</th>
-                    <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase">User Count</th>
+                    <th className="px-3 py-3 text-left text-xs font-medium text-white uppercase">Country</th>
+                    <th className="px-3 py-3 text-left text-xs font-medium text-white uppercase">Total Investment</th>
+                    <th className="px-3 py-3 text-left text-xs font-medium text-white uppercase">Investment Count</th>
+                    <th className="px-3 py-3 text-left text-xs font-medium text-white uppercase">User Count</th>
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
                   {report.countries.length === 0 ? (
                     <tr>
-                      <td colSpan={4} className="px-6 py-4 text-center text-gray-500">
+                      <td colSpan={4} className="px-6 py-4 text-center text-black">
                         No data found
                       </td>
                     </tr>
                   ) : (
                     report.countries.map((c: any) => (
                       <tr key={c.country}>
-                        <td className="px-3 py-3 text-xs font-medium text-gray-900">
+                        <td className="px-3 py-3 text-xs font-medium text-black">
                           {c.country}
                         </td>
                         <td className="px-3 py-3 text-xs font-medium text-indigo-600">
                           ${c.totalInvestment.toFixed(2)}
                         </td>
-                        <td className="px-3 py-3 text-xs text-gray-500">
+                        <td className="px-3 py-3 text-xs text-black">
                           {c.investmentCount}
                         </td>
-                        <td className="px-3 py-3 text-xs text-gray-500">
+                        <td className="px-3 py-3 text-xs text-black">
                           {c.userCount}
                         </td>
                       </tr>
@@ -155,44 +155,44 @@ export default function CountryBusinessReportPage() {
               {report.countries.map((country: any) => (
                 <div key={country.country} className="bg-white rounded-lg shadow overflow-hidden">
                   <div className="px-6 py-4 border-b border-gray-200">
-                    <h3 className="text-lg font-semibold text-gray-900">
+                    <h3 className="text-lg font-semibold text-black">
                       {country.country} - {country.userCount} {country.userCount === 1 ? 'User' : 'Users'}
                     </h3>
                   </div>
                   <div className="overflow-x-auto">
                     <table className="w-full divide-y divide-gray-200">
-                      <thead className="bg-gray-50">
+                      <thead className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white">
                         <tr>
-                          <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase">User ID</th>
-                          <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase">User Name</th>
-                          <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase">User Email</th>
-                          <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase">Total Investment</th>
-                          <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase">Investment Count</th>
+                          <th className="px-3 py-3 text-left text-xs font-medium text-white uppercase">User ID</th>
+                          <th className="px-3 py-3 text-left text-xs font-medium text-white uppercase">User Name</th>
+                          <th className="px-3 py-3 text-left text-xs font-medium text-white uppercase">User Email</th>
+                          <th className="px-3 py-3 text-left text-xs font-medium text-white uppercase">Total Investment</th>
+                          <th className="px-3 py-3 text-left text-xs font-medium text-white uppercase">Investment Count</th>
                         </tr>
                       </thead>
                       <tbody className="bg-white divide-y divide-gray-200">
                         {country.users.length === 0 ? (
                           <tr>
-                            <td colSpan={5} className="px-6 py-4 text-center text-gray-500">
+                            <td colSpan={5} className="px-6 py-4 text-center text-black">
                               No users found
                             </td>
                           </tr>
                         ) : (
                           country.users.map((u: any) => (
                             <tr key={u.userId}>
-                              <td className="px-3 py-3 text-xs font-mono text-gray-600">
+                              <td className="px-3 py-3 text-xs font-mono text-black">
                                 {u.userId}
                               </td>
-                              <td className="px-3 py-3 text-xs text-gray-900">
+                              <td className="px-3 py-3 text-xs text-black">
                                 {u.userName}
                               </td>
-                              <td className="px-3 py-3 text-xs text-gray-500">
+                              <td className="px-3 py-3 text-xs text-black">
                                 {u.userEmail}
                               </td>
-                              <td className="px-3 py-3 text-xs font-medium text-gray-900">
+                              <td className="px-3 py-3 text-xs font-medium text-black">
                                 ${u.totalInvestment.toFixed(2)}
                               </td>
-                              <td className="px-3 py-3 text-xs text-gray-500">
+                              <td className="px-3 py-3 text-xs text-black">
                                 {u.investmentCount}
                               </td>
                             </tr>

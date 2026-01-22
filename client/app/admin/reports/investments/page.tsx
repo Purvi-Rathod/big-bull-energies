@@ -8,6 +8,11 @@ export default function InvestmentsReportPage() {
   const [report, setReport] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [searchTerm, setSearchTerm] = useState('');
+  const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'inactive'>('all');
+  const [typeFilter, setTypeFilter] = useState<string>('all');
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
   const hasFetchedRef = useRef(false);
 
   useEffect(() => {
@@ -34,11 +39,52 @@ export default function InvestmentsReportPage() {
     }
   };
 
+  const getFilteredInvestments = () => {
+    if (!report?.investments) return [];
+    
+    let filtered = [...report.investments];
+    
+    if (searchTerm) {
+      const term = searchTerm.toLowerCase();
+      filtered = filtered.filter((inv: any) =>
+        inv.userId.toLowerCase().includes(term) ||
+        inv.userName.toLowerCase().includes(term) ||
+        inv.userEmail.toLowerCase().includes(term) ||
+        inv.packageName.toLowerCase().includes(term)
+      );
+    }
+    
+    if (statusFilter !== 'all') {
+      filtered = filtered.filter((inv: any) => 
+        statusFilter === 'active' ? inv.isActive : !inv.isActive
+      );
+    }
+    
+    if (typeFilter !== 'all') {
+      filtered = filtered.filter((inv: any) => inv.type === typeFilter);
+    }
+    
+    if (startDate) {
+      const start = new Date(startDate);
+      start.setHours(0, 0, 0, 0);
+      filtered = filtered.filter((inv: any) => new Date(inv.createdAt) >= start);
+    }
+    
+    if (endDate) {
+      const end = new Date(endDate);
+      end.setHours(23, 59, 59, 999);
+      filtered = filtered.filter((inv: any) => new Date(inv.createdAt) <= end);
+    }
+    
+    return filtered;
+  };
+
   const exportToCSV = () => {
     if (!report) return;
 
+    const filtered = getFilteredInvestments();
     const headers = ['Date', 'User ID', 'User Name', 'User Email', 'Package Name', 'Invested Amount', 'Type', 'Status', 'ROI Earned', 'Start Date', 'End Date'];
-    const rows = report.investments.map((inv: any) => [
+    const rows = filtered.map((inv: any) => [
       new Date(inv.createdAt).toLocaleString(),
       inv.userId,
       inv.userName,
@@ -57,11 +103,49 @@ export default function InvestmentsReportPage() {
     const link = document.createElement('a');
     const url = URL.createObjectURL(blob);
     link.setAttribute('href', url);
-    link.setAttribute('download', `investments_report_${new Date().toISOString().split('T')[0]}.csv`);
+    link.setAttribute('download', `investments_${new Date().toISOString().split('T')[0]}.csv`);
     link.style.visibility = 'hidden';
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+  };
+
+  const exportToExcel = () => {
+    if (!report) return;
+
+    const filtered = getFilteredInvestments();
+    const headers = ['Date', 'User ID', 'User Name', 'User Email', 'Package Name', 'Invested Amount', 'Type', 'Status', 'ROI Earned', 'Start Date', 'End Date'];
+    const rows = filtered.map((inv: any) => [
+      new Date(inv.createdAt).toLocaleString(),
+      inv.userId,
+      inv.userName,
+      inv.userEmail,
+      inv.packageName,
+      inv.investedAmount.toFixed(2),
+      inv.type,
+      inv.isActive ? 'Active' : 'Inactive',
+      inv.totalRoiEarned.toFixed(2),
+      new Date(inv.startDate).toLocaleDateString(),
+      new Date(inv.endDate).toLocaleDateString(),
+    ]);
+
+    const excelContent = [headers.join('\t'), ...rows.map((row: any[]) => row.join('\t'))].join('\n');
+    const blob = new Blob([excelContent], { type: 'application/vnd.ms-excel' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    link.setAttribute('download', `investments_${new Date().toISOString().split('T')[0]}.xls`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  // Get unique investment types for filter
+  const getInvestmentTypes = (): string[] => {
+    if (!report?.investments) return [];
+    const types = new Set(report.investments.map((inv: any) => inv.type));
+    return Array.from(types) as string[];
   };
 
   if (loading) {
@@ -69,7 +153,7 @@ export default function InvestmentsReportPage() {
       <div className="flex items-center justify-center py-12">
         <div className="text-center">
           <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-slate-600"></div>
-          <p className="mt-4 text-gray-600">Loading report...</p>
+          <p className="mt-4 text-black">Loading report...</p>
         </div>
       </div>
     );
@@ -88,21 +172,21 @@ export default function InvestmentsReportPage() {
           {/* Summary Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
             <div className="bg-white rounded-lg shadow p-6">
-              <h3 className="text-sm font-medium text-gray-500 mb-2">Total Investments</h3>
-              <p className="text-2xl font-bold text-gray-900">{report.summary.totalInvestments}</p>
+              <h3 className="text-sm font-medium text-black mb-2">Total Investments</h3>
+              <p className="text-2xl font-bold text-black">{report.summary.totalInvestments}</p>
             </div>
             <div className="bg-white rounded-lg shadow p-6">
-              <h3 className="text-sm font-medium text-gray-500 mb-2">Active Investments</h3>
+              <h3 className="text-sm font-medium text-black mb-2">Active Investments</h3>
               <p className="text-2xl font-bold text-green-600">{report.summary.activeInvestments}</p>
             </div>
             <div className="bg-white rounded-lg shadow p-6">
-              <h3 className="text-sm font-medium text-gray-500 mb-2">Total Amount</h3>
+              <h3 className="text-sm font-medium text-black mb-2">Total Amount</h3>
               <p className="text-2xl font-bold text-indigo-600">
                 ${report.summary.totalAmount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
               </p>
             </div>
             <div className="bg-white rounded-lg shadow p-6">
-              <h3 className="text-sm font-medium text-gray-500 mb-2">Total ROI Earned</h3>
+              <h3 className="text-sm font-medium text-black mb-2">Total ROI Earned</h3>
               <p className="text-2xl font-bold text-purple-600">
                 ${report.summary.totalROIEarned.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
               </p>
@@ -112,26 +196,26 @@ export default function InvestmentsReportPage() {
           {/* Package Stats */}
           {report.packageStats.length > 0 && (
             <div className="bg-white rounded-lg shadow p-6 mb-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Package Statistics</h3>
+              <h3 className="text-lg font-semibold text-black mb-4">Package Statistics</h3>
               <div className="overflow-x-auto">
                 <table className="w-full divide-y divide-gray-200">
-                  <thead className="bg-gray-50">
+                  <thead className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white">
                     <tr>
-                      <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase">Package Name</th>
-                      <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase">Count</th>
-                      <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase">Total Amount</th>
+                      <th className="px-3 py-3 text-left text-xs font-medium text-white uppercase">Package Name</th>
+                      <th className="px-3 py-3 text-left text-xs font-medium text-white uppercase">Count</th>
+                      <th className="px-3 py-3 text-left text-xs font-medium text-white uppercase">Total Amount</th>
                     </tr>
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
                     {report.packageStats.map((pkg: any, idx: number) => (
                       <tr key={idx}>
-                        <td className="px-3 py-3 text-xs font-medium text-gray-900">
+                        <td className="px-3 py-3 text-xs font-medium text-black">
                           {pkg.packageName}
                         </td>
-                        <td className="px-3 py-3 text-xs text-gray-500">
+                        <td className="px-3 py-3 text-xs text-black">
                           {pkg.count}
                         </td>
-                        <td className="px-3 py-3 text-xs font-medium text-gray-900">
+                        <td className="px-3 py-3 text-xs font-medium text-black">
                           ${pkg.totalAmount.toFixed(2)}
                         </td>
                       </tr>
@@ -144,65 +228,137 @@ export default function InvestmentsReportPage() {
 
           {/* Investments Table */}
           <div className="bg-white rounded-lg shadow overflow-hidden">
-            <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
-              <h3 className="text-lg font-semibold text-gray-900">All Investments ({report.investments.length})</h3>
-              {report.investments.length > 0 && (
-                <button
-                  onClick={exportToCSV}
-                  className="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                >
-                  Export CSV
-                </button>
-              )}
+            <div className="px-6 py-4 border-b border-gray-200">
+              <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-4">
+                <h3 className="text-lg font-semibold text-black">All Investments</h3>
+                <div className="flex gap-2">
+                  <button
+                    onClick={exportToCSV}
+                    className="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  >
+                    Export CSV
+                  </button>
+                  <button
+                    onClick={exportToExcel}
+                    className="px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500"
+                  >
+                    Export Excel
+                  </button>
+                </div>
+              </div>
+
+              {/* Filters */}
+              <div className="space-y-4">
+                <input
+                  type="text"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  placeholder="Search by User ID, Name, Email, or Package..."
+                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                />
+
+                <div className="flex gap-4 flex-wrap items-center">
+                  <select
+                    value={statusFilter}
+                    onChange={(e) => setStatusFilter(e.target.value as any)}
+                    className="px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  >
+                    <option value="all">All Status</option>
+                    <option value="active">Active</option>
+                    <option value="inactive">Inactive</option>
+                  </select>
+
+                  <select
+                    value={typeFilter}
+                    onChange={(e) => setTypeFilter(e.target.value)}
+                    className="px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  >
+                    <option value="all">All Types</option>
+                    {getInvestmentTypes().map((type: string) => (
+                      <option key={type} value={type}>{type.charAt(0).toUpperCase() + type.slice(1)}</option>
+                    ))}
+                  </select>
+
+                  <div className="flex gap-2 items-center">
+                    <label className="text-sm text-black">Date Range:</label>
+                    <input
+                      type="date"
+                      value={startDate}
+                      onChange={(e) => setStartDate(e.target.value)}
+                      className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    />
+                    <span className="text-black">to</span>
+                    <input
+                      type="date"
+                      value={endDate}
+                      onChange={(e) => setEndDate(e.target.value)}
+                      className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    />
+                    {(startDate || endDate) && (
+                      <button
+                        onClick={() => {
+                          setStartDate('');
+                          setEndDate('');
+                        }}
+                        className="px-3 py-2 bg-gray-200 text-black rounded-md hover:bg-gray-300 text-sm"
+                      >
+                        Clear
+                      </button>
+                    )}
+                  </div>
+                </div>
+              </div>
             </div>
             <div className="overflow-x-auto">
               <table className="w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
+                <thead className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white">
                   <tr>
-                    <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
-                    <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase">User ID</th>
-                    <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase">User Name</th>
-                    <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase">Package</th>
-                    <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase">Amount</th>
-                    <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase">Type</th>
-                    <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase">ROI Earned</th>
-                    <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                    <th className="px-3 py-3 text-left text-xs font-medium text-white uppercase">Date</th>
+                    <th className="px-3 py-3 text-left text-xs font-medium text-white uppercase">User ID</th>
+                    <th className="px-3 py-3 text-left text-xs font-medium text-white uppercase">User Name</th>
+                    <th className="px-3 py-3 text-left text-xs font-medium text-white uppercase">Package</th>
+                    <th className="px-3 py-3 text-left text-xs font-medium text-white uppercase">Amount</th>
+                    <th className="px-3 py-3 text-left text-xs font-medium text-white uppercase">Type</th>
+                    <th className="px-3 py-3 text-left text-xs font-medium text-white uppercase">ROI Earned</th>
+                    <th className="px-3 py-3 text-left text-xs font-medium text-white uppercase">Status</th>
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
-                  {report.investments.length === 0 ? (
+                  {getFilteredInvestments().length === 0 ? (
                     <tr>
-                      <td colSpan={8} className="px-6 py-4 text-center text-gray-500">
-                        No investments found
+                      <td colSpan={8} className="px-6 py-4 text-center text-black">
+                        {searchTerm || statusFilter !== 'all' || typeFilter !== 'all' || startDate || endDate
+                          ? 'No investments found matching your filters'
+                          : 'No investments found'}
                       </td>
                     </tr>
                   ) : (
-                    report.investments.map((inv: any) => (
+                    getFilteredInvestments().map((inv: any) => (
                       <tr key={inv.id}>
-                        <td className="px-3 py-3 text-xs text-gray-500">
+                        <td className="px-3 py-3 text-xs text-black">
                           {new Date(inv.createdAt).toLocaleString()}
                         </td>
-                        <td className="px-3 py-3 text-xs font-mono text-gray-600">
+                        <td className="px-3 py-3 text-xs font-mono text-black">
                           {inv.userId}
                         </td>
-                        <td className="px-3 py-3 text-xs text-gray-900">
+                        <td className="px-3 py-3 text-xs text-black">
                           {inv.userName}
                         </td>
-                        <td className="px-3 py-3 text-xs text-gray-500">
+                        <td className="px-3 py-3 text-xs text-black">
                           {inv.packageName}
                         </td>
-                        <td className="px-3 py-3 text-xs font-medium text-gray-900">
+                        <td className="px-3 py-3 text-xs font-medium text-black">
                           ${inv.investedAmount.toFixed(2)}
                         </td>
-                        <td className="px-3 py-3 text-xs text-gray-500 capitalize">
+                        <td className="px-3 py-3 text-xs text-black capitalize">
                           {inv.type}
                         </td>
                         <td className="px-3 py-3 text-xs font-medium text-purple-600">
                           ${inv.totalRoiEarned.toFixed(2)}
                         </td>
                         <td className="px-3 py-3 text-xs">
-                          <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                            inv.isActive ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
+                          <span className={`px-3 py-1 inline-flex text-xs leading-5 font-bold rounded-full border-2 shadow-sm ${
+                            inv.isActive ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-black'
                           }`}>
                             {inv.isActive ? 'Active' : 'Inactive'}
                           </span>
@@ -213,6 +369,12 @@ export default function InvestmentsReportPage() {
                 </tbody>
               </table>
             </div>
+            
+            {getFilteredInvestments().length > 0 && (
+              <div className="px-6 py-4 border-t border-gray-200 text-sm text-black">
+                Showing {getFilteredInvestments().length} of {report.investments.length} investments
+              </div>
+            )}
           </div>
         </>
       )}

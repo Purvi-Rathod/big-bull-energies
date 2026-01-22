@@ -138,6 +138,13 @@ export async function calculateDailyROI() {
           continue;
         }
 
+        // Skip ROI calculation for powerleg accounts (they only earn binary income)
+        const user = await User.findById(investment.user);
+        if (user && user.accountType === "powerleg") {
+          console.log(`[ROI Cron] Skipping ROI for powerleg account: ${user.userId}`);
+          continue;
+        }
+
         // Check if ROI was already calculated today
         const lastRoiDate = investment.lastRoiDate
           ? new Date(investment.lastRoiDate)

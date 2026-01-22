@@ -840,6 +840,75 @@ export const createWithdrawal = asyncHandler(async (req, res) => {
     throw new AppError("User not found", 404);
   }
 
+  // Check target completion for withdrawal lock
+  const { checkTargetCompletion } = await import("../services/target-completion.service");
+  const targetCheck = await checkTargetCompletion(userId);
+  
+  // For free accounts: special withdrawal rules
+  if (user.accountType === "free") {
+    // Free accounts can only withdraw from binary wallet
+    if (walletType !== "binary") {
+      throw new AppError(
+        "Free accounts can only withdraw from binary wallet. You can only withdraw the amount earned from binary business.",
+        403
+      );
+    }
+
+    // Free accounts must have a target set
+    if (!user.binaryTargetAmount || user.binaryTargetAmount === 0) {
+      throw new AppError(
+        "Free accounts require a binary target to be set. Please contact admin to set your binary target.",
+        403
+      );
+    }
+
+    // Free accounts must complete their binary target first
+    if (!targetCheck.isCompleted) {
+      const message = targetCheck.message || "Your binary target is not completed. Complete your binary target to unlock withdrawal.";
+      throw new AppError(message, 403);
+    }
+
+    // Get binary wallet to check balance
+    const binaryWallet = await Wallet.findOne({ user: userId, type: WalletType.BINARY });
+    if (!binaryWallet) {
+      throw new AppError("Binary wallet not found", 404);
+    }
+
+    const binaryBalance = parseFloat(binaryWallet.balance.toString());
+    
+    // Free accounts can only withdraw up to their binary wallet balance
+    if (amount > binaryBalance) {
+      throw new AppError(
+        `Insufficient binary balance. Available: $${binaryBalance.toFixed(2)}. Free accounts can only withdraw from binary earnings.`,
+        400
+      );
+    }
+
+    // Free accounts can only withdraw up to their target amount
+    // They can withdraw the amount they've earned from binary business (up to target)
+    const maxWithdrawable = Math.min(binaryBalance, user.binaryTargetAmount);
+    if (amount > maxWithdrawable) {
+      throw new AppError(
+        `Free accounts can withdraw up to $${maxWithdrawable.toFixed(2)} (target: $${user.binaryTargetAmount.toFixed(2)}, binary balance: $${binaryBalance.toFixed(2)}). You can only withdraw the amount earned from binary business.`,
+        400
+      );
+    }
+  } else {
+    // For normal and powerleg accounts: standard target check
+    if (!targetCheck.isCompleted) {
+      const message = targetCheck.message || "Your target is not completed. Complete your binary target to unlock withdrawal.";
+      throw new AppError(message, 403);
+    }
+
+    // Check if withdrawals are enabled (additional safety check)
+    if (user.withdrawEnabled === false && user.binaryTargetAmount && user.binaryTargetAmount > 0) {
+      throw new AppError(
+        "Your target is not completed. Complete your binary target to unlock withdrawal.",
+        403
+      );
+    }
+  }
+
   const hasWalletAddress = user.walletAddress && user.walletAddress.trim().length > 0;
   const hasBankAccount = user.bankAccount?.accountNumber && user.bankAccount.accountNumber.trim().length > 0;
 
@@ -1934,6 +2003,40 @@ export const getUserCareerProgressController = asyncHandler(async (req, res) => 
         totalRewardsEarned: 0,
         lastCheckedAt: null,
       },
+    },
+  });
+});
+
+/**
+ * Get user target completion status
+ * GET /api/v1/user/target-status
+ */
+export const getUserTargetStatus = asyncHandler(async (req, res) => {
+  const userId = (req as any).user?.id;
+  if (!userId) {
+    throw new AppError("User not authenticated", 401);
+  }
+
+  const user = await User.findById(userId);
+  if (!user) {
+    throw new AppError("User not found", 404);
+  }
+
+  const { checkTargetCompletion } = await import("../services/target-completion.service");
+  const targetCheck = await checkTargetCompletion(userId);
+
+  const response = res as any;
+  response.status(200).json({
+    status: "success",
+    data: {
+      binaryTargetAmount: user.binaryTargetAmount || 0,
+      targetStatus: user.targetStatus || "pending",
+      withdrawEnabled: user.withdrawEnabled || false,
+      leftBusiness: targetCheck.leftBusiness,
+      rightBusiness: targetCheck.rightBusiness,
+      totalBusiness: targetCheck.totalBusiness,
+      isCompleted: targetCheck.isCompleted,
+      message: targetCheck.message,
     },
   });
 });

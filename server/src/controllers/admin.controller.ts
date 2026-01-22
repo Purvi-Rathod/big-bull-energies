@@ -23,6 +23,8 @@ import { Settings } from "../models/Settings";
 import { UserCareerProgress } from "../models/UserCareerProgress";
 import { sendWithdrawalApprovedEmail, sendWithdrawalRejectedEmail } from "../lib/mail-service/email.service";
 import { getMinimumVoucherAmount as getMinVoucherAmount } from "../services/package.service";
+import { generateNextUserId, findUserByUserId } from "../services/userId.service";
+import { initializeUser } from "../services/userInit.service";
 import bcrypt from "bcryptjs";
 
 /**
@@ -351,7 +353,7 @@ export const getLatestCalculationJob = asyncHandler(async (req, res) => {
  */
 export const getAllUsers = asyncHandler(async (req, res) => {
   try {
-    const { page = 1, limit = 50, search = "" } = req.query;
+    const { page = 1, limit = 50, search = "", country = "", startDate = "", endDate = "" } = req.query;
     const skip = (Number(page) - 1) * Number(limit);
 
     // Build search query
@@ -365,9 +367,29 @@ export const getAllUsers = asyncHandler(async (req, res) => {
       ];
     }
 
+    // Add country filter
+    if (country) {
+      searchQuery.country = { $regex: country, $options: "i" };
+    }
+
+    // Add date range filter
+    if (startDate || endDate) {
+      searchQuery.createdAt = {};
+      if (startDate) {
+        const start = new Date(startDate as string);
+        start.setHours(0, 0, 0, 0);
+        searchQuery.createdAt.$gte = start;
+      }
+      if (endDate) {
+        const end = new Date(endDate as string);
+        end.setHours(23, 59, 59, 999);
+        searchQuery.createdAt.$lte = end;
+      }
+    }
+
     // Get users with pagination
     const users = await User.find(searchQuery)
-      .select("_id userId name email phone status referrer position createdAt")
+      .select("_id userId name email phone country status referrer position createdAt")
       .populate("referrer", "userId name")
       .sort({ createdAt: -1 })
       .skip(skip)
@@ -406,6 +428,7 @@ export const getAllUsers = asyncHandler(async (req, res) => {
         name: user.name,
         email: user.email || "-",
         phone: user.phone || "-",
+        country: user.country || "-",
         status: user.status,
         treeLink,
         totalInvestment: totalInvestment.toFixed(2),
@@ -683,12 +706,32 @@ export const getAdminStatistics = asyncHandler(async (req, res) => {
  */
 export const getAllWithdrawals = asyncHandler(async (req, res) => {
   try {
-    const { page = 1, limit = 50, status } = req.query;
+    const { page = 1, limit = 50, status, walletType = "", startDate = "", endDate = "" } = req.query;
     const skip = (Number(page) - 1) * Number(limit);
 
     const query: any = {};
     if (status) {
       query.status = status;
+    }
+
+    // Add wallet type filter
+    if (walletType) {
+      query.walletType = walletType;
+    }
+
+    // Add date range filter
+    if (startDate || endDate) {
+      query.createdAt = {};
+      if (startDate) {
+        const start = new Date(startDate as string);
+        start.setHours(0, 0, 0, 0);
+        query.createdAt.$gte = start;
+      }
+      if (endDate) {
+        const end = new Date(endDate as string);
+        end.setHours(23, 59, 59, 999);
+        query.createdAt.$lte = end;
+      }
     }
 
     const withdrawals = await Withdrawal.find(query)
@@ -1615,11 +1658,29 @@ export const getAdminReports = asyncHandler(async (req, res) => {
   const { 
     type = 'all', // 'roi', 'binary', 'referral', 'investment', 'withdrawal', 'payment', 'all'
     page = 1, 
-    limit = 50 
+    limit = 50,
+    startDate = "",
+    endDate = ""
   } = req.query;
 
   const skip = (Number(page) - 1) * Number(limit);
   const limitNum = Number(limit);
+
+  // Build date filter
+  const dateFilter: any = {};
+  if (startDate || endDate) {
+    dateFilter.createdAt = {};
+    if (startDate) {
+      const start = new Date(startDate as string);
+      start.setHours(0, 0, 0, 0);
+      dateFilter.createdAt.$gte = start;
+    }
+    if (endDate) {
+      const end = new Date(endDate as string);
+      end.setHours(23, 59, 59, 999);
+      dateFilter.createdAt.$lte = end;
+    }
+  }
 
   // Get all wallets
   const wallets = await Wallet.find({});
@@ -1707,9 +1768,11 @@ export const getAdminReports = asyncHandler(async (req, res) => {
   // If type is 'all', return all types with pagination (for backward compatibility)
   if (type === 'all') {
     // Get all transactions with user info (with pagination)
-    const transactions = await WalletTransaction.find({
+    const transactionQuery: any = {
       wallet: { $in: walletIds },
-    })
+      ...dateFilter,
+    };
+    const transactions = await WalletTransaction.find(transactionQuery)
       .populate("wallet", "type")
       .populate("user", "userId name email")
       .sort({ createdAt: -1 })
@@ -1748,8 +1811,8 @@ export const getAdminReports = asyncHandler(async (req, res) => {
     });
 
     // Get withdrawals with pagination
-    const totalWithdrawals = await Withdrawal.countDocuments({});
-    const withdrawals = await Withdrawal.find({})
+    const totalWithdrawals = await Withdrawal.countDocuments(dateFilter);
+    const withdrawals = await Withdrawal.find(dateFilter)
       .populate("user", "userId name email")
       .sort({ createdAt: -1 })
       .skip(skip)
@@ -1757,8 +1820,8 @@ export const getAdminReports = asyncHandler(async (req, res) => {
       .lean();
 
     // Get payments with pagination
-    const totalPayments = await Payment.countDocuments({});
-    const payments = await Payment.find({})
+    const totalPayments = await Payment.countDocuments(dateFilter);
+    const payments = await Payment.find(dateFilter)
       .populate("user", "userId name email")
       .populate("package", "packageName")
       .sort({ createdAt: -1 })
@@ -1766,9 +1829,7 @@ export const getAdminReports = asyncHandler(async (req, res) => {
       .limit(limitNum)
       .lean();
 
-    const totalTransactions = await WalletTransaction.countDocuments({
-      wallet: { $in: walletIds },
-    });
+    const totalTransactions = await WalletTransaction.countDocuments(transactionQuery);
 
     const response = res as any;
     response.status(200).json({
@@ -1806,13 +1867,14 @@ export const getAdminReports = asyncHandler(async (req, res) => {
     const targetWallets = wallets.filter((w) => w.type === targetWalletType);
     const targetWalletIds = targetWallets.map((w) => w._id);
 
-    total = await WalletTransaction.countDocuments({
+    const transactionQuery: any = {
       wallet: { $in: targetWalletIds },
-    });
+      ...dateFilter,
+    };
 
-    const transactions = await WalletTransaction.find({
-      wallet: { $in: targetWalletIds },
-    })
+    total = await WalletTransaction.countDocuments(transactionQuery);
+
+    const transactions = await WalletTransaction.find(transactionQuery)
       .populate("wallet", "type")
       .populate("user", "userId name email")
       .sort({ createdAt: -1 })
@@ -1825,13 +1887,14 @@ export const getAdminReports = asyncHandler(async (req, res) => {
     const investmentWallets = wallets.filter((w) => w.type === WalletType.INVESTMENT);
     const investmentWalletIds = investmentWallets.map((w) => w._id);
 
-    total = await WalletTransaction.countDocuments({
+    const transactionQuery: any = {
       wallet: { $in: investmentWalletIds },
-    });
+      ...dateFilter,
+    };
 
-    const transactions = await WalletTransaction.find({
-      wallet: { $in: investmentWalletIds },
-    })
+    total = await WalletTransaction.countDocuments(transactionQuery);
+
+    const transactions = await WalletTransaction.find(transactionQuery)
       .populate("wallet", "type")
       .populate("user", "userId name email")
       .sort({ createdAt: -1 })
@@ -1856,8 +1919,8 @@ export const getAdminReports = asyncHandler(async (req, res) => {
 
     result = transactions.map((tx) => formatInvestmentTransaction(tx, investmentMap));
   } else if (type === 'withdrawal') {
-    total = await Withdrawal.countDocuments({});
-    const withdrawals = await Withdrawal.find({})
+    total = await Withdrawal.countDocuments(dateFilter);
+    const withdrawals = await Withdrawal.find(dateFilter)
       .populate("user", "userId name email")
       .sort({ createdAt: -1 })
       .skip(skip)
@@ -1866,8 +1929,8 @@ export const getAdminReports = asyncHandler(async (req, res) => {
 
     result = withdrawals.map(formatWithdrawal);
   } else if (type === 'payment') {
-    total = await Payment.countDocuments({});
-    const payments = await Payment.find({})
+    total = await Payment.countDocuments(dateFilter);
+    const payments = await Payment.find(dateFilter)
       .populate("user", "userId name email")
       .populate("package", "packageName")
       .sort({ createdAt: -1 })
@@ -2539,11 +2602,515 @@ export const adminCreateInvestment = asyncHandler(async (req, res) => {
 });
 
 /**
+ * Admin: Add funds to user wallet
+ * POST /api/v1/admin/wallet/add-funds
+ */
+export const addFundsToWallet = asyncHandler(async (req, res) => {
+  const body = (req as any).body;
+  const { userId, walletType, amount, description } = body as {
+    userId: string;
+    walletType: WalletType;
+    amount: number;
+    description?: string;
+  };
+
+  if (!userId || !walletType || !amount) {
+    throw new AppError("User ID, wallet type, and amount are required", 400);
+  }
+
+  if (!Types.ObjectId.isValid(userId)) {
+    throw new AppError("Invalid user ID", 400);
+  }
+
+  if (amount <= 0) {
+    throw new AppError("Amount must be greater than zero", 400);
+  }
+
+  // Validate wallet type
+  const validWalletTypes = Object.values(WalletType);
+  if (!validWalletTypes.includes(walletType)) {
+    throw new AppError("Invalid wallet type", 400);
+  }
+
+  // Find user
+  const user = await User.findById(userId);
+  if (!user) {
+    throw new AppError("User not found", 404);
+  }
+
+  // Update wallet balance
+  const { updateWallet } = await import("../services/investment.service");
+  const wallet = await updateWallet(
+    user._id as Types.ObjectId,
+    walletType,
+    amount,
+    "add"
+  );
+
+  // Create transaction record
+  const { WalletTransaction } = await import("../models/WalletTransaction");
+  const walletDoc = await Wallet.findOne({ user: user._id, type: walletType });
+  if (walletDoc) {
+    await WalletTransaction.create({
+      wallet: walletDoc._id,
+      user: user._id,
+      type: "credit",
+      amount: Types.Decimal128.fromString(amount.toString()),
+      currency: "USD",
+      balanceBefore: Types.Decimal128.fromString((parseFloat(wallet.balance.toString()) - amount).toString()),
+      balanceAfter: wallet.balance,
+      status: "completed",
+      meta: {
+        type: "admin_add_funds",
+        description: description || `Admin added ${amount} to ${walletType} wallet`,
+        adminAction: true,
+      },
+    });
+  }
+
+  const response = res as any;
+  response.status(200).json({
+    status: "success",
+    message: `Successfully added ${amount} to ${walletType} wallet`,
+    data: {
+      userId: user.userId,
+      userName: user.name,
+      walletType,
+      amount,
+      newBalance: parseFloat(wallet.balance.toString()),
+    },
+  });
+});
+
+/**
+ * Admin: Remove funds from user wallet
+ * POST /api/v1/admin/wallet/remove-funds
+ */
+export const removeFundsFromWallet = asyncHandler(async (req, res) => {
+  const body = (req as any).body;
+  const { userId, walletType, amount, description } = body as {
+    userId: string;
+    walletType: WalletType;
+    amount: number;
+    description?: string;
+  };
+
+  if (!userId || !walletType || !amount) {
+    throw new AppError("User ID, wallet type, and amount are required", 400);
+  }
+
+  if (!Types.ObjectId.isValid(userId)) {
+    throw new AppError("Invalid user ID", 400);
+  }
+
+  if (amount <= 0) {
+    throw new AppError("Amount must be greater than zero", 400);
+  }
+
+  // Validate wallet type
+  const validWalletTypes = Object.values(WalletType);
+  if (!validWalletTypes.includes(walletType)) {
+    throw new AppError("Invalid wallet type", 400);
+  }
+
+  // Find user
+  const user = await User.findById(userId);
+  if (!user) {
+    throw new AppError("User not found", 404);
+  }
+
+  // Check current balance
+  const walletDoc = await Wallet.findOne({ user: user._id, type: walletType });
+  if (!walletDoc) {
+    throw new AppError(`Wallet of type ${walletType} not found for user`, 404);
+  }
+
+  const currentBalance = parseFloat(walletDoc.balance.toString());
+  if (currentBalance < amount) {
+    throw new AppError(`Insufficient balance. Current balance: ${currentBalance}, Requested: ${amount}`, 400);
+  }
+
+  // Update wallet balance
+  const { updateWallet } = await import("../services/investment.service");
+  const wallet = await updateWallet(
+    user._id as Types.ObjectId,
+    walletType,
+    amount,
+    "subtract"
+  );
+
+  // Create transaction record
+  const { WalletTransaction } = await import("../models/WalletTransaction");
+  await WalletTransaction.create({
+    wallet: walletDoc._id,
+    user: user._id,
+    type: "debit",
+    amount: Types.Decimal128.fromString(amount.toString()),
+    currency: "USD",
+    balanceBefore: Types.Decimal128.fromString(currentBalance.toString()),
+    balanceAfter: wallet.balance,
+    status: "completed",
+    meta: {
+      type: "admin_remove_funds",
+      description: description || `Admin removed ${amount} from ${walletType} wallet`,
+      adminAction: true,
+    },
+  });
+
+  const response = res as any;
+  response.status(200).json({
+    status: "success",
+    message: `Successfully removed ${amount} from ${walletType} wallet`,
+    data: {
+      userId: user.userId,
+      userName: user.name,
+      walletType,
+      amount,
+      newBalance: parseFloat(wallet.balance.toString()),
+    },
+  });
+});
+
+/**
+ * Admin: Create Powerleg Accounts
+ * POST /api/v1/admin/influencer/powerleg/create
+ */
+export const createPowerlegAccounts = asyncHandler(async (req, res) => {
+  const body = (req as any).body;
+  const { influencerUserId, accounts, packageId, amount } = body as {
+    influencerUserId: string;
+    accounts: Array<{
+      name: string;
+      email?: string;
+      phone?: string;
+      password: string;
+    }>;
+    packageId?: string;
+    amount?: number;
+  };
+
+  if (!influencerUserId || !accounts || !Array.isArray(accounts) || accounts.length === 0) {
+    throw new AppError("Influencer user ID and accounts array are required", 400);
+  }
+
+  // Find influencer user
+  const influencer = await findUserByUserId(influencerUserId);
+  if (!influencer) {
+    throw new AppError("Influencer user not found", 404);
+  }
+
+  // Validate package if provided
+  let packageData = null;
+  if (packageId) {
+    if (!Types.ObjectId.isValid(packageId)) {
+      throw new AppError("Invalid package ID", 400);
+    }
+    packageData = await Package.findById(packageId);
+    if (!packageData) {
+      throw new AppError("Package not found", 404);
+    }
+    if (amount && amount < parseFloat(packageData.minAmount.toString())) {
+      throw new AppError(`Amount must be at least ${packageData.minAmount}`, 400);
+    }
+  }
+
+  const createdAccounts = [];
+  const errors = [];
+
+  for (let i = 0; i < accounts.length; i++) {
+    const accountData = accounts[i];
+    try {
+      // Validate account data
+      if (!accountData.name || !accountData.password) {
+        errors.push({ index: i, error: "Name and password are required" });
+        continue;
+      }
+
+      if (accountData.password.length < 8) {
+        errors.push({ index: i, error: "Password must be at least 8 characters" });
+        continue;
+      }
+
+      // Generate userId
+      const userId = await generateNextUserId();
+
+      // Create powerleg user account
+      const powerlegUser = await User.create({
+        userId,
+        name: accountData.name,
+        email: accountData.email?.toLowerCase(),
+        phone: accountData.phone,
+        password: accountData.password,
+        referrer: influencer._id as Types.ObjectId,
+        position: null, // Powerleg accounts don't use binary tree positions
+        status: "inactive", // Will be activated when they invest
+        accountType: "powerleg",
+        country: influencer.country || undefined,
+      });
+
+      // Initialize binary tree and wallets (under influencer, no position)
+      try {
+        await initializeUser(
+          powerlegUser._id as Types.ObjectId,
+          influencer._id as Types.ObjectId,
+          null // No position - influencer can have unlimited children
+        );
+      } catch (initError: any) {
+        // If initialization fails, delete the user
+        await User.findByIdAndDelete(powerlegUser._id);
+        throw new AppError(`Failed to initialize user ${userId}: ${initError.message}`, 500);
+      }
+
+      // Create investment if package and amount provided
+      let investment = null;
+      if (packageData && amount) {
+        try {
+          const paymentId = `POWERLEG_${Date.now()}_${Math.random().toString(36).substring(7)}`;
+          const { processInvestment } = await import("../services/investment.service");
+          investment = await processInvestment(
+            powerlegUser._id as Types.ObjectId,
+            new Types.ObjectId(packageId),
+            amount,
+            paymentId,
+            undefined // No voucher
+          );
+          
+          // Update investment type
+          investment.type = "powerleg";
+          await investment.save();
+        } catch (invError: any) {
+          console.error(`Failed to create investment for ${userId}:`, invError);
+          errors.push({ index: i, userId, error: `Investment creation failed: ${invError.message}` });
+        }
+      }
+
+      createdAccounts.push({
+        userId: powerlegUser.userId,
+        name: powerlegUser.name,
+        email: powerlegUser.email,
+        phone: powerlegUser.phone,
+        investmentId: investment?._id?.toString(),
+      });
+    } catch (error: any) {
+      errors.push({ index: i, error: error.message || "Failed to create account" });
+    }
+  }
+
+  const response = res as any;
+  response.status(201).json({
+    status: "success",
+    message: `Successfully created ${createdAccounts.length} powerleg account(s)`,
+    data: {
+      influencerUserId: influencer.userId,
+      influencerName: influencer.name,
+      createdAccounts,
+      errors: errors.length > 0 ? errors : undefined,
+    },
+  });
+});
+
+/**
+ * Admin: Set binary target amount for user
+ * POST /api/v1/admin/users/:userId/set-binary-target
+ */
+export const setBinaryTarget = asyncHandler(async (req, res) => {
+  const { userId } = req.params;
+  const { targetAmount } = req.body as { targetAmount: number };
+
+  if (!Types.ObjectId.isValid(userId)) {
+    throw new AppError("Invalid user ID", 400);
+  }
+
+  if (targetAmount === undefined || targetAmount < 0) {
+    throw new AppError("Target amount must be a non-negative number", 400);
+  }
+
+  const user = await User.findById(userId);
+  if (!user) {
+    throw new AppError("User not found", 404);
+  }
+
+  // Set target amount
+  user.binaryTargetAmount = targetAmount;
+  
+  // If target is 0, enable withdrawals (no target)
+  if (targetAmount === 0) {
+    user.targetStatus = "completed";
+    user.withdrawEnabled = true;
+  } else {
+    // Check current completion status
+    const { checkTargetCompletion } = await import("../services/target-completion.service");
+    const targetCheck = await checkTargetCompletion(user._id as Types.ObjectId);
+    
+    if (targetCheck.isCompleted) {
+      user.targetStatus = "completed";
+      user.withdrawEnabled = true;
+    } else {
+      user.targetStatus = "pending";
+      user.withdrawEnabled = false;
+    }
+  }
+
+  await user.save();
+
+  const response = res as any;
+  response.status(200).json({
+    status: "success",
+    message: `Binary target set to $${targetAmount}`,
+    data: {
+      userId: user.userId,
+      userName: user.name,
+      binaryTargetAmount: user.binaryTargetAmount,
+      targetStatus: user.targetStatus,
+      withdrawEnabled: user.withdrawEnabled,
+    },
+  });
+});
+
+/**
+ * Admin: Get user target completion status
+ * GET /api/v1/admin/users/:userId/target-status
+ */
+export const getUserTargetStatus = asyncHandler(async (req, res) => {
+  const { userId } = req.params;
+
+  if (!Types.ObjectId.isValid(userId)) {
+    throw new AppError("Invalid user ID", 400);
+  }
+
+  const user = await User.findById(userId);
+  if (!user) {
+    throw new AppError("User not found", 404);
+  }
+
+  const { checkTargetCompletion } = await import("../services/target-completion.service");
+  const targetCheck = await checkTargetCompletion(user._id as Types.ObjectId);
+
+  const response = res as any;
+  response.status(200).json({
+    status: "success",
+    data: {
+      userId: user.userId,
+      userName: user.name,
+      binaryTargetAmount: user.binaryTargetAmount || 0,
+      targetStatus: user.targetStatus || "pending",
+      withdrawEnabled: user.withdrawEnabled || false,
+      leftBusiness: targetCheck.leftBusiness,
+      rightBusiness: targetCheck.rightBusiness,
+      totalBusiness: targetCheck.totalBusiness,
+      isCompleted: targetCheck.isCompleted,
+      message: targetCheck.message,
+    },
+  });
+});
+
+/**
+ * Admin: Create Free Accounts
+ * POST /api/v1/admin/influencer/free/create
+ */
+export const createFreeAccounts = asyncHandler(async (req, res) => {
+  const body = (req as any).body;
+  const { influencerUserId, accounts, binaryTargetAmount } = body as {
+    influencerUserId: string;
+    accounts: Array<{
+      name: string;
+      email?: string;
+      phone?: string;
+      password: string;
+    }>;
+    binaryTargetAmount?: number;
+  };
+
+  if (!influencerUserId || !accounts || !Array.isArray(accounts) || accounts.length === 0) {
+    throw new AppError("Influencer user ID and accounts array are required", 400);
+  }
+
+  // Find influencer user
+  const influencer = await findUserByUserId(influencerUserId);
+  if (!influencer) {
+    throw new AppError("Influencer user not found", 404);
+  }
+
+  const createdAccounts = [];
+  const errors = [];
+
+  for (let i = 0; i < accounts.length; i++) {
+    const accountData = accounts[i];
+    try {
+      // Validate account data
+      if (!accountData.name || !accountData.password) {
+        errors.push({ index: i, error: "Name and password are required" });
+        continue;
+      }
+
+      if (accountData.password.length < 8) {
+        errors.push({ index: i, error: "Password must be at least 8 characters" });
+        continue;
+      }
+
+      // Generate userId
+      const userId = await generateNextUserId();
+
+      // Create free user account - activated immediately (no investment required)
+      const freeUser = await User.create({
+        userId,
+        name: accountData.name,
+        email: accountData.email?.toLowerCase(),
+        phone: accountData.phone,
+        password: accountData.password,
+        referrer: influencer._id as Types.ObjectId,
+        position: null, // Free accounts don't use binary tree positions
+        status: "active", // Free accounts are activated immediately
+        accountType: "free",
+        binaryTargetAmount: binaryTargetAmount || 0, // Set binary target if provided
+        targetStatus: binaryTargetAmount && binaryTargetAmount > 0 ? "pending" : "completed", // Pending if target set
+        withdrawEnabled: binaryTargetAmount && binaryTargetAmount > 0 ? false : true, // Disabled if target set
+        country: influencer.country || undefined,
+      });
+
+      // Initialize binary tree and wallets (under influencer, no position)
+      try {
+        await initializeUser(
+          freeUser._id as Types.ObjectId,
+          influencer._id as Types.ObjectId,
+          null // No position - influencer can have unlimited children
+        );
+      } catch (initError: any) {
+        // If initialization fails, delete the user
+        await User.findByIdAndDelete(freeUser._id);
+        throw new AppError(`Failed to initialize user ${userId}: ${initError.message}`, 500);
+      }
+
+      createdAccounts.push({
+        userId: freeUser.userId,
+        name: freeUser.name,
+        email: freeUser.email,
+        phone: freeUser.phone,
+      });
+    } catch (error: any) {
+      errors.push({ index: i, error: error.message || "Failed to create account" });
+    }
+  }
+
+  const response = res as any;
+  response.status(201).json({
+    status: "success",
+    message: `Successfully created ${createdAccounts.length} free account(s)`,
+    data: {
+      influencerUserId: influencer.userId,
+      influencerName: influencer.name,
+      createdAccounts,
+      errors: errors.length > 0 ? errors : undefined,
+    },
+  });
+});
+
+/**
  * Get all tickets
  * GET /api/v1/admin/tickets
  */
 export const getAllTickets = asyncHandler(async (req, res) => {
-  const { status, page = 1, limit = 50 } = req.query;
+  const { status, page = 1, limit = 50, startDate = "", endDate = "" } = req.query;
   const skip = (Number(page) - 1) * Number(limit);
 
   const { Ticket } = await import("../models/Ticket");
@@ -2551,6 +3118,21 @@ export const getAllTickets = asyncHandler(async (req, res) => {
   const query: any = {};
   if (status) {
     query.status = status;
+  }
+
+  // Add date range filter
+  if (startDate || endDate) {
+    query.createdAt = {};
+    if (startDate) {
+      const start = new Date(startDate as string);
+      start.setHours(0, 0, 0, 0);
+      query.createdAt.$gte = start;
+    }
+    if (endDate) {
+      const end = new Date(endDate as string);
+      end.setHours(23, 59, 59, 999);
+      query.createdAt.$lte = end;
+    }
   }
 
   const tickets = await Ticket.find(query)
@@ -2728,7 +3310,26 @@ export const changeUserPassword = asyncHandler(async (req, res) => {
  * GET /api/v1/admin/vouchers
  */
 export const getAllVouchers = asyncHandler(async (req, res) => {
-  const vouchers = await Voucher.find({})
+  const { startDate = "", endDate = "" } = req.query;
+  
+  const query: any = {};
+  
+  // Add date range filter
+  if (startDate || endDate) {
+    query.createdAt = {};
+    if (startDate) {
+      const start = new Date(startDate as string);
+      start.setHours(0, 0, 0, 0);
+      query.createdAt.$gte = start;
+    }
+    if (endDate) {
+      const end = new Date(endDate as string);
+      end.setHours(23, 59, 59, 999);
+      query.createdAt.$lte = end;
+    }
+  }
+  
+  const vouchers = await Voucher.find(query)
     .populate("user", "userId name email")
     .populate("fromWallet", "type")
     .populate("createdBy", "name userId")

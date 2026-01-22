@@ -351,3 +351,22 @@ body {
 .animate-slide-up {
   animation: slide-up 0.6s ease-out forwards;
 }
+
+/* Custom scrollbar for report tabs */
+.reports-tabs-container::-webkit-scrollbar {
+  height: 6px;
+}
+
+.reports-tabs-container::-webkit-scrollbar-track {
+  background: #f7fafc;
+  border-radius: 3px;
+}
+
+.reports-tabs-container::-webkit-scrollbar-thumb {
+  background: #cbd5e0;
+  border-radius: 3px;
+}
+
+.reports-tabs-container::-webkit-scrollbar-thumb:hover {
+  background: #a0aec0;
+}

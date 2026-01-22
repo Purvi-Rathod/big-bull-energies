@@ -4,14 +4,15 @@ import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 
 const reportTabs = [
-  { id: 'daily-business', name: 'Daily Business Report', href: '/admin/reports/daily-business' },
-  { id: 'nowpayments', name: 'NOWPayments Report', href: '/admin/reports/nowpayments' },
-  { id: 'country-business', name: 'Country Business Report', href: '/admin/reports/country-business' },
-  { id: 'investments', name: 'Investments Report', href: '/admin/reports/investments' },
-  { id: 'withdrawals', name: 'Withdrawal Report', href: '/admin/reports/withdrawals' },
-  { id: 'binary', name: 'Binary Report', href: '/admin/reports/binary' },
-  { id: 'referral', name: 'Referral Report', href: '/admin/reports/referral' },
-  { id: 'roi', name: 'ROI Report', href: '/admin/reports/roi' },
+  { id: 'daily-business', name: 'Daily Business', href: '/admin/reports/daily-business' },
+  { id: 'nowpayments', name: 'NOWPayments', href: '/admin/reports/nowpayments' },
+  { id: 'country-business', name: 'Country Business', href: '/admin/reports/country-business' },
+  { id: 'investments', name: 'Investments', href: '/admin/reports/investments' },
+  { id: 'withdrawals', name: 'Withdrawals', href: '/admin/reports/withdrawals' },
+  { id: 'binary', name: 'Binary', href: '/admin/reports/binary' },
+  { id: 'referral', name: 'Referral', href: '/admin/reports/referral' },
+  { id: 'roi', name: 'ROI Transactions', href: '/admin/reports/roi' },
+  { id: 'roi-statistics', name: 'ROI Statistics', href: '/admin/reports/roi-statistics' },
 ];
 
 export default function ReportsLayout({ children }: { children: React.ReactNode }) {
@@ -21,15 +22,22 @@ export default function ReportsLayout({ children }: { children: React.ReactNode 
 
   return (
     <div className="w-full">
-      <div className="mb-6">
-        <h1 className="text-3xl font-bold text-gray-900">Reports</h1>
-        <p className="mt-1 text-sm text-gray-500">View detailed reports and analytics</p>
+      <div className="mb-8">
+        <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 bg-clip-text text-transparent">Reports</h1>
+        <p className="mt-2 text-base text-gray-700">View detailed reports and analytics</p>
       </div>
 
       {/* Subtabs */}
       <div className="mb-6">
-        <div className="border-b border-gray-200">
-          <nav className="-mb-px flex space-x-8 overflow-x-auto">
+        <div 
+          className="bg-gradient-to-r from-indigo-50 via-purple-50 to-pink-50 rounded-xl p-2 border-2 border-indigo-200 overflow-x-auto reports-tabs-container shadow-lg"
+          style={{ 
+            scrollbarWidth: 'thin', 
+            scrollbarColor: '#818cf8 #e0e7ff',
+            WebkitOverflowScrolling: 'touch'
+          }}
+        >
+          <nav className="flex space-x-2" style={{ minWidth: 'max-content' }}>
             {reportTabs.map((tab) => {
               const isActive = pathname === tab.href;
               return (
@@ -38,9 +46,9 @@ export default function ReportsLayout({ children }: { children: React.ReactNode 
                   href={tab.href}
                   className={`${
                     isActive
-                      ? 'border-indigo-500 text-indigo-600'
-                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                  } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors`}
+                      ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg transform scale-105'
+                      : 'bg-white text-gray-700 hover:bg-indigo-100 hover:text-indigo-700'
+                  } whitespace-nowrap py-3 px-4 rounded-lg font-semibold text-sm transition-all duration-200 flex-shrink-0`}
                 >
                   {tab.name}
                 </Link>

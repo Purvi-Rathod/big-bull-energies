@@ -190,7 +190,7 @@ export default function AdminInvestmentsPage() {
       <div className="flex items-center justify-center py-12">
         <div className="text-center">
           <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-slate-600"></div>
-          <p className="mt-4 text-gray-600">Loading...</p>
+          <p className="mt-4 text-black">Loading...</p>
         </div>
       </div>
     );
@@ -199,15 +199,15 @@ export default function AdminInvestmentsPage() {
   return (
     <div className="w-full">
       <div className="mb-6">
-        <h1 className="text-3xl font-bold text-gray-900">Create Investment for User</h1>
-        <p className="mt-1 text-sm text-gray-500">Create investments on behalf of users</p>
+        <h1 className="text-3xl font-bold text-black">Create Investment for User</h1>
+        <p className="mt-1 text-sm text-black">Create investments on behalf of users</p>
       </div>
 
       <div className="bg-white rounded-lg shadow p-6">
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* User Selection */}
           <div>
-            <label htmlFor="userSearch" className="block text-sm font-medium text-gray-700 mb-2">
+            <label htmlFor="userSearch" className="block text-sm font-medium text-black mb-2">
               Search User <span className="text-red-500">*</span>
             </label>
             <div className="relative">
@@ -242,14 +242,14 @@ export default function AdminInvestmentsPage() {
                     }}
                     className="w-full text-left px-4 py-2 hover:bg-gray-50 border-b border-gray-100 last:border-b-0"
                   >
-                    <div className="font-medium text-gray-900">{user.userId}</div>
-                    <div className="text-sm text-gray-500">{user.name} {user.email && `(${user.email})`}</div>
+                    <div className="font-medium text-black">{user.userId}</div>
+                    <div className="text-sm text-black">{user.name} {user.email && `(${user.email})`}</div>
                   </button>
                 ))}
               </div>
             )}
             {userSearch && !searching && filteredUsers.length === 0 && (
-              <p className="mt-1 text-sm text-gray-500">No users found matching your search</p>
+              <p className="mt-1 text-sm text-black">No users found matching your search</p>
             )}
             {formData.userId && (
               <p className="mt-1 text-sm text-green-600">✓ User selected</p>
@@ -258,7 +258,7 @@ export default function AdminInvestmentsPage() {
 
           {/* Package Selection */}
           <div>
-            <label htmlFor="packageId" className="block text-sm font-medium text-gray-700 mb-2">
+            <label htmlFor="packageId" className="block text-sm font-medium text-black mb-2">
               Package <span className="text-red-500">*</span>
             </label>
             <select
@@ -284,10 +284,10 @@ export default function AdminInvestmentsPage() {
             )}
             {selectedPackage && (
               <div className="mt-2 p-3 bg-blue-50 rounded-md">
-                <p className="text-sm text-gray-700">
+                <p className="text-sm text-black">
                   <strong>ROI:</strong> {selectedPackage.roi}% | <strong>Duration:</strong> {selectedPackage.duration} days
                 </p>
-                <p className="text-sm text-gray-700 mt-1">
+                <p className="text-sm text-black mt-1">
                   <strong>Amount Range:</strong> ${selectedPackage.minAmount} - ${selectedPackage.maxAmount}
                 </p>
               </div>
@@ -296,7 +296,7 @@ export default function AdminInvestmentsPage() {
 
           {/* Amount */}
           <div>
-            <label htmlFor="amount" className="block text-sm font-medium text-gray-700 mb-2">
+            <label htmlFor="amount" className="block text-sm font-medium text-black mb-2">
               Investment Amount <span className="text-red-500">*</span>
             </label>
             <input
@@ -312,7 +312,7 @@ export default function AdminInvestmentsPage() {
               className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
             />
             {selectedPackage && formData.amount && (
-              <p className="mt-1 text-sm text-gray-500">
+              <p className="mt-1 text-sm text-black">
                 Must be between ${selectedPackage.minAmount} and ${selectedPackage.maxAmount}
               </p>
             )}

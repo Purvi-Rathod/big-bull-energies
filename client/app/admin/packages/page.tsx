@@ -252,7 +252,7 @@ export default function PackagesPage() {
       <div className="flex items-center justify-center py-12">
         <div className="text-center">
           <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
-          <p className="mt-4 text-gray-600">Loading packages...</p>
+          <p className="mt-4 text-black">Loading packages...</p>
         </div>
       </div>
     );
@@ -262,8 +262,8 @@ export default function PackagesPage() {
     <div className="w-full">
       <div className="mb-6 flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Package Management</h1>
-          <p className="mt-1 text-sm text-gray-500">Create and manage investment packages</p>
+          <h1 className="text-3xl font-bold text-black">Package Management</h1>
+          <p className="mt-1 text-sm text-black">Create and manage investment packages</p>
         </div>
         <button
           onClick={() => handleOpenModal()}
@@ -288,8 +288,8 @@ export default function PackagesPage() {
         <div className="bg-white shadow overflow-hidden sm:rounded-lg">
           <div className="px-4 py-5 sm:px-6 border-b border-gray-200">
             <div className="flex justify-between items-center">
-              <h3 className="text-lg font-medium text-gray-900">All Packages</h3>
-              <span className="text-sm text-gray-500">
+              <h3 className="text-lg font-medium text-black">All Packages</h3>
+              <span className="text-sm text-black">
                 Page {page} of {totalPages} ({packages.length} packages)
               </span>
             </div>
@@ -297,36 +297,36 @@ export default function PackagesPage() {
 
           <div className="overflow-x-auto">
             <table className="w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
+              <thead className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white">
                 <tr>
-                  <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[130px]">
+                  <th className="px-3 py-3 text-left text-xs font-medium text-white uppercase tracking-wider w-[130px]">
                     Package Name
                   </th>
-                  <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[130px]">
+                  <th className="px-3 py-3 text-left text-xs font-medium text-white uppercase tracking-wider w-[130px]">
                     Min/Max Amount
                   </th>
-                  <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[90px]">
+                  <th className="px-3 py-3 text-left text-xs font-medium text-white uppercase tracking-wider w-[90px]">
                     Duration
                   </th>
-                  <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[80px]">
+                  <th className="px-3 py-3 text-left text-xs font-medium text-white uppercase tracking-wider w-[80px]">
                     ROI %
                   </th>
-                  <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[100px]">
+                  <th className="px-3 py-3 text-left text-xs font-medium text-white uppercase tracking-wider w-[100px]">
                     Binary %
                   </th>
-                  <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[90px]">
+                  <th className="px-3 py-3 text-left text-xs font-medium text-white uppercase tracking-wider w-[90px]">
                     Referral %
                   </th>
-                  <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[110px]">
+                  <th className="px-3 py-3 text-left text-xs font-medium text-white uppercase tracking-wider w-[110px]">
                     Capping Limit
                   </th>
-                  <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[110px]">
+                  <th className="px-3 py-3 text-left text-xs font-medium text-white uppercase tracking-wider w-[110px]">
                     Principle %
                   </th>
-                  <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[80px]">
+                  <th className="px-3 py-3 text-left text-xs font-medium text-white uppercase tracking-wider w-[80px]">
                     Status
                   </th>
-                  <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[100px]">
+                  <th className="px-3 py-3 text-left text-xs font-medium text-white uppercase tracking-wider w-[100px]">
                     Actions
                   </th>
                 </tr>
@@ -334,7 +334,7 @@ export default function PackagesPage() {
               <tbody className="bg-white divide-y divide-gray-200">
                 {packages.length === 0 ? (
                   <tr>
-                    <td colSpan={10} className="px-6 py-4 text-center text-sm text-gray-500">
+                    <td colSpan={10} className="px-6 py-4 text-center text-sm text-black">
                       No packages found. Click "Add Package" to create one.
                     </td>
                   </tr>
@@ -372,48 +372,48 @@ export default function PackagesPage() {
                     return (
                       <tr key={pkg._id || pkg.id} className="hover:bg-gray-50">
                         <td className="px-3 py-3">
-                          <div className="text-xs font-medium text-gray-900 truncate max-w-[130px]" title={pkg.packageName}>
+                          <div className="text-xs font-medium text-black truncate max-w-[130px]" title={pkg.packageName}>
                             {pkg.packageName}
                           </div>
                         </td>
                         <td className="px-3 py-3">
-                          <div className="text-xs text-gray-500">
+                          <div className="text-xs text-black">
                             ${formatAmount(minAmt)} - ${formatAmount(maxAmt)}
                           </div>
                         </td>
                         <td className="px-3 py-3">
-                          <div className="text-xs text-gray-500">
+                          <div className="text-xs text-black">
                             {pkg.duration} days
                           </div>
                         </td>
                         <td className="px-3 py-3">
-                          <div className="text-xs text-gray-500">
+                          <div className="text-xs text-black">
                             {roiValue !== null && roiValue !== undefined && typeof roiValue === 'number' 
                               ? `${roiValue.toFixed(2)}%` 
                               : '-'}
                           </div>
                         </td>
                         <td className="px-3 py-3">
-                          <div className="text-xs text-gray-500">
+                          <div className="text-xs text-black">
                             {binaryValue !== null && binaryValue !== undefined && typeof binaryValue === 'number'
                               ? `${binaryValue.toFixed(2)}%`
                               : '-'}
                           </div>
                         </td>
                         <td className="px-3 py-3">
-                          <div className="text-xs text-gray-500">
+                          <div className="text-xs text-black">
                             {referralValue !== null && referralValue !== undefined && typeof referralValue === 'number'
                               ? `${referralValue.toFixed(2)}%`
                               : '-'}
                           </div>
                         </td>
                         <td className="px-3 py-3">
-                          <div className="text-xs text-gray-500">
+                          <div className="text-xs text-black">
                             ${formatAmount(capLimit)}
                           </div>
                         </td>
                         <td className="px-3 py-3">
-                          <div className="text-xs text-gray-500">
+                          <div className="text-xs text-black">
                             {principleValue !== null && principleValue !== undefined && typeof principleValue === 'number'
                               ? `${principleValue.toFixed(2)}%`
                               : '-'}
@@ -421,10 +421,10 @@ export default function PackagesPage() {
                         </td>
                         <td className="px-3 py-3">
                           <span
-                            className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                            className={`px-3 py-1 inline-flex text-xs leading-5 font-bold rounded-full border-2 shadow-sm ${
                               pkg.status === 'Active'
-                                ? 'bg-green-100 text-green-800'
-                                : 'bg-gray-100 text-gray-800'
+                                ? 'bg-gradient-to-r from-green-100 to-emerald-100 text-green-800 border-2 border-green-300 font-bold shadow-sm'
+                                : 'bg-gradient-to-r from-red-100 to-pink-100 text-red-800 border-2 border-red-300 font-bold shadow-sm'
                             }`}
                           >
                             {pkg.status}
@@ -459,17 +459,17 @@ export default function PackagesPage() {
               <button
                 onClick={() => setPage(Math.max(1, page - 1))}
                 disabled={page === 1}
-                className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-black bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
                 Previous
               </button>
-              <span className="text-sm text-gray-700">
+              <span className="text-sm text-black">
                 Page {page} of {totalPages}
               </span>
               <button
                 onClick={() => setPage(Math.min(totalPages, page + 1))}
                 disabled={page === totalPages}
-                className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-black bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
                 Next
               </button>
@@ -482,12 +482,12 @@ export default function PackagesPage() {
         <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50 flex items-center justify-center p-4">
           <div className="relative bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
             <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex justify-between items-center">
-              <h3 className="text-xl font-semibold text-gray-900">
+              <h3 className="text-xl font-semibold text-black">
                 {editingPackage ? 'Edit Package' : 'Create New Package'}
               </h3>
               <button
                 onClick={() => setShowModal(false)}
-                className="text-gray-400 hover:text-gray-600 transition-colors"
+                className="text-black hover:text-black transition-colors"
               >
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -503,7 +503,7 @@ export default function PackagesPage() {
               )}
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Package Name *</label>
+                <label className="block text-sm font-medium text-black mb-1">Package Name *</label>
                 <input
                   type="text"
                   required
@@ -516,7 +516,7 @@ export default function PackagesPage() {
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Min Amount ($) *</label>
+                  <label className="block text-sm font-medium text-black mb-1">Min Amount ($) *</label>
                   <input
                     type="number"
                     required
@@ -529,7 +529,7 @@ export default function PackagesPage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Max Amount ($) *</label>
+                  <label className="block text-sm font-medium text-black mb-1">Max Amount ($) *</label>
                   <input
                     type="number"
                     required
@@ -544,7 +544,7 @@ export default function PackagesPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Duration (days) *</label>
+                <label className="block text-sm font-medium text-black mb-1">Duration (days) *</label>
                 <input
                   type="number"
                   required
@@ -558,7 +558,7 @@ export default function PackagesPage() {
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">ROI % *</label>
+                  <label className="block text-sm font-medium text-black mb-1">ROI % *</label>
                   <input
                     type="number"
                     required
@@ -569,10 +569,10 @@ export default function PackagesPage() {
                     className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 text-black bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                     placeholder="1.75"
                   />
-                  <p className="mt-1 text-xs text-gray-500">Daily ROI percentage</p>
+                  <p className="mt-1 text-xs text-black">Daily ROI percentage</p>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Binary Bonus % *</label>
+                  <label className="block text-sm font-medium text-black mb-1">Binary Bonus % *</label>
                   <input
                     type="number"
                     required
@@ -583,13 +583,13 @@ export default function PackagesPage() {
                     className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 text-black bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                     placeholder="10.00"
                   />
-                  <p className="mt-1 text-xs text-gray-500">Binary matching percentage</p>
+                  <p className="mt-1 text-xs text-black">Binary matching percentage</p>
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Level One Referral % *</label>
+                  <label className="block text-sm font-medium text-black mb-1">Level One Referral % *</label>
                   <input
                     type="number"
                     required
@@ -600,10 +600,10 @@ export default function PackagesPage() {
                     className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 text-black bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                     placeholder="9"
                   />
-                  <p className="mt-1 text-xs text-gray-500">First level referral bonus</p>
+                  <p className="mt-1 text-xs text-black">First level referral bonus</p>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Principle Return % *</label>
+                  <label className="block text-sm font-medium text-black mb-1">Principle Return % *</label>
                   <input
                     type="number"
                     required
@@ -614,12 +614,12 @@ export default function PackagesPage() {
                     className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 text-black bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                     placeholder="50.00"
                   />
-                  <p className="mt-1 text-xs text-gray-500">Percentage of principle returned</p>
+                  <p className="mt-1 text-xs text-black">Percentage of principle returned</p>
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Capping Limit ($) *</label>
+                <label className="block text-sm font-medium text-black mb-1">Capping Limit ($) *</label>
                 <input
                   type="text"
                   required
@@ -628,11 +628,11 @@ export default function PackagesPage() {
                   className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 text-black bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                   placeholder="2000.00"
                 />
-                <p className="mt-1 text-xs text-gray-500">Maximum binary matching cap (use "0" for no limit)</p>
+                <p className="mt-1 text-xs text-black">Maximum binary matching cap (use "0" for no limit)</p>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Status *</label>
+                <label className="block text-sm font-medium text-black mb-1">Status *</label>
                 <select
                   value={formData.status || 'Active'}
                   onChange={(e) => setFormData({ ...formData, status: e.target.value as 'Active' | 'InActive' })}
@@ -647,7 +647,7 @@ export default function PackagesPage() {
                 <button
                   type="button"
                   onClick={() => setShowModal(false)}
-                  className="px-6 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition-colors"
+                  className="px-6 py-2 border border-gray-300 rounded-md text-black hover:bg-gray-50 transition-colors"
                 >
                   Cancel
                 </button>

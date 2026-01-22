@@ -301,7 +301,7 @@ export default function GalleryPage() {
       <div className="flex items-center justify-center py-12">
         <div className="text-center">
           <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
-          <p className="mt-4 text-gray-600">Loading gallery items...</p>
+          <p className="mt-4 text-black">Loading gallery items...</p>
         </div>
       </div>
     );
@@ -311,8 +311,8 @@ export default function GalleryPage() {
     <div className="w-full">
       <div className="mb-6 flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Gallery Management</h1>
-          <p className="mt-1 text-sm text-gray-500">Manage photos and videos for the website gallery</p>
+          <h1 className="text-3xl font-bold text-black">Gallery Management</h1>
+          <p className="mt-1 text-sm text-black">Manage photos and videos for the website gallery</p>
         </div>
         <button
           onClick={() => handleOpenModal()}
@@ -342,7 +342,7 @@ export default function GalleryPage() {
           className={`px-4 py-2 rounded-md text-sm font-medium transition ${
             selectedCategory === ''
               ? 'bg-indigo-600 text-white'
-              : 'bg-gray-200 text-gray-900 hover:bg-gray-300'
+              : 'bg-gray-200 text-black hover:bg-gray-300'
           }`}
         >
           All Categories
@@ -354,7 +354,7 @@ export default function GalleryPage() {
             className={`px-4 py-2 rounded-md text-sm font-medium transition ${
               selectedCategory === cat
                 ? 'bg-indigo-600 text-white'
-                : 'bg-gray-200 text-gray-900 hover:bg-gray-300'
+                : 'bg-gray-200 text-black hover:bg-gray-300'
             }`}
           >
             {cat}
@@ -365,8 +365,8 @@ export default function GalleryPage() {
       <div className="bg-white shadow overflow-hidden sm:rounded-lg">
         <div className="px-4 py-5 sm:px-6 border-b border-gray-200">
           <div className="flex justify-between items-center">
-            <h3 className="text-lg font-medium text-gray-900">Gallery Items</h3>
-            <span className="text-sm text-gray-500">
+            <h3 className="text-lg font-medium text-black">Gallery Items</h3>
+            <span className="text-sm text-black">
               Page {page} of {totalPages} ({items.length} items)
             </span>
           </div>
@@ -374,27 +374,27 @@ export default function GalleryPage() {
 
         <div className="overflow-x-auto">
           <table className="w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
+            <thead className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white">
               <tr>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-4 py-3 text-left text-xs font-medium text-black uppercase tracking-wider">
                   Preview
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-4 py-3 text-left text-xs font-medium text-black uppercase tracking-wider">
                   Title
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-4 py-3 text-left text-xs font-medium text-black uppercase tracking-wider">
                   Category
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-4 py-3 text-left text-xs font-medium text-black uppercase tracking-wider">
                   Type
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-4 py-3 text-left text-xs font-medium text-black uppercase tracking-wider">
                   Order
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-4 py-3 text-left text-xs font-medium text-black uppercase tracking-wider">
                   Status
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-4 py-3 text-left text-xs font-medium text-black uppercase tracking-wider">
                   Actions
                 </th>
               </tr>
@@ -402,7 +402,7 @@ export default function GalleryPage() {
             <tbody className="bg-white divide-y divide-gray-200">
               {items.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="px-6 py-4 text-center text-sm text-gray-500">
+                  <td colSpan={7} className="px-6 py-4 text-center text-sm text-black">
                     No gallery items found. Click "Add Gallery Item" to create one.
                   </td>
                 </tr>
@@ -412,7 +412,7 @@ export default function GalleryPage() {
                     <td className="px-4 py-4 whitespace-nowrap">
                       <div className="w-16 h-16 rounded overflow-hidden bg-gray-100 flex items-center justify-center">
                         {item.mediaType === 'video' ? (
-                          <Video className="w-8 h-8 text-gray-400" />
+                          <Video className="w-8 h-8 text-black" />
                         ) : (
                           <img
                             src={item.mediaUrl}
@@ -421,16 +421,16 @@ export default function GalleryPage() {
                             onError={(e) => {
                               const target = e.target as HTMLImageElement;
                               target.style.display = 'none';
-                              target.parentElement!.innerHTML = '<div class="w-full h-full flex items-center justify-center"><ImageIcon class="w-8 h-8 text-gray-400" /></div>';
+                              target.parentElement!.innerHTML = '<div class="w-full h-full flex items-center justify-center"><ImageIcon class="w-8 h-8 text-black" /></div>';
                             }}
                           />
                         )}
                       </div>
                     </td>
                     <td className="px-4 py-4">
-                      <div className="text-sm font-medium text-gray-900">{item.title}</div>
+                      <div className="text-sm font-medium text-black">{item.title}</div>
                       {item.description && (
-                        <div className="text-sm text-gray-500 truncate max-w-xs">{item.description}</div>
+                        <div className="text-sm text-black truncate max-w-xs">{item.description}</div>
                       )}
                     </td>
                     <td className="px-4 py-4 whitespace-nowrap">
@@ -447,7 +447,7 @@ export default function GalleryPage() {
                         {item.mediaType === 'video' ? 'Video' : 'Photo'}
                       </span>
                     </td>
-                    <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500">
+                    <td className="px-4 py-4 whitespace-nowrap text-sm text-black">
                       {item.order}
                     </td>
                     <td className="px-4 py-4 whitespace-nowrap">
@@ -456,7 +456,7 @@ export default function GalleryPage() {
                         className={`px-2 py-1 text-xs font-medium rounded-full transition ${
                           item.status === 'Active'
                             ? 'bg-green-100 text-green-800 hover:bg-green-200'
-                            : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
+                            : 'bg-gray-100 text-black hover:bg-gray-200'
                         }`}
                       >
                         {item.status === 'Active' ? (
@@ -503,17 +503,17 @@ export default function GalleryPage() {
             <button
               onClick={() => setPage(Math.max(1, page - 1))}
               disabled={page === 1}
-              className="px-4 py-2 text-sm font-medium text-gray-900 bg-white border text-gray-900 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-4 py-2 text-sm font-medium text-black bg-white border text-black rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Previous
             </button>
-            <span className="text-sm text-gray-900">
+            <span className="text-sm text-black">
               Page {page} of {totalPages}
             </span>
             <button
               onClick={() => setPage(Math.min(totalPages, page + 1))}
               disabled={page === totalPages}
-              className="px-4 py-2 text-sm font-medium text-gray-900 bg-white border text-gray-900 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-4 py-2 text-sm font-medium text-black bg-white border text-black rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Next
             </button>
@@ -526,37 +526,37 @@ export default function GalleryPage() {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
             <div className="p-6">
-              <h2 className="text-2xl font-bold text-gray-900 mb-4">
+              <h2 className="text-2xl font-bold text-black mb-4">
                 {editingItem ? 'Edit Gallery Item' : 'Add Gallery Item'}
               </h2>
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-900 mb-1">
+                  <label className="block text-sm font-medium text-black mb-1">
                     Title *
                   </label>
                   <input
                     type="text"
                     value={formData.title}
                     onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                    className="w-full px-3 py-2 border text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    className="w-full px-3 py-2 border text-black rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
                     required
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-900 mb-1">
+                  <label className="block text-sm font-medium text-black mb-1">
                     Description
                   </label>
                   <textarea
                     value={formData.description}
                     onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                    className="w-full px-3 py-2 border text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    className="w-full px-3 py-2 border text-black rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
                     rows={3}
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-900 mb-1">
+                  <label className="block text-sm font-medium text-black mb-1">
                     Media Type *
                   </label>
                   <select
@@ -567,7 +567,7 @@ export default function GalleryPage() {
                       setSelectedFile(null);
                       setUploadPreview(null);
                     }}
-                    className="w-full px-3 py-2 border text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    className="w-full px-3 py-2 border text-black rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
                     required
                   >
                     <option value="photo">Photo</option>
@@ -576,14 +576,14 @@ export default function GalleryPage() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-900 mb-1">
+                  <label className="block text-sm font-medium text-black mb-1">
                     {formData.mediaType === 'photo' ? 'Photo Upload or URL *' : 'Video URL *'}
                   </label>
                   
                   {/* File Upload Section - Only for Photos */}
                   {formData.mediaType === 'photo' && (
                     <div className="mb-3">
-                      <label className="block text-xs font-medium text-gray-600 mb-2">
+                      <label className="block text-xs font-medium text-black mb-2">
                         Upload image to Cloudinary:
                       </label>
                       <div className="flex gap-2">
@@ -595,9 +595,9 @@ export default function GalleryPage() {
                             className="hidden"
                             disabled={uploading}
                           />
-                          <div className="px-4 py-2 border-2 border-dashed text-gray-900 rounded-md hover:border-indigo-500 transition text-center">
-                            <Upload className="w-5 h-5 mx-auto mb-1 text-gray-400" />
-                            <span className="text-sm text-gray-600">Choose Image File</span>
+                          <div className="px-4 py-2 border-2 border-dashed text-black rounded-md hover:border-indigo-500 transition text-center">
+                            <Upload className="w-5 h-5 mx-auto mb-1 text-black" />
+                            <span className="text-sm text-black">Choose Image File</span>
                           </div>
                         </label>
                         {selectedFile && (
@@ -614,7 +614,7 @@ export default function GalleryPage() {
                               type="button"
                               onClick={handleRemoveFile}
                               disabled={uploading}
-                              className="px-4 py-2 bg-gray-200 text-gray-900 rounded-md hover:bg-gray-300 disabled:opacity-50 text-sm"
+                              className="px-4 py-2 bg-gray-200 text-black rounded-md hover:bg-gray-300 disabled:opacity-50 text-sm"
                             >
                               <X className="w-4 h-4" />
                             </button>
@@ -624,7 +624,7 @@ export default function GalleryPage() {
                       
                       {selectedFile && (
                         <div className="mt-2">
-                          <p className="text-xs text-gray-600 mb-1">
+                          <p className="text-xs text-black mb-1">
                             Selected: {selectedFile.name} ({(selectedFile.size / 1024 / 1024).toFixed(2)} MB)
                           </p>
                           {uploadPreview && (
@@ -632,7 +632,7 @@ export default function GalleryPage() {
                               <img
                                 src={uploadPreview}
                                 alt="Preview"
-                                className="max-w-full h-32 object-contain rounded border text-gray-900"
+                                className="max-w-full h-32 object-contain rounded border text-black"
                               />
                             </div>
                           )}
@@ -644,7 +644,7 @@ export default function GalleryPage() {
                                   style={{ width: `${uploadProgress}%` }}
                                 />
                               </div>
-                              <p className="text-xs text-gray-500 mt-1">Uploading to Cloudinary... {uploadProgress}%</p>
+                              <p className="text-xs text-black mt-1">Uploading to Cloudinary... {uploadProgress}%</p>
                             </div>
                           )}
                         </div>
@@ -657,7 +657,7 @@ export default function GalleryPage() {
                     type="url"
                     value={formData.mediaUrl}
                     onChange={(e) => setFormData({ ...formData, mediaUrl: e.target.value })}
-                    className="w-full px-3 py-2 border text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    className="w-full px-3 py-2 border text-black rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
                     placeholder={
                       formData.mediaType === 'photo' 
                         ? 'https://res.cloudinary.com/... or paste image URL' 
@@ -665,7 +665,7 @@ export default function GalleryPage() {
                     }
                     required
                   />
-                  <p className="mt-1 text-xs text-gray-500">
+                  <p className="mt-1 text-xs text-black">
                     {formData.mediaType === 'photo' 
                       ? 'Upload an image file above (will be stored in Cloudinary) or paste an image URL'
                       : 'Paste the video URL (YouTube, Vimeo, or direct video link)'}
@@ -674,28 +674,28 @@ export default function GalleryPage() {
 
                 {formData.mediaType === 'video' && (
                   <div>
-                    <label className="block text-sm font-medium text-gray-900 mb-1">
+                    <label className="block text-sm font-medium text-black mb-1">
                       Thumbnail URL (Optional)
                     </label>
                     <input
                       type="url"
                       value={formData.thumbnailUrl}
                       onChange={(e) => setFormData({ ...formData, thumbnailUrl: e.target.value })}
-                      className="w-full px-3 py-2 border text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                      className="w-full px-3 py-2 border text-black rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
                       placeholder="https://example.com/thumbnail.jpg"
                     />
                   </div>
                 )}
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-900 mb-1">
+                  <label className="block text-sm font-medium text-black mb-1">
                     Category *
                   </label>
                   <input
                     type="text"
                     value={formData.category}
                     onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                    className="w-full px-3 py-2 border text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    className="w-full px-3 py-2 border text-black rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
                     placeholder="e.g., Office Video, Solar Plant 1, Solar Plant 2, Events"
                     list="categories"
                     required
@@ -705,33 +705,33 @@ export default function GalleryPage() {
                       <option key={cat} value={cat} />
                     ))}
                   </datalist>
-                  <p className="mt-1 text-xs text-gray-500">
+                  <p className="mt-1 text-xs text-black">
                     Type a new category or select from existing ones
                   </p>
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-900 mb-1">
+                    <label className="block text-sm font-medium text-black mb-1">
                       Display Order
                     </label>
                     <input
                       type="number"
                       value={formData.order}
                       onChange={(e) => setFormData({ ...formData, order: parseInt(e.target.value) || 0 })}
-                      className="w-full px-3 py-2 border text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                      className="w-full px-3 py-2 border text-black rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
                       min="0"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-900 mb-1">
+                    <label className="block text-sm font-medium text-black mb-1">
                       Status *
                     </label>
                     <select
                       value={formData.status}
                       onChange={(e) => setFormData({ ...formData, status: e.target.value as 'Active' | 'InActive' })}
-                      className="w-full px-3 py-2 border text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                      className="w-full px-3 py-2 border text-black rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
                       required
                     >
                       <option value="Active">Active</option>
@@ -750,7 +750,7 @@ export default function GalleryPage() {
                   <button
                     type="button"
                     onClick={() => setShowModal(false)}
-                    className="flex-1 px-4 py-2 bg-gray-200 text-gray-900 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500"
+                    className="flex-1 px-4 py-2 bg-gray-200 text-black rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500"
                   >
                     Cancel
                   </button>

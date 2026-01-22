@@ -186,6 +186,7 @@ import treeRoutes from './routes/tree.routes';
 import userRoutes from './routes/user.routes';
 import paymentRoutes from './routes/payment.routes';
 import galleryRoutes from './routes/gallery.routes';
+// import kycRoutes from './routes/kyc.routes'; // Temporarily disabled
 
 // Import callback handler for root path fallback
 import { handlePaymentCallback } from './controllers/payment.controller';
@@ -198,6 +199,7 @@ app.use("/api/v1/tree", generalLimiter, treeRoutes);
 app.use("/api/v1/user", generalLimiter, userRoutes);
 app.use("/api/v1/payment", generalLimiter, paymentRoutes);
 app.use("/api/v1/gallery", generalLimiter, galleryRoutes);
+// app.use("/api/v1/user/kyc", generalLimiter, kycRoutes); // Temporarily disabled
 
 // Handle NOWPayments callbacks that might come to root path
 // This is a fallback in case NOWPayments sends webhooks to wrong URL

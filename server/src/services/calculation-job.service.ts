@@ -5,6 +5,7 @@ import { BinaryTree } from "../models/BinaryTree";
 import { Wallet } from "../models/Wallet";
 import { WalletTransaction } from "../models/WalletTransaction";
 import { Package } from "../models/Package";
+import { User } from "../models/User";
 import { deactivateExpiredInvestments } from "./roi-cron.service";
 import { updateWallet, calculateBinaryBonus } from "./investment.service";
 import { createROITransaction, createBinaryTransaction } from "./transaction.service";
@@ -277,6 +278,14 @@ async function calculateDailyROIResumable(job: ICalculationJob) {
         // Process ROI calculation (simplified - you'll need to adapt your existing logic)
         const pkg = investment.packageId as any;
         if (!pkg) {
+          job.processedInvestmentIds.push(investment._id as Types.ObjectId);
+          continue;
+        }
+
+        // Skip ROI calculation for powerleg accounts (they only earn binary income)
+        const user = await User.findById(investment.user);
+        if (user && user.accountType === "powerleg") {
+          console.log(`[Calculation Job] Skipping ROI for powerleg account: ${user.userId}`);
           job.processedInvestmentIds.push(investment._id as Types.ObjectId);
           continue;
         }

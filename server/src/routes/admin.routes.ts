@@ -37,10 +37,16 @@ import {
   getReferralReport,
   getROIReport,
   adminCreateInvestment,
+  addFundsToWallet,
+  removeFundsFromWallet,
   getAllTickets,
   updateTicket,
   getAllVouchers,
   createVoucherForUser,
+  createPowerlegAccounts,
+  createFreeAccounts,
+  setBinaryTarget,
+  getUserTargetStatus,
 } from "../controllers/admin.controller";
 import {
   getAllPackages,
@@ -67,6 +73,10 @@ import {
   getGalleryCategories,
   uploadGalleryMedia,
 } from "../controllers/gallery.controller";
+// import {
+//   getAllKYC,
+//   updateKYCStatus,
+// } from "../controllers/kyc.controller"; // Temporarily disabled
 import { requireAdminAuth } from "../middleware/admin.middleware";
 import multer from "multer";
 
@@ -127,6 +137,19 @@ router.post("/withdrawals/:id/reject", requireAdminAuth, rejectWithdrawal);
 
 // Investment management
 router.post("/investments/create", requireAdminAuth, adminCreateInvestment);
+
+// Wallet management routes (admin only)
+router.post("/wallet/add-funds", requireAdminAuth, addFundsToWallet);
+router.post("/wallet/remove-funds", requireAdminAuth, removeFundsFromWallet);
+
+// Influencer management
+router.post("/influencer/powerleg/create", requireAdminAuth, createPowerlegAccounts);
+router.post("/influencer/free/create", requireAdminAuth, createFreeAccounts);
+
+// Binary target management
+router.post("/users/:userId/set-binary-target", requireAdminAuth, setBinaryTarget);
+router.get("/users/:userId/target-status", requireAdminAuth, getUserTargetStatus);
+
 router.delete("/investments/flush-all", requireAdminAuth, flushAllInvestments);
 router.delete("/flush-user-data", requireAdminAuth, flushAllUserData);
 
@@ -182,5 +205,9 @@ const upload = multer({
   },
 });
 router.post("/gallery/upload", requireAdminAuth, upload.single("file"), uploadGalleryMedia);
+
+// KYC management (admin only) - Temporarily disabled
+// router.get("/kyc", requireAdminAuth, getAllKYC);
+// router.put("/kyc/:id/status", requireAdminAuth, updateKYCStatus);
 
 export default router;

@@ -19,6 +19,7 @@ import {
   getUserCareerProgressController,
   createTicket,
   getUserTickets,
+  getUserTargetStatus,
 } from "../controllers/user.controller";
 import { requireAuth } from "../middleware/auth.middleware";
 
@@ -44,6 +45,7 @@ router.get("/direct-referrals", requireAuth, getUserDirectReferrals);
 // Wallet Exchange feature has been removed - users should use vouchers for reinvestment
 // router.post("/wallet-exchange", requireAuth, exchangeWalletFunds);
 router.get("/career-progress", requireAuth, getUserCareerProgressController);
+router.get("/target-status", requireAuth, getUserTargetStatus);
 router.post("/tickets", requireAuth, createTicket);
 router.get("/tickets", requireAuth, getUserTickets);
 

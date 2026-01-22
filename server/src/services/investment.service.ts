@@ -220,6 +220,15 @@ export async function addBusinessVolume(
       console.error(`[Career Level] Error checking career levels for user ${userId}:`, careerError);
     }
 
+    // Check target completion after business volume is added
+    try {
+      const { updateTargetCompletionStatus } = await import("./target-completion.service");
+      await updateTargetCompletionStatus(userId);
+    } catch (targetError) {
+      // Don't fail the business volume addition if target check fails
+      console.error(`[Target Completion] Error checking target completion for user ${userId}:`, targetError);
+    }
+
     return {
       leftBusiness: parseFloat(userTree.leftBusiness.toString()),
       rightBusiness: parseFloat(userTree.rightBusiness.toString()),

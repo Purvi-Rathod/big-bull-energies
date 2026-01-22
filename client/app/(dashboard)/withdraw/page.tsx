@@ -17,6 +17,25 @@ interface BinaryTreeInfo {
   cappingLimit: number;
 }
 
+interface TargetStatus {
+  binaryTargetAmount: number;
+  targetStatus: 'pending' | 'completed';
+  withdrawEnabled: boolean;
+  leftBusiness: number;
+  rightBusiness: number;
+  totalBusiness: number;
+  isCompleted: boolean;
+  message?: string;
+}
+
+interface UserProfile {
+  accountType?: 'normal' | 'powerleg' | 'free';
+  userId?: string;
+  name?: string;
+  email?: string;
+  walletAddress?: string;
+}
+
 interface Withdrawal {
   id: string;
   amount: number;
@@ -34,6 +53,8 @@ export default function WithdrawPage() {
   const router = useRouter();
   const [wallets, setWallets] = useState<Wallet[]>([]);
   const [binaryTree, setBinaryTree] = useState<BinaryTreeInfo | null>(null);
+  const [targetStatus, setTargetStatus] = useState<TargetStatus | null>(null);
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [userWalletAddress, setUserWalletAddress] = useState<string | null>(null);
   const [walletAddress, setWalletAddress] = useState(''); // Saved wallet address from profile
   const [modalWalletAddress, setModalWalletAddress] = useState(''); // Temporary input value in modal
@@ -61,20 +82,31 @@ export default function WithdrawPage() {
   const fetchData = async () => {
     try {
       setLoading(true);
-      const [walletsRes, binaryTreeRes, userProfileRes, reportsRes] = await Promise.all([
+      const [walletsRes, binaryTreeRes, userProfileRes, reportsRes, targetStatusRes] = await Promise.all([
         api.getUserWallets(),
         api.getUserBinaryTree().catch(() => ({ data: null })),
         api.getUserProfile().catch(() => ({ data: null })),
         api.getUserReports().catch(() => ({ data: { withdrawals: [] } })),
+        api.getUserTargetStatus().catch(() => ({ data: null })),
       ]);
 
       if (walletsRes.data) {
         setWallets(walletsRes.data.wallets || []);
-        const withdrawableWallets = walletsRes.data.wallets.filter((w: Wallet) =>
-          ['roi', 'interest', 'referral', 'binary', 'career_level'].includes(
-            w.type
-          )
-        );
+        
+        // Set user profile if available
+        if (userProfileRes.data?.user) {
+          setUserProfile(userProfileRes.data.user);
+        }
+        
+        // For free accounts, only show binary wallet
+        const isFreeAccount = userProfileRes.data?.user?.accountType === 'free';
+        const withdrawableWallets = walletsRes.data.wallets.filter((w: Wallet) => {
+          if (isFreeAccount) {
+            return w.type === 'binary';
+          }
+          return ['roi', 'interest', 'referral', 'binary', 'career_level'].includes(w.type);
+        });
+        
         if (withdrawableWallets.length > 0 && !selectedWalletType) {
           setSelectedWalletType(withdrawableWallets[0].type);
         }
@@ -84,12 +116,18 @@ export default function WithdrawPage() {
           cappingLimit: binaryTreeRes.data.binaryTree.cappingLimit || 0,
         });
       }
-      if (userProfileRes.data?.user?.walletAddress) {
-        setUserWalletAddress(userProfileRes.data.user.walletAddress);
-        setWalletAddress(userProfileRes.data.user.walletAddress);
+      if (userProfileRes.data?.user) {
+        setUserProfile(userProfileRes.data.user);
+        if (userProfileRes.data.user.walletAddress) {
+          setUserWalletAddress(userProfileRes.data.user.walletAddress);
+          setWalletAddress(userProfileRes.data.user.walletAddress);
+        }
       }
       if (reportsRes.data?.withdrawals) {
         setWithdrawals(reportsRes.data.withdrawals || []);
+      }
+      if (targetStatusRes.data) {
+        setTargetStatus(targetStatusRes.data);
       }
     } catch (err: any) {
       setError(err.message || 'Failed to load data');
@@ -99,7 +137,15 @@ export default function WithdrawPage() {
   };
 
   const handleWithdraw = async () => {
-    // Check wallet address first
+    // Check target completion first
+    if (targetStatus && targetStatus.binaryTargetAmount > 0 && !targetStatus.isCompleted) {
+      const errorMsg = targetStatus.message || 'Your target is not completed. Complete your binary target to unlock withdrawal.';
+      setError(errorMsg);
+      toast.error(errorMsg);
+      return;
+    }
+
+    // Check wallet address
     if (!walletAddress) {
       const errorMsg = 'USDT TRC20 wallet address is required. Please set your wallet address before requesting a withdrawal.';
       setError(errorMsg);
@@ -254,6 +300,82 @@ export default function WithdrawPage() {
             </div>
           )}
 
+          {/* Target Completion Lock Message */}
+          {targetStatus && targetStatus.binaryTargetAmount > 0 && !targetStatus.isCompleted && (
+            <div className="mb-6 bg-red-900/30 border-2 border-red-500/50 text-red-300 px-6 py-4 rounded-xl backdrop-blur-sm">
+              <div className="flex items-start gap-3">
+                <svg className="w-6 h-6 text-red-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+                <div className="flex-1">
+                  <h3 className="text-lg font-bold text-red-400 mb-2">Withdrawal Locked</h3>
+                  <p className="text-red-300 mb-2">
+                    {userProfile?.accountType === 'free' 
+                      ? "Your binary target is not completed. Complete your binary target to unlock binary withdrawals."
+                      : "Your target is not completed. Complete your binary target to unlock withdrawal."
+                    }
+                  </p>
+                  <div className="mt-3 space-y-1 text-sm">
+                    <div className="flex justify-between">
+                      <span className="text-red-200">Target Amount:</span>
+                      <span className="text-white font-semibold">${targetStatus.binaryTargetAmount.toFixed(2)}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-red-200">Left Leg Business:</span>
+                      <span className="text-white">${targetStatus.leftBusiness.toFixed(2)}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-red-200">Right Leg Business:</span>
+                      <span className="text-white">${targetStatus.rightBusiness.toFixed(2)}</span>
+                    </div>
+                    <div className="flex justify-between border-t border-red-500/30 pt-1 mt-1">
+                      <span className="text-red-200 font-semibold">Total Business:</span>
+                      <span className="text-white font-bold">${targetStatus.totalBusiness.toFixed(2)}</span>
+                    </div>
+                    {targetStatus.message && (
+                      <p className="text-red-200 text-xs mt-2 italic">{targetStatus.message}</p>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Free Account Info Message */}
+          {userProfile?.accountType === 'free' && targetStatus && targetStatus.binaryTargetAmount > 0 && (
+            <div className="mb-6 bg-blue-900/30 border-2 border-blue-500/50 text-blue-300 px-6 py-4 rounded-xl backdrop-blur-sm">
+              <div className="flex items-start gap-3">
+                <svg className="w-6 h-6 text-blue-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <div className="flex-1">
+                  <h3 className="text-lg font-bold text-blue-400 mb-2">Free Account Withdrawal Rules</h3>
+                  <p className="text-blue-300 mb-2">
+                    As a free account, you can only withdraw from your Binary wallet. You can withdraw the amount you've earned from binary business (up to your target amount: ${targetStatus.binaryTargetAmount.toFixed(2)}).
+                  </p>
+                  {targetStatus.isCompleted && (
+                    <div className="mt-3 space-y-1 text-sm">
+                      <div className="flex justify-between">
+                        <span className="text-blue-200">Binary Wallet Balance:</span>
+                        <span className="text-white font-semibold">
+                          ${wallets.find(w => w.type === 'binary')?.balance.toFixed(2) || '0.00'}
+                        </span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-blue-200">Max Withdrawable:</span>
+                        <span className="text-white font-bold">
+                          ${Math.min(
+                            parseFloat(wallets.find(w => w.type === 'binary')?.balance.toString() || '0'),
+                            targetStatus.binaryTargetAmount
+                          ).toFixed(2)}
+                        </span>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
 
           <div className="px-4 py-6 sm:px-0">
             <div className="bg-gradient-to-br from-gray-900/95 via-gray-800/95 to-gray-900/95 backdrop-blur-sm rounded-2xl shadow-2xl border border-yellow-500/30 p-8">
@@ -273,15 +395,18 @@ export default function WithdrawPage() {
                   <select
                     value={selectedWalletType}
                     onChange={(e) => setSelectedWalletType(e.target.value)}
-                    className="w-full px-4 py-3 border border-yellow-500/40 rounded-xl bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-yellow-500/50 focus:border-yellow-500/70 font-semibold"
+                    disabled={userProfile?.accountType === 'free'}
+                    className="w-full px-4 py-3 border border-yellow-500/40 rounded-xl bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-yellow-500/50 focus:border-yellow-500/70 font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     <option value="">Select a wallet</option>
                     {sortWallets(wallets
-                      .filter((w) =>
-                        ['roi', 'interest', 'referral', 'binary', 'career_level'].includes(
-                          w.type
-                        )
-                      ))
+                      .filter((w) => {
+                        // Free accounts can only withdraw from binary wallet
+                        if (userProfile?.accountType === 'free') {
+                          return w.type === 'binary';
+                        }
+                        return ['roi', 'interest', 'referral', 'binary', 'career_level'].includes(w.type);
+                      }))
                       .map((wallet) => {
                         const label =
                           wallet.type === 'career_level'
@@ -302,6 +427,11 @@ export default function WithdrawPage() {
                         );
                       })}
                   </select>
+                  {userProfile?.accountType === 'free' && (
+                    <p className="mt-2 text-sm text-blue-400 font-semibold">
+                      Free accounts can only withdraw from Binary wallet. You can withdraw the amount earned from binary business (up to your target).
+                    </p>
+                  )}
                 </div>
 
                 {selectedWallet && (
@@ -332,17 +462,31 @@ export default function WithdrawPage() {
                         value={withdrawAmount}
                         onChange={(e) => setWithdrawAmount(e.target.value)}
                         min="0.01"
-                        max={availableBalance}
+                        max={
+                          userProfile?.accountType === 'free' && targetStatus && targetStatus.binaryTargetAmount > 0
+                            ? Math.min(availableBalance, targetStatus.binaryTargetAmount)
+                            : availableBalance
+                        }
                         step="0.01"
                         className="w-full px-4 py-3 border border-yellow-500/40 rounded-xl bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-yellow-500/50 focus:border-yellow-500/70 font-semibold"
                         placeholder="Enter amount"
                       />
                       <p className="mt-2 text-xs text-gray-400 font-semibold">
-                        Maximum: <span className="text-yellow-400">${availableBalance.toFixed(2)}</span>
+                        Maximum: <span className="text-yellow-400">
+                          {userProfile?.accountType === 'free' && targetStatus && targetStatus.binaryTargetAmount > 0
+                            ? `$${Math.min(availableBalance, targetStatus.binaryTargetAmount).toFixed(2)} (target: $${targetStatus.binaryTargetAmount.toFixed(2)})`
+                            : `$${availableBalance.toFixed(2)}`
+                          }
+                        </span>
                         {binaryTree && binaryTree.cappingLimit > 0 && (
                           <> | Capping Limit: <span className="text-yellow-400">${binaryTree.cappingLimit.toFixed(2)}</span></>
                         )}
                       </p>
+                      {userProfile?.accountType === 'free' && targetStatus && targetStatus.binaryTargetAmount > 0 && (
+                        <p className="mt-1 text-xs text-blue-400 font-semibold">
+                          Free accounts can withdraw up to ${Math.min(availableBalance, targetStatus.binaryTargetAmount).toFixed(2)} (binary earnings up to target)
+                        </p>
+                      )}
                     </div>
 
                     {withdrawAmount && parseFloat(withdrawAmount) > 0 && (
@@ -371,7 +515,13 @@ export default function WithdrawPage() {
 
                     <button
                       onClick={handleWithdraw}
-                      disabled={withdrawing || !withdrawAmount || parseFloat(withdrawAmount) <= 0 || !walletAddress}
+                      disabled={Boolean(
+                        withdrawing || 
+                        !withdrawAmount || 
+                        parseFloat(withdrawAmount) <= 0 || 
+                        !walletAddress ||
+                        (targetStatus && targetStatus.binaryTargetAmount > 0 && !targetStatus.isCompleted)
+                      )}
                       className="w-full px-6 py-4 bg-gradient-to-r from-yellow-500 to-yellow-600 text-black rounded-xl hover:from-yellow-400 hover:to-yellow-500 font-bold transition-all shadow-lg shadow-yellow-500/30 hover:shadow-yellow-500/50 hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       {withdrawing ? 'Processing...' : 'Submit Withdrawal Request'}
@@ -379,6 +529,11 @@ export default function WithdrawPage() {
                     {!walletAddress && (
                       <p className="mt-3 text-sm text-red-400 text-center font-semibold">
                         Please set your USDT TRC20 wallet address to proceed
+                      </p>
+                    )}
+                    {targetStatus && targetStatus.binaryTargetAmount > 0 && !targetStatus.isCompleted && (
+                      <p className="mt-3 text-sm text-red-400 text-center font-semibold">
+                        Complete your binary target to unlock withdrawal
                       </p>
                     )}
                   </>

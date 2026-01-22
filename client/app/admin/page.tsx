@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { api } from '@/lib/api';
+import { countries } from '@/lib/countries';
 import toast from 'react-hot-toast';
 
 interface User {
@@ -11,6 +12,7 @@ interface User {
   name: string;
   email: string;
   phone: string;
+  country: string;
   status: string;
   treeLink: string;
   totalInvestment: string;
@@ -23,6 +25,9 @@ export default function AdminPanel() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [search, setSearch] = useState('');
+  const [countryFilter, setCountryFilter] = useState('');
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
   const [page, setPage] = useState(1);
   const [pagination, setPagination] = useState({ total: 0, pages: 0, limit: 50 });
   const [deletingUserId, setDeletingUserId] = useState<string | null>(null);
@@ -40,13 +45,20 @@ export default function AdminPanel() {
     if (isAdminUser || isAdminAccount) {
       fetchUsers();
     }
-  }, [page, search, user, admin]);
+  }, [page, search, countryFilter, startDate, endDate, user, admin]);
 
   const fetchUsers = async () => {
     try {
       setLoading(true);
       setError('');
-      const response = await api.getAdminUsers({ page, limit: 50, search });
+      const response = await api.getAdminUsers({ 
+        page, 
+        limit: 50, 
+        search,
+        country: countryFilter || undefined,
+        startDate: startDate || undefined,
+        endDate: endDate || undefined,
+      });
       if (response.data) {
         setUsers(response.data.users || []);
         setPagination(response.data.pagination || { total: 0, pages: 0, limit: 50 });
@@ -149,15 +161,21 @@ export default function AdminPanel() {
   };
 
   const getStatusColor = (status: string) => {
-    switch (status) {
+    switch (status.toLowerCase()) {
       case 'active':
-        return 'bg-green-100 text-green-800';
+        return 'bg-gradient-to-r from-green-100 to-emerald-100 text-green-800 border-2 border-green-300 font-bold';
       case 'inactive':
-        return 'bg-gray-100 text-gray-800';
+        return 'bg-gradient-to-r from-red-100 to-pink-100 text-red-800 border-2 border-red-300 font-bold';
       case 'suspended':
-        return 'bg-red-100 text-red-800';
+      case 'rejected':
+      case 'blocked':
+        return 'bg-gradient-to-r from-red-200 to-red-300 text-red-900 border-2 border-red-400 font-bold';
+      case 'pending':
+        return 'bg-gradient-to-r from-yellow-100 to-amber-100 text-yellow-800 border-2 border-yellow-300 font-bold';
+      case 'approved':
+        return 'bg-gradient-to-r from-blue-100 to-cyan-100 text-blue-800 border-2 border-blue-300 font-bold';
       default:
-        return 'bg-gray-100 text-gray-800';
+        return 'bg-gradient-to-r from-gray-100 to-slate-100 text-gray-800 border-2 border-gray-300 font-semibold';
     }
   };
 
@@ -167,7 +185,7 @@ export default function AdminPanel() {
       <div className="flex items-center justify-center py-12">
         <div className="text-center">
           <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
-          <p className="mt-4 text-gray-600">Loading...</p>
+          <p className="mt-4 text-black">Loading...</p>
         </div>
       </div>
     );
@@ -175,41 +193,86 @@ export default function AdminPanel() {
 
   return (
     <div className="w-full">
-      <div className="mb-6">
-        <h1 className="text-3xl font-bold text-gray-900">User Management</h1>
-        <p className="mt-1 text-sm text-gray-500">Manage and track all users in the system</p>
+      <div className="mb-8">
+        <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 bg-clip-text text-transparent">User Management</h1>
+        <p className="mt-2 text-base text-gray-700">Manage and track all users in the system</p>
         </div>
-        <div className="bg-white shadow rounded-lg">
+        <div className="bg-gradient-to-br from-white to-gray-50 shadow-xl border border-gray-200 rounded-xl">
 
-          {/* Search Bar */}
-          <div className="px-6 py-4 border-b border-gray-200">
-            <form onSubmit={handleSearch} className="flex gap-4">
-              <input
-                type="text"
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                placeholder="Search by name, email, userId, or phone..."
-                className="flex-1 px-4 py-2 border border-gray-300 rounded-md text-black bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-              />
-              <button
-                type="submit"
-                className="px-6 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-              >
-                Search
-              </button>
-              {search && (
-                <button
-                  type="button"
-                  onClick={() => {
-                    setSearch('');
+          {/* Filters */}
+          <div className="px-6 py-5 border-b-2 border-indigo-100 bg-gradient-to-r from-indigo-50 to-purple-50">
+            <form onSubmit={handleSearch} className="space-y-4">
+              {/* Search and Country Filter Row */}
+              <div className="flex gap-4 flex-wrap">
+                <input
+                  type="text"
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  placeholder="Search by name, email, userId, or phone..."
+                  className="flex-1 min-w-[200px] px-4 py-2 border border-gray-300 rounded-md text-black bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                />
+                <select
+                  value={countryFilter}
+                  onChange={(e) => {
+                    setCountryFilter(e.target.value);
                     setPage(1);
-                    fetchUsers();
                   }}
-                  className="px-6 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300"
+                  className="px-4 py-2 border border-gray-300 rounded-md text-black bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent min-w-[180px]"
                 >
-                  Clear
+                  <option value="">All Countries</option>
+                  {countries.map((country) => (
+                    <option key={country.code} value={country.name}>
+                      {country.name}
+                    </option>
+                  ))}
+                </select>
+                <button
+                  type="submit"
+                  className="px-6 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg hover:from-indigo-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 shadow-lg transition-all duration-200 font-semibold"
+                >
+                  Search
                 </button>
-              )}
+                {(search || countryFilter || startDate || endDate) && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setSearch('');
+                      setCountryFilter('');
+                      setStartDate('');
+                      setEndDate('');
+                      setPage(1);
+                      fetchUsers();
+                    }}
+                    className="px-6 py-2 bg-gradient-to-r from-gray-400 to-gray-500 text-white rounded-lg hover:from-gray-500 hover:to-gray-600 shadow-md transition-all duration-200 font-semibold"
+                  >
+                    Clear
+                  </button>
+                )}
+              </div>
+              
+              {/* Date Range Filter Row */}
+              <div className="flex gap-4 flex-wrap items-center">
+                <label className="text-sm font-medium text-black whitespace-nowrap">Date Range:</label>
+                <input
+                  type="date"
+                  value={startDate}
+                  onChange={(e) => {
+                    setStartDate(e.target.value);
+                    setPage(1);
+                  }}
+                  className="px-4 py-2 border border-gray-300 rounded-md text-black bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                />
+                <span className="text-black">to</span>
+                <input
+                  type="date"
+                  value={endDate}
+                  onChange={(e) => {
+                    setEndDate(e.target.value);
+                    setPage(1);
+                  }}
+                  className="px-4 py-2 border border-gray-300 rounded-md text-black bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                />
+              </div>
             </form>
           </div>
 
@@ -226,7 +289,7 @@ export default function AdminPanel() {
           {loading && (
             <div className="px-6 py-12 text-center">
               <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
-              <p className="mt-2 text-gray-500">Loading users...</p>
+              <p className="mt-2 text-black">Loading users...</p>
             </div>
           )}
 
@@ -234,33 +297,36 @@ export default function AdminPanel() {
           {!loading && (
             <div className="overflow-x-auto">
               <table className="w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
+                <thead className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white">
                   <tr>
-                    <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[120px]">
+                    <th className="px-3 py-3 text-left text-xs font-medium text-white uppercase tracking-wider w-[120px]">
                       Name
                     </th>
-                    <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[130px]">
+                    <th className="px-3 py-3 text-left text-xs font-medium text-white uppercase tracking-wider w-[130px]">
                       User ID
                     </th>
-                    <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[180px]">
+                    <th className="px-3 py-3 text-left text-xs font-medium text-white uppercase tracking-wider w-[180px]">
                       Email
                     </th>
-                    <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[110px]">
+                    <th className="px-3 py-3 text-left text-xs font-medium text-white uppercase tracking-wider w-[110px]">
                       Mobile
                     </th>
-                    <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[90px]">
+                    <th className="px-3 py-3 text-left text-xs font-medium text-white uppercase tracking-wider w-[120px]">
+                      Country
+                    </th>
+                    <th className="px-3 py-3 text-left text-xs font-medium text-white uppercase tracking-wider w-[90px]">
                       Status
                     </th>
-                    <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[130px]">
+                    <th className="px-3 py-3 text-left text-xs font-medium text-white uppercase tracking-wider w-[130px]">
                       Investment
                     </th>
-                    <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[110px]">
+                    <th className="px-3 py-3 text-left text-xs font-medium text-white uppercase tracking-wider w-[110px]">
                       Joined
                     </th>
-                    <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[90px]">
+                    <th className="px-3 py-3 text-left text-xs font-medium text-white uppercase tracking-wider w-[90px]">
                       Tree
                     </th>
-                    <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[140px]">
+                    <th className="px-3 py-3 text-left text-xs font-medium text-white uppercase tracking-wider w-[140px]">
                       Actions
                     </th>
                   </tr>
@@ -268,7 +334,7 @@ export default function AdminPanel() {
                 <tbody className="bg-white divide-y divide-gray-200">
                   {users.length === 0 ? (
                     <tr>
-                      <td colSpan={9} className="px-6 py-8 text-center text-gray-500">
+                      <td colSpan={10} className="px-6 py-8 text-center text-black">
                         No users found
                       </td>
                     </tr>
@@ -276,28 +342,33 @@ export default function AdminPanel() {
                     users.map((user) => (
                       <tr key={user.id} className="hover:bg-gray-50">
                         <td className="px-3 py-3">
-                          <div className="text-sm font-medium text-gray-900 truncate max-w-[120px]" title={user.name}>
+                          <div className="text-sm font-medium text-black truncate max-w-[120px]" title={user.name}>
                             {user.name}
                           </div>
                         </td>
                         <td className="px-3 py-3">
-                          <div className="text-xs text-gray-900 font-mono truncate max-w-[130px]" title={user.userId}>
+                          <div className="text-xs text-black font-mono truncate max-w-[130px]" title={user.userId}>
                             {user.userId}
                           </div>
                         </td>
                         <td className="px-3 py-3">
-                          <div className="text-xs text-gray-500 truncate max-w-[180px]" title={user.email}>
+                          <div className="text-xs text-black truncate max-w-[180px]" title={user.email}>
                             {user.email}
                           </div>
                         </td>
                         <td className="px-3 py-3">
-                          <div className="text-xs text-gray-500 truncate max-w-[110px]" title={user.phone}>
+                          <div className="text-xs text-black truncate max-w-[110px]" title={user.phone}>
                             {user.phone}
                           </div>
                         </td>
                         <td className="px-3 py-3">
+                          <div className="text-xs text-black truncate max-w-[120px]" title={user.country}>
+                            {user.country || '-'}
+                          </div>
+                        </td>
+                        <td className="px-3 py-3">
                           <span
-                            className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusColor(
+                            className={`px-3 py-1 inline-flex text-xs leading-5 font-bold rounded-full border-2 shadow-sm ${getStatusColor(
                               user.status
                             )}`}
                           >
@@ -305,7 +376,7 @@ export default function AdminPanel() {
                           </span>
                         </td>
                         <td className="px-3 py-3">
-                          <div className="text-xs text-gray-900 font-semibold">
+                          <div className="text-xs text-black font-semibold">
                             ${parseFloat(user.totalInvestment).toLocaleString('en-US', {
                               minimumFractionDigits: 2,
                               maximumFractionDigits: 2,
@@ -313,7 +384,7 @@ export default function AdminPanel() {
                           </div>
                         </td>
                         <td className="px-3 py-3">
-                          <div className="text-xs text-gray-500">{formatDate(user.joinedAt)}</div>
+                          <div className="text-xs text-black">{formatDate(user.joinedAt)}</div>
                         </td>
                         <td className="px-3 py-3">
                           <a
@@ -333,7 +404,7 @@ export default function AdminPanel() {
                                 setOpenDropdown(openDropdown === user.userId ? null : user.userId);
                               }}
                               disabled={deletingUserId === user.userId || updatingStatus === user.userId || user.userId === 'CROWN-000000' || user.userId === 'CROWN-000000'}
-                              className="p-1.5 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-md disabled:opacity-50 disabled:cursor-not-allowed"
+                              className="p-1.5 text-black hover:text-black hover:bg-gray-100 rounded-md disabled:opacity-50 disabled:cursor-not-allowed"
                               title="Actions"
                             >
                               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -409,21 +480,21 @@ export default function AdminPanel() {
           {/* Pagination */}
           {!loading && pagination.pages > 1 && (
             <div className="px-6 py-4 border-t border-gray-200 flex items-center justify-between">
-              <div className="text-sm text-gray-500">
+              <div className="text-sm text-black">
                 Showing {((page - 1) * pagination.limit) + 1} to {Math.min(page * pagination.limit, pagination.total)} of {pagination.total} users
               </div>
               <div className="flex gap-2">
                 <button
                   onClick={() => setPage((p) => Math.max(1, p - 1))}
                   disabled={page === 1}
-                  className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="px-4 py-2 border-2 border-indigo-300 rounded-lg text-sm font-semibold text-indigo-700 bg-white hover:bg-indigo-50 hover:border-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
                 >
                   Previous
                 </button>
                 <button
                   onClick={() => setPage((p) => Math.min(pagination.pages, p + 1))}
                   disabled={page === pagination.pages}
-                  className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="px-4 py-2 border-2 border-indigo-300 rounded-lg text-sm font-semibold text-indigo-700 bg-white hover:bg-indigo-50 hover:border-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
                 >
                   Next
                 </button>
@@ -444,11 +515,11 @@ export default function AdminPanel() {
                   </svg>
                 </div>
               </div>
-              <h3 className="text-lg font-medium text-gray-900 text-center mb-2">
+              <h3 className="text-lg font-medium text-black text-center mb-2">
                 Delete User
               </h3>
-              <p className="text-sm text-gray-500 text-center mb-4">
-                Are you sure you want to delete <span className="font-semibold text-gray-900">{deleteConfirm.userName}</span> ({deleteConfirm.userId})?
+              <p className="text-sm text-black text-center mb-4">
+                Are you sure you want to delete <span className="font-semibold text-black">{deleteConfirm.userName}</span> ({deleteConfirm.userId})?
               </p>
               <p className="text-xs text-red-600 text-center mb-6 bg-red-50 p-3 rounded">
                 ⚠️ This action cannot be undone. This will permanently delete the user and all related data including investments, wallets, transactions, withdrawals, vouchers, tickets, and binary tree entries.
@@ -457,7 +528,7 @@ export default function AdminPanel() {
                 <button
                   onClick={handleDeleteCancel}
                   disabled={deletingUserId === deleteConfirm.userId}
-                  className="flex-1 px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed font-medium"
+                  className="flex-1 px-4 py-2 bg-gray-200 text-black rounded-md hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed font-medium"
                 >
                   Cancel
                 </button>

@@ -57,7 +57,7 @@ export default function GenealogyPage() {
       setError(null);
 
       // Use getNodeDownlines API with depth=3
-      const response = await api.getNodeDownlines(userId, 3);
+      const response = await api.getNodeDownlines(userId, 4);
       
       if (response.data?.tree) {
         const rootUser = response.data.tree.find((u: TreeNode) => u.userId === userId);
@@ -90,8 +90,8 @@ export default function GenealogyPage() {
   useEffect(() => {
     if (user || admin) {
       // Load admin tree (CROWN-000000) by default
-      fetchTreeData('CROWN-000000', true);
-      setSelectedUserId('CROWN-000000');
+      fetchTreeData('CROWN-000001', true);
+      setSelectedUserId('CROWN-000001');
     }
   }, [user, admin, fetchTreeData]);
 
@@ -165,7 +165,7 @@ export default function GenealogyPage() {
           key={`empty-${level}-${position}`}
           className="flex flex-col items-center justify-center w-24 h-20 border-2 border-dashed border-gray-200 rounded-lg bg-gradient-to-br from-gray-50 to-gray-100 opacity-60"
         >
-          <div className="text-gray-400 text-[9px] font-medium">Empty</div>
+          <div className="text-black text-[9px] font-medium">Empty</div>
         </div>
       );
     }
@@ -189,16 +189,16 @@ export default function GenealogyPage() {
           onClick={() => !isRoot && handleNodeClick(node.userId)}
         >
           <div className="text-center">
-            <div className={`font-bold text-[11px] mb-0.5 truncate w-full ${isRoot ? 'text-white drop-shadow-sm' : 'text-gray-900'}`}>
+            <div className={`font-bold text-[11px] mb-0.5 truncate w-full ${isRoot ? 'text-white drop-shadow-sm' : 'text-black'}`}>
               {node.name || 'Unknown'}
             </div>
-            <div className={`text-[9px] mb-1 font-mono ${isRoot ? 'text-indigo-100' : 'text-gray-500'}`}>
+            <div className={`text-[9px] mb-1 font-mono ${isRoot ? 'text-indigo-100' : 'text-black'}`}>
               {node.userId}
             </div>
             <div className={`text-[8px] px-1.5 py-0.5 rounded-full inline-block mb-1 font-semibold ${
               node.status === 'active'
                 ? isRoot ? 'bg-emerald-400/90 text-white shadow-sm' : 'bg-emerald-100 text-emerald-700 border border-emerald-200'
-                : isRoot ? 'bg-gray-400/80 text-white' : 'bg-gray-100 text-gray-600 border border-gray-200'
+                : isRoot ? 'bg-gray-400/80 text-white' : 'bg-gray-100 text-black border border-gray-200'
             }`}>
               {node.status}
             </div>
@@ -345,14 +345,14 @@ export default function GenealogyPage() {
         <h1 className="text-4xl font-bold bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
           Genealogy
         </h1>
-        <p className="mt-2 text-sm text-gray-600">Interactive binary referral tree explorer with smooth navigation</p>
+        <p className="mt-2 text-sm text-black">Interactive binary referral tree explorer with smooth navigation</p>
       </div>
 
       {/* User Selection */}
       <div className="bg-gradient-to-br from-white to-indigo-50/30 rounded-xl shadow-lg border border-indigo-100 p-6 mb-6">
         <div className="flex gap-4 items-end">
           <div className="flex-1">
-            <label className="block text-sm font-semibold text-gray-700 mb-2">
+            <label className="block text-sm font-semibold text-black mb-2">
               Select User
             </label>
             <input
@@ -402,10 +402,10 @@ export default function GenealogyPage() {
             Reset
           </button>
           <div className="flex-1"></div>
-          <div className="text-sm text-gray-600 flex items-center gap-2 bg-white/80 px-4 py-2 rounded-lg border border-gray-200">
+          <div className="text-sm text-black flex items-center gap-2 bg-white/80 px-4 py-2 rounded-lg border border-gray-200">
             <span className="font-medium">Current Root:</span>
             <span className="font-bold text-indigo-700">{treeData.rootName}</span>
-            <span className="text-gray-500 font-mono text-xs">({treeData.rootUserId})</span>
+            <span className="text-black font-mono text-xs">({treeData.rootUserId})</span>
           </div>
         </div>
       )}
@@ -429,7 +429,7 @@ export default function GenealogyPage() {
             <div className="animate-spin rounded-full h-16 w-16 border-4 border-indigo-200"></div>
             <div className="animate-spin rounded-full h-16 w-16 border-4 border-indigo-600 border-t-transparent absolute top-0 left-0"></div>
           </div>
-          <p className="mt-4 text-gray-600 font-medium">Loading genealogy tree...</p>
+          <p className="mt-4 text-black font-medium">Loading genealogy tree...</p>
         </div>
       )}
 
@@ -534,11 +534,11 @@ export default function GenealogyPage() {
       {/* Empty State */}
       {!treeData && !loading && (
         <div className="bg-white rounded-lg shadow p-12 text-center">
-          <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="mx-auto h-12 w-12 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
           </svg>
-          <h3 className="mt-4 text-lg font-medium text-gray-900">No Tree Loaded</h3>
-          <p className="mt-2 text-sm text-gray-500">Enter a User ID above to view their genealogy tree</p>
+          <h3 className="mt-4 text-lg font-medium text-black">No Tree Loaded</h3>
+          <p className="mt-2 text-sm text-black">Enter a User ID above to view their genealogy tree</p>
         </div>
       )}
 
@@ -547,13 +547,13 @@ export default function GenealogyPage() {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
             <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
-              <h2 className="text-2xl font-bold text-gray-900">User Business Details</h2>
+              <h2 className="text-2xl font-bold text-black">User Business Details</h2>
               <button
                 onClick={() => {
                   setShowBusinessModal(false);
                   setSelectedBusinessNode(null);
                 }}
-                className="text-gray-400 hover:text-gray-600 transition-colors"
+                className="text-black hover:text-black transition-colors"
               >
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -564,38 +564,38 @@ export default function GenealogyPage() {
             <div className="p-6 space-y-6">
               {/* User Profile Section */}
               <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">User Profile</h3>
+                <h3 className="text-lg font-semibold text-black mb-4">User Profile</h3>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="text-sm font-medium text-gray-500">User ID</label>
-                    <p className="mt-1 text-sm text-gray-900">{selectedBusinessNode.userId}</p>
+                    <label className="text-sm font-medium text-black">User ID</label>
+                    <p className="mt-1 text-sm text-black">{selectedBusinessNode.userId}</p>
                   </div>
                   <div>
-                    <label className="text-sm font-medium text-gray-500">Name</label>
-                    <p className="mt-1 text-sm text-gray-900">{selectedBusinessNode.name || 'N/A'}</p>
+                    <label className="text-sm font-medium text-black">Name</label>
+                    <p className="mt-1 text-sm text-black">{selectedBusinessNode.name || 'N/A'}</p>
                   </div>
                   <div>
-                    <label className="text-sm font-medium text-gray-500">Email</label>
-                    <p className="mt-1 text-sm text-gray-900">{selectedBusinessNode.email || 'N/A'}</p>
+                    <label className="text-sm font-medium text-black">Email</label>
+                    <p className="mt-1 text-sm text-black">{selectedBusinessNode.email || 'N/A'}</p>
                   </div>
                   <div>
-                    <label className="text-sm font-medium text-gray-500">Phone</label>
-                    <p className="mt-1 text-sm text-gray-900">{selectedBusinessNode.phone || 'N/A'}</p>
+                    <label className="text-sm font-medium text-black">Phone</label>
+                    <p className="mt-1 text-sm text-black">{selectedBusinessNode.phone || 'N/A'}</p>
                   </div>
                   <div>
-                    <label className="text-sm font-medium text-gray-500">Status</label>
+                    <label className="text-sm font-medium text-black">Status</label>
                     <span className={`mt-1 inline-block px-2 py-1 rounded-full text-xs font-medium ${
                       selectedBusinessNode.status === 'active'
                         ? 'bg-green-100 text-green-800'
-                        : 'bg-gray-100 text-gray-800'
+                        : 'bg-gray-100 text-black'
                     }`}>
                       {selectedBusinessNode.status}
                     </span>
                   </div>
                   {selectedBusinessNode.totalInvestment && (
                     <div>
-                      <label className="text-sm font-medium text-gray-500">Total Investment</label>
-                      <p className="mt-1 text-sm text-gray-900">${parseFloat(selectedBusinessNode.totalInvestment).toFixed(2)}</p>
+                      <label className="text-sm font-medium text-black">Total Investment</label>
+                      <p className="mt-1 text-sm text-black">${parseFloat(selectedBusinessNode.totalInvestment).toFixed(2)}</p>
                     </div>
                   )}
                 </div>
@@ -603,10 +603,10 @@ export default function GenealogyPage() {
 
               {/* Parent Information */}
               <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Parent Information</h3>
+                <h3 className="text-lg font-semibold text-black mb-4">Parent Information</h3>
                 {selectedBusinessNode.parent || selectedBusinessNode.parentUserId ? (
                   <div className="bg-gray-50 rounded-lg p-4">
-                    <p className="text-sm text-gray-900">
+                    <p className="text-sm text-black">
                       {selectedBusinessNode.parentName && selectedBusinessNode.parentUserId
                         ? `${selectedBusinessNode.parentName} (${selectedBusinessNode.parentUserId})`
                         : (() => {
@@ -616,13 +616,13 @@ export default function GenealogyPage() {
                     </p>
                   </div>
                 ) : (
-                  <p className="text-sm text-gray-500">No parent (Root user)</p>
+                  <p className="text-sm text-black">No parent (Root user)</p>
                 )}
               </div>
 
               {/* Binary Business Section */}
               <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Binary Business</h3>
+                <h3 className="text-lg font-semibold text-black mb-4">Binary Business</h3>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="bg-blue-50 rounded-lg p-4">
                     <div className="flex items-center justify-between mb-2">
@@ -651,7 +651,7 @@ export default function GenealogyPage() {
 
               {/* Carry Forward Section */}
               <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Carry Forward</h3>
+                <h3 className="text-lg font-semibold text-black mb-4">Carry Forward</h3>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="bg-orange-50 rounded-lg p-4">
                     <div className="flex items-center justify-between">
@@ -674,7 +674,7 @@ export default function GenealogyPage() {
 
               {/* Downline Counts Summary */}
               <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Downline Summary</h3>
+                <h3 className="text-lg font-semibold text-black mb-4">Downline Summary</h3>
                 <div className="bg-indigo-50 rounded-lg p-4">
                   <div className="grid grid-cols-2 gap-4">
                     <div>

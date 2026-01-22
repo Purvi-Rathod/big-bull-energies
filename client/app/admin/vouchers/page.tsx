@@ -37,6 +37,8 @@ export default function AdminVouchersPage() {
   const [creating, setCreating] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
 
   // Form state
   const [formUserId, setFormUserId] = useState('');
@@ -49,7 +51,7 @@ export default function AdminVouchersPage() {
       fetchVouchers();
       fetchMinimumVoucherAmount();
     }
-  }, [user, admin]);
+  }, [user, admin, startDate, endDate]);
 
   // Also fetch minimum when modal opens to ensure latest value
   useEffect(() => {
@@ -88,7 +90,10 @@ export default function AdminVouchersPage() {
     try {
       setLoading(true);
       setError('');
-      const response = await api.getAllVouchers();
+      const response = await api.getAllVouchers({
+        startDate: startDate || undefined,
+        endDate: endDate || undefined,
+      });
       if (response.data) {
         setVouchers(response.data.vouchers);
       }
@@ -156,17 +161,19 @@ export default function AdminVouchersPage() {
   };
 
   const getStatusColor = (status: string) => {
-    switch (status) {
+    switch (status.toLowerCase()) {
       case 'active':
-        return 'bg-green-100 text-green-800';
+        return 'bg-gradient-to-r from-green-100 to-emerald-100 text-green-800 border-2 border-green-300 font-bold shadow-sm';
       case 'used':
-        return 'bg-blue-100 text-blue-800';
+        return 'bg-gradient-to-r from-blue-100 to-cyan-100 text-blue-800 border-2 border-blue-300 font-bold shadow-sm';
       case 'expired':
-        return 'bg-red-100 text-red-800';
+      case 'rejected':
+        return 'bg-gradient-to-r from-red-200 to-red-300 text-red-900 border-2 border-red-400 font-bold shadow-sm';
       case 'revoked':
-        return 'bg-gray-100 text-gray-800';
+      case 'inactive':
+        return 'bg-gradient-to-r from-red-100 to-pink-100 text-red-800 border-2 border-red-300 font-bold shadow-sm';
       default:
-        return 'bg-gray-100 text-gray-800';
+        return 'bg-gradient-to-r from-gray-100 to-slate-100 text-gray-800 border-2 border-gray-300 font-semibold shadow-sm';
     }
   };
 
@@ -196,7 +203,7 @@ export default function AdminVouchersPage() {
       <div className="flex items-center justify-center py-12">
         <div className="text-center">
           <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
-          <p className="mt-4 text-gray-600">Loading vouchers...</p>
+          <p className="mt-4 text-black">Loading vouchers...</p>
         </div>
       </div>
     );
@@ -206,8 +213,8 @@ export default function AdminVouchersPage() {
     <div className="w-full">
       <div className="mb-6 flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Voucher Management</h1>
-          <p className="mt-1 text-sm text-gray-500">Track and manage all vouchers in the system</p>
+          <h1 className="text-3xl font-bold text-black">Voucher Management</h1>
+          <p className="mt-1 text-sm text-black">Track and manage all vouchers in the system</p>
         </div>
         <button
           onClick={() => setShowCreateModal(true)}
@@ -225,9 +232,9 @@ export default function AdminVouchersPage() {
 
       {/* Filters */}
       <div className="mb-6 bg-white rounded-lg shadow p-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-black mb-2">
               Search
             </label>
             <input
@@ -239,7 +246,7 @@ export default function AdminVouchersPage() {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-black mb-2">
               Status Filter
             </label>
             <select
@@ -255,39 +262,74 @@ export default function AdminVouchersPage() {
             </select>
           </div>
         </div>
+        
+        {/* Date Range Filter */}
+        <div className="flex gap-4 items-end flex-wrap pt-4 border-t border-gray-200">
+          <label className="text-sm font-medium text-black whitespace-nowrap">Date Range:</label>
+          <div className="flex gap-2 items-center">
+            <input
+              type="date"
+              value={startDate}
+              onChange={(e) => {
+                setStartDate(e.target.value);
+              }}
+              className="px-3 py-2 border border-gray-300 rounded-md text-black bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+            />
+            <span className="text-black">to</span>
+            <input
+              type="date"
+              value={endDate}
+              onChange={(e) => {
+                setEndDate(e.target.value);
+              }}
+              className="px-3 py-2 border border-gray-300 rounded-md text-black bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+            />
+            {(startDate || endDate) && (
+              <button
+                onClick={() => {
+                  setStartDate('');
+                  setEndDate('');
+                }}
+                className="px-4 py-2 bg-gray-200 text-black rounded-md hover:bg-gray-300 text-sm"
+              >
+                Clear Dates
+              </button>
+            )}
+          </div>
+        </div>
       </div>
 
       {/* Vouchers Table */}
       <div className="bg-white shadow rounded-lg overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
+            <thead className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white">
               <tr>
-                <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[140px]">
+                <th className="px-3 py-3 text-left text-xs font-medium text-white uppercase tracking-wider w-[140px]">
                   Voucher ID
                 </th>
-                <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[140px]">
+                <th className="px-3 py-3 text-left text-xs font-medium text-white uppercase tracking-wider w-[140px]">
                   User
                 </th>
-                <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[100px]">
+                <th className="px-3 py-3 text-left text-xs font-medium text-white uppercase tracking-wider w-[100px]">
                   Amount
                 </th>
-                <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[120px]">
+                <th className="px-3 py-3 text-left text-xs font-medium text-white uppercase tracking-wider w-[120px]">
                   Investment Value
                 </th>
-                <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[90px]">
+                <th className="px-3 py-3 text-left text-xs font-medium text-white uppercase tracking-wider w-[90px]">
                   Status
                 </th>
-                <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[140px]">
+                <th className="px-3 py-3 text-left text-xs font-medium text-white uppercase tracking-wider w-[140px]">
                   Created At
                 </th>
-                <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[140px]">
+                <th className="px-3 py-3 text-left text-xs font-medium text-white uppercase tracking-wider w-[140px]">
                   Expiry Date
                 </th>
-                <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[100px]">
+                <th className="px-3 py-3 text-left text-xs font-medium text-white uppercase tracking-wider w-[100px]">
                   Duration
                 </th>
-                <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[140px]">
+                <th className="px-3 py-3 text-left text-xs font-medium text-white uppercase tracking-wider w-[140px]">
                   Used At
                 </th>
               </tr>
@@ -295,7 +337,7 @@ export default function AdminVouchersPage() {
             <tbody className="bg-white divide-y divide-gray-200">
               {filteredVouchers.length === 0 ? (
                 <tr>
-                  <td colSpan={9} className="px-6 py-4 text-center text-gray-500">
+                  <td colSpan={9} className="px-6 py-4 text-center text-black">
                     No vouchers found
                   </td>
                 </tr>
@@ -310,21 +352,21 @@ export default function AdminVouchersPage() {
                   return (
                     <tr key={voucher.id} className="hover:bg-gray-50">
                       <td className="px-3 py-3">
-                        <div className="text-xs font-mono text-gray-900 truncate max-w-[140px]" title={voucher.voucherId}>{voucher.voucherId}</div>
+                        <div className="text-xs font-mono text-black truncate max-w-[140px]" title={voucher.voucherId}>{voucher.voucherId}</div>
                       </td>
                       <td className="px-3 py-3">
                         {voucher.user ? (
                           <div>
-                            <div className="text-xs font-medium text-gray-900 truncate max-w-[140px]" title={voucher.user.name}>{voucher.user.name}</div>
-                            <div className="text-xs text-gray-500 truncate max-w-[140px]" title={voucher.user.userId}>{voucher.user.userId}</div>
-                            <div className="text-xs text-gray-400 truncate max-w-[140px]" title={voucher.user.email}>{voucher.user.email}</div>
+                            <div className="text-xs font-medium text-black truncate max-w-[140px]" title={voucher.user.name}>{voucher.user.name}</div>
+                            <div className="text-xs text-black truncate max-w-[140px]" title={voucher.user.userId}>{voucher.user.userId}</div>
+                            <div className="text-xs text-black truncate max-w-[140px]" title={voucher.user.email}>{voucher.user.email}</div>
                           </div>
                         ) : (
-                          <span className="text-xs text-gray-400">N/A</span>
+                          <span className="text-xs text-black">N/A</span>
                         )}
                       </td>
                       <td className="px-3 py-3">
-                        <div className="text-xs font-medium text-gray-900">
+                        <div className="text-xs font-medium text-black">
                           ${voucher.amount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                         </div>
                       </td>
@@ -332,30 +374,30 @@ export default function AdminVouchersPage() {
                         <div className="text-xs font-medium text-green-600">
                           ${voucher.investmentValue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                         </div>
-                        <div className="text-xs text-gray-500">({voucher.multiplier}x)</div>
+                        <div className="text-xs text-black">({voucher.multiplier}x)</div>
                       </td>
                       <td className="px-3 py-3">
-                        <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusColor(voucher.status)}`}>
+                        <span className={`px-3 py-1 inline-flex text-xs leading-5 font-bold rounded-full border-2 shadow-sm ${getStatusColor(voucher.status)}`}>
                           {voucher.status}
                           {isExpired(voucher.expiry) && voucher.status === 'active' && ' (Expired)'}
                         </span>
                       </td>
                       <td className="px-3 py-3">
-                        <div className="text-xs text-gray-500">{formatDate(voucher.createdAt)}</div>
+                        <div className="text-xs text-black">{formatDate(voucher.createdAt)}</div>
                       </td>
                       <td className="px-3 py-3">
-                        <div className="text-xs text-gray-500">{formatDate(voucher.expiry)}</div>
+                        <div className="text-xs text-black">{formatDate(voucher.expiry)}</div>
                         {isExpired(voucher.expiry) && (
                           <span className="text-xs text-red-600">(Expired)</span>
                         )}
                       </td>
                       <td className="px-3 py-3">
-                        <div className="text-xs text-gray-500">
+                        <div className="text-xs text-black">
                           {durationDays !== null ? `${durationDays} days` : 'N/A'}
                         </div>
                       </td>
                       <td className="px-3 py-3">
-                        <div className="text-xs text-gray-500">{formatDate(voucher.usedAt)}</div>
+                        <div className="text-xs text-black">{formatDate(voucher.usedAt)}</div>
                       </td>
                     </tr>
                   );
@@ -371,10 +413,10 @@ export default function AdminVouchersPage() {
         <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
           <div className="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
             <div className="mt-3">
-              <h3 className="text-lg font-medium text-gray-900 mb-4">Create Voucher</h3>
+              <h3 className="text-lg font-medium text-black mb-4">Create Voucher</h3>
               
               <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-black mb-2">
                   User ID *
                 </label>
                 <input
@@ -387,7 +429,7 @@ export default function AdminVouchersPage() {
               </div>
 
               <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-black mb-2">
                   Amount (USD) *
                 </label>
                 <input
@@ -399,16 +441,16 @@ export default function AdminVouchersPage() {
                   placeholder={minVoucherAmount.toFixed(2)}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
                 />
-                <p className="mt-1 text-xs text-gray-500">
+                <p className="mt-1 text-xs text-black">
                   Minimum voucher amount: ${minVoucherAmount.toFixed(2)}
                 </p>
-                <p className="mt-1 text-xs text-gray-500">
+                <p className="mt-1 text-xs text-black">
                   Investment Value will be: ${(parseFloat(formAmount) || 0) * 2} (2x multiplier)
                 </p>
               </div>
 
               <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-black mb-2">
                   Expiry Days (default: 120)
                 </label>
                 <input
@@ -436,7 +478,7 @@ export default function AdminVouchersPage() {
                     setFormExpiryDays('120');
                     setError('');
                   }}
-                  className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300"
+                  className="px-4 py-2 text-sm font-medium text-black bg-gray-200 rounded-md hover:bg-gray-300"
                 >
                   Cancel
                 </button>

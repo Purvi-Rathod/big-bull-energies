@@ -168,7 +168,7 @@ export default function AllTransactionsPage() {
   const renderTransactionTable = (transactions: Transaction[], title: string) => (
     <div className="bg-white rounded-lg shadow overflow-hidden">
       <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
-        <h3 className="text-lg font-semibold text-gray-900">{title}</h3>
+        <h3 className="text-lg font-semibold text-black">{title}</h3>
         {transactions.length > 0 && (
           <button
             onClick={() => exportTransactions(transactions, title)}
@@ -180,62 +180,68 @@ export default function AllTransactionsPage() {
       </div>
       <div className="overflow-x-auto">
         <table className="w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
+          <thead className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white">
             <tr>
-              <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
-              <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase">User ID</th>
-              <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase">User Name</th>
-              <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase">User Email</th>
-              <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase">Type</th>
-              <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase">Amount</th>
-              <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase">Balance Before</th>
-              <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase">Balance After</th>
-              <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+              <th className="px-3 py-3 text-left text-xs font-medium text-white uppercase">Date</th>
+              <th className="px-3 py-3 text-left text-xs font-medium text-white uppercase">User ID</th>
+              <th className="px-3 py-3 text-left text-xs font-medium text-white uppercase">User Name</th>
+              <th className="px-3 py-3 text-left text-xs font-medium text-white uppercase">User Email</th>
+              <th className="px-3 py-3 text-left text-xs font-medium text-white uppercase">Type</th>
+              <th className="px-3 py-3 text-left text-xs font-medium text-white uppercase">Amount</th>
+              <th className="px-3 py-3 text-left text-xs font-medium text-white uppercase">Balance Before</th>
+              <th className="px-3 py-3 text-left text-xs font-medium text-white uppercase">Balance After</th>
+              <th className="px-3 py-3 text-left text-xs font-medium text-white uppercase">Status</th>
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
             {transactions.length === 0 ? (
               <tr>
-                <td colSpan={9} className="px-6 py-4 text-center text-gray-500">
+                <td colSpan={9} className="px-6 py-4 text-center text-black">
                   No transactions found
                 </td>
               </tr>
             ) : (
               transactions.map((tx) => (
                 <tr key={tx.id}>
-                  <td className="px-3 py-3 text-xs text-gray-500">
+                  <td className="px-3 py-3 text-xs text-black">
                     {new Date(tx.createdAt).toLocaleString()}
                   </td>
-                  <td className="px-3 py-3 text-xs font-mono text-gray-600">
+                  <td className="px-3 py-3 text-xs font-mono text-black">
                     {tx.userId}
                   </td>
-                  <td className="px-3 py-3 text-xs text-gray-900">
+                  <td className="px-3 py-3 text-xs text-black">
                     {tx.userName}
                   </td>
-                  <td className="px-3 py-3 text-xs text-gray-500">
+                  <td className="px-3 py-3 text-xs text-black">
                     {tx.userEmail}
                   </td>
                   <td className="px-3 py-3 text-xs">
-                    <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                      <span className={`px-3 py-1 inline-flex text-xs leading-5 font-bold rounded-full border-2 shadow-sm ${
                       tx.type === 'credit' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
                     }`}>
                       {tx.type.toUpperCase()}
                     </span>
                   </td>
-                  <td className="px-3 py-3 text-xs font-medium text-gray-900">
+                  <td className="px-3 py-3 text-xs font-medium text-black">
                     ${tx.amount.toFixed(2)}
                   </td>
-                  <td className="px-3 py-3 text-xs text-gray-500">
+                  <td className="px-3 py-3 text-xs text-black">
                     ${tx.balanceBefore.toFixed(2)}
                   </td>
-                  <td className="px-3 py-3 text-xs text-gray-500">
+                  <td className="px-3 py-3 text-xs text-black">
                     ${tx.balanceAfter.toFixed(2)}
                   </td>
                   <td className="px-3 py-3 text-xs">
-                    <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                      tx.status === 'completed' ? 'bg-green-100 text-green-800' :
-                      tx.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
-                      'bg-red-100 text-red-800'
+                      <span className={`px-3 py-1 inline-flex text-xs leading-5 font-bold rounded-full border-2 shadow-sm ${
+                      tx.status === 'completed' || tx.status === 'approved' || tx.status === 'active' 
+                        ? 'bg-gradient-to-r from-green-100 to-emerald-100 text-green-800 border-2 border-green-300 font-bold shadow-sm' :
+                      tx.status === 'pending' 
+                        ? 'bg-gradient-to-r from-yellow-100 to-amber-100 text-yellow-800 border-2 border-yellow-300 font-bold shadow-sm' :
+                      tx.status === 'rejected' || tx.status === 'failed' || tx.status === 'suspended' || tx.status === 'blocked'
+                        ? 'bg-gradient-to-r from-red-200 to-red-300 text-red-900 border-2 border-red-400 font-bold shadow-sm' :
+                      tx.status === 'inactive'
+                        ? 'bg-gradient-to-r from-red-100 to-pink-100 text-red-800 border-2 border-red-300 font-bold shadow-sm' :
+                        'bg-gradient-to-r from-gray-100 to-slate-100 text-gray-800 border-2 border-gray-300 font-semibold shadow-sm'
                     }`}>
                       {tx.status}
                     </span>
@@ -252,7 +258,7 @@ export default function AllTransactionsPage() {
   const renderInvestmentTable = () => (
     <div className="bg-white rounded-lg shadow overflow-hidden">
       <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
-        <h3 className="text-lg font-semibold text-gray-900">Investment Transactions</h3>
+        <h3 className="text-lg font-semibold text-black">Investment Transactions</h3>
         {investmentTransactions.length > 0 && (
           <button
             onClick={() => exportInvestmentTransactions(investmentTransactions)}
@@ -264,62 +270,68 @@ export default function AllTransactionsPage() {
       </div>
       <div className="overflow-x-auto">
         <table className="w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
+          <thead className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white">
             <tr>
-              <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
-              <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase">User ID</th>
-              <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase">User Name</th>
-              <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase">Type</th>
-              <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase">Amount</th>
-              <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase">Package</th>
-              <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase">ROI</th>
-              <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase">Invested Amount</th>
-              <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+              <th className="px-3 py-3 text-left text-xs font-medium text-white uppercase">Date</th>
+              <th className="px-3 py-3 text-left text-xs font-medium text-white uppercase">User ID</th>
+              <th className="px-3 py-3 text-left text-xs font-medium text-white uppercase">User Name</th>
+              <th className="px-3 py-3 text-left text-xs font-medium text-white uppercase">Type</th>
+              <th className="px-3 py-3 text-left text-xs font-medium text-white uppercase">Amount</th>
+              <th className="px-3 py-3 text-left text-xs font-medium text-white uppercase">Package</th>
+              <th className="px-3 py-3 text-left text-xs font-medium text-white uppercase">ROI</th>
+              <th className="px-3 py-3 text-left text-xs font-medium text-white uppercase">Invested Amount</th>
+              <th className="px-3 py-3 text-left text-xs font-medium text-white uppercase">Status</th>
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
             {investmentTransactions.length === 0 ? (
               <tr>
-                <td colSpan={9} className="px-6 py-4 text-center text-gray-500">
+                <td colSpan={9} className="px-6 py-4 text-center text-black">
                   No investment transactions found
                 </td>
               </tr>
             ) : (
               investmentTransactions.map((tx) => (
                 <tr key={tx.id}>
-                  <td className="px-3 py-3 text-xs text-gray-500">
+                  <td className="px-3 py-3 text-xs text-black">
                     {new Date(tx.createdAt).toLocaleString()}
                   </td>
-                  <td className="px-3 py-3 text-xs font-mono text-gray-600">
+                  <td className="px-3 py-3 text-xs font-mono text-black">
                     {tx.userId}
                   </td>
-                  <td className="px-3 py-3 text-xs text-gray-900">
+                  <td className="px-3 py-3 text-xs text-black">
                     {tx.userName}
                   </td>
                   <td className="px-6 py-3 whitespace-nowrap text-sm">
-                    <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                      <span className={`px-3 py-1 inline-flex text-xs leading-5 font-bold rounded-full border-2 shadow-sm ${
                       tx.type === 'credit' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
                     }`}>
                       {tx.type.toUpperCase()}
                     </span>
                   </td>
-                  <td className="px-3 py-3 text-xs font-medium text-gray-900">
+                  <td className="px-3 py-3 text-xs font-medium text-black">
                     ${tx.amount.toFixed(2)}
                   </td>
-                  <td className="px-3 py-3 text-xs text-gray-500">
+                  <td className="px-3 py-3 text-xs text-black">
                     {tx.investment?.packageName || 'N/A'}
                   </td>
-                  <td className="px-3 py-3 text-xs text-gray-500">
+                  <td className="px-3 py-3 text-xs text-black">
                     {tx.investment?.roi || 0}%
                   </td>
-                  <td className="px-3 py-3 text-xs font-medium text-gray-900">
+                  <td className="px-3 py-3 text-xs font-medium text-black">
                     ${tx.investment?.investedAmount.toFixed(2) || '0.00'}
                   </td>
                   <td className="px-3 py-3 text-xs">
-                    <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                      tx.status === 'completed' ? 'bg-green-100 text-green-800' :
-                      tx.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
-                      'bg-red-100 text-red-800'
+                      <span className={`px-3 py-1 inline-flex text-xs leading-5 font-bold rounded-full border-2 shadow-sm ${
+                      tx.status === 'completed' || tx.status === 'approved' || tx.status === 'active' 
+                        ? 'bg-gradient-to-r from-green-100 to-emerald-100 text-green-800 border-2 border-green-300 font-bold shadow-sm' :
+                      tx.status === 'pending' 
+                        ? 'bg-gradient-to-r from-yellow-100 to-amber-100 text-yellow-800 border-2 border-yellow-300 font-bold shadow-sm' :
+                      tx.status === 'rejected' || tx.status === 'failed' || tx.status === 'suspended' || tx.status === 'blocked'
+                        ? 'bg-gradient-to-r from-red-200 to-red-300 text-red-900 border-2 border-red-400 font-bold shadow-sm' :
+                      tx.status === 'inactive'
+                        ? 'bg-gradient-to-r from-red-100 to-pink-100 text-red-800 border-2 border-red-300 font-bold shadow-sm' :
+                        'bg-gradient-to-r from-gray-100 to-slate-100 text-gray-800 border-2 border-gray-300 font-semibold shadow-sm'
                     }`}>
                       {tx.status}
                     </span>
@@ -336,7 +348,7 @@ export default function AllTransactionsPage() {
   const renderWithdrawalTable = () => (
     <div className="bg-white rounded-lg shadow overflow-hidden">
       <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
-        <h3 className="text-lg font-semibold text-gray-900">Withdrawal History</h3>
+        <h3 className="text-lg font-semibold text-black">Withdrawal History</h3>
         {withdrawals.length > 0 && (
           <button
             onClick={() => exportWithdrawals(withdrawals)}
@@ -348,62 +360,68 @@ export default function AllTransactionsPage() {
       </div>
       <div className="overflow-x-auto">
         <table className="w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
+          <thead className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white">
             <tr>
-              <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
-              <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase">User ID</th>
-              <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase">User Name</th>
-              <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase">Withdrawal ID</th>
-              <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase">Amount</th>
-              <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase">Charges</th>
-              <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase">Final Amount</th>
-              <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase">Wallet Type</th>
-              <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase">Method</th>
-              <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+              <th className="px-3 py-3 text-left text-xs font-medium text-white uppercase">Date</th>
+              <th className="px-3 py-3 text-left text-xs font-medium text-white uppercase">User ID</th>
+              <th className="px-3 py-3 text-left text-xs font-medium text-white uppercase">User Name</th>
+              <th className="px-3 py-3 text-left text-xs font-medium text-white uppercase">Withdrawal ID</th>
+              <th className="px-3 py-3 text-left text-xs font-medium text-white uppercase">Amount</th>
+              <th className="px-3 py-3 text-left text-xs font-medium text-white uppercase">Charges</th>
+              <th className="px-3 py-3 text-left text-xs font-medium text-white uppercase">Final Amount</th>
+              <th className="px-3 py-3 text-left text-xs font-medium text-white uppercase">Wallet Type</th>
+              <th className="px-3 py-3 text-left text-xs font-medium text-white uppercase">Method</th>
+              <th className="px-3 py-3 text-left text-xs font-medium text-white uppercase">Status</th>
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
             {withdrawals.length === 0 ? (
               <tr>
-                <td colSpan={10} className="px-6 py-4 text-center text-gray-500">
+                <td colSpan={10} className="px-6 py-4 text-center text-black">
                   No withdrawals found
                 </td>
               </tr>
             ) : (
               withdrawals.map((wd) => (
                 <tr key={wd.id} className="hover:bg-gray-50">
-                  <td className="px-3 py-3 text-xs text-gray-500">
+                  <td className="px-3 py-3 text-xs text-black">
                     {new Date(wd.createdAt).toLocaleString()}
                   </td>
-                  <td className="px-3 py-3 text-xs font-mono text-gray-600">
+                  <td className="px-3 py-3 text-xs font-mono text-black">
                     {wd.userId}
                   </td>
-                  <td className="px-3 py-3 text-xs text-gray-900">
+                  <td className="px-3 py-3 text-xs text-black">
                     {wd.userName}
                   </td>
-                  <td className="px-3 py-3 text-xs font-mono text-gray-600">
+                  <td className="px-3 py-3 text-xs font-mono text-black">
                     {wd.withdrawalId || wd.id.substring(0, 8)}
                   </td>
-                  <td className="px-3 py-3 text-xs font-medium text-gray-900">
+                  <td className="px-3 py-3 text-xs font-medium text-black">
                     ${wd.amount.toFixed(2)}
                   </td>
-                  <td className="px-3 py-3 text-xs text-gray-500">
+                  <td className="px-3 py-3 text-xs text-black">
                     ${wd.charges.toFixed(2)}
                   </td>
                   <td className="px-3 py-3 text-xs font-medium text-green-600">
                     ${wd.finalAmount.toFixed(2)}
                   </td>
-                  <td className="px-3 py-3 text-xs text-gray-500 capitalize">
+                  <td className="px-3 py-3 text-xs text-black capitalize">
                     {wd.walletType}
                   </td>
-                  <td className="px-3 py-3 text-xs text-gray-500 capitalize">
+                  <td className="px-3 py-3 text-xs text-black capitalize">
                     {wd.method || 'crypto'}
                   </td>
                   <td className="px-3 py-3 text-xs">
-                    <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                      wd.status === 'approved' ? 'bg-green-100 text-green-800' :
-                      wd.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
-                      'bg-red-100 text-red-800'
+                      <span className={`px-3 py-1 inline-flex text-xs leading-5 font-bold rounded-full border-2 shadow-sm ${
+                      wd.status === 'approved' || wd.status === 'active' 
+                        ? 'bg-gradient-to-r from-green-100 to-emerald-100 text-green-800 border-2 border-green-300 font-bold shadow-sm' :
+                      wd.status === 'pending' 
+                        ? 'bg-gradient-to-r from-yellow-100 to-amber-100 text-yellow-800 border-2 border-yellow-300 font-bold shadow-sm' :
+                      wd.status === 'rejected' || wd.status === 'failed' || wd.status === 'suspended' || wd.status === 'blocked'
+                        ? 'bg-gradient-to-r from-red-200 to-red-300 text-red-900 border-2 border-red-400 font-bold shadow-sm' :
+                      wd.status === 'inactive'
+                        ? 'bg-gradient-to-r from-red-100 to-pink-100 text-red-800 border-2 border-red-300 font-bold shadow-sm' :
+                        'bg-gradient-to-r from-gray-100 to-slate-100 text-gray-800 border-2 border-gray-300 font-semibold shadow-sm'
                     }`}>
                       {wd.status}
                     </span>
@@ -422,7 +440,7 @@ export default function AllTransactionsPage() {
       <div className="flex items-center justify-center py-12">
         <div className="text-center">
           <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-slate-600"></div>
-          <p className="mt-4 text-gray-600">Loading transactions...</p>
+          <p className="mt-4 text-black">Loading transactions...</p>
         </div>
       </div>
     );
@@ -431,8 +449,8 @@ export default function AllTransactionsPage() {
   return (
     <div className="w-full">
       <div className="mb-6">
-        <h1 className="text-3xl font-bold text-gray-900">All Transactions</h1>
-        <p className="mt-1 text-sm text-gray-500">View all transactions across the system</p>
+        <h1 className="text-3xl font-bold text-black">All Transactions</h1>
+        <p className="mt-1 text-sm text-black">View all transactions across the system</p>
       </div>
       {error && (
         <div className="mb-4 bg-red-50 border border-red-400 text-red-700 px-4 py-3 rounded">
@@ -452,7 +470,7 @@ export default function AllTransactionsPage() {
                   className={`${
                     activeTab === tab
                       ? 'border-indigo-500 text-indigo-600'
-                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                      : 'border-transparent text-black hover:text-black hover:border-gray-300'
                   } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm capitalize`}
                 >
                   {tab} {tab === 'roi' && `(${roiTransactions.length})`}

@@ -71,7 +71,7 @@ export default function NOWPaymentsReportPage() {
       <div className="flex items-center justify-center py-12">
         <div className="text-center">
           <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-slate-600"></div>
-          <p className="mt-4 text-gray-600">Loading report...</p>
+          <p className="mt-4 text-black">Loading report...</p>
         </div>
       </div>
     );
@@ -90,23 +90,23 @@ export default function NOWPaymentsReportPage() {
           {/* Summary Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
             <div className="bg-white rounded-lg shadow p-6">
-              <h3 className="text-sm font-medium text-gray-500 mb-2">Total Payments</h3>
-              <p className="text-2xl font-bold text-gray-900">{report.summary.totalPayments}</p>
+              <h3 className="text-sm font-medium text-black mb-2">Total Payments</h3>
+              <p className="text-2xl font-bold text-black">{report.summary.totalPayments}</p>
             </div>
             <div className="bg-white rounded-lg shadow p-6">
-              <h3 className="text-sm font-medium text-gray-500 mb-2">Total Amount</h3>
+              <h3 className="text-sm font-medium text-black mb-2">Total Amount</h3>
               <p className="text-2xl font-bold text-indigo-600">
                 ${report.summary.totalAmount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
               </p>
             </div>
             <div className="bg-white rounded-lg shadow p-6">
-              <h3 className="text-sm font-medium text-gray-500 mb-2">Completed</h3>
+              <h3 className="text-sm font-medium text-black mb-2">Completed</h3>
               <p className="text-2xl font-bold text-green-600">
                 ${report.summary.completedAmount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
               </p>
             </div>
             <div className="bg-white rounded-lg shadow p-6">
-              <h3 className="text-sm font-medium text-gray-500 mb-2">Pending</h3>
+              <h3 className="text-sm font-medium text-black mb-2">Pending</h3>
               <p className="text-2xl font-bold text-yellow-600">
                 ${report.summary.pendingAmount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
               </p>
@@ -116,7 +116,7 @@ export default function NOWPaymentsReportPage() {
           {/* Payments Table */}
           <div className="bg-white rounded-lg shadow overflow-hidden">
             <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
-              <h3 className="text-lg font-semibold text-gray-900">NOWPayments Transactions ({report.payments.length})</h3>
+              <h3 className="text-lg font-semibold text-black">NOWPayments Transactions ({report.payments.length})</h3>
               {report.payments.length > 0 && (
                 <button
                   onClick={exportToCSV}
@@ -128,24 +128,24 @@ export default function NOWPaymentsReportPage() {
             </div>
             <div className="overflow-x-auto">
               <table className="w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
+                <thead className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white">
                   <tr>
-                    <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase w-[140px]">Date</th>
-                    <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase w-[130px]">User ID</th>
-                    <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase w-[120px]">User Name</th>
-                    <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase w-[110px]">Package</th>
-                    <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase w-[120px]">Order ID</th>
-                    <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase w-[120px]">Payment ID</th>
-                    <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase w-[100px]">Amount</th>
-                    <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase w-[90px]">Status</th>
-                    <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase w-[150px]">Pay Address</th>
-                    <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase w-[110px]">Actually Paid</th>
+                    <th className="px-3 py-3 text-left text-xs font-medium text-white uppercase w-[140px]">Date</th>
+                    <th className="px-3 py-3 text-left text-xs font-medium text-white uppercase w-[130px]">User ID</th>
+                    <th className="px-3 py-3 text-left text-xs font-medium text-white uppercase w-[120px]">User Name</th>
+                    <th className="px-3 py-3 text-left text-xs font-medium text-white uppercase w-[110px]">Package</th>
+                    <th className="px-3 py-3 text-left text-xs font-medium text-white uppercase w-[120px]">Order ID</th>
+                    <th className="px-3 py-3 text-left text-xs font-medium text-white uppercase w-[120px]">Payment ID</th>
+                    <th className="px-3 py-3 text-left text-xs font-medium text-white uppercase w-[100px]">Amount</th>
+                    <th className="px-3 py-3 text-left text-xs font-medium text-white uppercase w-[90px]">Status</th>
+                    <th className="px-3 py-3 text-left text-xs font-medium text-white uppercase w-[150px]">Pay Address</th>
+                    <th className="px-3 py-3 text-left text-xs font-medium text-white uppercase w-[110px]">Actually Paid</th>
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
                   {report.payments.length === 0 ? (
                     <tr>
-                      <td colSpan={10} className="px-6 py-4 text-center text-gray-500">
+                      <td colSpan={10} className="px-6 py-4 text-center text-black">
                         No payments found
                       </td>
                     </tr>
@@ -153,40 +153,46 @@ export default function NOWPaymentsReportPage() {
                     report.payments.map((p: any) => (
                       <tr key={p.id}>
                         <td className="px-3 py-3">
-                          <div className="text-xs text-gray-500">{new Date(p.createdAt).toLocaleString()}</div>
+                          <div className="text-xs text-black">{new Date(p.createdAt).toLocaleString()}</div>
                         </td>
                         <td className="px-3 py-3">
-                          <div className="text-xs font-mono text-gray-600 truncate max-w-[130px]" title={p.userId}>{p.userId}</div>
+                          <div className="text-xs font-mono text-black truncate max-w-[130px]" title={p.userId}>{p.userId}</div>
                         </td>
                         <td className="px-3 py-3">
-                          <div className="text-xs text-gray-900 truncate max-w-[120px]" title={p.userName}>{p.userName}</div>
+                          <div className="text-xs text-black truncate max-w-[120px]" title={p.userName}>{p.userName}</div>
                         </td>
                         <td className="px-3 py-3">
-                          <div className="text-xs text-gray-500 truncate max-w-[110px]" title={p.packageName}>{p.packageName}</div>
+                          <div className="text-xs text-black truncate max-w-[110px]" title={p.packageName}>{p.packageName}</div>
                         </td>
                         <td className="px-3 py-3">
-                          <div className="text-xs font-mono text-gray-600 truncate max-w-[120px]" title={p.orderId}>{p.orderId}</div>
+                          <div className="text-xs font-mono text-black truncate max-w-[120px]" title={p.orderId}>{p.orderId}</div>
                         </td>
                         <td className="px-3 py-3">
-                          <div className="text-xs font-mono text-gray-600 truncate max-w-[120px]" title={p.paymentId}>{p.paymentId}</div>
+                          <div className="text-xs font-mono text-black truncate max-w-[120px]" title={p.paymentId}>{p.paymentId}</div>
                         </td>
                         <td className="px-3 py-3">
-                          <div className="text-xs font-medium text-gray-900">${p.amount.toFixed(2)} {p.currency}</div>
+                          <div className="text-xs font-medium text-black">${p.amount.toFixed(2)} {p.currency}</div>
                         </td>
                         <td className="px-3 py-3">
-                          <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                            p.status === 'completed' ? 'bg-green-100 text-green-800' :
-                            p.status === 'pending' || p.status === 'processing' ? 'bg-yellow-100 text-yellow-800' :
-                            'bg-red-100 text-red-800'
+                          <span className={`px-3 py-1 inline-flex text-xs leading-5 font-bold rounded-full border-2 shadow-sm ${
+                            p.status === 'completed' || p.status === 'approved' || p.status === 'active' || p.status === 'paid'
+                              ? 'bg-gradient-to-r from-green-100 to-emerald-100 text-green-800 border-2 border-green-300 font-bold shadow-sm' :
+                            p.status === 'pending' || p.status === 'processing' 
+                              ? 'bg-gradient-to-r from-yellow-100 to-amber-100 text-yellow-800 border-2 border-yellow-300 font-bold shadow-sm' :
+                            p.status === 'rejected' || p.status === 'failed' || p.status === 'suspended' || p.status === 'blocked' || p.status === 'cancelled'
+                              ? 'bg-gradient-to-r from-red-200 to-red-300 text-red-900 border-2 border-red-400 font-bold shadow-sm' :
+                            p.status === 'inactive'
+                              ? 'bg-gradient-to-r from-red-100 to-pink-100 text-red-800 border-2 border-red-300 font-bold shadow-sm' :
+                              'bg-gradient-to-r from-gray-100 to-slate-100 text-gray-800 border-2 border-gray-300 font-semibold shadow-sm'
                           }`}>
                             {p.status}
                           </span>
                         </td>
                         <td className="px-3 py-3">
-                          <div className="text-xs font-mono text-gray-500 truncate max-w-[150px]" title={p.payAddress || 'N/A'}>{p.payAddress || 'N/A'}</div>
+                          <div className="text-xs font-mono text-black truncate max-w-[150px]" title={p.payAddress || 'N/A'}>{p.payAddress || 'N/A'}</div>
                         </td>
                         <td className="px-3 py-3">
-                          <div className="text-xs font-medium text-gray-900">{p.actuallyPaid ? `$${p.actuallyPaid.toFixed(2)}` : 'N/A'}</div>
+                          <div className="text-xs font-medium text-black">{p.actuallyPaid ? `$${p.actuallyPaid.toFixed(2)}` : 'N/A'}</div>
                         </td>
                       </tr>
                     ))

@@ -12,6 +12,10 @@ export interface IUser extends Document {
   referrer?: Types.ObjectId | null;
   position?: "left" | "right" | null;
   status?: "active" | "inactive" | "suspended" | "blocked" | "suspected";
+  accountType?: "normal" | "powerleg" | "free"; // Account type for influencer management
+  binaryTargetAmount?: number; // Target binary business amount to unlock withdrawals
+  targetStatus?: "pending" | "completed"; // Status of binary target completion
+  withdrawEnabled?: boolean; // Whether withdrawals are enabled (unlocked after target completion)
   walletAddress?: string; // crypto wallet address
   bankAccount?: {
     accountNumber?: string;
@@ -36,6 +40,10 @@ const UserSchema = new Schema<IUser>({
   referrer: { type: Schema.Types.ObjectId, ref: "User", index: true, default: null },
   position: { type: String, enum: ["left", "right"], default: null },
   status: { type: String, enum: ["active","inactive","suspended","blocked","suspected"], default: "active" },
+  accountType: { type: String, enum: ["normal", "powerleg", "free"], default: "normal", index: true },
+  binaryTargetAmount: { type: Number, default: 0 },
+  targetStatus: { type: String, enum: ["pending", "completed"], default: "pending", index: true },
+  withdrawEnabled: { type: Boolean, default: false, index: true },
   walletAddress: { type: String },
   bankAccount: {
     accountNumber: { type: String },

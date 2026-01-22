@@ -201,7 +201,7 @@ export default function WithdrawalSchedulesPage() {
       <div className="flex items-center justify-center py-12">
         <div className="text-center">
           <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
-          <p className="mt-4 text-gray-600">Loading withdrawal schedules...</p>
+          <p className="mt-4 text-black">Loading withdrawal schedules...</p>
         </div>
       </div>
     );
@@ -211,8 +211,8 @@ export default function WithdrawalSchedulesPage() {
     <div className="w-full">
       <div className="mb-6 flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">ROI Withdrawal Schedules</h1>
-          <p className="mt-1 text-sm text-gray-500">Manage withdrawal schedules for each package type</p>
+          <h1 className="text-3xl font-bold text-black">ROI Withdrawal Schedules</h1>
+          <p className="mt-1 text-sm text-black">Manage withdrawal schedules for each package type</p>
         </div>
       </div>
 
@@ -230,8 +230,8 @@ export default function WithdrawalSchedulesPage() {
 
       <div className="bg-white shadow overflow-hidden sm:rounded-lg">
         <div className="px-4 py-5 sm:px-6 border-b border-gray-200">
-          <h3 className="text-lg font-medium text-gray-900">Package Schedules</h3>
-          <p className="mt-1 text-sm text-gray-500">
+          <h3 className="text-lg font-medium text-black">Package Schedules</h3>
+          <p className="mt-1 text-sm text-black">
             Configure when users can withdraw ROI based on their package type
           </p>
         </div>
@@ -241,13 +241,13 @@ export default function WithdrawalSchedulesPage() {
             <div key={pkg.packageName} className="p-6">
               <div className="flex items-start justify-between">
                 <div className="flex-1">
-                  <h4 className="text-lg font-semibold text-gray-900 mb-2">{pkg.packageName}</h4>
-                  <p className="text-sm text-gray-600 mb-4">{getScheduleDescription(pkg)}</p>
+                  <h4 className="text-lg font-semibold text-black mb-2">{pkg.packageName}</h4>
+                  <p className="text-sm text-black mb-4">{getScheduleDescription(pkg)}</p>
 
                   {editingPackage === pkg.packageName ? (
                     <div className="mt-4 space-y-4 bg-gray-50 p-4 rounded-lg">
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                        <label className="block text-sm font-medium text-black mb-2">
                           Schedule Type
                         </label>
                         <select
@@ -267,7 +267,7 @@ export default function WithdrawalSchedulesPage() {
                       </div>
 
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                        <label className="block text-sm font-medium text-black mb-2">
                           {formData.type === 'days_of_month' ? 'Days of Month' : 'Days of Week'}
                         </label>
                         <div className="flex flex-wrap gap-2 mb-2">
@@ -301,7 +301,7 @@ export default function WithdrawalSchedulesPage() {
                         </div>
                         <button
                           onClick={handleAddValue}
-                          className="px-4 py-2 text-sm bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition"
+                          className="px-4 py-2 text-sm bg-gray-200 text-black rounded-md hover:bg-gray-300 transition"
                         >
                           <Plus className="w-4 h-4 inline mr-1" />
                           Add {formData.type === 'days_of_month' ? 'Day' : 'Day of Week'}
@@ -316,7 +316,7 @@ export default function WithdrawalSchedulesPage() {
                           onChange={(e) => setFormData({ ...formData, enabled: e.target.checked })}
                           className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
                         />
-                        <label htmlFor={`enabled-${pkg.packageName}`} className="ml-2 text-sm text-gray-700">
+                        <label htmlFor={`enabled-${pkg.packageName}`} className="ml-2 text-sm text-black">
                           Enable this schedule (uncheck to allow daily withdrawals)
                         </label>
                       </div>
@@ -331,7 +331,7 @@ export default function WithdrawalSchedulesPage() {
                         </button>
                         <button
                           onClick={handleCancel}
-                          className="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500"
+                          className="px-4 py-2 bg-gray-200 text-black rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500"
                         >
                           Cancel
                         </button>

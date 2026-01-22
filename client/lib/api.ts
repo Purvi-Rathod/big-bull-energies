@@ -224,6 +224,31 @@ class ApiClient {
     });
   }
 
+  // KYC methods - Temporarily disabled
+  // async submitKYC(document: File, documentType: 'passport' | 'pan' | 'id_card', dateOfBirth: string) {
+  //   const formData = new FormData();
+  //   formData.append('document', document);
+  //   formData.append('documentType', documentType);
+  //   formData.append('dateOfBirth', dateOfBirth);
+  //   
+  //   return this.request<{ kyc: any }>('/user/kyc', {
+  //     method: 'POST',
+  //     body: formData,
+  //   });
+  // }
+
+  // async getUserKYC() {
+  //   // Add timestamp to prevent caching
+  //   return this.request<{ kyc: any }>(`/user/kyc?_t=${Date.now()}`, {
+  //     method: 'GET',
+  //     headers: {
+  //       'Cache-Control': 'no-cache, no-store, must-revalidate',
+  //       'Pragma': 'no-cache',
+  //       'Expires': '0',
+  //     },
+  //   });
+  // }
+
   async forgotPassword(userId: string) {
     return this.request<{ message: string }>('/auth/forgot-password', {
       method: 'POST',
@@ -527,11 +552,14 @@ class ApiClient {
   }
 
   // Admin User Management
-  async getAdminUsers(params?: { page?: number; limit?: number; search?: string }) {
+  async getAdminUsers(params?: { page?: number; limit?: number; search?: string; country?: string; startDate?: string; endDate?: string }) {
     const queryParams = new URLSearchParams();
     if (params?.page) queryParams.append('page', params.page.toString());
     if (params?.limit) queryParams.append('limit', params.limit.toString());
     if (params?.search) queryParams.append('search', params.search);
+    if (params?.country) queryParams.append('country', params.country);
+    if (params?.startDate) queryParams.append('startDate', params.startDate);
+    if (params?.endDate) queryParams.append('endDate', params.endDate);
     const query = queryParams.toString();
     return this.request<{ users: any[]; pagination: any }>(
       `/admin/users${query ? `?${query}` : ''}`,
@@ -557,6 +585,43 @@ class ApiClient {
     });
   }
 
+  // Admin KYC methods - Temporarily disabled
+  // async getAdminKYC(params?: { page?: number; limit?: number; status?: string; search?: string }) {
+  //   const queryParams = new URLSearchParams();
+  //   if (params?.page) queryParams.append('page', params.page.toString());
+  //   if (params?.limit) queryParams.append('limit', params.limit.toString());
+  //   if (params?.status) queryParams.append('status', params.status);
+  //   if (params?.search) queryParams.append('search', params.search);
+  //   // Add timestamp to prevent caching
+  //   queryParams.append('_t', Date.now().toString());
+  //   const query = queryParams.toString();
+  //   return this.request<{ kycRecords: any[]; pagination: any }>(
+  //     `/admin/kyc${query ? `?${query}` : ''}`,
+  //     { 
+  //       method: 'GET',
+  //       headers: {
+  //         'Cache-Control': 'no-cache, no-store, must-revalidate',
+  //         'Pragma': 'no-cache',
+  //         'Expires': '0',
+  //       },
+  //     }
+  //   );
+  // }
+
+  // async updateKYCStatus(kycId: string, status: 'approved' | 'rejected', rejectionReason?: string) {
+  //   // Add timestamp to prevent caching
+  //   const timestamp = Date.now();
+  //   return this.request<{ kyc: any }>(`/admin/kyc/${kycId}/status?_t=${timestamp}`, {
+  //     method: 'PUT',
+  //     headers: {
+  //       'Cache-Control': 'no-cache, no-store, must-revalidate',
+  //       'Pragma': 'no-cache',
+  //       'Expires': '0',
+  //     },
+  //     body: JSON.stringify({ status, rejectionReason }),
+  //   });
+  // }
+
   async deleteUser(userId: string) {
     return this.request<{ deletedUserId: string; deletedUserName: string }>(`/admin/users/${userId}`, {
       method: 'DELETE',
@@ -571,8 +636,12 @@ class ApiClient {
   }
 
   // Voucher Management (Admin)
-  async getAllVouchers() {
-    return this.request<{ vouchers: any[] }>('/admin/vouchers', {
+  async getAllVouchers(params?: { startDate?: string; endDate?: string }) {
+    const queryParams = new URLSearchParams();
+    if (params?.startDate) queryParams.append('startDate', params.startDate);
+    if (params?.endDate) queryParams.append('endDate', params.endDate);
+    const query = queryParams.toString();
+    return this.request<{ vouchers: any[] }>(`/admin/vouchers${query ? `?${query}` : ''}`, {
       method: 'GET',
     });
   }
@@ -633,11 +702,13 @@ class ApiClient {
     });
   }
 
-  async getAdminReports(params?: { type?: string; page?: number; limit?: number }) {
+  async getAdminReports(params?: { type?: string; page?: number; limit?: number; startDate?: string; endDate?: string }) {
     const queryParams = new URLSearchParams();
     if (params?.type) queryParams.append('type', params.type);
     if (params?.page) queryParams.append('page', params.page.toString());
     if (params?.limit) queryParams.append('limit', params.limit.toString());
+    if (params?.startDate) queryParams.append('startDate', params.startDate);
+    if (params?.endDate) queryParams.append('endDate', params.endDate);
     
     const query = queryParams.toString();
     return this.request<{
@@ -714,11 +785,27 @@ class ApiClient {
     });
   }
 
-  async getAllTickets(params?: { page?: number; limit?: number; status?: string }) {
+  async addFundsToWallet(data: { userId: string; walletType: string; amount: number; description?: string }) {
+    return this.request<{ userId: string; userName: string; walletType: string; amount: number; newBalance: number }>('/admin/wallet/add-funds', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  }
+
+  async removeFundsFromWallet(data: { userId: string; walletType: string; amount: number; description?: string }) {
+    return this.request<{ userId: string; userName: string; walletType: string; amount: number; newBalance: number }>('/admin/wallet/remove-funds', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  }
+
+  async getAllTickets(params?: { page?: number; limit?: number; status?: string; startDate?: string; endDate?: string }) {
     const queryParams = new URLSearchParams();
     if (params?.page) queryParams.append('page', params.page.toString());
     if (params?.limit) queryParams.append('limit', params.limit.toString());
     if (params?.status) queryParams.append('status', params.status);
+    if (params?.startDate) queryParams.append('startDate', params.startDate);
+    if (params?.endDate) queryParams.append('endDate', params.endDate);
     const query = queryParams.toString();
     return this.request<{ tickets: any[]; pagination: any }>(
       `/admin/tickets${query ? `?${query}` : ''}`,
@@ -746,11 +833,14 @@ class ApiClient {
     });
   }
 
-  async getAdminWithdrawals(params?: { page?: number; limit?: number; status?: string }) {
+  async getAdminWithdrawals(params?: { page?: number; limit?: number; status?: string; walletType?: string; startDate?: string; endDate?: string }) {
     const queryParams = new URLSearchParams();
     if (params?.page) queryParams.append('page', params.page.toString());
     if (params?.limit) queryParams.append('limit', params.limit.toString());
     if (params?.status) queryParams.append('status', params.status);
+    if (params?.walletType) queryParams.append('walletType', params.walletType);
+    if (params?.startDate) queryParams.append('startDate', params.startDate);
+    if (params?.endDate) queryParams.append('endDate', params.endDate);
     const query = queryParams.toString();
     return this.request<{ withdrawals: any[]; pagination: any }>(
       `/admin/withdrawals${query ? `?${query}` : ''}`,
@@ -908,6 +998,105 @@ class ApiClient {
   // Career Progress (User)
   async getUserCareerProgress() {
     return this.request<{ progress: any }>('/user/career-progress', {
+      method: 'GET',
+    });
+  }
+
+  // Target Completion Status
+  async getUserTargetStatus() {
+    return this.request<{
+      binaryTargetAmount: number;
+      targetStatus: 'pending' | 'completed';
+      withdrawEnabled: boolean;
+      leftBusiness: number;
+      rightBusiness: number;
+      totalBusiness: number;
+      isCompleted: boolean;
+      message?: string;
+    }>('/user/target-status', {
+      method: 'GET',
+    });
+  }
+
+  // Influencer Management (Admin)
+  async createPowerlegAccounts(data: {
+    influencerUserId: string;
+    accounts: Array<{
+      name: string;
+      email?: string;
+      phone?: string;
+      password: string;
+    }>;
+    packageId?: string;
+    amount?: number;
+  }) {
+    return this.request<{
+      createdAccounts: Array<{
+        userId: string;
+        name: string;
+        email?: string;
+        phone?: string;
+        investmentId?: string;
+      }>;
+      errors?: Array<{ index: number; userId?: string; error: string }>;
+    }>('/admin/influencer/powerleg/create', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  }
+
+  // Free Account Management (Admin)
+  async createFreeAccounts(data: {
+    influencerUserId: string;
+    accounts: Array<{
+      name: string;
+      email?: string;
+      phone?: string;
+      password: string;
+    }>;
+    binaryTargetAmount?: number;
+  }) {
+    return this.request<{
+      createdAccounts: Array<{
+        userId: string;
+        name: string;
+        email?: string;
+        phone?: string;
+      }>;
+      errors?: Array<{ index: number; error: string }>;
+    }>('/admin/influencer/free/create', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  }
+
+  // Binary Target Management (Admin)
+  async setBinaryTarget(userId: string, targetAmount: number) {
+    return this.request<{
+      userId: string;
+      userName: string;
+      binaryTargetAmount: number;
+      targetStatus: 'pending' | 'completed';
+      withdrawEnabled: boolean;
+    }>(`/admin/users/${userId}/set-binary-target`, {
+      method: 'POST',
+      body: JSON.stringify({ targetAmount }),
+    });
+  }
+
+  async getUserTargetStatusAdmin(userId: string) {
+    return this.request<{
+      userId: string;
+      userName: string;
+      binaryTargetAmount: number;
+      targetStatus: 'pending' | 'completed';
+      withdrawEnabled: boolean;
+      leftBusiness: number;
+      rightBusiness: number;
+      totalBusiness: number;
+      isCompleted: boolean;
+      message?: string;
+    }>(`/admin/users/${userId}/target-status`, {
       method: 'GET',
     });
   }

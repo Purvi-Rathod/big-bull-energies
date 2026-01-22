@@ -606,7 +606,7 @@ export default function SettingsPage() {
       <div className="flex items-center justify-center py-12">
         <div className="text-center">
           <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
-          <p className="mt-4 text-gray-600">Loading...</p>
+          <p className="mt-4 text-black">Loading...</p>
         </div>
       </div>
     );
@@ -615,8 +615,8 @@ export default function SettingsPage() {
   return (
     <div className="w-full space-y-6">
       <div className="mb-6">
-        <h1 className="text-3xl font-bold text-gray-900">Settings</h1>
-        <p className="mt-1 text-sm text-gray-500">Manage system settings and configurations</p>
+        <h1 className="text-3xl font-bold text-black">Settings</h1>
+        <p className="mt-1 text-sm text-black">Manage system settings and configurations</p>
       </div>
 
       {error && (
@@ -627,13 +627,13 @@ export default function SettingsPage() {
 
       {/* System Actions */}
       <div className="bg-white rounded-lg shadow p-6">
-        <h2 className="text-xl font-semibold text-gray-900 mb-4">System Actions</h2>
+        <h2 className="text-xl font-semibold text-black mb-4">System Actions</h2>
         <div className="space-y-4">
           <div className="space-y-4">
             <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
               <div>
-                <h3 className="text-lg font-medium text-gray-900">Trigger Daily Calculations</h3>
-                <p className="text-sm text-gray-600 mt-1">
+                <h3 className="text-lg font-medium text-black">Trigger Daily Calculations</h3>
+                <p className="text-sm text-black mt-1">
                   Manually trigger daily calculations for ROI, Binary, and Referral bonuses. 
                   Calculations run in the background and can be resumed if interrupted.
                 </p>
@@ -659,19 +659,19 @@ export default function SettingsPage() {
             {/* Job Status Display */}
             {jobStatus && (
               <div className={`p-4 border rounded-lg ${
-                jobStatus.status === 'completed' ? 'border-green-200 bg-green-50' :
-                jobStatus.status === 'failed' ? 'border-red-200 bg-red-50' :
-                jobStatus.status === 'processing' ? 'border-blue-200 bg-blue-50' :
-                'border-gray-200 bg-gray-50'
+                jobStatus.status === 'completed' ? 'border-2 border-green-300 bg-gradient-to-r from-green-100 to-emerald-100' :
+                jobStatus.status === 'failed' ? 'border-2 border-red-400 bg-gradient-to-r from-red-200 to-red-300' :
+                jobStatus.status === 'processing' ? 'border-2 border-blue-300 bg-gradient-to-r from-blue-100 to-cyan-100' :
+                'border-2 border-gray-300 bg-gradient-to-r from-gray-100 to-slate-100'
               }`}>
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
-                    <h4 className="font-semibold text-gray-900 mb-2">
+                    <h4 className="font-semibold text-black mb-2">
                       Job Status: <span className={`${
                         jobStatus.status === 'completed' ? 'text-green-600' :
                         jobStatus.status === 'failed' ? 'text-red-600' :
                         jobStatus.status === 'processing' ? 'text-blue-600' :
-                        'text-gray-600'
+                        'text-black'
                       }`}>
                         {jobStatus.status.toUpperCase()}
                       </span>
@@ -681,7 +681,7 @@ export default function SettingsPage() {
                     </h4>
                     {jobStatus.totalItems > 0 && (
                       <div className="mt-2">
-                        <div className="flex justify-between text-sm text-gray-600 mb-1">
+                        <div className="flex justify-between text-sm text-black mb-1">
                           <span>Progress: {jobStatus.processedItems || 0} / {jobStatus.totalItems}</span>
                           <span>{Math.round(((jobStatus.processedItems || 0) / jobStatus.totalItems) * 100)}%</span>
                         </div>
@@ -703,7 +703,7 @@ export default function SettingsPage() {
                       </div>
                     )}
                     {jobStatus.results && (
-                      <div className="mt-2 text-sm text-gray-600 space-y-1">
+                      <div className="mt-2 text-sm text-black space-y-1">
                         {jobStatus.results.roi && (
                           <div>
                             <strong>ROI:</strong> {jobStatus.results.roi.processed || 0} processed, {jobStatus.results.roi.errors || 0} errors
@@ -727,12 +727,12 @@ export default function SettingsPage() {
                       </div>
                     )}
                     {jobStatus.completedAt && (
-                      <div className="mt-2 text-xs text-gray-500">
+                      <div className="mt-2 text-xs text-black">
                         Completed at: {new Date(jobStatus.completedAt).toLocaleString()}
                       </div>
                     )}
                     {jobStatus.startedAt && jobStatus.status === 'processing' && (
-                      <div className="mt-2 text-xs text-gray-500">
+                      <div className="mt-2 text-xs text-black">
                         Started at: {new Date(jobStatus.startedAt).toLocaleString()}
                       </div>
                     )}
@@ -825,8 +825,8 @@ export default function SettingsPage() {
       <div className="bg-white rounded-lg shadow p-6">
         <div className="flex justify-between items-center mb-4">
           <div>
-            <h2 className="text-xl font-semibold text-gray-900">Payment Gateway Settings</h2>
-            <p className="text-sm text-gray-600 mt-1">Control NOWPayments gateway for development and testing</p>
+            <h2 className="text-xl font-semibold text-black">Payment Gateway Settings</h2>
+            <p className="text-sm text-black mt-1">Control NOWPayments gateway for development and testing</p>
           </div>
           <div className="flex items-center gap-4">
             <span className={`text-sm font-medium ${nowpaymentsEnabled ? 'text-green-600' : 'text-red-600'}`}>
@@ -860,8 +860,8 @@ export default function SettingsPage() {
       <div className="bg-white rounded-lg shadow p-6">
         <div className="flex justify-between items-center mb-4">
           <div>
-            <h2 className="text-xl font-semibold text-gray-900">Auth Rate Limiting</h2>
-            <p className="text-sm text-gray-600 mt-1">Control rate limiting for signup and login endpoints</p>
+            <h2 className="text-xl font-semibold text-black">Auth Rate Limiting</h2>
+            <p className="text-sm text-black mt-1">Control rate limiting for signup and login endpoints</p>
           </div>
           <div className="flex items-center gap-4">
             <span className={`text-sm font-medium ${rateLimitingEnabled ? 'text-green-600' : 'text-red-600'}`}>
@@ -973,8 +973,8 @@ export default function SettingsPage() {
 
       {/* ROI Withdrawal Schedules */}
       <div className="bg-white rounded-lg shadow p-6">
-        <h2 className="text-xl font-semibold text-gray-900 mb-4">ROI Withdrawal Schedules</h2>
-        <p className="text-sm text-gray-600 mb-6">
+        <h2 className="text-xl font-semibold text-black mb-4">ROI Withdrawal Schedules</h2>
+        <p className="text-sm text-black mb-6">
           Configure custom withdrawal schedules for each package. Leave empty to use default schedules.
         </p>
 
@@ -993,7 +993,7 @@ export default function SettingsPage() {
         {schedulesLoading ? (
           <div className="text-center py-8">
             <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
-            <p className="mt-2 text-gray-600">Loading schedules...</p>
+            <p className="mt-2 text-black">Loading schedules...</p>
           </div>
         ) : (
           <div className="space-y-4">
@@ -1002,12 +1002,12 @@ export default function SettingsPage() {
                 {editingPackage === pkg.packageId ? (
                   <div className="space-y-4">
                     <div>
-                      <h3 className="text-lg font-medium text-gray-900">{pkg.packageName}</h3>
-                      <p className="text-sm text-gray-500">Package ID: {pkg.packageId}</p>
+                      <h3 className="text-lg font-medium text-black">{pkg.packageName}</h3>
+                      <p className="text-sm text-black">Package ID: {pkg.packageId}</p>
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label className="block text-sm font-medium text-black mb-2">
                         Schedule Type
                       </label>
                       <select
@@ -1021,7 +1021,7 @@ export default function SettingsPage() {
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label className="block text-sm font-medium text-black mb-2">
                         {formData.type === 'days_of_month' ? 'Days of Month (1-31)' : 'Days of Week (0=Sunday, 6=Saturday)'}
                       </label>
                       <div className="flex flex-wrap gap-2">
@@ -1038,7 +1038,7 @@ export default function SettingsPage() {
                               className={`px-3 py-1 rounded-md text-sm font-medium transition ${
                                 formData.values.includes(day)
                                   ? 'bg-indigo-600 text-white'
-                                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                  : 'bg-gray-100 text-black hover:bg-gray-200'
                               }`}
                             >
                               {day}
@@ -1057,7 +1057,7 @@ export default function SettingsPage() {
                               className={`px-3 py-1 rounded-md text-sm font-medium transition ${
                                 formData.values.includes(index)
                                   ? 'bg-indigo-600 text-white'
-                                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                  : 'bg-gray-100 text-black hover:bg-gray-200'
                               }`}
                             >
                               {day}
@@ -1066,7 +1066,7 @@ export default function SettingsPage() {
                         )}
                       </div>
                       {formData.values.length > 0 && (
-                        <p className="mt-2 text-sm text-gray-600">
+                        <p className="mt-2 text-sm text-black">
                           Selected: {formData.type === 'days_of_month' 
                             ? formData.values.join(', ') 
                             : formData.values.map(d => ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][d]).join(', ')}
@@ -1082,7 +1082,7 @@ export default function SettingsPage() {
                         onChange={(e) => setFormData({ ...formData, enabled: e.target.checked })}
                         className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
                       />
-                      <label htmlFor={`enabled-${pkg.packageId}`} className="text-sm font-medium text-gray-700">
+                      <label htmlFor={`enabled-${pkg.packageId}`} className="text-sm font-medium text-black">
                         Enable this schedule
                       </label>
                     </div>
@@ -1096,7 +1096,7 @@ export default function SettingsPage() {
                       </button>
                       <button
                         onClick={handleCancelEdit}
-                        className="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500"
+                        className="px-4 py-2 bg-gray-200 text-black rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500"
                       >
                         Cancel
                       </button>
@@ -1113,8 +1113,8 @@ export default function SettingsPage() {
                 ) : (
                   <div className="flex items-center justify-between">
                     <div>
-                      <h3 className="text-lg font-medium text-gray-900">{pkg.packageName}</h3>
-                      <p className="text-sm text-gray-500 mt-1">
+                      <h3 className="text-lg font-medium text-black">{pkg.packageName}</h3>
+                      <p className="text-sm text-black mt-1">
                         {formatSchedule(pkg)}
                       </p>
                     </div>

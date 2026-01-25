@@ -16,6 +16,7 @@ import {
   approveWithdrawal,
   rejectWithdrawal,
   updateUserStatus,
+  updateUserProfile,
   deleteUser,
   flushAllInvestments,
   flushAllUserData,
@@ -44,6 +45,7 @@ import {
   getAllVouchers,
   createVoucherForUser,
   createPowerlegAccounts,
+  createPowerlegInvestment,
   createFreeAccounts,
   setBinaryTarget,
   getUserTargetStatus,
@@ -113,6 +115,7 @@ router.post("/calculation-job/:jobId/resume", requireAdminAuth, resumeCalculatio
 router.get("/users", requireAdminAuth, getAllUsers);
 router.post("/impersonate/:userId", requireAdminAuth, impersonateUser);
 router.put("/users/:userId/status", requireAdminAuth, updateUserStatus);
+router.put("/users/:userId/profile", requireAdminAuth, updateUserProfile);
 router.put("/users/:userId/password", requireAdminAuth, changeUserPassword); // SECURITY FIX: Now requires admin auth
 router.delete("/users/:userId", requireAdminAuth, deleteUser);
 
@@ -144,6 +147,7 @@ router.post("/wallet/remove-funds", requireAdminAuth, removeFundsFromWallet);
 
 // Influencer management
 router.post("/influencer/powerleg/create", requireAdminAuth, createPowerlegAccounts);
+router.post("/influencer/powerleg/investment", requireAdminAuth, createPowerlegInvestment);
 router.post("/influencer/free/create", requireAdminAuth, createFreeAccounts);
 
 // Binary target management

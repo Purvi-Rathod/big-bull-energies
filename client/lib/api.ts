@@ -585,6 +585,25 @@ class ApiClient {
     });
   }
 
+  async updateUserProfile(userId: string, data: {
+    name?: string;
+    email?: string;
+    phone?: string;
+    country?: string;
+    walletAddress?: string;
+    bankAccount?: {
+      accountNumber?: string;
+      bankName?: string;
+      ifscCode?: string;
+      accountHolderName?: string;
+    };
+  }) {
+    return this.request<{ user: any }>(`/admin/users/${userId}/profile`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    });
+  }
+
   // Admin KYC methods - Temporarily disabled
   // async getAdminKYC(params?: { page?: number; limit?: number; status?: string; search?: string }) {
   //   const queryParams = new URLSearchParams();
@@ -1040,6 +1059,17 @@ class ApiClient {
       }>;
       errors?: Array<{ index: number; userId?: string; error: string }>;
     }>('/admin/influencer/powerleg/create', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  }
+
+  async createPowerlegInvestment(data: {
+    userId: string;
+    packageId: string;
+    amount: number;
+  }) {
+    return this.request<{ investment: any }>('/admin/influencer/powerleg/investment', {
       method: 'POST',
       body: JSON.stringify(data),
     });

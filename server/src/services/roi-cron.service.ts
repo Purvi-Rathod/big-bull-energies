@@ -138,10 +138,9 @@ export async function calculateDailyROI() {
           continue;
         }
 
-        // Skip ROI calculation for powerleg accounts (they only earn binary income)
-        const user = await User.findById(investment.user);
-        if (user && user.accountType === "powerleg") {
-          console.log(`[ROI Cron] Skipping ROI for powerleg account: ${user.userId}`);
+        // Skip ROI calculation for powerleg investments (they only earn binary income)
+        if (investment.type === "powerleg") {
+          console.log(`[ROI Cron] Skipping ROI for powerleg investment: ${investment._id}`);
           continue;
         }
 

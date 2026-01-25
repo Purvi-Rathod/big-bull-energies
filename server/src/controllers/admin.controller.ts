@@ -1019,6 +1019,112 @@ export const updateUserStatus = asyncHandler(async (req, res) => {
 });
 
 /**
+ * Update user profile (admin only - can update all fields including email and walletAddress)
+ * PUT /api/v1/admin/users/:userId/profile
+ */
+export const updateUserProfile = asyncHandler(async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const { name, email, phone, country, walletAddress, bankAccount } = (req as any).body as {
+      name?: string;
+      email?: string;
+      phone?: string;
+      country?: string;
+      walletAddress?: string;
+      bankAccount?: {
+        accountNumber?: string;
+        bankName?: string;
+        ifscCode?: string;
+        accountHolderName?: string;
+      };
+    };
+
+    // Find user by userId
+    const user = await User.findOne({ userId });
+    if (!user) {
+      throw new AppError("User not found", 404);
+    }
+
+    // Prevent updating admin user profile
+    if (user.userId === "CROWN-000000" || user.userId === "CNEOX-000000") {
+      throw new AppError("Cannot update admin user profile", 403);
+    }
+
+    const updateData: any = {};
+
+    if (typeof name === "string" && name.trim().length > 0) {
+      updateData.name = name.trim();
+    }
+
+    if (email !== undefined) {
+      // Validate email format
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (email && !emailRegex.test(email)) {
+        throw new AppError("Invalid email format", 400);
+      }
+      // Check if email is already taken by another user
+      if (email) {
+        const existingUser = await User.findOne({ email, _id: { $ne: user._id } });
+        if (existingUser) {
+          throw new AppError("Email is already taken by another user", 400);
+        }
+      }
+      updateData.email = email;
+    }
+
+    if (phone !== undefined) {
+      // Basic phone validation (optional)
+      if (phone && !/^[0-9+\-\s]+$/.test(phone)) {
+        throw new AppError("Invalid phone number format", 400);
+      }
+      updateData.phone = phone;
+    }
+
+    if (typeof country === "string" && country.trim().length > 0) {
+      updateData.country = country.trim();
+    }
+
+    if (walletAddress !== undefined) {
+      updateData.walletAddress = walletAddress;
+    }
+
+    if (bankAccount !== undefined) {
+      updateData.bankAccount = {
+        accountNumber: bankAccount.accountNumber || "",
+        bankName: bankAccount.bankName || "",
+        ifscCode: bankAccount.ifscCode || "",
+        accountHolderName: bankAccount.accountHolderName || "",
+      };
+    }
+
+    // Update user
+    Object.assign(user, updateData);
+    await user.save();
+
+    const response = res as any;
+    response.status(200).json({
+      status: "success",
+      message: "User profile updated successfully",
+      data: {
+        user: {
+          id: user._id,
+          userId: user.userId,
+          name: user.name,
+          email: user.email,
+          phone: user.phone,
+          country: user.country,
+          walletAddress: user.walletAddress,
+          bankAccount: user.bankAccount,
+          status: user.status,
+        },
+      },
+    });
+  } catch (error: any) {
+    throw new AppError(error.message || "Failed to update user profile", 500);
+  }
+});
+
+/**
  * Delete user and all related data
  * DELETE /api/v1/admin/users/:userId
  */
@@ -2905,6 +3011,165 @@ export const createPowerlegAccounts = asyncHandler(async (req, res) => {
       influencerName: influencer.name,
       createdAccounts,
       errors: errors.length > 0 ? errors : undefined,
+    },
+  });
+});
+
+/**
+ * Admin: Create Powerleg Investment for existing user
+ * POST /api/v1/admin/influencer/powerleg/investment
+ */
+export const createPowerlegInvestment = asyncHandler(async (req, res) => {
+  const { userId, packageId, amount } = (req as any).body as {
+    userId: string;
+    packageId: string;
+    amount: number;
+  };
+
+  if (!userId || !packageId || !amount) {
+    throw new AppError("User ID, Package ID, and Amount are required", 400);
+  }
+
+  if (amount <= 0) {
+    throw new AppError("Amount must be greater than 0", 400);
+  }
+
+  // Find user by userId
+  const user = await findUserByUserId(userId);
+  if (!user) {
+    throw new AppError("User not found", 404);
+  }
+
+  // Validate package
+  if (!Types.ObjectId.isValid(packageId)) {
+    throw new AppError("Invalid package ID", 400);
+  }
+  const packageData = await Package.findById(packageId);
+  if (!packageData) {
+    throw new AppError("Package not found", 404);
+  }
+
+  // Validate amount
+  const minAmount = parseFloat(packageData.minAmount.toString());
+  const maxAmount = parseFloat(packageData.maxAmount.toString());
+  if (amount < minAmount || amount > maxAmount) {
+    throw new AppError(`Amount must be between $${minAmount} and $${maxAmount}`, 400);
+  }
+
+  // Import required modules
+  const { Investment } = await import("../models/Investment");
+  const { Wallet } = await import("../models/Wallet");
+  const { WalletType } = await import("../models/types");
+  const { createInvestmentTransaction } = await import("../services/transaction.service");
+  const { addBusinessVolumeUpTree } = await import("../services/investment.service");
+  const { BinaryTree } = await import("../models/BinaryTree");
+
+  // Activate user if inactive
+  if (user.status === "inactive") {
+    user.status = "active";
+    await user.save();
+  }
+
+  // Get user's binary tree
+  let userTree = await BinaryTree.findOne({ user: user._id });
+  if (!userTree) {
+    throw new AppError("User binary tree not found. User must be properly initialized.", 400);
+  }
+
+  // Determine position
+  let position: "left" | "right" = "left";
+  if (user.position) {
+    position = user.position as "left" | "right";
+  }
+
+  // Get package configuration
+  const durationDays = packageData.duration || 150;
+  const totalOutputPct = packageData.totalOutputPct || packageData.roi || 225;
+  
+  // Calculate daily ROI rate (even though it won't be used for ROI calculations)
+  let dailyRoiRate: number;
+  if (packageData.roi && packageData.roi > 0) {
+    dailyRoiRate = packageData.roi / 100;
+  } else if (packageData.totalOutputPct && packageData.totalOutputPct > 0) {
+    dailyRoiRate = (packageData.totalOutputPct / 100) / durationDays;
+  } else {
+    dailyRoiRate = 0.0175; // Default
+  }
+
+  // Calculate dates
+  const startDate = new Date();
+  const endDate = new Date();
+  endDate.setDate(endDate.getDate() + durationDays);
+
+  // Create powerleg investment (type = "powerleg")
+  const investment = await Investment.create({
+    user: user._id,
+    sponsor: user.referrer || undefined,
+    packageId: new Types.ObjectId(packageId),
+    investedAmount: Types.Decimal128.fromString(amount.toString()),
+    principal: Types.Decimal128.fromString(amount.toString()),
+    depositAmount: Types.Decimal128.fromString(amount.toString()),
+    type: "powerleg", // CRITICAL: Set type to "powerleg"
+    isBinaryUpdated: false,
+    referralPaid: false, // No referral bonus for powerleg investments
+    startDate,
+    endDate,
+    durationDays,
+    totalOutputPct,
+    dailyRoiRate,
+    daysElapsed: 0,
+    daysRemaining: durationDays,
+    expiresOn: endDate,
+    lastRoiDate: null,
+    totalRoiEarned: Types.Decimal128.fromString("0"),
+    totalReinvested: Types.Decimal128.fromString("0"),
+    isActive: true,
+  });
+
+  // Add investment amount to user's investment wallet
+  const investmentWallet = await Wallet.findOne({ user: user._id, type: WalletType.INVESTMENT });
+  if (investmentWallet) {
+    const currentBalance = parseFloat(investmentWallet.balance.toString());
+    investmentWallet.balance = Types.Decimal128.fromString((currentBalance + amount).toString());
+    await investmentWallet.save();
+  }
+
+  // Create investment transaction
+  await createInvestmentTransaction(
+    user._id as Types.ObjectId,
+    amount,
+    investment._id.toString()
+  );
+
+  // Add business volume up the tree (for binary calculations)
+  // Powerleg investments DO contribute to binary bonuses for upliners
+  // Pass isPowerleg=true to track powerleg BV separately (excluded from career levels)
+  await addBusinessVolumeUpTree(
+    user._id as Types.ObjectId,
+    amount,
+    position,
+    true // isPowerleg = true
+  );
+
+  // Mark investment as binary updated
+  investment.isBinaryUpdated = true;
+  await investment.save();
+
+  const response = res as any;
+  response.status(201).json({
+    status: "success",
+    message: "Powerleg investment created successfully",
+    data: {
+      investment: {
+        id: investment._id,
+        userId: user.userId,
+        userName: user.name,
+        packageName: packageData.packageName,
+        amount,
+        type: "powerleg",
+        startDate,
+        endDate,
+      },
     },
   });
 });

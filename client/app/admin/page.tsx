@@ -34,6 +34,21 @@ export default function AdminPanel() {
   const [deleteConfirm, setDeleteConfirm] = useState<{ userId: string; userName: string } | null>(null);
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const [updatingStatus, setUpdatingStatus] = useState<string | null>(null);
+  const [editingUser, setEditingUser] = useState<User | null>(null);
+  const [updatingProfile, setUpdatingProfile] = useState(false);
+  const [profileFormData, setProfileFormData] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    country: '',
+    walletAddress: '',
+    bankAccount: {
+      accountNumber: '',
+      bankName: '',
+      ifscCode: '',
+      accountHolderName: '',
+    },
+  });
 
   // Route protection is handled in layout
 
@@ -130,6 +145,60 @@ export default function AdminPanel() {
       console.error(`Error ${action}ing user:`, err);
     } finally {
       setUpdatingStatus(null);
+    }
+  };
+
+  const handleEditProfile = (user: User) => {
+    setEditingUser(user);
+    setProfileFormData({
+      name: user.name || '',
+      email: user.email || '',
+      phone: user.phone || '',
+      country: user.country || '',
+      walletAddress: '',
+      bankAccount: {
+        accountNumber: '',
+        bankName: '',
+        ifscCode: '',
+        accountHolderName: '',
+      },
+    });
+    setOpenDropdown(null);
+  };
+
+  const handleUpdateProfile = async () => {
+    if (!editingUser) return;
+
+    try {
+      setUpdatingProfile(true);
+      await api.updateUserProfile(editingUser.userId, profileFormData);
+      toast.success('User profile updated successfully!');
+      setEditingUser(null);
+      await fetchUsers();
+    } catch (err: any) {
+      toast.error(err.message || 'Failed to update user profile');
+      console.error('Error updating user profile:', err);
+    } finally {
+      setUpdatingProfile(false);
+    }
+  };
+
+  const handleProfileFormChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    if (name.startsWith('bankAccount.')) {
+      const field = name.split('.')[1];
+      setProfileFormData(prev => ({
+        ...prev,
+        bankAccount: {
+          ...prev.bankAccount,
+          [field]: value,
+        },
+      }));
+    } else {
+      setProfileFormData(prev => ({
+        ...prev,
+        [name]: value,
+      }));
     }
   };
 
@@ -431,6 +500,19 @@ export default function AdminPanel() {
                                   <button
                                     onClick={(e) => {
                                       e.stopPropagation();
+                                      handleEditProfile(user);
+                                    }}
+                                    disabled={user.userId === 'CROWN-000000' || user.userId === 'CROWN-000000'}
+                                    className="w-full text-left px-4 py-2 text-sm text-blue-600 hover:bg-blue-50 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                                  >
+                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                    </svg>
+                                    Update Profile
+                                  </button>
+                                  <button
+                                    onClick={(e) => {
+                                      e.stopPropagation();
                                       handleDeactivate(user.userId, user.status);
                                     }}
                                     disabled={updatingStatus === user.userId || user.userId === 'CROWN-000000' || user.userId === 'CROWN-000000'}
@@ -540,6 +622,165 @@ export default function AdminPanel() {
                   {deletingUserId === deleteConfirm.userId ? 'Deleting...' : 'Delete User'}
                 </button>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Update Profile Modal */}
+      {editingUser && (
+        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50 flex items-center justify-center p-4">
+          <div className="relative bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
+              <h3 className="text-lg font-semibold text-black">Update User Profile</h3>
+              <button
+                onClick={() => setEditingUser(null)}
+                className="text-gray-400 hover:text-gray-600"
+                disabled={updatingProfile}
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            <div className="p-6">
+              <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-md">
+                <p className="text-sm text-blue-800">
+                  <strong>User:</strong> {editingUser.name} ({editingUser.userId})
+                </p>
+              </div>
+
+              <form onSubmit={(e) => { e.preventDefault(); handleUpdateProfile(); }} className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-black mb-1">Name</label>
+                  <input
+                    type="text"
+                    name="name"
+                    value={profileFormData.name}
+                    onChange={handleProfileFormChange}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-md text-black bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-black mb-1">Email</label>
+                  <input
+                    type="email"
+                    name="email"
+                    value={profileFormData.email}
+                    onChange={handleProfileFormChange}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-md text-black bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-black mb-1">Phone</label>
+                  <input
+                    type="text"
+                    name="phone"
+                    value={profileFormData.phone}
+                    onChange={handleProfileFormChange}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-md text-black bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-black mb-1">Country</label>
+                  <select
+                    name="country"
+                    value={profileFormData.country}
+                    onChange={handleProfileFormChange}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-md text-black bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  >
+                    <option value="">Select Country</option>
+                    {countries.map((country) => (
+                      <option key={country.code} value={country.name}>
+                        {country.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-black mb-1">Wallet Address</label>
+                  <input
+                    type="text"
+                    name="walletAddress"
+                    value={profileFormData.walletAddress}
+                    onChange={handleProfileFormChange}
+                    placeholder="Enter wallet address"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-md text-black bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  />
+                </div>
+
+                <div className="border-t border-gray-200 pt-4">
+                  <h4 className="text-sm font-semibold text-black mb-3">Bank Account Details (Optional)</h4>
+                  <div className="space-y-3">
+                    <div>
+                      <label className="block text-sm font-medium text-black mb-1">Account Number</label>
+                      <input
+                        type="text"
+                        name="bankAccount.accountNumber"
+                        value={profileFormData.bankAccount.accountNumber}
+                        onChange={handleProfileFormChange}
+                        className="w-full px-4 py-2 border border-gray-300 rounded-md text-black bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-black mb-1">Bank Name</label>
+                      <input
+                        type="text"
+                        name="bankAccount.bankName"
+                        value={profileFormData.bankAccount.bankName}
+                        onChange={handleProfileFormChange}
+                        className="w-full px-4 py-2 border border-gray-300 rounded-md text-black bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                      />
+                    </div>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <label className="block text-sm font-medium text-black mb-1">IFSC Code</label>
+                        <input
+                          type="text"
+                          name="bankAccount.ifscCode"
+                          value={profileFormData.bankAccount.ifscCode}
+                          onChange={handleProfileFormChange}
+                          className="w-full px-4 py-2 border border-gray-300 rounded-md text-black bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-black mb-1">Account Holder Name</label>
+                        <input
+                          type="text"
+                          name="bankAccount.accountHolderName"
+                          value={profileFormData.bankAccount.accountHolderName}
+                          onChange={handleProfileFormChange}
+                          className="w-full px-4 py-2 border border-gray-300 rounded-md text-black bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex gap-3 pt-4 border-t border-gray-200">
+                  <button
+                    type="button"
+                    onClick={() => setEditingUser(null)}
+                    disabled={updatingProfile}
+                    className="flex-1 px-4 py-2 bg-gray-200 text-black rounded-md hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed font-medium"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={updatingProfile}
+                    className="flex-1 px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed font-medium"
+                  >
+                    {updatingProfile ? 'Updating...' : 'Update Profile'}
+                  </button>
+                </div>
+              </form>
             </div>
           </div>
         </div>

@@ -283,6 +283,8 @@ export async function initializeBinaryTree(userId: Types.ObjectId, referrerId?: 
       rightChild: null,
       leftBusiness: "0",
       rightBusiness: "0",
+      leftPowerlegBusiness: "0",
+      rightPowerlegBusiness: "0",
       leftCarry: "0",
       rightCarry: "0",
       leftDownlines: 0,

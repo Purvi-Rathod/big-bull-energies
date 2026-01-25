@@ -20,9 +20,17 @@ export async function checkAndAwardCareerLevels(userId: Types.ObjectId): Promise
       return; // No tree, no business volume
     }
 
+    // Get regular business volume (excluding powerleg BV)
+    // Powerleg investments should NOT trigger career level rewards
     const leftBusiness = parseFloat(userTree.leftBusiness.toString());
     const rightBusiness = parseFloat(userTree.rightBusiness.toString());
-    const totalBusinessVolume = leftBusiness + rightBusiness;
+    const leftPowerlegBV = parseFloat((userTree.leftPowerlegBusiness || Types.Decimal128.fromString("0")).toString());
+    const rightPowerlegBV = parseFloat((userTree.rightPowerlegBusiness || Types.Decimal128.fromString("0")).toString());
+    
+    // Calculate business volume excluding powerleg (for career level eligibility)
+    const leftBusinessExcludingPowerleg = leftBusiness - leftPowerlegBV;
+    const rightBusinessExcludingPowerleg = rightBusiness - rightPowerlegBV;
+    const totalBusinessVolume = leftBusinessExcludingPowerleg + rightBusinessExcludingPowerleg;
 
     // Get all active career levels, sorted by level (ascending)
     const activeLevels = await CareerLevel.find({ status: "Active" })
@@ -45,7 +53,7 @@ export async function checkAndAwardCareerLevels(userId: Types.ObjectId): Promise
       });
     }
 
-    // Update total business volume
+    // Update total business volume (excluding powerleg BV for career level eligibility)
     userProgress.totalBusinessVolume = Types.Decimal128.fromString(totalBusinessVolume.toString());
 
     if (activeLevels.length === 0) {
@@ -87,7 +95,8 @@ export async function checkAndAwardCareerLevels(userId: Types.ObjectId): Promise
       
       // CRITICAL: Career level rewards should only trigger when BOTH sides (left AND right) meet the business volume threshold
       // Both leftBusiness and rightBusiness must be >= levelThreshold
-      if (!isAlreadyCompleted && leftBusiness >= levelThreshold && rightBusiness >= levelThreshold) {
+      // IMPORTANT: Use business volume EXCLUDING powerleg BV (powerleg investments don't trigger career levels)
+      if (!isAlreadyCompleted && leftBusinessExcludingPowerleg >= levelThreshold && rightBusinessExcludingPowerleg >= levelThreshold) {
         const rewardAmount = parseFloat(level.rewardAmount.toString());
 
         // Award the reward to career level wallet

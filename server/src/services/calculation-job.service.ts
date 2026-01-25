@@ -282,10 +282,9 @@ async function calculateDailyROIResumable(job: ICalculationJob) {
           continue;
         }
 
-        // Skip ROI calculation for powerleg accounts (they only earn binary income)
-        const user = await User.findById(investment.user);
-        if (user && user.accountType === "powerleg") {
-          console.log(`[Calculation Job] Skipping ROI for powerleg account: ${user.userId}`);
+        // Skip ROI calculation for powerleg investments (they only earn binary income)
+        if (investment.type === "powerleg") {
+          console.log(`[Calculation Job] Skipping ROI for powerleg investment: ${investment._id}`);
           job.processedInvestmentIds.push(investment._id as Types.ObjectId);
           continue;
         }

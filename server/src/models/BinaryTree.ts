@@ -9,6 +9,8 @@ export interface IBinaryTree extends Document {
   rightChild?: Types.ObjectId | null;
   leftBusiness: Types.Decimal128; // Cumulative business volume (never decreases)
   rightBusiness: Types.Decimal128; // Cumulative business volume (never decreases)
+  leftPowerlegBusiness: Types.Decimal128; // Powerleg business volume (excluded from career levels)
+  rightPowerlegBusiness: Types.Decimal128; // Powerleg business volume (excluded from career levels)
   leftCarry: Types.Decimal128; // Unmatched portion (recalculated on binary calculation)
   rightCarry: Types.Decimal128; // Unmatched portion (recalculated on binary calculation)
   leftMatched: Types.Decimal128; // Amount matched from leftBusiness (for tracking)
@@ -26,6 +28,8 @@ const BinaryTreeSchema = new Schema<IBinaryTree>({
   rightChild: { type: Schema.Types.ObjectId, ref: "User" },
   leftBusiness: { type: Schema.Types.Decimal128, default: "0" }, // Cumulative business volume (never decreases)
   rightBusiness: { type: Schema.Types.Decimal128, default: "0" }, // Cumulative business volume (never decreases)
+  leftPowerlegBusiness: { type: Schema.Types.Decimal128, default: "0" }, // Powerleg business volume (excluded from career levels)
+  rightPowerlegBusiness: { type: Schema.Types.Decimal128, default: "0" }, // Powerleg business volume (excluded from career levels)
   leftCarry: { type: Schema.Types.Decimal128, default: "0" }, // Unmatched portion (recalculated on binary calculation)
   rightCarry: { type: Schema.Types.Decimal128, default: "0" }, // Unmatched portion (recalculated on binary calculation)
   leftMatched: { type: Schema.Types.Decimal128, default: "0" }, // Amount matched from leftBusiness (for tracking)

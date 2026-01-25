@@ -188,7 +188,8 @@ export async function calculateDailyBinaryBonuses() {
 export async function addBusinessVolume(
   userId: Types.ObjectId,
   amount: number,
-  position: "left" | "right"
+  position: "left" | "right",
+  isPowerleg: boolean = false
 ) {
   try {
     const userTree = await BinaryTree.findOne({ user: userId });
@@ -196,7 +197,7 @@ export async function addBusinessVolume(
       throw new AppError("User binary tree not found", 404);
     }
 
-    // Add BV to the specified leg's business
+    // Add BV to the specified leg's business (always add to regular BV for binary bonuses)
     const currentBusiness = position === "left" 
       ? parseFloat(userTree.leftBusiness.toString())
       : parseFloat(userTree.rightBusiness.toString());
@@ -205,8 +206,18 @@ export async function addBusinessVolume(
     
     if (position === "left") {
       userTree.leftBusiness = Types.Decimal128.fromString(newBusiness.toString());
+      // Also track powerleg BV separately if it's a powerleg investment
+      if (isPowerleg) {
+        const currentPowerlegBV = parseFloat((userTree.leftPowerlegBusiness || Types.Decimal128.fromString("0")).toString());
+        userTree.leftPowerlegBusiness = Types.Decimal128.fromString((currentPowerlegBV + amount).toString());
+      }
     } else {
       userTree.rightBusiness = Types.Decimal128.fromString(newBusiness.toString());
+      // Also track powerleg BV separately if it's a powerleg investment
+      if (isPowerleg) {
+        const currentPowerlegBV = parseFloat((userTree.rightPowerlegBusiness || Types.Decimal128.fromString("0")).toString());
+        userTree.rightPowerlegBusiness = Types.Decimal128.fromString((currentPowerlegBV + amount).toString());
+      }
     }
 
     await userTree.save();
@@ -691,7 +702,8 @@ export async function processInvestment(
     await addBusinessVolumeUpTree(
       userId, 
       amount, 
-      position
+      position,
+      false // Regular investment, not powerleg
     );
     console.log(`[Investment Service] ✅ Business volume added to parent tree`);
 
@@ -723,10 +735,11 @@ export async function processInvestment(
  * Binary bonuses are NOT calculated here - they are calculated daily via cron job
  * Only referral bonuses are calculated immediately at investment time
  */
-async function addBusinessVolumeUpTree(
+export async function addBusinessVolumeUpTree(
   userId: Types.ObjectId,
   amount: number,
-  position: "left" | "right"
+  position: "left" | "right",
+  isPowerleg: boolean = false
 ) {
   try {
     let currentUserId = userId;
@@ -754,10 +767,12 @@ async function addBusinessVolumeUpTree(
         
         // Add BV to parent's leg (Business Volume)
         // Binary bonus will be calculated in daily cron job
+        // Pass isPowerleg flag to track powerleg BV separately
         await addBusinessVolume(
           currentTree.parent,
           amount,
-          parentPosition
+          parentPosition,
+          isPowerleg
         );
 
         // Move up to parent for next iteration
@@ -773,7 +788,8 @@ async function addBusinessVolumeUpTree(
           await addBusinessVolume(
             currentTree.parent,
             amount,
-            adminPosition
+            adminPosition,
+            isPowerleg
           );
           break;
         } else {

@@ -1063,12 +1063,7 @@ export const updateUserProfile = asyncHandler(async (req, res) => {
         throw new AppError("Invalid email format", 400);
       }
       // Check if email is already taken by another user
-      if (email) {
-        const existingUser = await User.findOne({ email, _id: { $ne: user._id } });
-        if (existingUser) {
-          throw new AppError("Email is already taken by another user", 400);
-        }
-      }
+     
       updateData.email = email;
     }
 

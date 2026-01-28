@@ -376,7 +376,7 @@ class ApiClient {
     });
   }
 
-  async createInvestment(data: { packageId: string; amount: number; currency?: string; paymentId?: string; voucherId?: string }) {
+  async createInvestment(data: { packageId: string; amount: number; currency?: string; paymentId?: string; voucherId?: string; useMainWallet?: boolean }) {
     return this.request<{ investment: any; payment: any; wallets: any[]; binaryTree: any }>('/user/invest', {
       method: 'POST',
       body: JSON.stringify(data),
@@ -384,7 +384,7 @@ class ApiClient {
   }
 
   // NOWPayments integration
-  async createPayment(data: { packageId: string; amount: number; currency?: string; voucherId?: string }) {
+  async createPayment(data: { packageId: string; amount: number; currency?: string; voucherId?: string; useMainWallet?: boolean }) {
     return this.request<{ payment?: any; orderId?: string; voucher?: any; remainingAmount?: number; investment?: any }>('/payment/create', {
       method: 'POST',
       body: JSON.stringify(data),

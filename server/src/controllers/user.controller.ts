@@ -125,7 +125,7 @@ export const createInvestment = asyncHandler(async (req, res) => {
   }
 
   const body = req.body;
-  const { packageId, amount, currency = "USD", paymentId, voucherId } = body;
+  const { packageId, amount, currency = "USD", paymentId, voucherId, useMainWallet } = body;
 
   if (!packageId || !amount) {
     throw new AppError("Package ID and amount are required", 400);
@@ -139,8 +139,54 @@ export const createInvestment = asyncHandler(async (req, res) => {
   let paymentResult: any = null;
   let finalVoucherId = voucherId;
 
-  // If paymentId is provided (from NOWPayments), use it. Otherwise, process mock payment.
-  if (paymentId) {
+  // If useMainWallet is true, check and deduct from main wallet
+  if (useMainWallet) {
+    const { Wallet } = await import("../models/Wallet");
+    const { createWalletTransaction } = await import("../services/transaction.service");
+    
+    // Get user's main wallet
+    const mainWallet = await Wallet.findOne({ 
+      user: userId, 
+      type: WalletType.MAIN 
+    });
+    
+    if (!mainWallet) {
+      throw new AppError("Main wallet not found. Please contact support.", 404);
+    }
+    
+    const mainWalletBalance = parseFloat(mainWallet.balance.toString());
+    const investmentAmount = Number(amount);
+    
+    if (mainWalletBalance < investmentAmount) {
+      throw new AppError(
+        `Insufficient balance in main wallet. Available: $${mainWalletBalance.toFixed(2)}, Required: $${investmentAmount.toFixed(2)}`,
+        400
+      );
+    }
+    
+    // Deduct from main wallet
+    const newBalance = mainWalletBalance - investmentAmount;
+    mainWallet.balance = Types.Decimal128.fromString(newBalance.toString());
+    await mainWallet.save();
+    
+    // Create transaction record
+    await createWalletTransaction(
+      new Types.ObjectId(userId),
+      WalletType.MAIN,
+      "debit",
+      investmentAmount,
+      `main-wallet-${Date.now()}-${userId}`,
+      { description: `Investment package activation - $${investmentAmount}` }
+    );
+    
+    // Use a special payment ID format for main wallet payments
+    finalPaymentId = `main-wallet-${Date.now()}-${userId}`;
+    paymentResult = {
+      paymentId: finalPaymentId,
+      status: "completed",
+      method: "main_wallet",
+    };
+  } else if (paymentId) {
     // Check if investment already exists for this paymentId (prevent duplicates)
     const existingInvestment = await Investment.findOne({ voucherId: paymentId });
     if (existingInvestment) {

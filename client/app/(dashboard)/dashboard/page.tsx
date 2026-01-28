@@ -174,6 +174,7 @@ export default function DashboardPage() {
       token: 'Token',
       investment: 'Investment',
       career_level: 'Career Level',
+      main: 'Main Wallet',
     };
     return names[type] || type;
   };

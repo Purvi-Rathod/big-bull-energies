@@ -39,13 +39,29 @@ function InvestContent() {
   const [availableVouchers, setAvailableVouchers] = useState<any[]>([]);
   const [selectedVoucherId, setSelectedVoucherId] = useState<string | null>(null);
   const [loadingVouchers, setLoadingVouchers] = useState(false);
+  const [mainWalletBalance, setMainWalletBalance] = useState<number | null>(null);
+  const [useMainWallet, setUseMainWallet] = useState(false);
 
   useEffect(() => {
     if (packageId) {
       fetchPackage();
       fetchAvailableVouchers();
+      fetchMainWalletBalance();
     }
   }, [packageId]);
+
+  const fetchMainWalletBalance = async () => {
+    try {
+      const response = await api.getUserWallets();
+      if (response.data?.wallets) {
+        const mainWallet = response.data.wallets.find((w: any) => w.type === 'main');
+        setMainWalletBalance(mainWallet ? mainWallet.balance : 0);
+      }
+    } catch (err) {
+      console.error('Failed to fetch main wallet balance:', err);
+      setMainWalletBalance(0);
+    }
+  };
 
   const fetchAvailableVouchers = async () => {
     try {
@@ -177,6 +193,7 @@ function InvestContent() {
         amount,
         currency: 'USD',
         voucherId: selectedVoucherId || undefined,
+        useMainWallet: useMainWallet, // Pass user's choice
       });
 
       // Check if investment was created directly (payment gateway disabled)
@@ -413,6 +430,61 @@ function InvestContent() {
                   </div>
                 )}
 
+                {/* Main Wallet Option */}
+                {mainWalletBalance !== null && mainWalletBalance > 0 && (
+                  <div className="mb-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
+                    <label className="flex items-start cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={useMainWallet}
+                        onChange={(e) => setUseMainWallet(e.target.checked)}
+                        className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded mt-1"
+                      />
+                      <div className="ml-3 flex-1">
+                        <span className="text-sm font-medium text-gray-900">
+                          Use Main Wallet Balance
+                        </span>
+                        <p className="text-xs text-gray-600 mt-1">
+                          Available: <span className="font-semibold text-blue-700">${mainWalletBalance.toFixed(2)}</span> • This amount can only be used to activate investment packages
+                        </p>
+                        {useMainWallet && investAmount && !isNaN(parseFloat(investAmount)) && (() => {
+                          const investmentAmount = parseFloat(investAmount);
+                          const selectedVoucher = selectedVoucherId ? availableVouchers.find((v: any) => v.voucherId === selectedVoucherId) : null;
+                          const voucherValue = selectedVoucher ? (selectedVoucher.investmentValue || selectedVoucher.amount * 2) : 0;
+                          const amountAfterVoucher = Math.max(0, investmentAmount - voucherValue);
+                          const mainWalletToUse = Math.min(mainWalletBalance, amountAfterVoucher);
+                          const hasEnoughBalance = mainWalletBalance >= amountAfterVoucher;
+                          
+                          return (
+                            <div className="mt-3 text-sm">
+                              {voucherValue > 0 && (
+                                <div className="mb-2">
+                                  <span className="text-gray-600">After voucher coverage:</span>
+                                  <span className="font-semibold ml-2">${amountAfterVoucher.toFixed(2)}</span>
+                                </div>
+                              )}
+                              {amountAfterVoucher > 0 && (
+                                <div className={hasEnoughBalance ? 'text-green-700' : 'text-blue-700'}>
+                                  {hasEnoughBalance ? (
+                                    <span>✓ Will use ${mainWalletToUse.toFixed(2)} from main wallet</span>
+                                  ) : (
+                                    <span>✓ Will use ${mainWalletBalance.toFixed(2)} from main wallet (available balance)</span>
+                                  )}
+                                </div>
+                              )}
+                              {amountAfterVoucher === 0 && (
+                                <div className="text-green-700">
+                                  ✓ Investment fully covered by voucher
+                                </div>
+                              )}
+                            </div>
+                          );
+                        })()}
+                      </div>
+                    </label>
+                  </div>
+                )}
+
                 <div className="mb-4">
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Amount (USD)
@@ -436,7 +508,13 @@ function InvestContent() {
                   const selectedVoucher = selectedVoucherId ? availableVouchers.find((v: any) => v.voucherId === selectedVoucherId) : null;
                   const voucherValue = selectedVoucher ? (selectedVoucher.investmentValue || selectedVoucher.amount * 2) : 0;
                   const investmentAmount = parseFloat(investAmount);
-                  const remainingAmount = Math.max(0, investmentAmount - voucherValue);
+                  const amountAfterVoucher = Math.max(0, investmentAmount - voucherValue);
+                  
+                  // Calculate main wallet usage (only if user selected to use it)
+                  const mainWalletToUse = (useMainWallet && mainWalletBalance !== null && mainWalletBalance > 0)
+                    ? Math.min(mainWalletBalance, amountAfterVoucher) 
+                    : 0;
+                  const finalPaymentAmount = amountAfterVoucher - mainWalletToUse;
                   
                   return (
                     <div className="mb-6 p-4 bg-indigo-50 rounded-lg border border-indigo-200">
@@ -447,20 +525,26 @@ function InvestContent() {
                           <span className="font-semibold text-gray-900">${investmentAmount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                         </div>
                         {selectedVoucher && (
-                          <>
-                            <div className="flex justify-between border-t border-indigo-200 pt-2">
-                              <span className="text-gray-600">Voucher Applied (Investment Value):</span>
-                              <span className="font-semibold text-green-600">-${voucherValue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
-                            </div>
-                            {remainingAmount > 0 ? (
-                              <div className="flex justify-between">
-                                <span className="text-gray-600">Amount to Pay:</span>
-                                <span className="font-semibold text-orange-600">${remainingAmount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
-                              </div>
-                            ) : (
-                              <div className="flex justify-between items-center">
-                                <span className="text-gray-600">Amount to Pay:</span>
-                                <span className="font-semibold text-green-600 flex items-center">
+                          <div className="flex justify-between border-t border-indigo-200 pt-2">
+                            <span className="text-gray-600">Voucher Applied (Investment Value):</span>
+                            <span className="font-semibold text-green-600">-${voucherValue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                          </div>
+                        )}
+                        {useMainWallet && mainWalletToUse > 0 && (
+                          <div className="flex justify-between border-t border-indigo-200 pt-2">
+                            <span className="text-gray-600">Main Wallet Applied:</span>
+                            <span className="font-semibold text-blue-600">-${mainWalletToUse.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                          </div>
+                        )}
+                        {finalPaymentAmount > 0 ? (
+                          <div className="flex justify-between border-t-2 border-indigo-300 pt-2">
+                            <span className="text-gray-700 font-semibold">Amount to Pay:</span>
+                            <span className="font-bold text-orange-600 text-lg">${finalPaymentAmount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                          </div>
+                        ) : (
+                          <div className="flex justify-between items-center border-t-2 border-green-300 pt-2">
+                            <span className="text-gray-700 font-semibold">Amount to Pay:</span>
+                            <span className="font-bold text-green-600 text-lg flex items-center">
                                   <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
                                     <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                                   </svg>

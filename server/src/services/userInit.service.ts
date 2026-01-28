@@ -356,6 +356,7 @@ export async function initializeWallets(userId: Types.ObjectId) {
       { type: WalletType.TOKEN, balance: "0", reserved: "0", currency: "USD" },
       { type: WalletType.INVESTMENT, balance: "0", reserved: "0", currency: "USD" },
       { type: WalletType.CAREER_LEVEL, balance: "0", reserved: "0", currency: "USD" },
+      { type: WalletType.MAIN, balance: "5", reserved: "0", currency: "USD" }, // New users get $5 free in main wallet
     ];
 
     const wallets = await Promise.all(

@@ -27,7 +27,7 @@ export const createPayment = asyncHandler(async (req, res) => {
     throw new AppError("User not authenticated", 401);
   }
 
-  const { packageId, amount, currency = "USD", voucherId } = req.body;
+  const { packageId, amount, currency = "USD", voucherId, useMainWallet } = req.body;
 
   if (!packageId || !amount) {
     throw new AppError("Package ID and amount are required", 400);
@@ -65,10 +65,23 @@ export const createPayment = asyncHandler(async (req, res) => {
     throw new AppError("Package is not active", 400);
   }
 
+  // Get main wallet balance (will be used automatically if available)
+  const { Wallet } = await import("../models/Wallet");
+  const { WalletType } = await import("../models/types");
+  const { createWalletTransaction } = await import("../services/transaction.service");
+  
+  const mainWallet = await Wallet.findOne({ 
+    user: userId, 
+    type: WalletType.MAIN 
+  });
+  
+  const mainWalletBalance = mainWallet ? parseFloat(mainWallet.balance.toString()) : 0;
+
   // Handle voucher if provided
   let voucher = null;
   let voucherInvestmentValue = 0;
   let remainingAmount = investmentAmount;
+  let mainWalletUsed = 0;
 
   if (voucherId) {
     const { Voucher } = await import("../models/Voucher");
@@ -127,14 +140,38 @@ export const createPayment = asyncHandler(async (req, res) => {
     // - $100 voucher (investment value $200) can cover $150 investment ✅
     // - $100 voucher (investment value $200) can cover $300 investment (partial - user pays $100) ✅
     console.log(`[Voucher] Remaining amount: ${remainingAmount}, Voucher covers: ${voucherInvestmentValue >= investmentAmount}`);
-    if (remainingAmount === 0 || voucherInvestmentValue >= investmentAmount) {
-      // Process investment directly with voucher
+    
+    // Use main wallet balance to reduce remaining amount (if user selected to use it)
+    if (useMainWallet && mainWallet && mainWalletBalance > 0 && remainingAmount > 0) {
+      mainWalletUsed = Math.min(mainWalletBalance, remainingAmount);
+      remainingAmount = remainingAmount - mainWalletUsed;
+      
+      // Deduct from main wallet
+      if (mainWalletUsed > 0) {
+        const newBalance = mainWalletBalance - mainWalletUsed;
+        mainWallet.balance = Types.Decimal128.fromString(newBalance.toString());
+        await mainWallet.save();
+        
+        // Create transaction record
+        await createWalletTransaction(
+          userId,
+          WalletType.MAIN,
+          "debit",
+          mainWalletUsed,
+          `main-wallet-${Date.now()}-${userId}`,
+          { description: `Investment package activation - $${mainWalletUsed} used from main wallet` }
+        );
+      }
+    }
+    
+    if (remainingAmount === 0 || (voucherInvestmentValue + mainWalletUsed >= investmentAmount)) {
+      // Process investment directly (fully covered by voucher + main wallet)
       const { processInvestment } = await import("../services/investment.service");
       const investment = await processInvestment(
         userId,
         packageId,
         investmentAmount,
-        undefined, // paymentId (not needed when voucher fully covers)
+        undefined, // paymentId (not needed when fully covered)
         voucherId  // voucherId (5th parameter)
       );
 
@@ -144,21 +181,53 @@ export const createPayment = asyncHandler(async (req, res) => {
       const response = res as any;
       return response.status(200).json({
         status: "success",
-        message: "Investment activated successfully with voucher",
+        message: "Investment activated successfully",
         data: {
           investment: {
             id: investment._id,
             amount: investmentAmount,
-            voucherUsed: {
+            voucherUsed: voucher ? {
               voucherId: voucher.voucherId,
               amount: parseFloat(voucher.amount.toString()),
               investmentValue: voucherInvestmentValue,
-            },
+            } : null,
+            mainWalletUsed: mainWalletUsed > 0 ? mainWalletUsed : null,
             remainingAmount: 0,
           },
         },
       });
     }
+  }
+  
+  // If fully covered (voucher + main wallet), process investment directly
+  if (remainingAmount === 0) {
+    const { processInvestment } = await import("../services/investment.service");
+    const investment = await processInvestment(
+      userId,
+      packageId,
+      investmentAmount,
+      undefined, // paymentId (not needed when fully covered)
+      voucherId || undefined // voucherId
+    );
+    
+    const response = res as any;
+    return response.status(200).json({
+      status: "success",
+      message: "Investment activated successfully",
+      data: {
+        investment: {
+          id: investment._id,
+          amount: investmentAmount,
+          voucherUsed: voucher ? {
+            voucherId: voucher.voucherId,
+            amount: parseFloat(voucher.amount.toString()),
+            investmentValue: voucherInvestmentValue,
+          } : null,
+          mainWalletUsed: mainWalletUsed > 0 ? mainWalletUsed : null,
+          remainingAmount: 0,
+        },
+      },
+    });
   }
 
   // Generate order ID
@@ -180,6 +249,7 @@ export const createPayment = asyncHandler(async (req, res) => {
   console.log(`[Payment Create]   - Callback URL: ${callbackUrl}`);
   console.log(`[Payment Create]   - Success URL: ${successUrl}`);
   console.log(`[Payment Create]   - Cancel URL: ${cancelUrl}`);
+
 
   // Check if NOWPayments is enabled
   const nowpaymentsSetting = await Settings.findOne({ key: "nowpayments_enabled" });
@@ -213,10 +283,34 @@ export const createPayment = asyncHandler(async (req, res) => {
             amount: parseFloat(voucher.amount.toString()),
             investmentValue: voucherInvestmentValue,
           } : null,
+          mainWalletUsed: mainWalletUsed > 0 ? mainWalletUsed : null,
           remainingAmount: remainingAmount,
         },
       },
     });
+  }
+  
+  // Use main wallet balance to reduce payment amount (if user selected to use it and no voucher was used)
+  if (useMainWallet && !voucher && mainWallet && mainWalletBalance > 0 && investmentAmount > 0) {
+    mainWalletUsed = Math.min(mainWalletBalance, investmentAmount);
+    remainingAmount = investmentAmount - mainWalletUsed;
+    
+    // Deduct from main wallet
+    if (mainWalletUsed > 0) {
+      const newBalance = mainWalletBalance - mainWalletUsed;
+      mainWallet.balance = Types.Decimal128.fromString(newBalance.toString());
+      await mainWallet.save();
+      
+      // Create transaction record
+      await createWalletTransaction(
+        userId,
+        WalletType.MAIN,
+        "debit",
+        mainWalletUsed,
+        `main-wallet-${Date.now()}-${userId}`,
+        { description: `Investment package activation - $${mainWalletUsed} used from main wallet` }
+      );
+    }
   }
 
   // Get user email for invoice
@@ -228,11 +322,24 @@ export const createPayment = asyncHandler(async (req, res) => {
   try {
     console.log('Creating NOWPayments invoice for order:', orderId);
 
-    // Create invoice for remaining amount (if voucher is used)
-    const paymentAmount = remainingAmount > 0 ? remainingAmount : investmentAmount;
-    const orderDescription = voucher
-      ? `Investment in ${pkg.packageName} - $${investmentAmount} (Voucher: $${voucherInvestmentValue}, Remaining: $${remainingAmount})`
-      : `Investment in ${pkg.packageName} - $${investmentAmount}`;
+    // Calculate final payment amount after voucher and main wallet
+    const paymentAmount = remainingAmount;
+    
+    // Build order description
+    let orderDescription = `Investment in ${pkg.packageName} - $${investmentAmount}`;
+    const parts = [];
+    if (voucher) {
+      parts.push(`Voucher: $${voucherInvestmentValue}`);
+    }
+    if (mainWalletUsed > 0) {
+      parts.push(`Main Wallet: $${mainWalletUsed}`);
+    }
+    if (paymentAmount > 0) {
+      parts.push(`Payment: $${paymentAmount}`);
+    }
+    if (parts.length > 0) {
+      orderDescription += ` (${parts.join(', ')})`;
+    }
 
     console.log(`[Payment Create] 📤 Sending invoice request to NOWPayments:`);
     console.log(`[Payment Create]   - price_amount: ${paymentAmount}`);
@@ -285,12 +392,18 @@ export const createPayment = asyncHandler(async (req, res) => {
       status: "pending",
       paymentUrl: invoiceUrl,
       payCurrency: invoiceResponse.pay_currency || undefined,
-      meta: voucher ? {
-        voucherId: voucher.voucherId,
-        voucherAmount: parseFloat(voucher.amount.toString()),
-        voucherInvestmentValue: voucherInvestmentValue,
+      meta: {
+        ...(voucher ? {
+          voucherId: voucher.voucherId,
+          voucherAmount: parseFloat(voucher.amount.toString()),
+          voucherInvestmentValue: voucherInvestmentValue,
+        } : {}),
+        ...(mainWalletUsed > 0 ? {
+          mainWalletUsed: mainWalletUsed,
+        } : {}),
         remainingAmount: remainingAmount,
-      } : undefined,
+        totalInvestmentAmount: investmentAmount,
+      },
     });
 
     const response = res as any;

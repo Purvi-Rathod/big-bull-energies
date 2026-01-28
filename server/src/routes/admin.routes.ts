@@ -50,6 +50,7 @@ import {
   setBinaryTarget,
   getUserTargetStatus,
   getUserBio,
+  addMainWalletToAllUsers,
 } from "../controllers/admin.controller";
 import {
   getAllPackages,
@@ -146,6 +147,7 @@ router.post("/investments/create", requireAdminAuth, adminCreateInvestment);
 // Wallet management routes (admin only)
 router.post("/wallet/add-funds", requireAdminAuth, addFundsToWallet);
 router.post("/wallet/remove-funds", requireAdminAuth, removeFundsFromWallet);
+router.post("/wallet/add-main-wallet-to-all", requireAdminAuth, addMainWalletToAllUsers);
 
 // Influencer management
 router.post("/influencer/powerleg/create", requireAdminAuth, createPowerlegAccounts);

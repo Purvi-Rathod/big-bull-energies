@@ -2775,6 +2775,69 @@ export const getROIReport = asyncHandler(async (req, res) => {
 });
 
 /**
+ * Admin: Add main wallet to all existing users (one-time migration)
+ * POST /api/v1/admin/wallet/add-main-wallet-to-all
+ */
+export const addMainWalletToAllUsers = asyncHandler(async (req, res) => {
+  try {
+    const { Wallet } = await import("../models/Wallet");
+    const { WalletType } = await import("../models/types");
+    
+    // Get all users
+    const users = await User.find({}).select("_id userId").lean();
+    
+    let created = 0;
+    let alreadyExists = 0;
+    let errors = [];
+    
+    for (const user of users) {
+      try {
+        // Check if main wallet already exists
+        const existingWallet = await Wallet.findOne({
+          user: user._id,
+          type: WalletType.MAIN,
+        });
+        
+        if (existingWallet) {
+          alreadyExists++;
+          continue;
+        }
+        
+        // Create main wallet with $5 for existing users
+        await Wallet.create({
+          user: user._id,
+          type: WalletType.MAIN,
+          balance: Types.Decimal128.fromString("5"),
+          reserved: Types.Decimal128.fromString("0"),
+          currency: "USD",
+        });
+        
+        created++;
+      } catch (error: any) {
+        errors.push({
+          userId: user.userId,
+          error: error.message,
+        });
+      }
+    }
+    
+    const response = res as any;
+    response.status(200).json({
+      status: "success",
+      message: "Main wallet migration completed",
+      data: {
+        totalUsers: users.length,
+        created,
+        alreadyExists,
+        errors: errors.length > 0 ? errors : undefined,
+      },
+    });
+  } catch (error: any) {
+    throw new AppError(error.message || "Failed to add main wallets", 500);
+  }
+});
+
+/**
  * Admin: Create investment for a user
  * POST /api/v1/admin/investments/create
  */

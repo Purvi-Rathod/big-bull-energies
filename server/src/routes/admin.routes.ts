@@ -49,6 +49,7 @@ import {
   createFreeAccounts,
   setBinaryTarget,
   getUserTargetStatus,
+  getUserBio,
 } from "../controllers/admin.controller";
 import {
   getAllPackages,
@@ -113,6 +114,7 @@ router.post("/calculation-job/:jobId/resume", requireAdminAuth, resumeCalculatio
 
 // User management (admin only)
 router.get("/users", requireAdminAuth, getAllUsers);
+router.get("/users/:userId/bio", requireAdminAuth, getUserBio);
 router.post("/impersonate/:userId", requireAdminAuth, impersonateUser);
 router.put("/users/:userId/status", requireAdminAuth, updateUserStatus);
 router.put("/users/:userId/profile", requireAdminAuth, updateUserProfile);

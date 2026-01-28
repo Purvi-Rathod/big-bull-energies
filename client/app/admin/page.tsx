@@ -16,7 +16,14 @@ interface User {
   status: string;
   treeLink: string;
   totalInvestment: string;
+  packageNames: string[];
   joinedAt: string;
+  position: string | null;
+  referrer: {
+    userId: string;
+    name: string;
+    email: string | null;
+  } | null;
 }
 
 export default function AdminPanel() {
@@ -101,6 +108,11 @@ export default function AdminPanel() {
       toast.error(err.message || 'Failed to login as user');
       console.error('Error impersonating user:', err);
     }
+  };
+
+  const handleViewBio = (userId: string) => {
+    // Navigate to user bio page
+    window.location.href = `/admin/users/${userId}/bio`;
   };
 
   const handleDeleteClick = (userId: string, userName: string) => {
@@ -365,37 +377,34 @@ export default function AdminPanel() {
           {/* Users Table */}
           {!loading && (
             <div className="overflow-x-auto">
-              <table className="w-full divide-y divide-gray-200">
+              <table className="w-[10%]  divide-y divide-gray-200">
                 <thead className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white">
                   <tr>
-                    <th className="px-3 py-3 text-left text-xs font-medium text-white uppercase tracking-wider w-[120px]">
-                      Name
+                    <th className="px-4 py-4 text-left text-xs font-medium text-white uppercase tracking-wider w-[280px]">
+                      User
                     </th>
-                    <th className="px-3 py-3 text-left text-xs font-medium text-white uppercase tracking-wider w-[130px]">
-                      User ID
+                    <th className="px-4 py-4 text-left text-xs font-medium text-white uppercase tracking-wider w-[300px]">
+                      Position
                     </th>
-                    <th className="px-3 py-3 text-left text-xs font-medium text-white uppercase tracking-wider w-[180px]">
-                      Email
+                    <th className="px-4 py-4 text-left text-xs font-medium text-white uppercase tracking-wider w-[220px]">
+                      Sponsor
                     </th>
-                    <th className="px-3 py-3 text-left text-xs font-medium text-white uppercase tracking-wider w-[110px]">
-                      Mobile
+                    <th className="px-4 py-4 text-left text-xs font-medium text-white uppercase tracking-wider w-[180px]">
+                      Country&Phone
                     </th>
-                    <th className="px-3 py-3 text-left text-xs font-medium text-white uppercase tracking-wider w-[120px]">
-                      Country
-                    </th>
-                    <th className="px-3 py-3 text-left text-xs font-medium text-white uppercase tracking-wider w-[90px]">
+                    <th className="px-4 py-4 text-left text-xs font-medium text-white uppercase tracking-wider w-[90px]">
                       Status
                     </th>
-                    <th className="px-3 py-3 text-left text-xs font-medium text-white uppercase tracking-wider w-[130px]">
+                    <th className="px-4 py-4 text-left text-xs font-medium text-white uppercase tracking-wider w-[130px]">
                       Investment
                     </th>
-                    <th className="px-3 py-3 text-left text-xs font-medium text-white uppercase tracking-wider w-[110px]">
+                    <th className="px-4 py-4 text-left text-xs font-medium text-white uppercase tracking-wider w-[110px]">
                       Joined
                     </th>
-                    <th className="px-3 py-3 text-left text-xs font-medium text-white uppercase tracking-wider w-[90px]">
+                    <th className="px-4 py-4 text-left text-xs font-medium text-white uppercase tracking-wider w-[90px]">
                       Tree
                     </th>
-                    <th className="px-3 py-3 text-left text-xs font-medium text-white uppercase tracking-wider w-[140px]">
+                    <th className="px-4 py-4 text-left text-xs font-medium text-white uppercase tracking-wider w-[140px]">
                       Actions
                     </th>
                   </tr>
@@ -403,39 +412,89 @@ export default function AdminPanel() {
                 <tbody className="bg-white divide-y divide-gray-200">
                   {users.length === 0 ? (
                     <tr>
-                      <td colSpan={10} className="px-6 py-8 text-center text-black">
+                      <td colSpan={9} className="px-6 py-8 text-center text-black">
                         No users found
                       </td>
                     </tr>
                   ) : (
                     users.map((user) => (
                       <tr key={user.id} className="hover:bg-gray-50">
-                        <td className="px-3 py-3">
-                          <div className="text-sm font-medium text-black truncate max-w-[120px]" title={user.name}>
-                            {user.name}
+                        {/* User Column */}
+                        <td className="px-4 py-5">
+                          <div className="flex flex-col gap-2">
+                            <div className="text-xs text-black font-mono font-semibold" title={user.userId}>
+                              {user.userId}
+                            </div>
+                            <div className="text-sm font-medium text-black" title={user.name}>
+                              {user.name}
+                            </div>
+                            <div className="text-xs text-gray-600 truncate max-w-[250px]" title={user.email}>
+                              {user.email}
+                            </div>
+                            <div className="flex gap-2 mt-1">
+                              <button
+                                onClick={() => handleViewBio(user.userId)}
+                                className="px-2 py-1 text-xs bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+                                title="View user dashboard"
+                              >
+                                Bio
+                              </button>
+                              <button
+                                onClick={() => handleImpersonate(user.userId)}
+                                className="px-2 py-1 text-xs bg-indigo-500 text-white rounded hover:bg-indigo-600 transition-colors"
+                                title="Login as user"
+                              >
+                                Login
+                              </button>
+                            </div>
                           </div>
                         </td>
-                        <td className="px-3 py-3">
-                          <div className="text-xs text-black font-mono truncate max-w-[130px]" title={user.userId}>
-                            {user.userId}
+                        {/* Position Column */}
+                        <td className="px-4 py-5">
+                          <div className="flex flex-col gap-1">
+                            {user.position ? (
+                              <span className="text-xs font-semibold text-black">{user.position}</span>
+                            ) : (
+                              <span className="text-xs text-gray-400">-</span>
+                            )}
+                            {user.referrer ? (
+                              <span className="text-xs text-gray-500 font-mono">Parent: {user.referrer.userId}</span>
+                            ) : (
+                              <span className="text-xs text-gray-400">No parent</span>
+                            )}
                           </div>
                         </td>
-                        <td className="px-3 py-3">
-                          <div className="text-xs text-black truncate max-w-[180px]" title={user.email}>
-                            {user.email}
+                        {/* Sponsor Column */}
+                        <td className="px-4 py-5">
+                          {user.referrer ? (
+                            <div className="flex flex-col gap-1">
+                              <div className="text-xs font-semibold text-black" title={user.referrer.name}>
+                                {user.referrer.name}
+                              </div>
+                              <div className="text-xs text-gray-600 truncate max-w-[200px]" title={user.referrer.email || ''}>
+                                {user.referrer.email || '-'}
+                              </div>
+                              <div className="text-xs text-gray-500 font-mono" title={user.referrer.userId}>
+                                {user.referrer.userId}
+                              </div>
+                            </div>
+                          ) : (
+                            <div className="text-xs text-gray-400">-</div>
+                          )}
+                        </td>
+                        {/* Country&Phone Column */}
+                        <td className="px-4 py-5">
+                          <div className="flex flex-col gap-1">
+                            <div className="text-xs text-black font-medium" title={user.country}>
+                              {user.country || '-'}
+                            </div>
+                            <div className="text-xs text-gray-600 font-mono" title={user.phone}>
+                              {user.phone || '-'}
+                            </div>
                           </div>
                         </td>
-                        <td className="px-3 py-3">
-                          <div className="text-xs text-black truncate max-w-[110px]" title={user.phone}>
-                            {user.phone}
-                          </div>
-                        </td>
-                        <td className="px-3 py-3">
-                          <div className="text-xs text-black truncate max-w-[120px]" title={user.country}>
-                            {user.country || '-'}
-                          </div>
-                        </td>
-                        <td className="px-3 py-3">
+                        {/* Status Column */}
+                        <td className="px-4 py-5">
                           <span
                             className={`px-3 py-1 inline-flex text-xs leading-5 font-bold rounded-full border-2 shadow-sm ${getStatusColor(
                               user.status
@@ -444,18 +503,38 @@ export default function AdminPanel() {
                             {user.status}
                           </span>
                         </td>
-                        <td className="px-3 py-3">
-                          <div className="text-xs text-black font-semibold">
-                            ${parseFloat(user.totalInvestment).toLocaleString('en-US', {
-                              minimumFractionDigits: 2,
-                              maximumFractionDigits: 2,
-                            })}
+                        {/* Investment Column */}
+                        <td className="px-4 py-5">
+                          <div className="flex flex-col gap-1">
+                            <div className="text-xs text-black font-semibold">
+                              ${parseFloat(user.totalInvestment).toLocaleString('en-US', {
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2,
+                              })}
+                            </div>
+                            {user.packageNames && user.packageNames.length > 0 ? (
+                              <div className="flex flex-wrap gap-1">
+                                {user.packageNames.map((pkgName, idx) => (
+                                  <span
+                                    key={idx}
+                                    className="text-xs px-1.5 py-0.5 bg-indigo-100 text-indigo-700 rounded font-medium"
+                                    title={pkgName}
+                                  >
+                                    {pkgName}
+                                  </span>
+                                ))}
+                              </div>
+                            ) : (
+                              <span className="text-xs text-gray-400">No packages</span>
+                            )}
                           </div>
                         </td>
-                        <td className="px-3 py-3">
+                        {/* Joined Column */}
+                        <td className="px-4 py-5">
                           <div className="text-xs text-black">{formatDate(user.joinedAt)}</div>
                         </td>
-                        <td className="px-3 py-3">
+                        {/* Tree Column */}
+                        <td className="px-4 py-5">
                           <a
                             href={user.treeLink}
                             target="_blank"
@@ -465,7 +544,8 @@ export default function AdminPanel() {
                             View
                           </a>
                         </td>
-                        <td className="px-3 py-3 text-xs font-medium">
+                        {/* Actions Column */}
+                        <td className="px-4 py-5 text-xs font-medium">
                           <div className="relative dropdown-container">
                             <button
                               onClick={(e) => {
@@ -484,19 +564,6 @@ export default function AdminPanel() {
                             {openDropdown === user.userId && (
                               <div className="absolute right-0 mt-1 w-40 bg-white rounded-md shadow-lg border border-gray-200 z-50">
                                 <div className="py-1">
-                                  <button
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      setOpenDropdown(null);
-                                      handleImpersonate(user.userId);
-                                    }}
-                                    className="w-full text-left px-4 py-2 text-sm text-indigo-600 hover:bg-indigo-50 flex items-center gap-2"
-                                  >
-                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
-                                    </svg>
-                                    Login
-                                  </button>
                                   <button
                                     onClick={(e) => {
                                       e.stopPropagation();

@@ -81,6 +81,14 @@ class ApiClient {
       if (!response.ok) {
         // Handle token expiration (401 Unauthorized)
         if (response.status === 401) {
+          // Check if this is a login endpoint - if so, return the actual error message
+          const isLoginEndpoint = endpoint.includes('/auth/login') || endpoint.includes('/admin/login');
+          
+          if (isLoginEndpoint) {
+            // For login endpoints, return the actual error message from the server
+            throw new Error(data.message || 'Invalid credentials');
+          }
+          
           // Check if this is an admin endpoint and user might just not have admin access
           // In this case, don't redirect - let the component handle the error
           const isAdminEndpoint = endpoint.startsWith('/admin');
@@ -565,6 +573,19 @@ class ApiClient {
       `/admin/users${query ? `?${query}` : ''}`,
       { method: 'GET' }
     );
+  }
+
+  async getUserBio(userId: string) {
+    return this.request<{
+      user: any;
+      wallets: any[];
+      investments: any[];
+      binaryTree: any;
+      vouchers: any[];
+      directReferrals: any[];
+    }>(`/admin/users/${userId}/bio`, {
+      method: 'GET',
+    });
   }
 
   async impersonateUser(userId: string) {

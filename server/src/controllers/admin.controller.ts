@@ -390,7 +390,7 @@ export const getAllUsers = asyncHandler(async (req, res) => {
     // Get users with pagination
     const users = await User.find(searchQuery)
       .select("_id userId name email phone country status referrer position createdAt")
-      .populate("referrer", "userId name")
+      .populate("referrer", "userId name email")
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(Number(limit))
@@ -399,26 +399,46 @@ export const getAllUsers = asyncHandler(async (req, res) => {
     // Get total count
     const total = await User.countDocuments(searchQuery);
 
-    // Get investment totals for each user
+    // Get investment totals and package names for each user
     const userIds = users.map((u) => u._id);
     const investments = await Investment.aggregate([
       { $match: { user: { $in: userIds } } },
       {
+        $lookup: {
+          from: "packages",
+          localField: "packageId",
+          foreignField: "_id",
+          as: "package",
+        },
+      },
+      {
+        $unwind: {
+          path: "$package",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
         $group: {
           _id: "$user",
           totalInvestment: { $sum: { $toDouble: "$investedAmount" } },
+          packageNames: { $addToSet: "$package.packageName" },
         },
       },
     ]);
 
     const investmentMap = new Map();
     investments.forEach((inv) => {
-      investmentMap.set(inv._id.toString(), inv.totalInvestment);
+      investmentMap.set(inv._id.toString(), {
+        totalInvestment: inv.totalInvestment,
+        packageNames: (inv.packageNames || []).filter((name: string) => name != null),
+      });
     });
 
     // Format users with additional data
     const formattedUsers = users.map((user) => {
-      const totalInvestment = investmentMap.get(user._id.toString()) || 0;
+      const investmentData = investmentMap.get(user._id.toString()) || { totalInvestment: 0, packageNames: [] };
+      const totalInvestment = investmentData.totalInvestment || 0;
+      const packageNames = investmentData.packageNames || [];
       const baseUrl = process.env.CLIENT_URL || process.env.FRONTEND_URL || "http://localhost:3000";
       const treeLink = `${baseUrl}/tree?userId=${user.userId}`;
 
@@ -432,10 +452,12 @@ export const getAllUsers = asyncHandler(async (req, res) => {
         status: user.status,
         treeLink,
         totalInvestment: totalInvestment.toFixed(2),
+        packageNames: packageNames,
         referrer: user.referrer
           ? {
               userId: (user.referrer as any).userId,
               name: (user.referrer as any).name,
+              email: (user.referrer as any).email || null,
             }
           : null,
         position: user.position || null,
@@ -1116,6 +1138,177 @@ export const updateUserProfile = asyncHandler(async (req, res) => {
     });
   } catch (error: any) {
     throw new AppError(error.message || "Failed to update user profile", 500);
+  }
+});
+
+/**
+ * Get user bio/profile data (admin only - no login required)
+ * GET /api/v1/admin/users/:userId/bio
+ */
+export const getUserBio = asyncHandler(async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    // Find user by userId
+    const user = await User.findOne({ userId })
+      .populate("referrer", "userId name email")
+      .lean();
+
+    if (!user) {
+      throw new AppError("User not found", 404);
+    }
+
+    const userObjId = user._id;
+
+    // Get all wallets
+    const wallets = await Wallet.find({ user: userObjId })
+      .select("type balance reserved currency")
+      .lean();
+
+    const walletsFormatted = wallets.map((wallet) => ({
+      type: wallet.type,
+      balance: parseFloat(wallet.balance.toString()),
+      reserved: parseFloat(wallet.reserved?.toString() || "0"),
+      currency: wallet.currency || "USD",
+    }));
+
+    // Get all investments
+    const investments = await Investment.find({ user: userObjId })
+      .populate("packageId", "packageName roi duration")
+      .sort({ createdAt: -1 })
+      .lean();
+
+    // Get voucher information for investments
+    const voucherIds = investments
+      .filter((inv) => inv.voucherId)
+      .map((inv) => inv.voucherId);
+    
+    const vouchersMap = new Map();
+    if (voucherIds.length > 0) {
+      const { Voucher } = await import("../models/Voucher");
+      const vouchers = await Voucher.find({ voucherId: { $in: voucherIds } })
+        .select("voucherId amount")
+        .lean();
+      vouchers.forEach((v: any) => {
+        vouchersMap.set(v.voucherId, {
+          voucherId: v.voucherId,
+          amount: parseFloat(v.amount.toString()),
+        });
+      });
+    }
+
+    const investmentsFormatted = investments.map((inv) => {
+      const voucherInfo = inv.voucherId ? vouchersMap.get(inv.voucherId) : null;
+      return {
+        id: inv._id,
+        package: inv.packageId ? {
+          id: (inv.packageId as any)._id,
+          name: (inv.packageId as any).packageName,
+          roi: (inv.packageId as any).roi,
+          duration: (inv.packageId as any).duration,
+        } : null,
+        investedAmount: parseFloat(inv.investedAmount.toString()),
+        depositAmount: parseFloat(inv.depositAmount.toString()),
+        type: inv.type,
+        isBinaryUpdated: inv.isBinaryUpdated,
+        createdAt: inv.createdAt,
+        expiresOn: inv.expiresOn,
+        voucherId: inv.voucherId || null,
+        voucher: voucherInfo || null,
+      };
+    });
+
+    // Get binary tree info
+    const { BinaryTree } = await import("../models/BinaryTree");
+    const binaryTree = await BinaryTree.findOne({ user: userObjId })
+      .populate("parent", "userId name")
+      .populate("leftChild", "userId name")
+      .populate("rightChild", "userId name")
+      .lean();
+
+    // Get vouchers
+    const { Voucher } = await import("../models/Voucher");
+    const vouchers = await Voucher.find({ userId: user.userId })
+      .sort({ createdAt: -1 })
+      .lean();
+
+    const vouchersFormatted = vouchers.map((v: any) => ({
+      id: v._id,
+      voucherId: v.voucherId,
+      amount: parseFloat(v.amount.toString()),
+      status: v.status,
+      createdAt: v.createdAt || v.createdOn,
+      expiresAt: v.expiry || null,
+    }));
+
+    // Get direct referrals
+    const directReferrals = await User.find({ referrer: userObjId })
+      .select("userId name email phone country status createdAt")
+      .sort({ createdAt: -1 })
+      .lean();
+
+    const response = res as any;
+    response.status(200).json({
+      status: "success",
+      data: {
+        user: {
+          id: user._id,
+          userId: user.userId,
+          name: user.name,
+          email: user.email || "-",
+          phone: user.phone || "-",
+          country: user.country || "-",
+          status: user.status,
+          walletAddress: user.walletAddress || null,
+          bankAccount: user.bankAccount || null,
+          referrer: user.referrer ? {
+            userId: (user.referrer as any).userId,
+            name: (user.referrer as any).name,
+            email: (user.referrer as any).email || null,
+          } : null,
+          position: user.position || null,
+          createdAt: (user as any).createdAt || user.createdAt,
+        },
+        wallets: walletsFormatted,
+        investments: investmentsFormatted,
+        binaryTree: binaryTree ? {
+          parent: binaryTree.parent ? {
+            id: (binaryTree.parent as any)._id,
+            userId: (binaryTree.parent as any).userId,
+            name: (binaryTree.parent as any).name,
+          } : null,
+          leftChild: binaryTree.leftChild ? {
+            id: (binaryTree.leftChild as any)._id,
+            userId: (binaryTree.leftChild as any).userId,
+            name: (binaryTree.leftChild as any).name,
+          } : null,
+          rightChild: binaryTree.rightChild ? {
+            id: (binaryTree.rightChild as any)._id,
+            userId: (binaryTree.rightChild as any).userId,
+            name: (binaryTree.rightChild as any).name,
+          } : null,
+          leftBusiness: parseFloat(binaryTree.leftBusiness.toString()),
+          rightBusiness: parseFloat(binaryTree.rightBusiness.toString()),
+          leftCarry: parseFloat(binaryTree.leftCarry.toString()),
+          rightCarry: parseFloat(binaryTree.rightCarry.toString()),
+          leftDownlines: binaryTree.leftDownlines,
+          rightDownlines: binaryTree.rightDownlines,
+          cappingLimit: binaryTree.cappingLimit ? parseFloat(binaryTree.cappingLimit.toString()) : 0,
+        } : null,
+        vouchers: vouchersFormatted,
+        directReferrals: directReferrals.map((ref) => ({
+          userId: ref.userId,
+          name: ref.name,
+          email: ref.email || "-",
+          phone: ref.phone || "-",
+          country: ref.country || "-",
+          status: ref.status,
+          joinedAt: (ref as any).createdAt || ref.createdAt,
+        })),
+      },
+    });
+  } catch (error: any) {
+    throw new AppError(error.message || "Failed to fetch user bio", 500);
   }
 });
 

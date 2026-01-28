@@ -551,8 +551,6 @@ function InvestContent() {
                                   $0.00 (Fully Covered)
                                 </span>
                               </div>
-                            )}
-                          </>
                         )}
                         <div className="flex justify-between border-t border-indigo-200 pt-2">
                           <span className="text-gray-600">Total Return ({totalOutputPct}%):</span>

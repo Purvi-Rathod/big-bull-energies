@@ -48,6 +48,7 @@ import {
   createPowerlegAccounts,
   createPowerlegInvestment,
   createFreeAccounts,
+  getFreeAccountsList,
   setBinaryTarget,
   getUserTargetStatus,
   getUserBio,
@@ -156,6 +157,7 @@ router.post("/wallet/add-main-wallet-to-all", requireAdminAuth, addMainWalletToA
 // Influencer management
 router.post("/influencer/powerleg/create", requireAdminAuth, createPowerlegAccounts);
 router.post("/influencer/powerleg/investment", requireAdminAuth, createPowerlegInvestment);
+router.get("/influencer/free/list", requireAdminAuth, getFreeAccountsList);
 router.post("/influencer/free/create", requireAdminAuth, createFreeAccounts);
 
 // Binary target management

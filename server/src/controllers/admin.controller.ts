@@ -3644,103 +3644,143 @@ export const getUserTargetStatus = asyncHandler(async (req, res) => {
 });
 
 /**
- * Admin: Create Free Accounts
+ * Admin: Activate existing user as Free Account (under influencer, with package and binary target)
  * POST /api/v1/admin/influencer/free/create
+ * Body: { userId, influencerUserId, packageId, amount, binaryTargetAmount }
  */
 export const createFreeAccounts = asyncHandler(async (req, res) => {
   const body = (req as any).body;
-  const { influencerUserId, accounts, binaryTargetAmount } = body as {
+  const { userId, influencerUserId, packageId, amount, binaryTargetAmount } = body as {
+    userId: string;
     influencerUserId: string;
-    accounts: Array<{
-      name: string;
-      email?: string;
-      phone?: string;
-      password: string;
-    }>;
-    binaryTargetAmount?: number;
+    packageId: string;
+    amount: number;
+    binaryTargetAmount: number;
   };
 
-  if (!influencerUserId || !accounts || !Array.isArray(accounts) || accounts.length === 0) {
-    throw new AppError("Influencer user ID and accounts array are required", 400);
+  if (!userId || !influencerUserId || !packageId || amount == null || amount <= 0) {
+    throw new AppError("User ID, Influencer User ID, Package ID, and Amount are required", 400);
   }
 
-  // Find influencer user
+  const targetAmount = Number(binaryTargetAmount);
+  if (isNaN(targetAmount) || targetAmount < 0) {
+    throw new AppError("Binary target amount must be a valid non-negative number", 400);
+  }
+
+  const user = await findUserByUserId(userId);
+  if (!user) {
+    throw new AppError("User not found", 404);
+  }
+
   const influencer = await findUserByUserId(influencerUserId);
   if (!influencer) {
     throw new AppError("Influencer user not found", 404);
   }
 
-  const createdAccounts = [];
-  const errors = [];
-
-  for (let i = 0; i < accounts.length; i++) {
-    const accountData = accounts[i];
-    try {
-      // Validate account data
-      if (!accountData.name || !accountData.password) {
-        errors.push({ index: i, error: "Name and password are required" });
-        continue;
-      }
-
-      if (accountData.password.length < 8) {
-        errors.push({ index: i, error: "Password must be at least 8 characters" });
-        continue;
-      }
-
-      // Generate userId
-      const userId = await generateNextUserId();
-
-      // Create free user account - activated immediately (no investment required)
-      const freeUser = await User.create({
-        userId,
-        name: accountData.name,
-        email: accountData.email?.toLowerCase(),
-        phone: accountData.phone,
-        password: accountData.password,
-        referrer: influencer._id as Types.ObjectId,
-        position: null, // Free accounts don't use binary tree positions
-        status: "active", // Free accounts are activated immediately
-        accountType: "free",
-        binaryTargetAmount: binaryTargetAmount || 0, // Set binary target if provided
-        targetStatus: binaryTargetAmount && binaryTargetAmount > 0 ? "pending" : "completed", // Pending if target set
-        withdrawEnabled: binaryTargetAmount && binaryTargetAmount > 0 ? false : true, // Disabled if target set
-        country: influencer.country || undefined,
-      });
-
-      // Initialize binary tree and wallets (under influencer, no position)
-      try {
-        await initializeUser(
-          freeUser._id as Types.ObjectId,
-          influencer._id as Types.ObjectId,
-          null // No position - influencer can have unlimited children
-        );
-      } catch (initError: any) {
-        // If initialization fails, delete the user
-        await User.findByIdAndDelete(freeUser._id);
-        throw new AppError(`Failed to initialize user ${userId}: ${initError.message}`, 500);
-      }
-
-      createdAccounts.push({
-        userId: freeUser.userId,
-        name: freeUser.name,
-        email: freeUser.email,
-        phone: freeUser.phone,
-      });
-    } catch (error: any) {
-      errors.push({ index: i, error: error.message || "Failed to create account" });
-    }
+  if (!Types.ObjectId.isValid(packageId)) {
+    throw new AppError("Invalid package ID", 400);
   }
+
+  const pkg = await Package.findById(packageId);
+  if (!pkg) {
+    throw new AppError("Package not found", 404);
+  }
+
+  const minAmount = parseFloat(pkg.minAmount.toString());
+  const maxAmount = parseFloat(pkg.maxAmount.toString());
+  if (amount < minAmount || amount > maxAmount) {
+    throw new AppError(`Amount must be between $${minAmount} and $${maxAmount} for this package`, 400);
+  }
+
+  // Set user as free account under influencer
+  user.referrer = influencer._id as Types.ObjectId;
+  user.accountType = "free";
+  user.binaryTargetAmount = targetAmount;
+  user.targetStatus = targetAmount > 0 ? "pending" : "completed";
+  user.withdrawEnabled = targetAmount > 0 ? false : true;
+  await user.save();
+
+  // Create investment for the user (package activation)
+  const paymentId = `FREE_${Date.now()}_${Math.random().toString(36).substring(7)}`;
+  const { processInvestment } = await import("../services/investment.service");
+  const investmentDoc = await processInvestment(
+    user._id as Types.ObjectId,
+    new Types.ObjectId(packageId),
+    amount,
+    paymentId,
+    undefined
+  );
+  if (investmentDoc) {
+    investmentDoc.type = "free";
+    await investmentDoc.save();
+  }
+
+  const investment = await Investment.findOne({ user: user._id }).sort({ createdAt: -1 }).lean();
 
   const response = res as any;
   response.status(201).json({
     status: "success",
-    message: `Successfully created ${createdAccounts.length} free account(s)`,
+    message: "User activated as free account with package and binary target",
     data: {
+      userId: user.userId,
+      userName: user.name,
       influencerUserId: influencer.userId,
       influencerName: influencer.name,
-      createdAccounts,
-      errors: errors.length > 0 ? errors : undefined,
+      packageId,
+      packageName: pkg.packageName,
+      amount,
+      binaryTargetAmount: targetAmount,
+      investmentId: investment?._id,
     },
+  });
+});
+
+/**
+ * Admin: List all free accounts
+ * GET /api/v1/admin/influencer/free/list
+ */
+export const getFreeAccountsList = asyncHandler(async (req, res) => {
+  const freeUsers = await User.find({ accountType: "free" })
+    .populate("referrer", "userId name email")
+    .sort({ createdAt: -1 })
+    .lean();
+
+  const userIds = freeUsers.map((u) => u._id);
+  const freeInvestments = await Investment.find({ user: { $in: userIds }, type: "free" })
+    .populate("packageId", "packageName")
+    .sort({ createdAt: -1 })
+    .lean();
+
+  const investmentByUser = new Map<string, { packageName: string; amount: number }>();
+  freeInvestments.forEach((inv: any) => {
+    const uid = (inv.user as any)?.toString?.() ?? inv.user?.toString?.();
+    if (uid && !investmentByUser.has(uid)) {
+      investmentByUser.set(uid, {
+        packageName: (inv.packageId as any)?.packageName ?? "N/A",
+        amount: parseFloat(inv.investedAmount?.toString() ?? "0"),
+      });
+    }
+  });
+
+  const list = freeUsers.map((u: any) => ({
+    userId: u.userId,
+    name: u.name,
+    email: u.email ?? "",
+    country: u.country ?? "",
+    influencerUserId: (u.referrer as any)?.userId ?? "",
+    influencerName: (u.referrer as any)?.name ?? "",
+    binaryTargetAmount: u.binaryTargetAmount ?? 0,
+    targetStatus: u.targetStatus ?? "pending",
+    withdrawEnabled: u.withdrawEnabled ?? false,
+    packageName: investmentByUser.get(u._id.toString())?.packageName ?? "—",
+    amount: investmentByUser.get(u._id.toString())?.amount ?? 0,
+    createdAt: u.createdAt,
+  }));
+
+  const response = res as any;
+  response.status(200).json({
+    status: "success",
+    data: { accounts: list },
   });
 });
 

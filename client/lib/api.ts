@@ -1127,25 +1127,43 @@ class ApiClient {
     });
   }
 
-  // Free Account Management (Admin)
-  async createFreeAccounts(data: {
-    influencerUserId: string;
-    accounts: Array<{
-      name: string;
-      email?: string;
-      phone?: string;
-      password: string;
-    }>;
-    binaryTargetAmount?: number;
-  }) {
+  async getFreeAccountsList() {
     return this.request<{
-      createdAccounts: Array<{
+      accounts: Array<{
         userId: string;
         name: string;
-        email?: string;
-        phone?: string;
+        email: string;
+        country: string;
+        influencerUserId: string;
+        influencerName: string;
+        binaryTargetAmount: number;
+        targetStatus: string;
+        withdrawEnabled: boolean;
+        packageName: string;
+        amount: number;
+        createdAt: string;
       }>;
-      errors?: Array<{ index: number; error: string }>;
+    }>('/admin/influencer/free/list', { method: 'GET' });
+  }
+
+  // Free Account Management (Admin) - activate existing user with package and binary target
+  async createFreeAccounts(data: {
+    userId: string;
+    influencerUserId: string;
+    packageId: string;
+    amount: number;
+    binaryTargetAmount: number;
+  }) {
+    return this.request<{
+      userId: string;
+      userName: string;
+      influencerUserId: string;
+      influencerName: string;
+      packageId: string;
+      packageName: string;
+      amount: number;
+      binaryTargetAmount: number;
+      investmentId?: string;
     }>('/admin/influencer/free/create', {
       method: 'POST',
       body: JSON.stringify(data),

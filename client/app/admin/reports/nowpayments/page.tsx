@@ -37,21 +37,20 @@ export default function NOWPaymentsReportPage() {
   const exportToCSV = () => {
     if (!report) return;
 
-    const headers = ['Date', 'User ID', 'User Name', 'User Email', 'Package', 'Order ID', 'Payment ID', 'Amount', 'Currency', 'Status', 'Pay Address', 'Pay Amount', 'Actually Paid'];
-    const rows = report.payments.map((p: any) => [
-      new Date(p.createdAt).toLocaleString(),
+    const headers = ['SL NO', 'User ID', 'User Name', 'User Email', 'Country', 'Payment ID', 'Package', 'USD Amount', 'Crypto Amount', 'Received', 'Status', 'Date'];
+    const rows = report.payments.map((p: any, idx: number) => [
+      idx + 1,
       p.userId,
       p.userName,
       p.userEmail,
-      p.packageName,
-      p.orderId,
+      p.country || '—',
       p.paymentId,
-      `$${p.amount.toFixed(2)}`,
-      p.currency,
+      p.packageName,
+      `${p.amount.toFixed(2)} ${p.currency?.toLowerCase() || 'usd'}`,
+      p.cryptoAmount || '—',
+      p.received || '—',
       p.status,
-      p.payAddress || 'N/A',
-      p.payAmount ? `$${p.payAmount.toFixed(2)}` : 'N/A',
-      p.actuallyPaid ? `$${p.actuallyPaid.toFixed(2)}` : 'N/A',
+      new Date(p.createdAt).toLocaleString(),
     ]);
 
     const csvContent = [headers.join(','), ...rows.map((row: any[]) => row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(','))].join('\n');
@@ -64,6 +63,7 @@ export default function NOWPaymentsReportPage() {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+    URL.revokeObjectURL(url);
   };
 
   if (loading) {
@@ -130,16 +130,16 @@ export default function NOWPaymentsReportPage() {
               <table className="w-full divide-y divide-gray-200">
                 <thead className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white">
                   <tr>
-                    <th className="px-3 py-3 text-left text-xs font-medium text-white uppercase w-[140px]">Date</th>
-                    <th className="px-3 py-3 text-left text-xs font-medium text-white uppercase w-[130px]">User ID</th>
-                    <th className="px-3 py-3 text-left text-xs font-medium text-white uppercase w-[120px]">User Name</th>
-                    <th className="px-3 py-3 text-left text-xs font-medium text-white uppercase w-[110px]">Package</th>
-                    <th className="px-3 py-3 text-left text-xs font-medium text-white uppercase w-[120px]">Order ID</th>
+                    <th className="px-3 py-3 text-left text-xs font-medium text-white uppercase w-[70px]">SL NO</th>
+                    <th className="px-3 py-3 text-left text-xs font-medium text-white uppercase min-w-[180px]">User</th>
+                    <th className="px-3 py-3 text-left text-xs font-medium text-white uppercase w-[100px]">Country</th>
                     <th className="px-3 py-3 text-left text-xs font-medium text-white uppercase w-[120px]">Payment ID</th>
-                    <th className="px-3 py-3 text-left text-xs font-medium text-white uppercase w-[100px]">Amount</th>
-                    <th className="px-3 py-3 text-left text-xs font-medium text-white uppercase w-[90px]">Status</th>
-                    <th className="px-3 py-3 text-left text-xs font-medium text-white uppercase w-[150px]">Pay Address</th>
-                    <th className="px-3 py-3 text-left text-xs font-medium text-white uppercase w-[110px]">Actually Paid</th>
+                    <th className="px-3 py-3 text-left text-xs font-medium text-white uppercase w-[140px]">Package</th>
+                    <th className="px-3 py-3 text-left text-xs font-medium text-white uppercase w-[100px]">USD</th>
+                    <th className="px-3 py-3 text-left text-xs font-medium text-white uppercase w-[140px]">Crypto</th>
+                    <th className="px-3 py-3 text-left text-xs font-medium text-white uppercase w-[140px]">Received</th>
+                    <th className="px-3 py-3 text-left text-xs font-medium text-white uppercase w-[100px]">Status</th>
+                    <th className="px-3 py-3 text-left text-xs font-medium text-white uppercase w-[140px]">Date</th>
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
@@ -150,49 +150,51 @@ export default function NOWPaymentsReportPage() {
                       </td>
                     </tr>
                   ) : (
-                    report.payments.map((p: any) => (
-                      <tr key={p.id}>
+                    report.payments.map((p: any, index: number) => (
+                      <tr key={p.id} className="hover:bg-gray-50">
                         <td className="px-3 py-3">
-                          <div className="text-xs text-black">{new Date(p.createdAt).toLocaleString()}</div>
+                          <div className="text-xs font-medium text-black">{index + 1}</div>
                         </td>
                         <td className="px-3 py-3">
-                          <div className="text-xs font-mono text-black truncate max-w-[130px]" title={p.userId}>{p.userId}</div>
+                          <div className="flex flex-col gap-0.5">
+                            <div className="text-xs font-mono font-semibold text-black">{p.userId}</div>
+                            <div className="text-xs text-black">{p.userName}</div>
+                            <div className="text-xs text-gray-600 truncate max-w-[200px]" title={p.userEmail}>{p.userEmail}</div>
+                          </div>
                         </td>
                         <td className="px-3 py-3">
-                          <div className="text-xs text-black truncate max-w-[120px]" title={p.userName}>{p.userName}</div>
+                          <div className="text-xs text-black">{p.country || '—'}</div>
                         </td>
                         <td className="px-3 py-3">
-                          <div className="text-xs text-black truncate max-w-[110px]" title={p.packageName}>{p.packageName}</div>
+                          <div className="text-xs font-mono text-black" title={p.paymentId}>{p.paymentId}</div>
                         </td>
                         <td className="px-3 py-3">
-                          <div className="text-xs font-mono text-black truncate max-w-[120px]" title={p.orderId}>{p.orderId}</div>
+                          <div className="text-xs font-medium text-black">{p.packageName}</div>
                         </td>
                         <td className="px-3 py-3">
-                          <div className="text-xs font-mono text-black truncate max-w-[120px]" title={p.paymentId}>{p.paymentId}</div>
+                          <div className="text-xs font-medium text-black">{p.amount.toFixed(2)} usd</div>
                         </td>
                         <td className="px-3 py-3">
-                          <div className="text-xs font-medium text-black">${p.amount.toFixed(2)} {p.currency}</div>
+                          <div className="text-xs font-mono text-black">{p.cryptoAmount || '—'}</div>
                         </td>
                         <td className="px-3 py-3">
-                          <span className={`px-3 py-1 inline-flex text-xs leading-5 font-bold rounded-full border-2 shadow-sm ${
+                          <div className="text-xs font-mono text-black">{p.received || '—'}</div>
+                        </td>
+                        <td className="px-3 py-3">
+                          <span className={`px-2 py-1 inline-flex text-xs leading-5 font-bold rounded-full ${
                             p.status === 'completed' || p.status === 'approved' || p.status === 'active' || p.status === 'paid'
-                              ? 'bg-gradient-to-r from-green-100 to-emerald-100 text-green-800 border-2 border-green-300 font-bold shadow-sm' :
-                            p.status === 'pending' || p.status === 'processing' 
-                              ? 'bg-gradient-to-r from-yellow-100 to-amber-100 text-yellow-800 border-2 border-yellow-300 font-bold shadow-sm' :
+                              ? 'bg-green-100 text-green-800 border border-green-300' :
+                            p.status === 'pending' || p.status === 'processing' || p.status === 'sending'
+                              ? 'bg-yellow-100 text-yellow-800 border border-yellow-300' :
                             p.status === 'rejected' || p.status === 'failed' || p.status === 'suspended' || p.status === 'blocked' || p.status === 'cancelled'
-                              ? 'bg-gradient-to-r from-red-200 to-red-300 text-red-900 border-2 border-red-400 font-bold shadow-sm' :
-                            p.status === 'inactive'
-                              ? 'bg-gradient-to-r from-red-100 to-pink-100 text-red-800 border-2 border-red-300 font-bold shadow-sm' :
-                              'bg-gradient-to-r from-gray-100 to-slate-100 text-gray-800 border-2 border-gray-300 font-semibold shadow-sm'
+                              ? 'bg-red-100 text-red-800 border border-red-300' :
+                            'bg-gray-100 text-gray-800 border border-gray-300'
                           }`}>
                             {p.status}
                           </span>
                         </td>
                         <td className="px-3 py-3">
-                          <div className="text-xs font-mono text-black truncate max-w-[150px]" title={p.payAddress || 'N/A'}>{p.payAddress || 'N/A'}</div>
-                        </td>
-                        <td className="px-3 py-3">
-                          <div className="text-xs font-medium text-black">{p.actuallyPaid ? `$${p.actuallyPaid.toFixed(2)}` : 'N/A'}</div>
+                          <div className="text-xs text-black">{new Date(p.createdAt).toLocaleString()}</div>
                         </td>
                       </tr>
                     ))

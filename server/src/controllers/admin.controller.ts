@@ -757,7 +757,7 @@ export const getAllWithdrawals = asyncHandler(async (req, res) => {
     }
 
     const withdrawals = await Withdrawal.find(query)
-      .populate("user", "userId name email phone walletAddress bankAccount")
+      .populate("user", "userId name email phone walletAddress bankAccount country")
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(Number(limit))
@@ -771,6 +771,7 @@ export const getAllWithdrawals = asyncHandler(async (req, res) => {
       userName: (wd.user as any)?.name,
       userEmail: (wd.user as any)?.email,
       userPhone: (wd.user as any)?.phone,
+      country: (wd.user as any)?.country ?? "",
       walletAddress: (wd.user as any)?.walletAddress,
       bankAccount: (wd.user as any)?.bankAccount,
       amount: parseFloat(wd.amount.toString()),
@@ -1310,6 +1311,68 @@ export const getUserBio = asyncHandler(async (req, res) => {
   } catch (error: any) {
     throw new AppError(error.message || "Failed to fetch user bio", 500);
   }
+});
+
+/**
+ * Get user reports (investments, withdrawals, referral, roi, binary, all transactions)
+ * GET /api/v1/admin/users/:userId/reports
+ */
+export const getUserReports = asyncHandler(async (req, res) => {
+  const { userId } = req.params;
+  const user = await User.findOne({ userId }).select("_id").lean();
+  if (!user) {
+    throw new AppError("User not found", 404);
+  }
+  const userObjId = user._id;
+
+  const [withdrawals, allTx] = await Promise.all([
+    Withdrawal.find({ user: userObjId }).sort({ createdAt: -1 }).lean(),
+    WalletTransaction.find({ user: userObjId })
+      .populate("wallet", "type")
+      .sort({ createdAt: -1 })
+      .lean(),
+  ]);
+
+  const formatTx = (tx: any) => ({
+    id: tx._id,
+    walletType: (tx.wallet as any)?.type || "unknown",
+    type: tx.type,
+    amount: parseFloat(tx.amount?.toString() || "0"),
+    balanceBefore: parseFloat(tx.balanceBefore?.toString() || "0"),
+    balanceAfter: parseFloat(tx.balanceAfter?.toString() || "0"),
+    status: tx.status,
+    txRef: tx.txRef,
+    createdAt: tx.createdAt,
+  });
+
+  const referralTransactions = allTx.filter((tx) => (tx.wallet as any)?.type === WalletType.REFERRAL).map(formatTx);
+  const roiTransactions = allTx.filter((tx) => (tx.wallet as any)?.type === WalletType.ROI).map(formatTx);
+  const binaryTransactions = allTx.filter((tx) => (tx.wallet as any)?.type === WalletType.BINARY).map(formatTx);
+  const allTransactions = allTx.map(formatTx);
+
+  const withdrawalsFormatted = withdrawals.map((w: any) => ({
+    id: w._id,
+    amount: parseFloat(w.amount?.toString() || "0"),
+    charges: parseFloat(w.charges?.toString() || "0"),
+    finalAmount: parseFloat(w.finalAmount?.toString() || "0"),
+    walletType: w.walletType,
+    status: w.status,
+    method: w.method,
+    withdrawalId: w.withdrawalId,
+    createdAt: w.createdAt,
+  }));
+
+  const response = res as any;
+  response.status(200).json({
+    status: "success",
+    data: {
+      withdrawals: withdrawalsFormatted,
+      referralTransactions,
+      roiTransactions,
+      binaryTransactions,
+      allTransactions,
+    },
+  });
 });
 
 /**
@@ -2338,7 +2401,7 @@ export const getNOWPaymentsReport = asyncHandler(async (req, res) => {
   const { Payment } = await import("../models/Payment");
   
   const payments = await Payment.find({})
-    .populate("user", "userId name email")
+    .populate("user", "userId name email country")
     .populate("package", "packageName")
     .sort({ createdAt: -1 })
     .lean();
@@ -2362,24 +2425,32 @@ export const getNOWPaymentsReport = asyncHandler(async (req, res) => {
         pendingAmount,
         failedAmount: totalAmount - completedAmount - pendingAmount,
       },
-      payments: payments.map((p) => ({
-        id: p._id,
-        userId: (p.user as any)?.userId || "N/A",
-        userName: (p.user as any)?.name || "Unknown",
-        userEmail: (p.user as any)?.email || "N/A",
-        packageName: (p.package as any)?.packageName || "N/A",
-        orderId: p.orderId,
-        paymentId: p.paymentId,
-        amount: parseFloat(p.amount.toString()),
-        currency: p.currency,
-        status: p.status,
-        payAddress: p.payAddress,
-        payAmount: p.payAmount ? parseFloat(p.payAmount.toString()) : null,
-        payCurrency: p.payCurrency,
-        actuallyPaid: p.actuallyPaid ? parseFloat(p.actuallyPaid.toString()) : null,
-        createdAt: p.createdAt,
-        updatedAt: p.updatedAt,
-      })),
+      payments: payments.map((p) => {
+        const payAmount = p.payAmount ? parseFloat(p.payAmount.toString()) : null;
+        const actuallyPaid = p.actuallyPaid ? parseFloat(p.actuallyPaid.toString()) : null;
+        const payCurrency = (p as any).payCurrency || "";
+        return {
+          id: p._id,
+          userId: (p.user as any)?.userId || "N/A",
+          userName: (p.user as any)?.name || "Unknown",
+          userEmail: (p.user as any)?.email || "N/A",
+          country: (p.user as any)?.country || "",
+          packageName: (p.package as any)?.packageName || "N/A",
+          orderId: p.orderId,
+          paymentId: p.paymentId,
+          amount: parseFloat(p.amount.toString()),
+          currency: p.currency,
+          status: p.status,
+          payAddress: p.payAddress,
+          payAmount,
+          payCurrency,
+          actuallyPaid,
+          cryptoAmount: payAmount != null && payCurrency ? `${payAmount} ${payCurrency}` : null,
+          received: actuallyPaid != null && payCurrency ? `${actuallyPaid} ${payCurrency}` : null,
+          createdAt: p.createdAt,
+          updatedAt: p.updatedAt,
+        };
+      }),
     },
   });
 });
@@ -2955,6 +3026,58 @@ export const adminCreateInvestment = asyncHandler(async (req, res) => {
         createdAt: investment.createdAt,
       },
     },
+  });
+});
+
+/**
+ * Admin: List investments created by admin on behalf of users
+ * GET /api/v1/admin/investments/admin-created
+ * Query: fromDate (YYYY-MM-DD), toDate (YYYY-MM-DD)
+ */
+export const getAdminCreatedInvestments = asyncHandler(async (req, res) => {
+  const query = req.query as { fromDate?: string; toDate?: string };
+  const { fromDate, toDate } = query;
+
+  const filter: Record<string, unknown> = { type: "admin" };
+  if (fromDate || toDate) {
+    filter.createdAt = {} as Record<string, Date>;
+    if (fromDate) {
+      const start = new Date(fromDate);
+      start.setHours(0, 0, 0, 0);
+      (filter.createdAt as Record<string, Date>).$gte = start;
+    }
+    if (toDate) {
+      const end = new Date(toDate);
+      end.setHours(23, 59, 59, 999);
+      (filter.createdAt as Record<string, Date>).$lte = end;
+    }
+  }
+
+  const investments = await Investment.find(filter)
+    .populate("user", "userId name email country")
+    .populate("packageId", "packageName _id")
+    .sort({ createdAt: -1 })
+    .lean();
+
+  const list = investments.map((inv) => {
+    const amount = parseFloat((inv as any).investedAmount?.toString() ?? "0");
+    const packageName = (inv.packageId as any)?.packageName ?? "N/A";
+    return {
+      transactionId: (inv as any)._id?.toString() ?? "",
+      transactionName: `${packageName} - $${amount.toFixed(2)}`,
+      userId: (inv.user as any)?.userId ?? "N/A",
+      packageId: (inv.packageId as any)?._id?.toString() ?? "N/A",
+      packageName,
+      country: (inv.user as any)?.country ?? "",
+      amount,
+      createdAt: (inv as any).createdAt,
+    };
+  });
+
+  const response = res as any;
+  response.status(200).json({
+    status: "success",
+    data: { investments: list },
   });
 });
 

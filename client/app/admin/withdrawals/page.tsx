@@ -13,6 +13,7 @@ interface Withdrawal {
   userName: string;
   userEmail: string;
   userPhone: string;
+  country?: string;
   walletAddress?: string;
   bankAccount?: any;
   amount: number;
@@ -395,6 +396,7 @@ function AdminWithdrawalsContent() {
                 <thead className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white">
                   <tr>
                     <th className="px-3 py-3 text-left text-xs font-medium text-white uppercase w-[140px]">User</th>
+                    <th className="px-3 py-3 text-left text-xs font-medium text-white uppercase w-[100px]">Country</th>
                     <th className="px-3 py-3 text-left text-xs font-medium text-white uppercase w-[120px]">Amount</th>
                     <th className="px-3 py-3 text-left text-xs font-medium text-white uppercase w-[100px]">Wallet Type</th>
                     <th className="px-3 py-3 text-left text-xs font-medium text-white uppercase w-[180px]">Wallet Address</th>
@@ -406,7 +408,7 @@ function AdminWithdrawalsContent() {
                 <tbody className="bg-white divide-y divide-gray-200">
                   {withdrawals.length === 0 ? (
                     <tr>
-                      <td colSpan={7} className="px-6 py-8 text-center text-black">
+                      <td colSpan={8} className="px-6 py-8 text-center text-black">
                         No withdrawals found
                       </td>
                     </tr>
@@ -417,6 +419,9 @@ function AdminWithdrawalsContent() {
                           <div className="text-xs font-medium text-black truncate max-w-[140px]" title={wd.userName}>{wd.userName}</div>
                           <div className="text-xs text-black truncate max-w-[140px]" title={wd.userId}>{wd.userId}</div>
                           <div className="text-xs text-black truncate max-w-[140px]" title={wd.userEmail}>{wd.userEmail}</div>
+                        </td>
+                        <td className="px-3 py-3">
+                          <div className="text-xs text-black">{wd.country || '—'}</div>
                         </td>
                         <td className="px-3 py-3">
                           <div className="text-xs font-semibold text-black">{formatCurrency(wd.amount)}</div>

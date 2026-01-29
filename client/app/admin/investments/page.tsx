@@ -22,6 +22,17 @@ interface User {
   email: string;
 }
 
+interface AdminCreatedInvestment {
+  transactionId: string;
+  transactionName: string;
+  userId: string;
+  packageId: string;
+  packageName: string;
+  country: string;
+  amount: number;
+  createdAt: string;
+}
+
 export default function AdminInvestmentsPage() {
   const { admin } = useAuth();
   const [users, setUsers] = useState<User[]>([]);
@@ -35,6 +46,10 @@ export default function AdminInvestmentsPage() {
   });
   const [userSearch, setUserSearch] = useState('');
   const [searching, setSearching] = useState(false);
+  const [adminCreatedList, setAdminCreatedList] = useState<AdminCreatedInvestment[]>([]);
+  const [loadingReport, setLoadingReport] = useState(false);
+  const [fromDate, setFromDate] = useState('');
+  const [toDate, setToDate] = useState('');
   const hasFetchedRef = useRef(false);
 
   useEffect(() => {
@@ -43,7 +58,58 @@ export default function AdminInvestmentsPage() {
     }
     hasFetchedRef.current = true;
     fetchData();
+    fetchAdminCreatedInvestments();
   }, []);
+
+  const fetchAdminCreatedInvestments = async (params?: { fromDate?: string; toDate?: string }) => {
+    try {
+      setLoadingReport(true);
+      const res = await api.getAdminCreatedInvestments(params);
+      if (res.data?.investments) {
+        setAdminCreatedList(res.data.investments);
+      }
+    } catch (err) {
+      console.error('Failed to load admin-created investments:', err);
+      setAdminCreatedList([]);
+    } finally {
+      setLoadingReport(false);
+    }
+  };
+
+  const handleApplyDateFilter = () => {
+    fetchAdminCreatedInvestments(
+      fromDate || toDate ? { fromDate: fromDate || undefined, toDate: toDate || undefined } : undefined
+    );
+  };
+
+  const handleClearDateFilter = () => {
+    setFromDate('');
+    setToDate('');
+    fetchAdminCreatedInvestments();
+  };
+
+  const exportToExcel = () => {
+    const headers = ['Transaction', 'User ID', 'Package ID', 'Country', 'Amount', 'Created Date'];
+    const rows = adminCreatedList.map((row) => [
+      row.transactionName,
+      row.userId,
+      row.packageId,
+      row.country || '—',
+      row.amount.toFixed(2),
+      row.createdAt ? new Date(row.createdAt).toLocaleString() : '—',
+    ]);
+    const excelContent = [headers.join('\t'), ...rows.map((r) => r.join('\t'))].join('\n');
+    const blob = new Blob([excelContent], { type: 'application/vnd.ms-excel' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `admin-created-investments_${new Date().toISOString().split('T')[0]}.xls`;
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
 
   const fetchData = async () => {
     try {
@@ -157,6 +223,7 @@ export default function AdminInvestmentsPage() {
       toast.success('Investment created successfully!');
       setFormData({ userId: '', packageId: '', amount: '' });
       setUserSearch('');
+      await fetchAdminCreatedInvestments();
     } catch (err: any) {
       toast.error(err.message || 'Failed to create investment');
     } finally {
@@ -222,7 +289,7 @@ export default function AdminInvestmentsPage() {
                   }
                 }}
                 placeholder="Search by User ID, Name, or Email"
-                className="w-full px-4 py-2 pr-10 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+                className="w-full px-4 py-2 pr-10 border text-black border-gray-600 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
               />
               {searching && userSearch && (
                 <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
@@ -266,7 +333,7 @@ export default function AdminInvestmentsPage() {
               required
               value={formData.packageId}
               onChange={(e) => setFormData({ ...formData, packageId: e.target.value, amount: '' })}
-              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+              className="w-full px-4 py-2 text-black border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
             >
               <option value="">Select a package</option>
               {packages.length === 0 ? (
@@ -309,7 +376,7 @@ export default function AdminInvestmentsPage() {
               value={formData.amount}
               onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
               placeholder="Enter investment amount"
-              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+              className="w-full text-black px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
             />
             {selectedPackage && formData.amount && (
               <p className="mt-1 text-sm text-black">
@@ -329,6 +396,91 @@ export default function AdminInvestmentsPage() {
             </button>
           </div>
         </form>
+      </div>
+
+      {/* Report: Admin-created investments */}
+      <div className="mt-8 bg-white rounded-lg shadow p-6">
+        <h2 className="text-xl font-bold text-black mb-4">Admin-Created Investments Report</h2>
+        <p className="text-sm text-black mb-4">Investments created by admin on behalf of users</p>
+
+        {/* Date filters and Excel export */}
+        <div className="flex flex-wrap items-center gap-3 mb-4">
+          <label className="flex items-center gap-2 text-sm text-black">
+            <span>From</span>
+            <input
+              type="date"
+              value={fromDate}
+              onChange={(e) => setFromDate(e.target.value)}
+              className="px-3 py-2 border border-gray-300 rounded-md text-black focus:ring-indigo-500 focus:border-indigo-500"
+            />
+          </label>
+          <label className="flex items-center gap-2 text-sm text-black">
+            <span>To</span>
+            <input
+              type="date"
+              value={toDate}
+              onChange={(e) => setToDate(e.target.value)}
+              className="px-3 py-2 border border-gray-300 rounded-md text-black focus:ring-indigo-500 focus:border-indigo-500"
+            />
+          </label>
+          <button
+            type="button"
+            onClick={handleApplyDateFilter}
+            className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+          >
+            Apply
+          </button>
+          <button
+            type="button"
+            onClick={handleClearDateFilter}
+            className="px-4 py-2 text-sm font-medium text-black bg-gray-200 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2"
+          >
+            Clear
+          </button>
+          <button
+            type="button"
+            onClick={exportToExcel}
+            disabled={adminCreatedList.length === 0}
+            className="px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            Export Excel
+          </button>
+        </div>
+
+        {loadingReport ? (
+          <div className="flex justify-center py-8">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600" />
+          </div>
+        ) : adminCreatedList.length === 0 ? (
+          <p className="text-black py-6 text-center">No admin-created investments yet.</p>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead>
+                <tr>
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-black uppercase tracking-wider">Transaction</th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-black uppercase tracking-wider">User ID</th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-black uppercase tracking-wider">Package ID</th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-black uppercase tracking-wider">Country</th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-black uppercase tracking-wider">Amount</th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-black uppercase tracking-wider">Created Date</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-200">
+                {adminCreatedList.map((row) => (
+                  <tr key={row.transactionId} className="hover:bg-gray-50">
+                    <td className="px-4 py-3 text-sm text-black font-medium" title={row.transactionId}>{row.transactionName}</td>
+                    <td className="px-4 py-3 text-sm text-black font-medium">{row.userId}</td>
+                    <td className="px-4 py-3 text-sm text-black font-mono" title={row.packageName}>{row.packageId}</td>
+                    <td className="px-4 py-3 text-sm text-black">{row.country || '—'}</td>
+                    <td className="px-4 py-3 text-sm text-black font-semibold">${row.amount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                    <td className="px-4 py-3 text-sm text-black">{row.createdAt ? new Date(row.createdAt).toLocaleString() : '—'}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
     </div>
   );

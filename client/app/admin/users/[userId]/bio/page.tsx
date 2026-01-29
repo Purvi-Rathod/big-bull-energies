@@ -104,12 +104,20 @@ export default function UserBioPage() {
   const router = useRouter();
   const userId = params.userId as string;
   const [bio, setBio] = useState<UserBio | null>(null);
+  const [reports, setReports] = useState<{
+    withdrawals: any[];
+    referralTransactions: any[];
+    roiTransactions: any[];
+    binaryTransactions: any[];
+    allTransactions: any[];
+  } | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
   useEffect(() => {
     if (userId) {
       fetchUserBio();
+      fetchUserReports();
     }
   }, [userId]);
 
@@ -126,6 +134,20 @@ export default function UserBioPage() {
       toast.error(err.message || 'Failed to fetch user bio');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchUserReports = async () => {
+    try {
+      const response = await api.getAdminUserReports(userId);
+      if (response.data) {
+        setReports(response.data);
+      } else {
+        setReports({ withdrawals: [], referralTransactions: [], roiTransactions: [], binaryTransactions: [], allTransactions: [] });
+      }
+    } catch (err) {
+      console.error('Failed to fetch user reports:', err);
+      setReports({ withdrawals: [], referralTransactions: [], roiTransactions: [], binaryTransactions: [], allTransactions: [] });
     }
   };
 
@@ -321,9 +343,9 @@ export default function UserBioPage() {
         </div>
       </div>
 
-      {/* Investments */}
+      {/* Investments Report */}
       <div className="bg-white rounded-lg shadow-lg p-6 border border-gray-200">
-        <h2 className="text-xl font-semibold text-black mb-4">Investments</h2>
+        <h2 className="text-xl font-semibold text-black mb-4">Investments Report</h2>
         <div className="overflow-x-auto">
           <table className="w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
@@ -471,6 +493,198 @@ export default function UserBioPage() {
           </table>
         </div>
       </div>
+
+      {/* Reports section - Withdrawals, Referral, ROI, Binary, All Transactions */}
+      {reports && (
+        <div className="space-y-6">
+          {/* Withdrawals Report */}
+          <div className="bg-white rounded-lg shadow-lg p-6 border border-gray-200">
+            <h2 className="text-xl font-semibold text-black mb-4">Withdrawals Report</h2>
+            <div className="overflow-x-auto">
+              <table className="w-full divide-y divide-gray-200">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase">Amount</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase">Charges</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase">Final Amount</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase">Wallet Type</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase">Status</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase">Method</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase">Date</th>
+                  </tr>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {reports.withdrawals.length === 0 ? (
+                    <tr><td colSpan={7} className="px-4 py-4 text-center text-gray-500">No withdrawals found</td></tr>
+                  ) : (
+                    reports.withdrawals.map((w: any) => (
+                      <tr key={w.id} className="hover:bg-gray-50">
+                        <td className="px-4 py-3 text-sm text-black">${w.amount?.toFixed(2)}</td>
+                        <td className="px-4 py-3 text-sm text-black">${w.charges?.toFixed(2)}</td>
+                        <td className="px-4 py-3 text-sm text-black font-medium">${w.finalAmount?.toFixed(2)}</td>
+                        <td className="px-4 py-3 text-sm text-black">{w.walletType}</td>
+                        <td className="px-4 py-3"><span className={`px-2 py-1 rounded-full text-xs font-semibold ${getStatusColor(w.status)}`}>{w.status}</span></td>
+                        <td className="px-4 py-3 text-sm text-black">{w.method || '—'}</td>
+                        <td className="px-4 py-3 text-sm text-black">{formatDate(w.createdAt)}</td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          {/* Referral Report */}
+          <div className="bg-white rounded-lg shadow-lg p-6 border border-gray-200">
+            <h2 className="text-xl font-semibold text-black mb-4">Referral Report</h2>
+            <div className="overflow-x-auto">
+              <table className="w-full divide-y divide-gray-200">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase">Type</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase">Amount</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase">Balance Before</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase">Balance After</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase">Status</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase">Ref</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase">Date</th>
+                  </tr>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {reports.referralTransactions.length === 0 ? (
+                    <tr><td colSpan={7} className="px-4 py-4 text-center text-gray-500">No referral transactions found</td></tr>
+                  ) : (
+                    reports.referralTransactions.map((tx: any) => (
+                      <tr key={tx.id} className="hover:bg-gray-50">
+                        <td className="px-4 py-3 text-sm font-medium text-black">{tx.type}</td>
+                        <td className="px-4 py-3 text-sm text-black">${tx.amount?.toFixed(2)}</td>
+                        <td className="px-4 py-3 text-sm text-black">${tx.balanceBefore?.toFixed(2)}</td>
+                        <td className="px-4 py-3 text-sm text-black">${tx.balanceAfter?.toFixed(2)}</td>
+                        <td className="px-4 py-3 text-sm text-black">{tx.status}</td>
+                        <td className="px-4 py-3 text-sm text-gray-600 font-mono truncate max-w-[120px]" title={tx.txRef}>{tx.txRef || '—'}</td>
+                        <td className="px-4 py-3 text-sm text-black">{formatDate(tx.createdAt)}</td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          {/* ROI Report */}
+          <div className="bg-white rounded-lg shadow-lg p-6 border border-gray-200">
+            <h2 className="text-xl font-semibold text-black mb-4">ROI Report</h2>
+            <div className="overflow-x-auto">
+              <table className="w-full divide-y divide-gray-200">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase">Type</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase">Amount</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase">Balance Before</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase">Balance After</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase">Status</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase">Ref</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase">Date</th>
+                  </tr>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {reports.roiTransactions.length === 0 ? (
+                    <tr><td colSpan={7} className="px-4 py-4 text-center text-gray-500">No ROI transactions found</td></tr>
+                  ) : (
+                    reports.roiTransactions.map((tx: any) => (
+                      <tr key={tx.id} className="hover:bg-gray-50">
+                        <td className="px-4 py-3 text-sm font-medium text-black">{tx.type}</td>
+                        <td className="px-4 py-3 text-sm text-black">${tx.amount?.toFixed(2)}</td>
+                        <td className="px-4 py-3 text-sm text-black">${tx.balanceBefore?.toFixed(2)}</td>
+                        <td className="px-4 py-3 text-sm text-black">${tx.balanceAfter?.toFixed(2)}</td>
+                        <td className="px-4 py-3 text-sm text-black">{tx.status}</td>
+                        <td className="px-4 py-3 text-sm text-gray-600 font-mono truncate max-w-[120px]" title={tx.txRef}>{tx.txRef || '—'}</td>
+                        <td className="px-4 py-3 text-sm text-black">{formatDate(tx.createdAt)}</td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          {/* Binary Report */}
+          <div className="bg-white rounded-lg shadow-lg p-6 border border-gray-200">
+            <h2 className="text-xl font-semibold text-black mb-4">Binary Report</h2>
+            <div className="overflow-x-auto">
+              <table className="w-full divide-y divide-gray-200">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase">Type</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase">Amount</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase">Balance Before</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase">Balance After</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase">Status</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase">Ref</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase">Date</th>
+                  </tr>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {reports.binaryTransactions.length === 0 ? (
+                    <tr><td colSpan={7} className="px-4 py-4 text-center text-gray-500">No binary transactions found</td></tr>
+                  ) : (
+                    reports.binaryTransactions.map((tx: any) => (
+                      <tr key={tx.id} className="hover:bg-gray-50">
+                        <td className="px-4 py-3 text-sm font-medium text-black">{tx.type}</td>
+                        <td className="px-4 py-3 text-sm text-black">${tx.amount?.toFixed(2)}</td>
+                        <td className="px-4 py-3 text-sm text-black">${tx.balanceBefore?.toFixed(2)}</td>
+                        <td className="px-4 py-3 text-sm text-black">${tx.balanceAfter?.toFixed(2)}</td>
+                        <td className="px-4 py-3 text-sm text-black">{tx.status}</td>
+                        <td className="px-4 py-3 text-sm text-gray-600 font-mono truncate max-w-[120px]" title={tx.txRef}>{tx.txRef || '—'}</td>
+                        <td className="px-4 py-3 text-sm text-black">{formatDate(tx.createdAt)}</td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          {/* All Transactions */}
+          <div className="bg-white rounded-lg shadow-lg p-6 border border-gray-200">
+            <h2 className="text-xl font-semibold text-black mb-4">All Transactions</h2>
+            <div className="overflow-x-auto">
+              <table className="w-full divide-y divide-gray-200">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase">Wallet Type</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase">Type</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase">Amount</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase">Balance Before</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase">Balance After</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase">Status</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase">Ref</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase">Date</th>
+                  </tr>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {reports.allTransactions.length === 0 ? (
+                    <tr><td colSpan={8} className="px-4 py-4 text-center text-gray-500">No transactions found</td></tr>
+                  ) : (
+                    reports.allTransactions.map((tx: any) => (
+                      <tr key={tx.id} className="hover:bg-gray-50">
+                        <td className="px-4 py-3 text-sm font-medium text-black">{tx.walletType}</td>
+                        <td className="px-4 py-3 text-sm font-medium text-black">{tx.type}</td>
+                        <td className="px-4 py-3 text-sm text-black">${tx.amount?.toFixed(2)}</td>
+                        <td className="px-4 py-3 text-sm text-black">${tx.balanceBefore?.toFixed(2)}</td>
+                        <td className="px-4 py-3 text-sm text-black">${tx.balanceAfter?.toFixed(2)}</td>
+                        <td className="px-4 py-3 text-sm text-black">{tx.status}</td>
+                        <td className="px-4 py-3 text-sm text-gray-600 font-mono truncate max-w-[120px]" title={tx.txRef}>{tx.txRef || '—'}</td>
+                        <td className="px-4 py-3 text-sm text-black">{formatDate(tx.createdAt)}</td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -38,6 +38,7 @@ import {
   getReferralReport,
   getROIReport,
   adminCreateInvestment,
+  getAdminCreatedInvestments,
   addFundsToWallet,
   removeFundsFromWallet,
   getAllTickets,
@@ -50,6 +51,7 @@ import {
   setBinaryTarget,
   getUserTargetStatus,
   getUserBio,
+  getUserReports,
   addMainWalletToAllUsers,
 } from "../controllers/admin.controller";
 import {
@@ -116,6 +118,7 @@ router.post("/calculation-job/:jobId/resume", requireAdminAuth, resumeCalculatio
 // User management (admin only)
 router.get("/users", requireAdminAuth, getAllUsers);
 router.get("/users/:userId/bio", requireAdminAuth, getUserBio);
+router.get("/users/:userId/reports", requireAdminAuth, getUserReports);
 router.post("/impersonate/:userId", requireAdminAuth, impersonateUser);
 router.put("/users/:userId/status", requireAdminAuth, updateUserStatus);
 router.put("/users/:userId/profile", requireAdminAuth, updateUserProfile);
@@ -142,6 +145,7 @@ router.post("/withdrawals/:id/approve", requireAdminAuth, approveWithdrawal);
 router.post("/withdrawals/:id/reject", requireAdminAuth, rejectWithdrawal);
 
 // Investment management
+router.get("/investments/admin-created", requireAdminAuth, getAdminCreatedInvestments);
 router.post("/investments/create", requireAdminAuth, adminCreateInvestment);
 
 // Wallet management routes (admin only)

@@ -588,6 +588,18 @@ class ApiClient {
     });
   }
 
+  async getAdminUserReports(userId: string) {
+    return this.request<{
+      withdrawals: any[];
+      referralTransactions: any[];
+      roiTransactions: any[];
+      binaryTransactions: any[];
+      allTransactions: any[];
+    }>(`/admin/users/${userId}/reports`, {
+      method: 'GET',
+    });
+  }
+
   async impersonateUser(userId: string) {
     const response = await this.request<{ user: any; token: string }>(`/admin/impersonate/${userId}`, {
       method: 'POST',
@@ -822,6 +834,25 @@ class ApiClient {
     return this.request<{ investment: any }>('/admin/investments/create', {
       method: 'POST',
       body: JSON.stringify(data),
+    });
+  }
+
+  async getAdminCreatedInvestments(params?: { fromDate?: string; toDate?: string }) {
+    const query = new URLSearchParams();
+    if (params?.fromDate) query.set('fromDate', params.fromDate);
+    if (params?.toDate) query.set('toDate', params.toDate);
+    const qs = query.toString();
+    return this.request<{ investments: Array<{
+      transactionId: string;
+      transactionName: string;
+      userId: string;
+      packageId: string;
+      packageName: string;
+      country: string;
+      amount: number;
+      createdAt: string;
+    }> }>('/admin/investments/admin-created' + (qs ? `?${qs}` : ''), {
+      method: 'GET',
     });
   }
 

@@ -1146,10 +1146,9 @@ class ApiClient {
     }>('/admin/influencer/free/list', { method: 'GET' });
   }
 
-  // Free Account Management (Admin) - activate existing user with package and binary target
+  // Free Account Management (Admin) - give existing user free investment + binary target (no referrer, no new account)
   async createFreeAccounts(data: {
     userId: string;
-    influencerUserId: string;
     packageId: string;
     amount: number;
     binaryTargetAmount: number;
@@ -1157,8 +1156,6 @@ class ApiClient {
     return this.request<{
       userId: string;
       userName: string;
-      influencerUserId: string;
-      influencerName: string;
       packageId: string;
       packageName: string;
       amount: number;

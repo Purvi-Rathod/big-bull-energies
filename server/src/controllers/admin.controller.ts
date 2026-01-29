@@ -3644,22 +3644,21 @@ export const getUserTargetStatus = asyncHandler(async (req, res) => {
 });
 
 /**
- * Admin: Activate existing user as Free Account (under influencer, with package and binary target)
+ * Admin: Give existing user a free investment + binary target (no referrer, no downline)
  * POST /api/v1/admin/influencer/free/create
- * Body: { userId, influencerUserId, packageId, amount, binaryTargetAmount }
+ * Body: { userId, packageId, amount, binaryTargetAmount }
  */
 export const createFreeAccounts = asyncHandler(async (req, res) => {
   const body = (req as any).body;
-  const { userId, influencerUserId, packageId, amount, binaryTargetAmount } = body as {
+  const { userId, packageId, amount, binaryTargetAmount } = body as {
     userId: string;
-    influencerUserId: string;
     packageId: string;
     amount: number;
     binaryTargetAmount: number;
   };
 
-  if (!userId || !influencerUserId || !packageId || amount == null || amount <= 0) {
-    throw new AppError("User ID, Influencer User ID, Package ID, and Amount are required", 400);
+  if (!userId || !packageId || amount == null || amount <= 0) {
+    throw new AppError("User ID, Package ID, and Amount are required", 400);
   }
 
   const targetAmount = Number(binaryTargetAmount);
@@ -3667,14 +3666,13 @@ export const createFreeAccounts = asyncHandler(async (req, res) => {
     throw new AppError("Binary target amount must be a valid non-negative number", 400);
   }
 
-  const user = await findUserByUserId(userId);
+  // Resolve user: accept full userId (e.g. CROWN-000003) or short (e.g. 000003)
+  let user = await findUserByUserId(userId.trim());
+  if (!user && /^\d+$/.test(userId.trim())) {
+    user = await findUserByUserId("CROWN-" + userId.trim());
+  }
   if (!user) {
     throw new AppError("User not found", 404);
-  }
-
-  const influencer = await findUserByUserId(influencerUserId);
-  if (!influencer) {
-    throw new AppError("Influencer user not found", 404);
   }
 
   if (!Types.ObjectId.isValid(packageId)) {
@@ -3692,15 +3690,14 @@ export const createFreeAccounts = asyncHandler(async (req, res) => {
     throw new AppError(`Amount must be between $${minAmount} and $${maxAmount} for this package`, 400);
   }
 
-  // Set user as free account under influencer
-  user.referrer = influencer._id as Types.ObjectId;
+  // Apply free account: target + withdrawal rules. Do NOT set or change referrer.
   user.accountType = "free";
   user.binaryTargetAmount = targetAmount;
   user.targetStatus = targetAmount > 0 ? "pending" : "completed";
   user.withdrawEnabled = targetAmount > 0 ? false : true;
   await user.save();
 
-  // Create investment for the user (package activation)
+  // Create investment for this user (free package activation). No new account created.
   const paymentId = `FREE_${Date.now()}_${Math.random().toString(36).substring(7)}`;
   const { processInvestment } = await import("../services/investment.service");
   const investmentDoc = await processInvestment(
@@ -3720,12 +3717,10 @@ export const createFreeAccounts = asyncHandler(async (req, res) => {
   const response = res as any;
   response.status(201).json({
     status: "success",
-    message: "User activated as free account with package and binary target",
+    message: "Free investment and target applied to existing user. No new account or downline created.",
     data: {
       userId: user.userId,
       userName: user.name,
-      influencerUserId: influencer.userId,
-      influencerName: influencer.name,
       packageId,
       packageName: pkg.packageName,
       amount,

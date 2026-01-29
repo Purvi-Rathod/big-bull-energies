@@ -5,13 +5,6 @@ import { useAuth } from '@/contexts/AuthContext';
 import { api } from '@/lib/api';
 import toast from 'react-hot-toast';
 
-interface User {
-  id: string;
-  userId: string;
-  name: string;
-  email: string;
-}
-
 interface Package {
   id: string;
   packageName: string;
@@ -24,16 +17,13 @@ interface Package {
 
 export default function FreeAccountPage() {
   const { admin } = useAuth();
-  const [userSearch, setUserSearch] = useState('');
-  const [selectedUser, setSelectedUser] = useState<User | null>(null);
-  const [users, setUsers] = useState<User[]>([]);
+  const [userId, setUserId] = useState('');
   const [packages, setPackages] = useState<Package[]>([]);
   const [selectedPackageId, setSelectedPackageId] = useState('');
   const [amount, setAmount] = useState('');
   const [binaryTarget, setBinaryTarget] = useState('');
   const [loading, setLoading] = useState(false);
   const [creating, setCreating] = useState(false);
-  const [searchingUser, setSearchingUser] = useState(false);
   const [freeAccounts, setFreeAccounts] = useState<Array<{
     userId: string;
     name: string;
@@ -98,30 +88,6 @@ export default function FreeAccountPage() {
     }
   };
 
-  const searchUser = async () => {
-    if (!userSearch.trim()) {
-      toast.error('Please enter a User ID or name to search');
-      return;
-    }
-    try {
-      setSearchingUser(true);
-      const res = await api.getAdminUsers({ page: 1, limit: 20, search: userSearch.trim() });
-      const list = res.data?.users || [];
-      setUsers(list);
-      if (list.length === 1) {
-        setSelectedUser(list[0]);
-        setUsers([]);
-        setUserSearch(list[0].userId);
-      } else if (list.length === 0) {
-        toast.error('No users found');
-      }
-    } catch (err: any) {
-      toast.error(err.message || 'Failed to search users');
-    } finally {
-      setSearchingUser(false);
-    }
-  };
-
   const selectedPackage = packages.find((p) => p.id === selectedPackageId);
   const amountNum = amount ? parseFloat(amount) : NaN;
   const targetNum = binaryTarget ? parseFloat(binaryTarget) : NaN;
@@ -130,8 +96,9 @@ export default function FreeAccountPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!selectedUser) {
-      toast.error('Please select a user');
+    const trimmedUserId = userId.trim();
+    if (!trimmedUserId) {
+      toast.error('Please enter an existing User ID');
       return;
     }
     if (!selectedPackageId || !selectedPackage) {
@@ -150,15 +117,13 @@ export default function FreeAccountPage() {
     try {
       setCreating(true);
       await api.createFreeAccounts({
-        userId: selectedUser.userId,
-        influencerUserId: 'CROWN-000000',
+        userId: trimmedUserId,
         packageId: selectedPackageId,
         amount: amountNum,
         binaryTargetAmount: targetNum,
       });
-      toast.success('User activated as free account with package and binary target');
-      setSelectedUser(null);
-      setUserSearch('');
+      toast.success(`Package and target applied to ${trimmedUserId}. No new account created.`);
+      setUserId('');
       setSelectedPackageId('');
       setAmount('');
       setBinaryTarget('');
@@ -177,7 +142,7 @@ export default function FreeAccountPage() {
           Create Free Account
         </h1>
         <p className="mt-2 text-base text-gray-700">
-          Activate an existing user as a free account: assign package and binary target. Account is under CROWN-000000.
+          Enter an existing user ID. That user will receive the package investment and binary target. No new account or downline is created.
         </p>
       </div>
 
@@ -198,7 +163,7 @@ export default function FreeAccountPage() {
                 <li>Withdrawal Restriction: Can only withdraw from Binary wallet</li>
                 <li>Target Required: Must complete binary target to unlock withdrawals</li>
                 <li>Withdrawal Limit: Can only withdraw amount earned from binary business (up to target)</li>
-                <li>Account is under CROWN-000000</li>
+                <li>Existing user’s referrer is not changed; no new account or downline is created</li>
               </ul>
             </div>
           </div>
@@ -206,51 +171,19 @@ export default function FreeAccountPage() {
       </div>
 
       <form onSubmit={handleSubmit} className="max-w-3xl mx-auto bg-gradient-to-br from-white to-gray-50 rounded-xl shadow-xl border border-gray-200 p-8 space-y-6">
-        {/* 1. User ID */}
+        {/* 1. Existing User ID */}
         <div>
           <label className="block text-sm font-medium text-black mb-2">
-            User ID <span className="text-red-500">*</span>
+            Existing User ID <span className="text-red-500">*</span>
           </label>
-          <div className="flex gap-2 mb-2">
-            <input
-              type="text"
-              value={userSearch}
-              onChange={(e) => {
-                setUserSearch(e.target.value);
-                if (selectedUser && e.target.value !== selectedUser.userId) setSelectedUser(null);
-              }}
-              onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), searchUser())}
-              placeholder="Enter User ID or name to search..."
-              className="flex-1 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 text-black placeholder:text-gray-500"
-            />
-            <button type="button" onClick={searchUser} disabled={searchingUser} className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 disabled:opacity-50">
-              {searchingUser ? 'Searching...' : 'Search'}
-            </button>
-          </div>
-          {users.length > 0 && (
-            <div className="border border-gray-200 rounded-md max-h-40 overflow-y-auto">
-              {users.map((u) => (
-                <button
-                  key={u.id}
-                  type="button"
-                  onClick={() => {
-                    setSelectedUser(u);
-                    setUserSearch(u.userId);
-                    setUsers([]);
-                  }}
-                  className="w-full text-left px-4 py-2 hover:bg-gray-50 border-b border-gray-100 last:border-b-0"
-                >
-                  <span className="font-medium">{u.userId}</span> — {u.name}
-                </button>
-              ))}
-            </div>
-          )}
-          {selectedUser && (
-            <div className="mt-2 p-3 bg-green-50 border border-green-200 rounded-md text-sm text-green-800">
-              Selected: {selectedUser.userId} — {selectedUser.name}
-              <button type="button" onClick={() => { setSelectedUser(null); setUserSearch(''); }} className="ml-2 text-green-600 hover:underline">Change</button>
-            </div>
-          )}
+          <input
+            type="text"
+            value={userId}
+            onChange={(e) => setUserId(e.target.value)}
+            placeholder="e.g. CROWN-00024"
+            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 text-black placeholder:text-gray-500 font-mono"
+          />
+          <p className="mt-1 text-xs text-gray-600">The same account will receive the package and target. No new account is created.</p>
         </div>
 
         {/* 2. Package */}
@@ -326,7 +259,7 @@ export default function FreeAccountPage() {
             type="submit"
             disabled={
               creating ||
-              !selectedUser ||
+              !userId.trim() ||
               !selectedPackageId ||
               !amountValid ||
               !targetValid
@@ -341,8 +274,8 @@ export default function FreeAccountPage() {
       {/* Created Free Accounts table - full width for broader display */}
       <div className="mt-10 w-full max-w-[1600px] mx-auto bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
         <div className="px-6 py-4 border-b border-gray-200">
-          <h2 className="text-xl font-semibold text-black">Created Free Accounts</h2>
-          <p className="text-sm text-gray-600 mt-0.5">Users activated as free accounts under an influencer</p>
+          <h2 className="text-xl font-semibold text-black">Free Accounts</h2>
+          <p className="text-sm text-gray-600 mt-0.5">Existing users who received a free investment and binary target (no new account created)</p>
         </div>
         {loadingFreeAccounts ? (
           <div className="px-6 py-12 text-center text-gray-500">Loading...</div>
@@ -357,7 +290,7 @@ export default function FreeAccountPage() {
                   <th className="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase">Name</th>
                   <th className="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase">Email</th>
                   <th className="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase">Country</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase">Influencer</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase">Referrer</th>
                   <th className="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase">Package</th>
                   <th className="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase">Amount</th>
                   <th className="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase">Binary Target</th>
@@ -374,8 +307,8 @@ export default function FreeAccountPage() {
                     <td className="px-4 py-3 text-sm text-gray-600 truncate max-w-[180px]" title={row.email}>{row.email || '—'}</td>
                     <td className="px-4 py-3 text-sm text-black">{row.country || '—'}</td>
                     <td className="px-4 py-3 text-sm text-black">
-                      <span className="font-mono">{row.influencerUserId}</span>
-                      {row.influencerName && <span className="text-gray-600"> — {row.influencerName}</span>}
+                      <span className="font-mono">{row.influencerUserId || '—'}</span>
+                      {row.influencerName ? <span className="text-gray-600"> — {row.influencerName}</span> : null}
                     </td>
                     <td className="px-4 py-3 text-sm text-black">{row.packageName}</td>
                     <td className="px-4 py-3 text-sm font-medium text-black">${row.amount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>

@@ -789,18 +789,28 @@ export const handlePaymentCallback = asyncHandler(async (req, res) => {
       console.log(`[NOWPayments Callback]   - User ID: ${userId}`);
       console.log(`[NOWPayments Callback] Processing investment for user ${userId}...`);
       
-      // Check for duplicate investment (like old implementation)
-      // Old implementation checked by txn_id, we check by paymentId stored in voucherId field
-      const txnId = callback.payment_id || invoiceId || payment.paymentId;
-      console.log(`[NOWPayments Callback] Checking for duplicate investment by payment ID: ${txnId}`);
+      // Check for duplicate investment
+      // FIXED: Use invoice_id as primary identifier (matches Payment.paymentId)
+      // Also check payment_id to prevent duplicates from both IDs
+      const invoiceIdStr = invoiceId?.toString() || payment.paymentId;
+      const paymentIdStr = callback.payment_id?.toString();
       
+      console.log(`[NOWPayments Callback] Checking for duplicate investment:`);
+      console.log(`[NOWPayments Callback]   - Invoice ID: ${invoiceIdStr}`);
+      console.log(`[NOWPayments Callback]   - Payment ID: ${paymentIdStr || 'N/A'}`);
+      
+      // Check for existing investment by invoice_id (primary) OR payment_id (secondary)
       const existingInvestment = await Investment.findOne({ 
-        voucherId: txnId // paymentId is stored in voucherId field
+        $or: [
+          { voucherId: invoiceIdStr }, // Check by invoice_id (primary)
+          ...(paymentIdStr ? [{ voucherId: paymentIdStr }] : []) // Also check by payment_id if present
+        ]
       });
       
       if (existingInvestment) {
-        console.log(`[NOWPayments Callback] ⚠️ Investment already exists for payment ID ${txnId}`);
+        console.log(`[NOWPayments Callback] ⚠️ Investment already exists`);
         console.log(`[NOWPayments Callback] Existing Investment ID: ${existingInvestment._id}`);
+        console.log(`[NOWPayments Callback] Existing Investment voucherId: ${existingInvestment.voucherId}`);
         console.log(`[NOWPayments Callback] This is a duplicate callback. Returning success.`);
         
         // Link investment to payment if not already linked
@@ -819,6 +829,11 @@ export const handlePaymentCallback = asyncHandler(async (req, res) => {
         });
       }
       
+      // FIXED: Use invoice_id as primary identifier (matches Payment.paymentId)
+      // This ensures investments can be linked back to payment records
+      // Define txnId outside the if block so it's available for all logging
+      const txnId = invoiceIdStr || payment.paymentId;
+      
       // Auto-create investment if it doesn't exist yet
       if (!payment.investmentId) {
         console.log(`[NOWPayments Callback] 💼 Investment does not exist, creating now...`);
@@ -832,14 +847,15 @@ export const handlePaymentCallback = asyncHandler(async (req, res) => {
           console.log(`[NOWPayments Callback]   - User ID: ${userId}`);
           console.log(`[NOWPayments Callback]   - Package ID: ${payment.package}`);
           console.log(`[NOWPayments Callback]   - Amount: $${parseFloat(payment.amount.toString())}`);
-          console.log(`[NOWPayments Callback]   - Payment ID: ${txnId}`);
+          console.log(`[NOWPayments Callback]   - Transaction ID (invoice_id): ${txnId}`);
+          console.log(`[NOWPayments Callback]   - Payment ID (from callback): ${paymentIdStr || 'N/A'}`);
           console.log(`[NOWPayments Callback]   - Voucher ID: ${voucherId || 'none'}`);
           
           const investment = await processInvestment(
             new Types.ObjectId(userId),
             payment.package as Types.ObjectId,
             parseFloat(payment.amount.toString()),
-            txnId, // Use payment_id/invoice_id as transaction ID (like old implementation)
+            txnId, // Use invoice_id (matches Payment.paymentId) to ensure proper linking
             voucherId
           );
           

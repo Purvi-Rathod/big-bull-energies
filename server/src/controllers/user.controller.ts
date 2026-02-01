@@ -187,6 +187,7 @@ export const createInvestment = asyncHandler(async (req, res) => {
       method: "main_wallet",
     };
   } else if (paymentId) {
+    // FIXED: Enhanced duplicate prevention - check by paymentId AND check all Payment records
     // Check if investment already exists for this paymentId (prevent duplicates)
     const existingInvestment = await Investment.findOne({ voucherId: paymentId });
     if (existingInvestment) {
@@ -197,6 +198,21 @@ export const createInvestment = asyncHandler(async (req, res) => {
     const payment = await Payment.findOne({ paymentId: paymentId });
     if (payment && payment.investmentId) {
       throw new AppError("Investment already exists for this payment. Duplicate investment prevented.", 400);
+    }
+    
+    // FIXED: Also check if ANY payment record with same invoice_id/payment_id has an investment
+    // This prevents duplicates when NOWPayments sends both invoice_id and payment_id
+    const allPaymentsWithSameId = await Payment.find({
+      $or: [
+        { paymentId: paymentId },
+        { orderId: paymentId } // Also check by orderId in case paymentId is actually an orderId
+      ],
+      user: userId
+    });
+    
+    const paymentWithInvestment = allPaymentsWithSameId.find(p => p.investmentId);
+    if (paymentWithInvestment) {
+      throw new AppError("Investment already exists for this payment (found by invoice_id/payment_id). Duplicate investment prevented.", 400);
     }
 
     // Payment already processed via NOWPayments, use the provided paymentId

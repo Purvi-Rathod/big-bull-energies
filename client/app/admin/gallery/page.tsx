@@ -123,13 +123,13 @@ export default function GalleryPage() {
     setShowModal(true);
   };
 
-  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // Only allow image files for upload (videos must use URL)
+    // Only allow image files for upload
     if (!file.type.startsWith('image/')) {
-      toast.error('Please select an image file. For videos, use the URL input field.');
+      toast.error('Please select an image file');
       return;
     }
 
@@ -150,50 +150,41 @@ export default function GalleryPage() {
       setUploadPreview(reader.result as string);
     };
     reader.readAsDataURL(file);
-  };
 
-  const handleUpload = async () => {
-    if (!selectedFile) {
-      toast.error('Please select a file to upload');
-      return;
-    }
-
-    // Only allow image uploads
-    if (!selectedFile.type.startsWith('image/')) {
-      toast.error('Only image files can be uploaded. For videos, use the URL input field.');
-      return;
-    }
-
+    // AUTO-UPLOAD: Automatically upload the file when selected
     try {
       setUploading(true);
       setUploadProgress(0);
       setError('');
 
       // Upload image to Cloudinary
-      const response = await api.uploadGalleryMedia(selectedFile, 'gallery', 'image');
+      const response = await api.uploadGalleryMedia(file, 'gallery', 'image');
       
       if (response.data && response.data.url) {
-        // Store Cloudinary URL in form data
+        // Store Cloudinary URL in form data automatically
         setFormData({
           ...formData,
           mediaUrl: response.data.url, // Cloudinary secure URL
           thumbnailUrl: response.data.url, // Use same URL for thumbnail
           mediaType: 'photo', // Ensure it's set to photo
         });
-        toast.success('Image uploaded to Cloudinary successfully!');
-        setSelectedFile(null);
-        setUploadPreview(null);
+        toast.success('Image uploaded successfully!');
         setUploadProgress(100);
+        // Keep preview and file for user to see
       }
     } catch (err: any) {
-      const errorMessage = err.message || 'Failed to upload file to Cloudinary';
+      const errorMessage = err.message || 'Failed to upload file';
       setError(errorMessage);
       toast.error(errorMessage);
+      setSelectedFile(null);
+      setUploadPreview(null);
     } finally {
       setUploading(false);
       setTimeout(() => setUploadProgress(0), 2000);
     }
   };
+
+  // Removed handleUpload - now auto-uploads on file select
 
   const handleRemoveFile = () => {
     setSelectedFile(null);
@@ -234,14 +225,14 @@ export default function GalleryPage() {
       setError('');
       setSuccess('');
 
-      if (!formData.title || !formData.mediaUrl || !formData.category) {
-        setError('Title, Media URL, and Category are required');
+      if (!formData.title || !formData.category) {
+        setError('Title and Category are required');
         return;
       }
 
-      // Validate that photos have Cloudinary URLs or valid image URLs
+      // Validate that photos have been uploaded (mediaUrl should be set automatically)
       if (formData.mediaType === 'photo' && !formData.mediaUrl) {
-        setError('Please upload an image or provide an image URL');
+        setError('Please upload an image file');
         return;
       }
 
@@ -254,7 +245,7 @@ export default function GalleryPage() {
       const submitData = {
         title: formData.title,
         description: formData.description || '',
-        mediaUrl: formData.mediaUrl, // Cloudinary URL for photos, or video URL
+        mediaUrl: formData.mediaUrl || '', // Cloudinary URL for photos, or video URL
         mediaType: formData.mediaType || 'photo',
         category: formData.category,
         thumbnailUrl: formData.thumbnailUrl || formData.mediaUrl || '', // Use mediaUrl as thumbnail if not provided
@@ -575,102 +566,117 @@ export default function GalleryPage() {
                   </select>
                 </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-black mb-1">
-                    {formData.mediaType === 'photo' ? 'Photo Upload or URL *' : 'Video URL *'}
-                  </label>
-                  
-                  {/* File Upload Section - Only for Photos */}
-                  {formData.mediaType === 'photo' && (
-                    <div className="mb-3">
-                      <label className="block text-xs font-medium text-black mb-2">
-                        Upload image to Cloudinary:
-                      </label>
-                      <div className="flex gap-2">
-                        <label className="flex-1 cursor-pointer">
-                          <input
-                            type="file"
-                            accept="image/*"
-                            onChange={handleFileSelect}
-                            className="hidden"
-                            disabled={uploading}
-                          />
-                          <div className="px-4 py-2 border-2 border-dashed text-black rounded-md hover:border-indigo-500 transition text-center">
-                            <Upload className="w-5 h-5 mx-auto mb-1 text-black" />
-                            <span className="text-sm text-black">Choose Image File</span>
-                          </div>
-                        </label>
-                        {selectedFile && (
-                          <>
-                            <button
-                              type="button"
-                              onClick={handleUpload}
-                              disabled={uploading}
-                              className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed text-sm"
-                            >
-                              {uploading ? 'Uploading...' : 'Upload to Cloudinary'}
-                            </button>
-                            <button
-                              type="button"
-                              onClick={handleRemoveFile}
-                              disabled={uploading}
-                              className="px-4 py-2 bg-gray-200 text-black rounded-md hover:bg-gray-300 disabled:opacity-50 text-sm"
-                            >
-                              <X className="w-4 h-4" />
-                            </button>
-                          </>
-                        )}
-                      </div>
-                      
-                      {selectedFile && (
-                        <div className="mt-2">
-                          <p className="text-xs text-black mb-1">
-                            Selected: {selectedFile.name} ({(selectedFile.size / 1024 / 1024).toFixed(2)} MB)
-                          </p>
-                          {uploadPreview && (
-                            <div className="mt-2">
-                              <img
-                                src={uploadPreview}
-                                alt="Preview"
-                                className="max-w-full h-32 object-contain rounded border text-black"
-                              />
-                            </div>
-                          )}
-                          {uploading && (
-                            <div className="mt-2">
-                              <div className="w-full bg-gray-200 rounded-full h-2">
-                                <div
-                                  className="bg-indigo-600 h-2 rounded-full transition-all duration-300"
-                                  style={{ width: `${uploadProgress}%` }}
-                                />
-                              </div>
-                              <p className="text-xs text-black mt-1">Uploading to Cloudinary... {uploadProgress}%</p>
-                            </div>
-                          )}
+                {/* Photo Upload Section - Simplified, No URL Input */}
+                {formData.mediaType === 'photo' && (
+                  <div>
+                    <label className="block text-sm font-medium text-black mb-1">
+                      Photo Upload *
+                    </label>
+                    <div className="flex gap-2 items-start">
+                      <label className="flex-1 cursor-pointer">
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={handleFileSelect}
+                          className="hidden"
+                          disabled={uploading}
+                        />
+                        <div className={`px-4 py-3 border-2 border-dashed rounded-md transition text-center ${
+                          uploading 
+                            ? 'border-gray-300 bg-gray-50 cursor-not-allowed' 
+                            : 'border-indigo-300 hover:border-indigo-500 hover:bg-indigo-50 cursor-pointer'
+                        }`}>
+                          <Upload className={`w-6 h-6 mx-auto mb-2 ${uploading ? 'text-gray-400' : 'text-indigo-600'}`} />
+                          <span className={`text-sm block ${uploading ? 'text-gray-500' : 'text-black'}`}>
+                            {uploading ? 'Uploading...' : 'Choose Image File'}
+                          </span>
+                          <span className="text-xs text-gray-500 mt-1 block">
+                            {uploading ? 'Please wait' : 'Click to select image'}
+                          </span>
                         </div>
+                      </label>
+                      {selectedFile && formData.mediaUrl && !uploading && (
+                        <button
+                          type="button"
+                          onClick={handleRemoveFile}
+                          className="px-3 py-2 bg-red-100 text-red-700 rounded-md hover:bg-red-200 transition"
+                          title="Remove image"
+                        >
+                          <X className="w-5 h-5" />
+                        </button>
                       )}
                     </div>
-                  )}
+                    
+                    {uploading && (
+                      <div className="mt-3">
+                        <div className="w-full bg-gray-200 rounded-full h-2">
+                          <div
+                            className="bg-indigo-600 h-2 rounded-full transition-all duration-300"
+                            style={{ width: `${uploadProgress}%` }}
+                          />
+                        </div>
+                        <p className="text-xs text-gray-600 mt-1">Uploading to Cloudinary... {uploadProgress}%</p>
+                      </div>
+                    )}
 
-                  {/* URL Input */}
-                  <input
-                    type="url"
-                    value={formData.mediaUrl}
-                    onChange={(e) => setFormData({ ...formData, mediaUrl: e.target.value })}
-                    className="w-full px-3 py-2 border text-black rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                    placeholder={
-                      formData.mediaType === 'photo' 
-                        ? 'https://res.cloudinary.com/... or paste image URL' 
-                        : 'https://youtube.com/watch?v=... or paste video URL'
-                    }
-                    required
-                  />
-                  <p className="mt-1 text-xs text-black">
-                    {formData.mediaType === 'photo' 
-                      ? 'Upload an image file above (will be stored in Cloudinary) or paste an image URL'
-                      : 'Paste the video URL (YouTube, Vimeo, or direct video link)'}
-                  </p>
-                </div>
+                    {selectedFile && uploadPreview && !uploading && (
+                      <div className="mt-3">
+                        <p className="text-xs text-gray-600 mb-2">
+                          ✓ {selectedFile.name} ({(selectedFile.size / 1024 / 1024).toFixed(2)} MB) - Uploaded successfully
+                        </p>
+                        <div className="border rounded-md overflow-hidden">
+                          <img
+                            src={uploadPreview}
+                            alt="Preview"
+                            className="max-w-full h-40 object-contain bg-gray-50"
+                          />
+                        </div>
+                      </div>
+                    )}
+
+                    {formData.mediaUrl && !selectedFile && (
+                      <div className="mt-3">
+                        <p className="text-xs text-green-600 mb-2">✓ Image URL set</p>
+                        <div className="border rounded-md overflow-hidden">
+                          <img
+                            src={formData.mediaUrl}
+                            alt="Current"
+                            className="max-w-full h-40 object-contain bg-gray-50"
+                            onError={(e) => {
+                              (e.target as HTMLImageElement).style.display = 'none';
+                            }}
+                          />
+                        </div>
+                      </div>
+                    )}
+
+                    {!formData.mediaUrl && !uploading && (
+                      <p className="mt-2 text-xs text-gray-600">
+                        Select an image file to upload. It will be automatically uploaded to Cloudinary.
+                      </p>
+                    )}
+                  </div>
+                )}
+
+                {/* Video URL Section - Only for Videos */}
+                {formData.mediaType === 'video' && (
+                  <div>
+                    <label className="block text-sm font-medium text-black mb-1">
+                      Video URL *
+                    </label>
+                    <input
+                      type="url"
+                      value={formData.mediaUrl}
+                      onChange={(e) => setFormData({ ...formData, mediaUrl: e.target.value })}
+                      className="w-full px-3 py-2 border text-black rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                      placeholder="https://youtube.com/watch?v=... or paste video URL"
+                      required
+                    />
+                    <p className="mt-1 text-xs text-gray-600">
+                      Paste the video URL (YouTube, Vimeo, or direct video link)
+                    </p>
+                  </div>
+                )}
 
                 {formData.mediaType === 'video' && (
                   <div>

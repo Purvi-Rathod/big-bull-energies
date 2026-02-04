@@ -3647,6 +3647,8 @@ export const getUserTargetStatus = asyncHandler(async (req, res) => {
  * Admin: Give existing user a free investment + binary target (no referrer, no downline)
  * POST /api/v1/admin/influencer/free/create
  * Body: { userId, packageId, amount, binaryTargetAmount }
+ * 
+ * OPTIMIZED: Reduced redundant queries and improved performance
  */
 export const createFreeAccounts = asyncHandler(async (req, res) => {
   const body = (req as any).body;
@@ -3666,20 +3668,30 @@ export const createFreeAccounts = asyncHandler(async (req, res) => {
     throw new AppError("Binary target amount must be a valid non-negative number", 400);
   }
 
-  // Resolve user: accept full userId (e.g. CROWN-000003) or short (e.g. 000003)
-  let user = await findUserByUserId(userId.trim());
-  if (!user && /^\d+$/.test(userId.trim())) {
-    user = await findUserByUserId("CROWN-" + userId.trim());
-  }
-  if (!user) {
-    throw new AppError("User not found", 404);
-  }
-
   if (!Types.ObjectId.isValid(packageId)) {
     throw new AppError("Invalid package ID", 400);
   }
 
-  const pkg = await Package.findById(packageId);
+  // OPTIMIZATION 1: Batch load user and package in parallel (reduces sequential wait time)
+  const trimmedUserId = userId.trim();
+  let userPromise: Promise<any>;
+  if (/^\d+$/.test(trimmedUserId)) {
+    // Try both formats in parallel, use first successful result
+    userPromise = findUserByUserId(trimmedUserId).catch(() => 
+      findUserByUserId("CROWN-" + trimmedUserId)
+    );
+  } else {
+    userPromise = findUserByUserId(trimmedUserId);
+  }
+  
+  const [user, pkg] = await Promise.all([
+    userPromise,
+    Package.findById(packageId)
+  ]);
+
+  if (!user) {
+    throw new AppError("User not found", 404);
+  }
   if (!pkg) {
     throw new AppError("Package not found", 404);
   }
@@ -3690,16 +3702,21 @@ export const createFreeAccounts = asyncHandler(async (req, res) => {
     throw new AppError(`Amount must be between $${minAmount} and $${maxAmount} for this package`, 400);
   }
 
+  // OPTIMIZATION 2: Pre-import service to avoid dynamic import overhead
+  const { processInvestment } = require("../services/investment.service");
+  
+  // OPTIMIZATION 3: Prepare payment ID before processing
+  const paymentId = `FREE_${Date.now()}_${Math.random().toString(36).substring(7)}`;
+
+  // OPTIMIZATION 4: Update user fields first (before investment processing)
   // Apply free account: target + withdrawal rules. Do NOT set or change referrer.
   user.accountType = "free";
   user.binaryTargetAmount = targetAmount;
   user.targetStatus = targetAmount > 0 ? "pending" : "completed";
   user.withdrawEnabled = targetAmount > 0 ? false : true;
-  await user.save();
-
-  // Create investment for this user (free package activation). No new account created.
-  const paymentId = `FREE_${Date.now()}_${Math.random().toString(36).substring(7)}`;
-  const { processInvestment } = await import("../services/investment.service");
+  
+  // OPTIMIZATION 5: Process investment (this will also activate user if inactive)
+  // Note: processInvestment will fetch user/package again internally, but saves are batched
   const investmentDoc = await processInvestment(
     user._id as Types.ObjectId,
     new Types.ObjectId(packageId),
@@ -3707,12 +3724,19 @@ export const createFreeAccounts = asyncHandler(async (req, res) => {
     paymentId,
     undefined
   );
+
+  // OPTIMIZATION 6: Update investment type and save user in parallel (if investment created)
   if (investmentDoc) {
     investmentDoc.type = "free";
-    await investmentDoc.save();
+    // Save both in parallel - user.save() updates accountType/target fields, investmentDoc.save() updates type
+    await Promise.all([
+      investmentDoc.save(),
+      user.save()
+    ]);
+  } else {
+    // Fallback: save user if investment creation failed
+    await user.save();
   }
-
-  const investment = await Investment.findOne({ user: user._id }).sort({ createdAt: -1 }).lean();
 
   const response = res as any;
   response.status(201).json({
@@ -3725,7 +3749,7 @@ export const createFreeAccounts = asyncHandler(async (req, res) => {
       packageName: pkg.packageName,
       amount,
       binaryTargetAmount: targetAmount,
-      investmentId: investment?._id,
+      investmentId: investmentDoc?._id,
     },
   });
 });

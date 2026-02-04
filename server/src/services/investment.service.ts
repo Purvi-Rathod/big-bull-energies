@@ -731,7 +731,7 @@ export async function processInvestment(
 
 /**
  * Add business volume up the tree when a user invests
- * This function traverses up the binary tree and adds BV to parent's legs
+ * OPTIMIZED: Batch loads ancestors and defers career level checks for better performance
  * Binary bonuses are NOT calculated here - they are calculated daily via cron job
  * Only referral bonuses are calculated immediately at investment time
  */
@@ -742,62 +742,132 @@ export async function addBusinessVolumeUpTree(
   isPowerleg: boolean = false
 ) {
   try {
+    // OPTIMIZATION: Collect all ancestors first, then batch process
+    const ancestorsToUpdate: Array<{ userId: Types.ObjectId; position: "left" | "right" }> = [];
     let currentUserId = userId;
+    const visited = new Set<string>();
 
-    // Traverse up the tree starting from the investing user
-    while (currentUserId) {
-      const currentTree = await BinaryTree.findOne({ user: currentUserId });
+    // Step 1: Collect all ancestors that need BV updates (single traversal)
+    while (currentUserId && !visited.has(currentUserId.toString())) {
+      visited.add(currentUserId.toString());
+      
+      const currentTree = await BinaryTree.findOne({ user: currentUserId })
+        .select("parent leftChild rightChild")
+        .lean();
+      
       if (!currentTree || !currentTree.parent) {
         break; // Reached root or no parent
       }
 
-      const parentTree = await BinaryTree.findOne({ user: currentTree.parent });
+      const parentId = currentTree.parent as Types.ObjectId;
+      const parentTree = await BinaryTree.findOne({ user: parentId })
+        .select("leftChild rightChild")
+        .lean();
+      
       if (!parentTree) {
         break;
       }
 
       // Determine which side of parent this user is on
-      const isLeftChild = parentTree.leftChild?.toString() === currentUserId.toString();
-      const isRightChild = parentTree.rightChild?.toString() === currentUserId.toString();
+      const currentUserIdStr = currentUserId.toString();
+      const isLeftChild = parentTree.leftChild?.toString() === currentUserIdStr;
+      const isRightChild = parentTree.rightChild?.toString() === currentUserIdStr;
       
-      // Check if user is a direct child (binary tree) or admin's child (unlimited)
       if (isLeftChild || isRightChild) {
         // User is a direct binary child
         const parentPosition = isLeftChild ? "left" : "right";
-        
-        // Add BV to parent's leg (Business Volume)
-        // Binary bonus will be calculated in daily cron job
-        // Pass isPowerleg flag to track powerleg BV separately
-        await addBusinessVolume(
-          currentTree.parent,
-          amount,
-          parentPosition,
-          isPowerleg
-        );
-
-        // Move up to parent for next iteration
-        // Each level gets BV added from their children's investments
-        currentUserId = currentTree.parent;
+        ancestorsToUpdate.push({ userId: parentId, position: parentPosition });
+        currentUserId = parentId;
       } else {
         // Check if parent is admin (has unlimited children via parent relationship)
-        const parentUser = await User.findById(currentTree.parent);
-        if (parentUser?.userId === "CROWN-000000" || parentUser?.userId === "CNEOX-000000") {
+        const parentUser = await User.findById(parentId).select("userId").lean();
+        if (parentUser && ((parentUser as any).userId === "CROWN-000000" || (parentUser as any).userId === "CNEOX-000000")) {
           // User is admin's child, add BV but don't calculate binary bonus
-          // Admin doesn't follow binary tree rules for bonuses
-          const adminPosition = position; // Use the original position
-          await addBusinessVolume(
-            currentTree.parent,
-            amount,
-            adminPosition,
-            isPowerleg
-          );
+          ancestorsToUpdate.push({ userId: parentId, position: position });
           break;
         } else {
-          // Not a direct child and not admin's child, stop traversal
           break;
         }
       }
     }
+
+    if (ancestorsToUpdate.length === 0) {
+      return; // No ancestors to update
+    }
+
+    // OPTIMIZATION 2: Batch load all trees that need updating
+    const ancestorIds = ancestorsToUpdate.map(a => a.userId);
+    const treesToUpdate = await BinaryTree.find({ user: { $in: ancestorIds } });
+    const treeMap = new Map<string, any>();
+    treesToUpdate.forEach(tree => {
+      treeMap.set(tree.user.toString(), tree);
+    });
+
+    // OPTIMIZATION 3: Batch update all business volumes (no career level checks during update)
+    const updatePromises: Promise<any>[] = [];
+    
+    for (const { userId: ancestorId, position: ancestorPosition } of ancestorsToUpdate) {
+      const tree = treeMap.get(ancestorId.toString());
+      if (!tree) continue;
+
+      // Update business volume directly (faster than calling addBusinessVolume)
+      const currentBusiness = ancestorPosition === "left" 
+        ? parseFloat(tree.leftBusiness.toString())
+        : parseFloat(tree.rightBusiness.toString());
+      
+      const newBusiness = currentBusiness + amount;
+      
+      if (ancestorPosition === "left") {
+        tree.leftBusiness = Types.Decimal128.fromString(newBusiness.toString());
+        if (isPowerleg) {
+          const currentPowerlegBV = parseFloat((tree.leftPowerlegBusiness || Types.Decimal128.fromString("0")).toString());
+          tree.leftPowerlegBusiness = Types.Decimal128.fromString((currentPowerlegBV + amount).toString());
+        }
+      } else {
+        tree.rightBusiness = Types.Decimal128.fromString(newBusiness.toString());
+        if (isPowerleg) {
+          const currentPowerlegBV = parseFloat((tree.rightPowerlegBusiness || Types.Decimal128.fromString("0")).toString());
+          tree.rightPowerlegBusiness = Types.Decimal128.fromString((currentPowerlegBV + amount).toString());
+        }
+      }
+
+      updatePromises.push(tree.save());
+    }
+
+    // OPTIMIZATION 4: Batch save all trees
+    await Promise.all(updatePromises);
+
+    // OPTIMIZATION 5: Defer career level and target checks (run in background, don't block)
+    // These are expensive operations and don't need to block the investment creation
+    const ancestorIdsForChecks = ancestorsToUpdate.map(a => a.userId);
+    setImmediate(async () => {
+      try {
+        const { checkAndAwardCareerLevels } = await import("./career-level.service");
+        const { updateTargetCompletionStatus } = await import("./target-completion.service");
+        
+        // Run checks in parallel for all ancestors
+        await Promise.all(
+          ancestorIdsForChecks.map(async (ancestorId) => {
+            try {
+              await Promise.all([
+                checkAndAwardCareerLevels(ancestorId).catch(err => 
+                  console.error(`[Career Level] Error for user ${ancestorId}:`, err)
+                ),
+                updateTargetCompletionStatus(ancestorId).catch(err => 
+                  console.error(`[Target Completion] Error for user ${ancestorId}:`, err)
+                )
+              ]);
+            } catch (error) {
+              // Don't fail if checks fail
+              console.error(`Error running checks for user ${ancestorId}:`, error);
+            }
+          })
+        );
+      } catch (error) {
+        console.error("Error in deferred career level/target checks:", error);
+      }
+    });
+
   } catch (error) {
     console.error("Error adding business volume up tree:", error);
     // Don't throw, just log - we don't want to fail the investment if BV addition fails

@@ -16,6 +16,7 @@ dotenv.config({ path: "./.env" });
 
 /**
  * Recursively count all users in a subtree (left or right leg)
+ * FIXED: Now properly handles admin nodes which can have unlimited children via parent relationship
  */
 async function countSubtreeUsers(
   rootUserId: mongoose.Types.ObjectId,
@@ -32,18 +33,63 @@ async function countSubtreeUsers(
       return 0;
     }
 
-    // Count the direct child (1) plus all its descendants
-    const childTree = await BinaryTree.findOne({ user: childInLeg });
-    if (!childTree) {
-      return 1; // Just the direct child
+    const childId = (childInLeg as any)?.toString() || childInLeg.toString();
+    const childObjId = new mongoose.Types.ObjectId(childId);
+
+    // Use iterative BFS approach to handle admin nodes correctly
+    const visited = new Set<string>();
+    const queue: { userId: mongoose.Types.ObjectId; level: number }[] = [{ userId: childObjId, level: 0 }];
+    let count = 0;
+    const maxDepth = 100; // Safety limit
+
+    while (queue.length > 0) {
+      const current = queue.shift()!;
+      if (current.level >= maxDepth) break;
+
+      const currentIdStr = current.userId.toString();
+      if (visited.has(currentIdStr)) continue;
+      visited.add(currentIdStr);
+      count++; // Count this user
+
+      const currentTree = await BinaryTree.findOne({ user: current.userId })
+        .select("leftChild rightChild parent")
+        .lean();
+
+      if (!currentTree) continue;
+
+      // Check if this node is admin (can have unlimited children via parent relationship)
+      const user = await User.findById(current.userId).select("userId").lean();
+      const isAdmin = (user as any)?.userId === "CROWN-000000" || (user as any)?.userId === "CNEOX-000000";
+
+      if (isAdmin) {
+        // For admin, check all children via parent relationship
+        const adminChildren = await BinaryTree.find({ parent: current.userId })
+          .select("user")
+          .lean();
+        adminChildren.forEach((child: any) => {
+          const childId = child.user?.toString() || child.user;
+          if (childId && !visited.has(childId)) {
+            queue.push({ userId: new mongoose.Types.ObjectId(childId), level: current.level + 1 });
+          }
+        });
+      } else {
+        // Regular users: only left and right children
+        if (currentTree.leftChild) {
+          const leftId = (currentTree.leftChild as any)?.toString() || currentTree.leftChild.toString();
+          if (!visited.has(leftId)) {
+            queue.push({ userId: new mongoose.Types.ObjectId(leftId), level: current.level + 1 });
+          }
+        }
+        if (currentTree.rightChild) {
+          const rightId = (currentTree.rightChild as any)?.toString() || currentTree.rightChild.toString();
+          if (!visited.has(rightId)) {
+            queue.push({ userId: new mongoose.Types.ObjectId(rightId), level: current.level + 1 });
+          }
+        }
+      }
     }
 
-    // Recursively count left and right subtrees of the child
-    const leftCount = await countSubtreeUsers(childInLeg as mongoose.Types.ObjectId, "left");
-    const rightCount = await countSubtreeUsers(childInLeg as mongoose.Types.ObjectId, "right");
-
-    // Total = 1 (the child itself) + all its descendants
-    return 1 + leftCount + rightCount;
+    return count;
   } catch (error) {
     console.error(`Error counting subtree for ${rootUserId} in ${leg} leg:`, error);
     return 0;

@@ -508,6 +508,86 @@ export const getMyTree = asyncHandler(async (req, res) => {
  * GET /api/v1/tree/node/:userId/downlines
  * Query params: maxDepth (default: 10, max: 20)
  */
+/**
+ * Check if targetUser is in requestingUser's downline
+ * Returns true if targetUser is a descendant of requestingUser (or same user)
+ */
+async function isUserInDownline(
+  requestingUserObjId: Types.ObjectId,
+  targetUserObjId: Types.ObjectId,
+  maxDepth: number = 50
+): Promise<boolean> {
+  // Same user - always allowed
+  if (requestingUserObjId.equals(targetUserObjId)) {
+    return true;
+  }
+
+  // Check if requesting user is admin - admins can view any tree
+  const requestingUser = await User.findById(requestingUserObjId).select("userId").lean();
+  const requestingIsAdmin = (requestingUser as any)?.userId === "CROWN-000000" || (requestingUser as any)?.userId === "CNEOX-000000";
+  if (requestingIsAdmin) {
+    return true; // Admins can view any tree
+  }
+
+  // Traverse downline to find target user
+  const visited = new Set<string>();
+  const queue: { userId: Types.ObjectId; level: number }[] = [{ userId: requestingUserObjId, level: 0 }];
+  
+  while (queue.length > 0) {
+    const current = queue.shift()!;
+    if (current.level >= maxDepth) break;
+    
+    const currentIdStr = current.userId.toString();
+    if (visited.has(currentIdStr)) continue;
+    visited.add(currentIdStr);
+    
+    // Check if this is the target user
+    if (current.userId.equals(targetUserObjId)) {
+      return true;
+    }
+    
+    // Get tree and add children to queue
+    const tree = await BinaryTree.findOne({ user: current.userId })
+      .select("leftChild rightChild parent")
+      .lean();
+    
+    if (!tree) continue;
+    
+    // Check if this node is admin (can have unlimited children via parent relationship)
+    const user = await User.findById(current.userId).select("userId").lean();
+    const isAdmin = (user as any)?.userId === "CROWN-000000" || (user as any)?.userId === "CNEOX-000000";
+    
+    if (isAdmin) {
+      // For admin, check all children via parent relationship
+      const adminChildren = await BinaryTree.find({ parent: current.userId })
+        .select("user")
+        .lean();
+      adminChildren.forEach((child: any) => {
+        const childId = child.user?.toString() || child.user;
+        if (childId && !visited.has(childId)) {
+          queue.push({ userId: new Types.ObjectId(childId), level: current.level + 1 });
+        }
+      });
+    } else {
+      // Regular users: only left and right children
+      if (tree.leftChild) {
+        const leftId = (tree.leftChild as any)?.toString() || tree.leftChild.toString();
+        if (!visited.has(leftId)) {
+          queue.push({ userId: new Types.ObjectId(leftId), level: current.level + 1 });
+        }
+      }
+      if (tree.rightChild) {
+        const rightId = (tree.rightChild as any)?.toString() || tree.rightChild.toString();
+        if (!visited.has(rightId)) {
+          queue.push({ userId: new Types.ObjectId(rightId), level: current.level + 1 });
+        }
+      }
+    }
+  }
+  
+  return false;
+}
+
 export const getNodeDownlines = asyncHandler(async (req, res) => {
   const requestingUserId = (req as any).user?.id;
   if (!requestingUserId) {
@@ -522,6 +602,19 @@ export const getNodeDownlines = asyncHandler(async (req, res) => {
   // Get depth limit from query params (default: 10 levels, max: 20)
   const maxDepth = Math.min(parseInt(req.query.maxDepth as string) || 10, 20);
 
+  // Find requesting user
+  const requestingUser = await User.findById(requestingUserId)
+    .select("_id userId")
+    .lean();
+  
+  if (!requestingUser) {
+    throw new AppError("Requesting user not found", 404);
+  }
+
+  // Check if requesting user is admin - admins can view any tree
+  const requestingUserIdStr = (requestingUser as any).userId;
+  const requestingIsAdmin = requestingUserIdStr === "CROWN-000000" || requestingUserIdStr === "CNEOX-000000";
+
   // Find target user by userId (not _id)
   const targetUser = await User.findOne({ userId: targetUserId })
     .select("_id userId name email phone status")
@@ -532,7 +625,21 @@ export const getNodeDownlines = asyncHandler(async (req, res) => {
   }
 
   // Convert _id to ObjectId (lean() returns plain object)
+  const requestingUserObjId = new Types.ObjectId((requestingUser._id as any).toString());
   const targetUserObjId = new Types.ObjectId((targetUser._id as any).toString());
+  
+  // FIXED: Access control - check if target user is in requesting user's downline (unless requesting user is admin)
+  if (!requestingIsAdmin) {
+    const hasAccess = await isUserInDownline(requestingUserObjId, targetUserObjId);
+    
+    if (!hasAccess) {
+      throw new AppError(
+        `Access denied: You can only view genealogy trees of users in your downline. ${targetUserId} is not in your downline.`,
+        403
+      );
+    }
+  }
+
   const isAdmin = (targetUser as any).userId === "CROWN-000000" || (targetUser as any).userId === "CNEOX-000000";
 
   // Collect all descendant user IDs efficiently using level-by-level batch loading
@@ -654,9 +761,118 @@ export const getNodeDownlines = asyncHandler(async (req, res) => {
     });
   });
 
+  const investmentMap = new Map<string, number>();
+  investmentAggregation.forEach((inv: any) => {
+    investmentMap.set(inv._id.toString(), inv.totalInvestment || 0);
+  });
+
+  /**
+   * Calculate downline counts dynamically by querying database for ALL descendants
+   * FIXED: Now queries database to count all descendants, not limited by maxDepth
+   * This ensures accurate counts even if stored counts are stale
+   */
+  const calculateDownlineCounts = async (userIdStr: string, leg: "left" | "right"): Promise<number> => {
+    const treeInfo = binaryTrees.find((t: any) => {
+      const tUserId = t.user?._id?.toString() || t.user?.toString();
+      return tUserId === userIdStr;
+    });
+
+    if (!treeInfo) return 0;
+
+    const childId = leg === "left" 
+      ? (treeInfo.leftChild as any)?._id?.toString() || (treeInfo.leftChild as any)?.toString()
+      : (treeInfo.rightChild as any)?._id?.toString() || (treeInfo.rightChild as any)?.toString();
+
+    if (!childId) return 0;
+
+    // Query database to count ALL descendants (not limited by loaded tree or maxDepth)
+    const childObjId = new Types.ObjectId(childId);
+    const visited = new Set<string>();
+    const queue: { userId: Types.ObjectId; level: number }[] = [{ userId: childObjId, level: 0 }];
+    let count = 0;
+    const maxDepth = 100; // Safety limit for counting
+
+    while (queue.length > 0) {
+      const current = queue.shift()!;
+      if (current.level >= maxDepth) break;
+
+      const currentIdStr = current.userId.toString();
+      if (visited.has(currentIdStr)) continue;
+      visited.add(currentIdStr);
+      count++; // Count this user
+
+      // Query database for this user's tree (not limited to loaded trees)
+      const currentTree = await BinaryTree.findOne({ user: current.userId })
+        .select("leftChild rightChild parent")
+        .lean();
+
+      if (!currentTree) continue;
+
+      // Check if admin
+      const currentUser = await User.findById(current.userId).select("userId").lean();
+      const isAdmin = currentUser && ((currentUser as any).userId === "CROWN-000000" || (currentUser as any).userId === "CNEOX-000000");
+
+      if (isAdmin) {
+        // For admin, get all children via parent relationship
+        const adminChildren = await BinaryTree.find({ parent: current.userId })
+          .select("user")
+          .lean();
+        adminChildren.forEach((child: any) => {
+          const childId = child.user?.toString() || child.user;
+          if (childId && !visited.has(childId)) {
+            queue.push({ userId: new Types.ObjectId(childId), level: current.level + 1 });
+          }
+        });
+      } else {
+        // Regular users: only left and right children
+        if (currentTree.leftChild) {
+          const leftId = (currentTree.leftChild as any)?.toString() || currentTree.leftChild.toString();
+          if (!visited.has(leftId)) {
+            queue.push({ userId: new Types.ObjectId(leftId), level: current.level + 1 });
+          }
+        }
+        if (currentTree.rightChild) {
+          const rightId = (currentTree.rightChild as any)?.toString() || currentTree.rightChild.toString();
+          if (!visited.has(rightId)) {
+            queue.push({ userId: new Types.ObjectId(rightId), level: current.level + 1 });
+          }
+        }
+      }
+    }
+
+    return count;
+  };
+
   const treeMap = new Map<string, any>();
+  
+  // Calculate counts for all users in parallel (queries database for ALL descendants, not just loaded ones)
+  const countPromises: Promise<{ userIdStr: string; leftCount: number; rightCount: number }>[] = [];
+  
   binaryTrees.forEach((tree: any) => {
     const userIdStr = tree.user?._id?.toString() || tree.user?.toString();
+    countPromises.push(
+      Promise.all([
+        calculateDownlineCounts(userIdStr, "left"),
+        calculateDownlineCounts(userIdStr, "right")
+      ]).then(([leftCount, rightCount]) => ({
+        userIdStr,
+        leftCount,
+        rightCount
+      }))
+    );
+  });
+
+  // Wait for all counts to be calculated
+  const countResults = await Promise.all(countPromises);
+  const countMap = new Map<string, { leftCount: number; rightCount: number }>();
+  countResults.forEach(result => {
+    countMap.set(result.userIdStr, { leftCount: result.leftCount, rightCount: result.rightCount });
+  });
+
+  binaryTrees.forEach((tree: any) => {
+    const userIdStr = tree.user?._id?.toString() || tree.user?.toString();
+    const counts = countMap.get(userIdStr) || { leftCount: 0, rightCount: 0 };
+    
     treeMap.set(userIdStr, {
       parent: (tree.parent as any)?._id?.toString() || (tree.parent as any)?.toString() || null,
       parentUserId: (tree.parent as any)?.userId || null,
@@ -671,14 +887,9 @@ export const getNodeDownlines = asyncHandler(async (req, res) => {
       rightCarry: parseFloat(tree.rightCarry?.toString() || "0"),
       leftMatched: parseFloat(tree.leftMatched?.toString() || "0"),
       rightMatched: parseFloat(tree.rightMatched?.toString() || "0"),
-      leftDownlines: tree.leftDownlines || 0,
-      rightDownlines: tree.rightDownlines || 0,
+      leftDownlines: counts.leftCount, // Use dynamically calculated count (all descendants)
+      rightDownlines: counts.rightCount, // Use dynamically calculated count (all descendants)
     });
-  });
-
-  const investmentMap = new Map<string, number>();
-  investmentAggregation.forEach((inv: any) => {
-    investmentMap.set(inv._id.toString(), inv.totalInvestment || 0);
   });
 
   // Build tree structure efficiently using pre-loaded data

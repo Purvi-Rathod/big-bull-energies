@@ -1,0 +1,242 @@
+================================================================================
+NOWPAYMENTS DIAGNOSTIC REPORT
+================================================================================
+Generated: 2026-02-01T11:08:31.611Z
+User ID: CROWN-000282
+User Name: Fatma Toktemur
+User Email: 35ayfa35@gmail.com
+
+────────────────────────────────────────────────────────────────────────────────
+SUMMARY
+────────────────────────────────────────────────────────────────────────────────
+Total Payment Records: 15
+Total Investment Records: 2
+Completed Payments: 1
+Pending Payments: 14
+Failed Payments: 0
+Payments With Investments: 1
+Payments Without Investments: 0
+Investments With Payments: 1
+Investments Without Payments: 1
+Duplicate Payment IDs: 0
+Duplicate Investment voucherIds: 0
+Total Amount Paid: $100.00
+Total Amount Invested: $200.00
+
+⚠️ DISCREPANCIES:
+  - Amount mismatch: Paid $100.00 but invested $200.00
+  - Payment count mismatch: 1 completed payments but 2 investments
+
+────────────────────────────────────────────────────────────────────────────────
+PAYMENT RECORDS
+────────────────────────────────────────────────────────────────────────────────
+
+Payment #1:
+  ID: 697cf45d82fe7a7b2fe41b0d
+  Order ID: INV_696a6aa43016bc95ba09f358_1769796700919_tnvxcno8a
+  Payment ID: 5205381421
+  Amount: $100.00
+  Status: completed
+  Package: Solar Starter
+  Created: 2026-01-30T18:11:41.694Z
+  Updated: 2026-01-30T18:22:14.029Z
+  Actually Paid: $100.00 
+  Has Investment: ✅ YES
+  Linked Investment ID: 697cf5a682fe7a7b2fe41bf9
+  Match Type: byInvestmentId
+
+Payment #2:
+  ID: 697cec4982fe7a7b2fe41839
+  Order ID: INV_696a6aa43016bc95ba09f358_1769794632339_la50alpes
+  Payment ID: 4952458779
+  Amount: $100.07
+  Status: processing
+  Package: Solar Starter
+  Created: 2026-01-30T17:37:13.103Z
+  Updated: 2026-01-30T17:38:01.550Z
+  Has Investment: ❌ NO
+
+Payment #3:
+  ID: 697cebc882fe7a7b2fe4182a
+  Order ID: INV_696a6aa43016bc95ba09f358_1769794503322_l1nvwfdu5
+  Payment ID: 6400024654
+  Amount: $100.08
+  Status: processing
+  Package: Solar Starter
+  Created: 2026-01-30T17:35:04.098Z
+  Updated: 2026-01-30T17:36:40.346Z
+  Has Investment: ❌ NO
+
+Payment #4:
+  ID: 697ceb0d82fe7a7b2fe417d3
+  Order ID: INV_696a6aa43016bc95ba09f358_1769794316463_1nhug33v9
+  Payment ID: 5679589995
+  Amount: $101.01
+  Status: pending
+  Package: Solar Starter
+  Created: 2026-01-30T17:31:57.216Z
+  Updated: 2026-01-30T17:31:57.216Z
+  Has Investment: ❌ NO
+
+Payment #5:
+  ID: 697cea9e82fe7a7b2fe417c4
+  Order ID: INV_696a6aa43016bc95ba09f358_1769794205655_m4lks56cf
+  Payment ID: 4608853991
+  Amount: $101.05
+  Status: processing
+  Package: Solar Starter
+  Created: 2026-01-30T17:30:06.411Z
+  Updated: 2026-01-30T17:31:36.259Z
+  Has Investment: ❌ NO
+
+Payment #6:
+  ID: 697cea4682fe7a7b2fe417b4
+  Order ID: INV_696a6aa43016bc95ba09f358_1769794117306_xrs35qmhr
+  Payment ID: 4298088537
+  Amount: $101.07
+  Status: pending
+  Package: Solar Starter
+  Created: 2026-01-30T17:28:38.051Z
+  Updated: 2026-01-30T17:28:38.051Z
+  Has Investment: ❌ NO
+
+Payment #7:
+  ID: 697ce9ba82fe7a7b2fe4179f
+  Order ID: INV_696a6aa43016bc95ba09f358_1769793978067_pbpi2vd2i
+  Payment ID: 5592351130
+  Amount: $100.07
+  Status: processing
+  Package: Solar Starter
+  Created: 2026-01-30T17:26:18.830Z
+  Updated: 2026-01-30T17:28:16.729Z
+  Has Investment: ❌ NO
+
+Payment #8:
+  ID: 697ce95582fe7a7b2fe41795
+  Order ID: INV_696a6aa43016bc95ba09f358_1769793876745_d04a8q1c4
+  Payment ID: 6327535755
+  Amount: $100.05
+  Status: pending
+  Package: Solar Starter
+  Created: 2026-01-30T17:24:37.495Z
+  Updated: 2026-01-30T17:24:37.495Z
+  Has Investment: ❌ NO
+
+Payment #9:
+  ID: 697ce8d782fe7a7b2fe41747
+  Order ID: INV_696a6aa43016bc95ba09f358_1769793750689_w2hld45tt
+  Payment ID: 4905753976
+  Amount: $100.04
+  Status: pending
+  Package: Solar Starter
+  Created: 2026-01-30T17:22:31.456Z
+  Updated: 2026-01-30T17:22:31.456Z
+  Has Investment: ❌ NO
+
+Payment #10:
+  ID: 697ce88782fe7a7b2fe41735
+  Order ID: INV_696a6aa43016bc95ba09f358_1769793670419_d6wp4ll9m
+  Payment ID: 5549968609
+  Amount: $100.03
+  Status: processing
+  Package: Solar Starter
+  Created: 2026-01-30T17:21:11.157Z
+  Updated: 2026-01-30T17:22:06.707Z
+  Has Investment: ❌ NO
+
+Payment #11:
+  ID: 697ce82082fe7a7b2fe41723
+  Order ID: INV_696a6aa43016bc95ba09f358_1769793567425_nyyjsh40q
+  Payment ID: 6410331229
+  Amount: $100.02
+  Status: processing
+  Package: Solar Starter
+  Created: 2026-01-30T17:19:28.178Z
+  Updated: 2026-01-30T17:20:46.723Z
+  Has Investment: ❌ NO
+
+Payment #12:
+  ID: 697ce79382fe7a7b2fe4170c
+  Order ID: INV_696a6aa43016bc95ba09f358_1769793426463_9jzhhq3lb
+  Payment ID: 4719417323
+  Amount: $102.00
+  Status: processing
+  Package: Solar Starter
+  Created: 2026-01-30T17:17:07.228Z
+  Updated: 2026-01-30T17:18:18.985Z
+  Has Investment: ❌ NO
+
+Payment #13:
+  ID: 697ce72582fe7a7b2fe41701
+  Order ID: INV_696a6aa43016bc95ba09f358_1769793316925_1x52brpry
+  Payment ID: 5048535644
+  Amount: $100.01
+  Status: processing
+  Package: Solar Starter
+  Created: 2026-01-30T17:15:17.674Z
+  Updated: 2026-01-30T17:17:47.528Z
+  Has Investment: ❌ NO
+
+Payment #14:
+  ID: 697ce6e782fe7a7b2fe416ea
+  Order ID: INV_696a6aa43016bc95ba09f358_1769793254965_619zmxv45
+  Payment ID: 5914344927
+  Amount: $100.00
+  Status: pending
+  Package: Solar Starter
+  Created: 2026-01-30T17:14:15.717Z
+  Updated: 2026-01-30T17:14:15.717Z
+  Has Investment: ❌ NO
+
+Payment #15:
+  ID: 697ce61d82fe7a7b2fe416db
+  Order ID: INV_696a6aa43016bc95ba09f358_1769793052901_enbyuzm6k
+  Payment ID: 6362475509
+  Amount: $100.00
+  Status: processing
+  Package: Solar Starter
+  Created: 2026-01-30T17:10:53.725Z
+  Updated: 2026-01-30T17:14:11.571Z
+  Has Investment: ❌ NO
+
+────────────────────────────────────────────────────────────────────────────────
+INVESTMENT RECORDS
+────────────────────────────────────────────────────────────────────────────────
+
+Investment #1:
+  ID: 697cf5a682fe7a7b2fe41bf9
+  Amount: $100.00
+  voucherId: 5205381421
+  Package: Solar Starter
+  Status: Active
+  Created: 2026-01-30T18:17:10.082Z
+  Start Date: 2026-01-30T18:17:10.077Z
+  End Date: 2026-08-18T18:17:10.078Z
+  Linked Payments: 1
+    Payment 1: Order ID INV_696a6aa43016bc95ba09f358_1769796700919_tnvxcno8a, Payment ID 5205381421, Status completed
+  Match Type: byVoucherId
+  ⚠️ Issues:
+    - Investment linked to payment by voucherId but payment.investmentId not set
+
+Investment #2:
+  ID: 697cf58d82fe7a7b2fe41b8d
+  Amount: $100.00
+  voucherId: 5491768647
+  Package: Solar Starter
+  Status: Active
+  Created: 2026-01-30T18:16:45.808Z
+  Start Date: 2026-01-30T18:16:45.805Z
+  End Date: 2026-08-18T18:16:45.805Z
+  Linked Payments: 0
+  ⚠️ Issues:
+    - Investment has no linked payment record
+
+────────────────────────────────────────────────────────────────────────────────
+DUPLICATE ANALYSIS
+────────────────────────────────────────────────────────────────────────────────
+
+✅ No duplicates found
+
+================================================================================
+END OF REPORT
+================================================================================

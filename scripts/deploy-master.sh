@@ -53,10 +53,35 @@ fi
 
 echo "✅ All critical files verified"
 
-# Step 3: Stop containers
+# Step 3: Stop containers and clean up conflicts
 echo ""
-echo "📋 Step 3: Stopping containers..."
-docker compose down
+echo "📋 Step 3: Stopping containers and cleaning up conflicts..."
+docker compose down --remove-orphans 2>/dev/null || true
+
+# Remove ALL containers (running or stopped) with binary-system in name
+echo "   - Removing all binary-system containers..."
+docker ps -a --filter "name=binary-system-backend" -q | while read -r cid; do
+  [ -n "$cid" ] && docker stop "$cid" 2>/dev/null || true
+  [ -n "$cid" ] && docker rm -f "$cid" 2>/dev/null || true
+done || true
+
+docker ps -a --filter "name=binary-system-frontend" -q | while read -r cid; do
+  [ -n "$cid" ] && docker stop "$cid" 2>/dev/null || true
+  [ -n "$cid" ] && docker rm -f "$cid" 2>/dev/null || true
+done || true
+
+# Remove containers with ID prefixes in names (Docker Compose legacy naming issue)
+echo "   - Removing containers with ID prefixes..."
+docker ps -a --format "{{.Names}} {{.ID}}" 2>/dev/null | grep -E "[0-9a-f]{12}_binary-system" | awk '{print $2}' | while read -r cid; do
+  [ -n "$cid" ] && docker stop "$cid" 2>/dev/null || true
+  [ -n "$cid" ] && docker rm -f "$cid" 2>/dev/null || true
+done || true
+
+# Also check for containers with underscore prefixes
+docker ps -a --format "{{.Names}} {{.ID}}" 2>/dev/null | grep -E ".*_binary-system-(backend|frontend)" | awk '{print $2}' | while read -r cid; do
+  [ -n "$cid" ] && docker stop "$cid" 2>/dev/null || true
+  [ -n "$cid" ] && docker rm -f "$cid" 2>/dev/null || true
+done || true
 
 # Step 4: Clean all caches
 echo ""

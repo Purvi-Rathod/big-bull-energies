@@ -599,8 +599,10 @@ export const getNodeDownlines = asyncHandler(async (req, res) => {
     throw new AppError("User ID is required", 400);
   }
 
-  // Get depth limit from query params (default: 10 levels, max: 20)
-  const maxDepth = Math.min(parseInt(req.query.maxDepth as string) || 10, 20);
+  // OPTIMIZATION: Reduce maxDepth for large trees to prevent timeout
+  // Default: 3 levels (4 total including root), max: 5 levels
+  // This prevents loading too many users for users with 400+ downlines
+  const maxDepth = Math.min(parseInt(req.query.maxDepth as string) || 3, 5);
 
   // Find requesting user
   const requestingUser = await User.findById(requestingUserId)
@@ -721,13 +723,18 @@ export const getNodeDownlines = asyncHandler(async (req, res) => {
 
   const userIdsArray = Array.from(allTreeUserIds).map(id => new Types.ObjectId(id));
 
+  // OPTIMIZATION: Limit number of users loaded to prevent timeout for very large trees
+  // For users with 400+ downlines, loading all descendants would cause timeout
+  // Limit to first 500 users (should cover 3-4 levels for display)
+  const limitedUserIds = userIdsArray.slice(0, 500);
+  
   // Batch load all users in ONE query
-  const users = await User.find({ _id: { $in: userIdsArray } })
+  const users = await User.find({ _id: { $in: limitedUserIds } })
     .select("userId name email phone status")
     .lean();
 
   // Batch load all binary trees in ONE query with population
-  const binaryTrees = await BinaryTree.find({ user: { $in: userIdsArray } })
+  const binaryTrees = await BinaryTree.find({ user: { $in: limitedUserIds } })
     .populate("parent", "userId name")
     .populate("leftChild", "userId name")
     .populate("rightChild", "userId name")
@@ -736,7 +743,7 @@ export const getNodeDownlines = asyncHandler(async (req, res) => {
   // Batch calculate investments using aggregation (ONE query)
   const investmentAggregation = await Investment.aggregate([
     {
-      $match: { user: { $in: userIdsArray } }
+      $match: { user: { $in: limitedUserIds } }
     },
     {
       $group: {
@@ -766,113 +773,16 @@ export const getNodeDownlines = asyncHandler(async (req, res) => {
     investmentMap.set(inv._id.toString(), inv.totalInvestment || 0);
   });
 
-  /**
-   * Calculate downline counts dynamically by querying database for ALL descendants
-   * FIXED: Now queries database to count all descendants, not limited by maxDepth
-   * This ensures accurate counts even if stored counts are stale
-   */
-  const calculateDownlineCounts = async (userIdStr: string, leg: "left" | "right"): Promise<number> => {
-    const treeInfo = binaryTrees.find((t: any) => {
-      const tUserId = t.user?._id?.toString() || t.user?.toString();
-      return tUserId === userIdStr;
-    });
-
-    if (!treeInfo) return 0;
-
-    const childId = leg === "left" 
-      ? (treeInfo.leftChild as any)?._id?.toString() || (treeInfo.leftChild as any)?.toString()
-      : (treeInfo.rightChild as any)?._id?.toString() || (treeInfo.rightChild as any)?.toString();
-
-    if (!childId) return 0;
-
-    // Query database to count ALL descendants (not limited by loaded tree or maxDepth)
-    const childObjId = new Types.ObjectId(childId);
-    const visited = new Set<string>();
-    const queue: { userId: Types.ObjectId; level: number }[] = [{ userId: childObjId, level: 0 }];
-    let count = 0;
-    const maxDepth = 100; // Safety limit for counting
-
-    while (queue.length > 0) {
-      const current = queue.shift()!;
-      if (current.level >= maxDepth) break;
-
-      const currentIdStr = current.userId.toString();
-      if (visited.has(currentIdStr)) continue;
-      visited.add(currentIdStr);
-      count++; // Count this user
-
-      // Query database for this user's tree (not limited to loaded trees)
-      const currentTree = await BinaryTree.findOne({ user: current.userId })
-        .select("leftChild rightChild parent")
-        .lean();
-
-      if (!currentTree) continue;
-
-      // Check if admin
-      const currentUser = await User.findById(current.userId).select("userId").lean();
-      const isAdmin = currentUser && ((currentUser as any).userId === "CROWN-000000" || (currentUser as any).userId === "CNEOX-000000");
-
-      if (isAdmin) {
-        // For admin, get all children via parent relationship
-        const adminChildren = await BinaryTree.find({ parent: current.userId })
-          .select("user")
-          .lean();
-        adminChildren.forEach((child: any) => {
-          const childId = child.user?.toString() || child.user;
-          if (childId && !visited.has(childId)) {
-            queue.push({ userId: new Types.ObjectId(childId), level: current.level + 1 });
-          }
-        });
-      } else {
-        // Regular users: only left and right children
-        if (currentTree.leftChild) {
-          const leftId = (currentTree.leftChild as any)?.toString() || currentTree.leftChild.toString();
-          if (!visited.has(leftId)) {
-            queue.push({ userId: new Types.ObjectId(leftId), level: current.level + 1 });
-          }
-        }
-        if (currentTree.rightChild) {
-          const rightId = (currentTree.rightChild as any)?.toString() || currentTree.rightChild.toString();
-          if (!visited.has(rightId)) {
-            queue.push({ userId: new Types.ObjectId(rightId), level: current.level + 1 });
-          }
-        }
-      }
-    }
-
-    return count;
-  };
-
+  // OPTIMIZATION: Use stored counts from database (fast, no queries)
+  // For users with 400+ downlines, calculating dynamically would cause timeout
+  // Stored counts should be accurate after running recalculation script
   const treeMap = new Map<string, any>();
   
-  // Calculate counts for all users in parallel (queries database for ALL descendants, not just loaded ones)
-  const countPromises: Promise<{ userIdStr: string; leftCount: number; rightCount: number }>[] = [];
-  
   binaryTrees.forEach((tree: any) => {
     const userIdStr = tree.user?._id?.toString() || tree.user?.toString();
-    countPromises.push(
-      Promise.all([
-        calculateDownlineCounts(userIdStr, "left"),
-        calculateDownlineCounts(userIdStr, "right")
-      ]).then(([leftCount, rightCount]) => ({
-        userIdStr,
-        leftCount,
-        rightCount
-      }))
-    );
-  });
-
-  // Wait for all counts to be calculated
-  const countResults = await Promise.all(countPromises);
-  const countMap = new Map<string, { leftCount: number; rightCount: number }>();
-  countResults.forEach(result => {
-    countMap.set(result.userIdStr, { leftCount: result.leftCount, rightCount: result.rightCount });
-  });
-
-  binaryTrees.forEach((tree: any) => {
-    const userIdStr = tree.user?._id?.toString() || tree.user?.toString();
-    const counts = countMap.get(userIdStr) || { leftCount: 0, rightCount: 0 };
     
+    // Use stored counts from database (already loaded, no additional queries)
+    // This is MUCH faster than calculating dynamically for large trees
     treeMap.set(userIdStr, {
       parent: (tree.parent as any)?._id?.toString() || (tree.parent as any)?.toString() || null,
       parentUserId: (tree.parent as any)?.userId || null,
@@ -887,8 +797,8 @@ export const getNodeDownlines = asyncHandler(async (req, res) => {
       rightCarry: parseFloat(tree.rightCarry?.toString() || "0"),
       leftMatched: parseFloat(tree.leftMatched?.toString() || "0"),
       rightMatched: parseFloat(tree.rightMatched?.toString() || "0"),
-      leftDownlines: counts.leftCount, // Use dynamically calculated count (all descendants)
-      rightDownlines: counts.rightCount, // Use dynamically calculated count (all descendants)
+      leftDownlines: tree.leftDownlines || 0, // Use stored count (fast, no queries)
+      rightDownlines: tree.rightDownlines || 0, // Use stored count (fast, no queries)
     });
   });
 

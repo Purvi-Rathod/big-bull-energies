@@ -210,19 +210,38 @@ jobs:
           # Clean up containers with conflicting names
           echo "🧹 Cleaning up containers with conflicting names..."
           
-          # Remove stopped/exited containers
-          docker ps -a --filter "name=binary-system-backend" --filter "status=exited" -q | while read -r cid; do
+          # First, stop and remove containers managed by docker compose
+          echo "   - Stopping existing compose containers..."
+          $DOCKER_COMPOSE down --remove-orphans 2>/dev/null || true
+          
+          # Remove ALL containers (running or stopped) with binary-system in name
+          echo "   - Removing all binary-system containers..."
+          docker ps -a --filter "name=binary-system-backend" -q | while read -r cid; do
+            [ -n "$cid" ] && docker stop "$cid" 2>/dev/null || true
             [ -n "$cid" ] && docker rm -f "$cid" 2>/dev/null || true
           done || true
           
-          docker ps -a --filter "name=binary-system-frontend" --filter "status=exited" -q | while read -r cid; do
+          docker ps -a --filter "name=binary-system-frontend" -q | while read -r cid; do
+            [ -n "$cid" ] && docker stop "$cid" 2>/dev/null || true
             [ -n "$cid" ] && docker rm -f "$cid" 2>/dev/null || true
           done || true
           
-          # Remove containers with ID prefixes in names
+          # Remove containers with ID prefixes in names (Docker Compose legacy naming issue)
+          echo "   - Removing containers with ID prefixes..."
           docker ps -a --format "{{.Names}} {{.ID}}" 2>/dev/null | grep -E "[0-9a-f]{12}_binary-system" | awk '{print $2}' | while read -r cid; do
+            [ -n "$cid" ] && docker stop "$cid" 2>/dev/null || true
             [ -n "$cid" ] && docker rm -f "$cid" 2>/dev/null || true
           done || true
+          
+          # Also check for containers with the exact pattern from the error
+          docker ps -a --format "{{.Names}} {{.ID}}" 2>/dev/null | grep -E ".*_binary-system-(backend|frontend)" | awk '{print $2}' | while read -r cid; do
+            [ -n "$cid" ] && docker stop "$cid" 2>/dev/null || true
+            [ -n "$cid" ] && docker rm -f "$cid" 2>/dev/null || true
+          done || true
+          
+          # Final cleanup: remove any orphaned containers
+          echo "   - Cleaning up orphaned containers..."
+          docker container prune -f 2>/dev/null || true
           
           # Start new containers with --remove-orphans to clean up conflicts
           $DOCKER_COMPOSE up -d --force-recreate --remove-orphans backend frontend

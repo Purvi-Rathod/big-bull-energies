@@ -29,7 +29,12 @@
     "reset:admin-password": "ts-node -r dotenv/config src/scripts/resetAdminPassword.ts",
     "migrate:investment-wallets": "ts-node -r dotenv/config src/scripts/addInvestmentWallets.ts",
     "recalculate:downlines": "ts-node -r dotenv/config src/scripts/recalculateDownlines.ts",
-    "create:children": "ts-node -r dotenv/config src/scripts/createLeftRightChildren.ts"
+    "create:children": "ts-node -r dotenv/config src/scripts/createLeftRightChildren.ts",
+    "reconcile": "ts-node -r dotenv/config src/scripts/runReconciliation.ts",
+    "reconcile:user": "ts-node -r dotenv/config src/scripts/runReconciliation.ts",
+    "diagnose:binary-tree": "ts-node -r dotenv/config src/scripts/diagnoseBinaryTree.ts",
+    "fix:binary-tree": "ts-node -r dotenv/config src/scripts/fixBinaryTreeIssues.ts",
+    "backup:database": "ts-node -r dotenv/config src/scripts/backupDatabase.ts"
   },
   "mochaJunitReporterReporterOptions": {
     "mochaFile": "./test-results/junit.xml"

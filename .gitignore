@@ -35,6 +35,7 @@ build/
 
 # Node modules (already covered in subdirectories)
 node_modules/
-
-
+backups/
+diagnostic-reports
+reconciliation-reports
 binary_sytem.pem

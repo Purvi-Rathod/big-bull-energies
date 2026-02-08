@@ -213,22 +213,7 @@ app.post('/', asyncHandler(async (req, res, next) => {
     const contentType = req.headers['content-type'] || '';
     const hasNextAction = req.headers['next-action'];
     
-    console.log(`[ROOT POST] Request Details:`);
-    console.log(`[ROOT POST]   - Original URL: ${req.originalUrl}`);
-    console.log(`[ROOT POST]   - Path: ${req.path}`);
-    console.log(`[ROOT POST]   - Method: ${req.method}`);
-    console.log(`[ROOT POST]   - Protocol: ${req.protocol}`);
-    console.log(`[ROOT POST]   - Host: ${req.get('host')}`);
-    console.log(`[ROOT POST]   - IP: ${req.ip}`);
-    console.log(`[ROOT POST]   - Remote Address: ${req.socket.remoteAddress}`);
-    console.log(`[ROOT POST]   - X-Forwarded-For: ${req.get('x-forwarded-for') || 'N/A'}`);
-    console.log(`[ROOT POST]   - X-Real-IP: ${req.get('x-real-ip') || 'N/A'}`);
-    console.log(`[ROOT POST]   - User-Agent: ${req.get('user-agent') || 'N/A'}`);
-    console.log(`[ROOT POST]   - Content-Type: ${contentType}`);
-    console.log(`[ROOT POST]   - Content-Length: ${req.get('content-length') || 'N/A'}`);
-    console.log(`[ROOT POST]   - Has Next-Action Header: ${hasNextAction ? 'YES' : 'NO'}`);
-    console.log(`[ROOT POST] All Headers:`, JSON.stringify(req.headers, null, 2));
-    
+
     // Skip Next.js Server Actions (they use multipart/form-data and next-action header)
     if (contentType.includes('multipart/form-data') || hasNextAction) {
         console.log(`[ROOT POST] ⏭️ Skipping Next.js Server Action request`);

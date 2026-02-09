@@ -158,14 +158,16 @@ jobs:
       - name: Deploy to server
         env:
           DEPLOY_PATH: ${{ secrets.STAGGING_PATH }}
+        timeout-minutes: 45
         run: |
-          echo "📤 Copying stagging deployment script..."
-          scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=~/.ssh/known_hosts \
-            /tmp/deploy-stagging.sh ${{ secrets.PROD_USER }}@${{ secrets.PROD_HOST }}:~/deploy-stagging.sh
+          # SSH keepalive: prevents "Broken pipe" during long Docker builds (npm ci can take 15+ min)
+          SSH_OPTS="-o StrictHostKeyChecking=no -o UserKnownHostsFile=~/.ssh/known_hosts -o ServerAliveInterval=30 -o ServerAliveCountMax=60"
 
-          echo "🚀 Executing stagging deployment..."
-          ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=~/.ssh/known_hosts \
-            ${{ secrets.PROD_USER }}@${{ secrets.PROD_HOST }} \
+          echo "📤 Copying stagging deployment script..."
+          scp $SSH_OPTS /tmp/deploy-stagging.sh ${{ secrets.PROD_USER }}@${{ secrets.PROD_HOST }}:~/deploy-stagging.sh
+
+          echo "🚀 Executing stagging deployment (build may take 15-25 min)..."
+          ssh $SSH_OPTS ${{ secrets.PROD_USER }}@${{ secrets.PROD_HOST }} \
             "chmod +x ~/deploy-stagging.sh && DEPLOY_PATH='${{ secrets.STAGGING_PATH }}' bash ~/deploy-stagging.sh"
 
       - name: Verify deployment

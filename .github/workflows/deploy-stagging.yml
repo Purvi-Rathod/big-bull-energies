@@ -11,6 +11,18 @@ jobs:
     name: Deploy to Stagging
 
     steps:
+      - name: Validate secrets
+        run: |
+          if [ -z "${{ secrets.STAGGING_PATH }}" ]; then
+            echo "❌ STAGGING_PATH secret is not set!"
+            echo ""
+            echo "Add it in: Settings → Secrets and variables → Actions → New repository secret"
+            echo "Name: STAGGING_PATH"
+            echo "Value: /home/deployer/apps/stagging/crown-bankers (or your stagging app path)"
+            exit 1
+          fi
+          echo "✅ STAGGING_PATH is configured"
+
       - name: Checkout code
         uses: actions/checkout@v4
         with:

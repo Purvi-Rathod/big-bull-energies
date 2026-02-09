@@ -38,3 +38,8 @@ node_modules/
 
 
 binary_sytem.pem
+backups
+
+diagnostic-reports
+
+reconciliation-reports

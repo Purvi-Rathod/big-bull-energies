@@ -43,12 +43,16 @@ fi
 COMPOSE_CMD="$DOCKER_COMPOSE -f $COMPOSE_FILE --env-file $ENV_FILE"
 
 echo ""
-echo "🛑 Stopping stagging containers..."
-$COMPOSE_CMD down --remove-orphans 2>/dev/null || true
+echo "🛑 Stopping stagging containers and removing stale volumes..."
+$COMPOSE_CMD down --remove-orphans --volumes 2>/dev/null || true
 
 echo ""
-echo "🔨 Building stagging Docker images..."
-$COMPOSE_CMD build --no-cache
+echo "🧹 Pruning build cache (ensures fresh build with correct API URL)..."
+docker builder prune -f 2>/dev/null || true
+
+echo ""
+echo "🔨 Building stagging Docker images (no cache)..."
+$COMPOSE_CMD build --no-cache --pull
 
 echo ""
 echo "🚀 Starting stagging containers..."

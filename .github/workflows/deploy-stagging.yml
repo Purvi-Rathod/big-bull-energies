@@ -96,8 +96,8 @@ jobs:
           CURRENT_COMMIT=$(git rev-parse --short HEAD)
           echo "📌 Deploying commit: ${CURRENT_COMMIT}"
 
-          echo "🛑 Stopping stagging containers..."
-          $COMPOSE_CMD down --remove-orphans 2>/dev/null || true
+          echo "🛑 Stopping stagging containers and removing stale volumes..."
+          $COMPOSE_CMD down --remove-orphans --volumes 2>/dev/null || true
 
           docker ps -a --filter "name=binary-system-backend-stagging" -q | while read -r cid; do
             [ -n "$cid" ] && docker stop "$cid" 2>/dev/null || true

@@ -1,0 +1,85 @@
+# Stagging environment - runs alongside production on the same server
+# Port 4000: stagging.api.crownbankers.com (API)
+# Port 3002: stagging.crownbankers.com (Frontend)
+#
+# Usage: docker compose -f docker-compose.stagging.yml --env-file .env.stagging up -d
+
+services:
+  backend:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: binary-system-backend-stagging
+    ports:
+      - "4000:8000"
+    read_only: true
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add:
+      - NET_BIND_SERVICE
+    tmpfs:
+      - /tmp:noexec,nosuid,size=100m
+      - /usr/src/app/logs:noexec,nosuid,size=50m
+      - /usr/src/app/tmp:noexec,nosuid,size=50m
+    environment:
+      - NODE_ENV=${NODE_ENV:-production}
+      - PORT=${PORT:-8000}
+      - MONGODB_URL_DEVELOPMENT=${MONGODB_URL_DEVELOPMENT}
+      - MONGODB_URL_PRODUCTION=${MONGODB_URL_PRODUCTION}
+      - ACCESS_TOKEN_SECRET=${ACCESS_TOKEN_SECRET}
+      - REFRESH_TOKEN_SECRET=${REFRESH_TOKEN_SECRET}
+      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-${CLIENT_URL:-https://stagging.crownbankers.com}}
+      - EMAIL_USER=${EMAIL_USER}
+      - EMAIL_PASS=${EMAIL_PASS}
+      - REDIS_USERNAME=${REDIS_USERNAME}
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
+      - REDIS_HOST=${REDIS_HOST}
+      - REDIS_PORT=${REDIS_PORT}
+      - ADMIN_JWT_SECRET=${ADMIN_JWT_SECRET}
+      - ADMIN_JWT_EXPIRES_IN=${ADMIN_JWT_EXPIRES_IN}
+      - NOWPAYMENTS_API_KEY=${NOWPAYMENTS_API_KEY}
+      - NOWPAYMENTS_API_URL=${NOWPAYMENTS_API_URL}
+      - NOWPAYMENTS_CALLBACK_URL=${NOWPAYMENTS_CALLBACK_URL}
+      - NOWPAYMENTS_IPN_SECRET=${NOWPAYMENTS_IPN_SECRET}
+      - CLIENT_URL=${CLIENT_URL:-https://stagging.crownbankers.com}
+      - API_URL=${API_URL:-https://stagging.api.crownbankers.com}
+    restart: unless-stopped
+    networks:
+      - binary-network-stagging
+
+  frontend:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+      args:
+        - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL:-https://stagging.api.crownbankers.com}/api/v1
+    container_name: binary-system-frontend-stagging
+    ports:
+      - "3002:3000"
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add:
+      - NET_BIND_SERVICE
+    tmpfs:
+      - /tmp:noexec,nosuid,size=100m
+    volumes:
+      - frontend-next-cache-stagging:/app/.next:rw
+    environment:
+      - NODE_ENV=${NODE_ENV:-production}
+      - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL:-https://stagging.api.crownbankers.com}/api/v1
+    depends_on:
+      - backend
+    restart: unless-stopped
+    networks:
+      - binary-network-stagging
+
+networks:
+  binary-network-stagging:
+    driver: bridge
+
+volumes:
+  frontend-next-cache-stagging:

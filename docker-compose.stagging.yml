@@ -54,7 +54,7 @@ services:
       context: ./client
       dockerfile: Dockerfile
       args:
-        - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL:-https://stagging.api.crownbankers.com}/api/v1
+        - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL:-https://api.stagging.crownbankers.com}/api/v1
     container_name: binary-system-frontend-stagging
     ports:
       - "3002:3000"

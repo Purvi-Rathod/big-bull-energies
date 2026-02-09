@@ -111,12 +111,8 @@ jobs:
 
           docker container prune -f 2>/dev/null || true
 
-          echo "🧹 Pruning build cache and old images..."
-          docker builder prune -af 2>/dev/null || true
-          docker image prune -af 2>/dev/null || true
-
           echo "🔨 Building stagging Docker images (no cache)..."
-          $COMPOSE_CMD build --no-cache --pull
+          $COMPOSE_CMD build --no-cache
 
           echo "🚀 Starting stagging containers..."
           $COMPOSE_CMD up -d --remove-orphans
@@ -147,9 +143,6 @@ jobs:
           echo "📊 Container status:"
           $COMPOSE_CMD ps
 
-          echo "🧹 Removing old/unused images..."
-          docker image prune -af 2>/dev/null || true
-
           echo ""
           echo "✅ Stagging deployment complete! Commit: ${CURRENT_COMMIT}"
           DEPLOY_SCRIPT
@@ -158,7 +151,7 @@ jobs:
       - name: Deploy to server
         env:
           DEPLOY_PATH: ${{ secrets.STAGGING_PATH }}
-        timeout-minutes: 45
+        timeout-minutes: 60
         run: |
           # SSH keepalive: prevents "Broken pipe" during long Docker builds (npm ci can take 15+ min)
           SSH_OPTS="-o StrictHostKeyChecking=no -o UserKnownHostsFile=~/.ssh/known_hosts -o ServerAliveInterval=30 -o ServerAliveCountMax=60"

@@ -1,5 +1,5 @@
 # Stagging environment - runs alongside production on the same server
-# Port 4000: stagging.api.crownbankers.com (API)
+# Port 4000: api.stagging.crownbankers.com (API)
 # Port 3002: stagging.crownbankers.com (Frontend)
 #
 # Usage: docker compose -f docker-compose.stagging.yml --env-file .env.stagging up -d

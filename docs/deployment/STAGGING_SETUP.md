@@ -6,8 +6,8 @@ The stagging environment runs alongside production on the same server with diffe
 
 | Service   | Port | Domain                      |
 |-----------|------|-----------------------------|
-| API       | 4000 | stagging.api.crownbankers.com |
-| Frontend  | 3002 | stagging.crownbankers.com     |
+| API       | 4000 | staging.api.crownbankers.com |
+| Frontend  | 3002 | staging.crownbankers.com     |
 
 ## Quick Start
 
@@ -37,10 +37,10 @@ docker compose -f docker-compose.stagging.yml --env-file .env.stagging up -d --b
 Add these server blocks to route the stagging domains. Create `/etc/nginx/sites-available/stagging-crownbankers`:
 
 ```nginx
-# stagging.api.crownbankers.com -> localhost:4000
+# staging.api.crownbankers.com -> localhost:4000
 server {
     listen 80;
-    server_name stagging.api.crownbankers.com;
+    server_name staging.api.crownbankers.com;
     
     location / {
         proxy_pass http://localhost:4000;
@@ -56,10 +56,10 @@ server {
     }
 }
 
-# stagging.crownbankers.com -> localhost:3002
+# staging.crownbankers.com -> localhost:3002
 server {
     listen 80;
-    server_name stagging.crownbankers.com;
+    server_name staging.crownbankers.com;
     
     location / {
         proxy_pass http://localhost:3002;
@@ -82,7 +82,7 @@ For HTTPS, use Let's Encrypt:
 sudo ln -s /etc/nginx/sites-available/stagging-crownbankers /etc/nginx/sites-enabled/
 sudo nginx -t
 sudo systemctl reload nginx
-sudo certbot --nginx -d stagging.api.crownbankers.com -d stagging.crownbankers.com
+sudo certbot --nginx -d staging.api.crownbankers.com -d staging.crownbankers.com
 ```
 
 ## DNS Configuration
@@ -91,7 +91,7 @@ Add A records pointing to your production server IP:
 
 | Record  | Type | Value         |
 |---------|------|---------------|
-| stagging.api | A | YOUR_SERVER_IP |
+| staging.api | A | YOUR_SERVER_IP |
 | stagging     | A | YOUR_SERVER_IP |
 
 ## Firewall

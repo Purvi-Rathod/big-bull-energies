@@ -1,6 +1,6 @@
 #!/bin/bash
 # Deploy stagging environment on the same production server
-# Stagging: API on 4000 (stagging.api.crownbankers.com), Frontend on 3002 (stagging.crownbankers.com)
+# Stagging: API on 4000 (api.stagging.crownbankers.com), Frontend on 3002 (stagging.crownbankers.com)
 
 set -e
 

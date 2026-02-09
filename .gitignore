@@ -42,5 +42,5 @@ binary_sytem.pem
 backups
 
 diagnostic-reports
-
+.env.stagging
 reconciliation-reports

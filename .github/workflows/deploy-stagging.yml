@@ -1,0 +1,159 @@
+name: Deploy to Stagging
+
+on:
+  push:
+    branches: [ staging ]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    name: Deploy to Stagging
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup SSH
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.PROD_SSH_KEY }}
+
+      - name: Configure SSH
+        run: |
+          mkdir -p ~/.ssh
+          chmod 700 ~/.ssh
+          ssh-keyscan -H ${{ secrets.PROD_HOST }} >> ~/.ssh/known_hosts
+          chmod 644 ~/.ssh/known_hosts
+
+          echo "🔍 Testing SSH connection..."
+          ssh -o BatchMode=yes -o ConnectTimeout=5 ${{ secrets.PROD_USER }}@${{ secrets.PROD_HOST }} "echo 'SSH connection successful'" || {
+            echo "⚠️ SSH connection test failed"
+            exit 1
+          }
+
+      - name: Create stagging deployment script
+        run: |
+          cat > /tmp/deploy-stagging.sh << 'DEPLOY_SCRIPT'
+          #!/bin/bash
+          set -e
+
+          DEPLOY_PATH="${DEPLOY_PATH}"
+          COMPOSE_FILE="docker-compose.stagging.yml"
+          ENV_FILE=".env.stagging"
+
+          echo "🚀 Starting stagging deployment..."
+          echo "📍 Path: ${DEPLOY_PATH}"
+
+          cd "${DEPLOY_PATH}"
+
+          if [ ! -f "$COMPOSE_FILE" ]; then
+            echo "❌ Error: $COMPOSE_FILE not found"
+            exit 1
+          fi
+
+          if [ ! -f "$ENV_FILE" ]; then
+            echo "❌ Error: $ENV_FILE not found"
+            exit 1
+          fi
+
+          echo "🔐 Configuring GitHub SSH access..."
+          mkdir -p ~/.ssh
+          chmod 700 ~/.ssh
+          if ! grep -q "github.com" ~/.ssh/known_hosts 2>/dev/null; then
+            ssh-keyscan -H github.com >> ~/.ssh/known_hosts 2>/dev/null || true
+          fi
+
+          if command -v docker &> /dev/null && docker compose version &> /dev/null 2>&1; then
+            DOCKER_COMPOSE="docker compose"
+          elif command -v docker-compose &> /dev/null; then
+            DOCKER_COMPOSE="docker-compose"
+          else
+            echo "❌ Docker Compose not found!"
+            exit 1
+          fi
+
+          COMPOSE_CMD="$DOCKER_COMPOSE -f $COMPOSE_FILE --env-file $ENV_FILE"
+
+          echo "📥 Pulling latest changes from origin/staging..."
+          git fetch origin
+          git reset --hard origin/staging
+
+          CURRENT_COMMIT=$(git rev-parse --short HEAD)
+          echo "📌 Deploying commit: ${CURRENT_COMMIT}"
+
+          echo "🛑 Stopping stagging containers..."
+          $COMPOSE_CMD down --remove-orphans 2>/dev/null || true
+
+          docker ps -a --filter "name=binary-system-backend-stagging" -q | while read -r cid; do
+            [ -n "$cid" ] && docker stop "$cid" 2>/dev/null || true
+            [ -n "$cid" ] && docker rm -f "$cid" 2>/dev/null || true
+          done || true
+
+          docker ps -a --filter "name=binary-system-frontend-stagging" -q | while read -r cid; do
+            [ -n "$cid" ] && docker stop "$cid" 2>/dev/null || true
+            [ -n "$cid" ] && docker rm -f "$cid" 2>/dev/null || true
+          done || true
+
+          docker container prune -f 2>/dev/null || true
+
+          echo "🔨 Building stagging Docker images..."
+          $COMPOSE_CMD build --no-cache
+
+          echo "🚀 Starting stagging containers..."
+          $COMPOSE_CMD up -d --remove-orphans
+
+          echo "⏳ Waiting for services..."
+          sleep 15
+
+          if ! docker ps | grep -q "binary-system-backend-stagging"; then
+            echo "❌ Error: Backend stagging container is not running!"
+            $COMPOSE_CMD logs --tail=50 backend
+            exit 1
+          fi
+
+          if ! docker ps | grep -q "binary-system-frontend-stagging"; then
+            echo "❌ Error: Frontend stagging container is not running!"
+            $COMPOSE_CMD logs --tail=50 frontend
+            exit 1
+          fi
+
+          BACKEND_HEALTH=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:4000/api/v1/health 2>/dev/null || \
+                           curl -s -o /dev/null -w "%{http_code}" http://localhost:4000/api/health 2>/dev/null || echo "000")
+          FRONTEND_HEALTH=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:3002 2>/dev/null || echo "000")
+
+          echo "✅ Backend (4000): HTTP ${BACKEND_HEALTH}"
+          echo "✅ Frontend (3002): HTTP ${FRONTEND_HEALTH}"
+
+          echo ""
+          echo "📊 Container status:"
+          $COMPOSE_CMD ps
+
+          docker image prune -f 2>/dev/null || true
+
+          echo ""
+          echo "✅ Stagging deployment complete! Commit: ${CURRENT_COMMIT}"
+          DEPLOY_SCRIPT
+          chmod +x /tmp/deploy-stagging.sh
+
+      - name: Deploy to server
+        env:
+          DEPLOY_PATH: ${{ secrets.STAGGING_PATH }}
+        run: |
+          echo "📤 Copying stagging deployment script..."
+          scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=~/.ssh/known_hosts \
+            /tmp/deploy-stagging.sh ${{ secrets.PROD_USER }}@${{ secrets.PROD_HOST }}:~/deploy-stagging.sh
+
+          echo "🚀 Executing stagging deployment..."
+          ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=~/.ssh/known_hosts \
+            ${{ secrets.PROD_USER }}@${{ secrets.PROD_HOST }} \
+            "chmod +x ~/deploy-stagging.sh && DEPLOY_PATH='${{ secrets.STAGGING_PATH }}' bash ~/deploy-stagging.sh"
+
+      - name: Verify deployment
+        run: |
+          echo "✅ Stagging deployment workflow completed"
+          echo "🌐 Stagging URLs:"
+          echo "   API:     https://stagging.api.crownbankers.com (port 4000)"
+          echo "   Frontend: https://stagging.crownbankers.com (port 3002)"

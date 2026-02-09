@@ -44,7 +44,7 @@ services:
       - NOWPAYMENTS_CALLBACK_URL=${NOWPAYMENTS_CALLBACK_URL}
       - NOWPAYMENTS_IPN_SECRET=${NOWPAYMENTS_IPN_SECRET}
       - CLIENT_URL=${CLIENT_URL:-https://stagging.crownbankers.com}
-      - API_URL=${API_URL:-https://stagging.api.crownbankers.com}
+      - API_URL=${API_URL:-https://api.stagging.crownbankers.com}
     restart: unless-stopped
     networks:
       - binary-network-stagging
@@ -70,7 +70,7 @@ services:
       - frontend-next-cache-stagging:/app/.next:rw
     environment:
       - NODE_ENV=${NODE_ENV:-production}
-      - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL:-https://stagging.api.crownbankers.com}/api/v1
+      - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL:-https://api.stagging.crownbankers.com}/api/v1
     depends_on:
       - backend
     restart: unless-stopped

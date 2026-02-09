@@ -167,5 +167,5 @@ jobs:
         run: |
           echo "✅ Stagging deployment workflow completed"
           echo "🌐 Stagging URLs:"
-          echo "   API:     https://stagging.api.crownbankers.com (port 4000)"
+          echo "   API:     https://api.stagging.crownbankers.com (port 4000)"
           echo "   Frontend: https://stagging.crownbankers.com (port 3002)"

@@ -36,23 +36,29 @@ export default function FreeAccountPage() {
     withdrawEnabled: boolean;
     packageName: string;
     amount: number;
-    createdAt: string;
+    activationDate: string | null;
   }>>([]);
   const [loadingFreeAccounts, setLoadingFreeAccounts] = useState(false);
+  const [freePage, setFreePage] = useState(1);
+  const [freePagination, setFreePagination] = useState({ page: 1, limit: 10, total: 0, pages: 1 });
   const hasFetchedPackages = useRef(false);
 
   useEffect(() => {
     if (hasFetchedPackages.current) return;
     hasFetchedPackages.current = true;
     fetchPackages();
-    fetchFreeAccounts();
   }, []);
 
-  const fetchFreeAccounts = async () => {
+  useEffect(() => {
+    fetchFreeAccounts(freePage);
+  }, [freePage]);
+
+  const fetchFreeAccounts = async (page: number = 1) => {
     try {
       setLoadingFreeAccounts(true);
-      const res = await api.getFreeAccountsList();
+      const res = await api.getFreeAccountsList({ page, limit: 10 });
       if (res.data?.accounts) setFreeAccounts(res.data.accounts);
+      if (res.data?.pagination) setFreePagination(res.data.pagination);
     } catch (err) {
       setFreeAccounts([]);
     } finally {
@@ -127,7 +133,7 @@ export default function FreeAccountPage() {
       setSelectedPackageId('');
       setAmount('');
       setBinaryTarget('');
-      await fetchFreeAccounts();
+      await fetchFreeAccounts(freePage);
     } catch (err: any) {
       toast.error(err.message || 'Failed to activate free account');
     } finally {
@@ -155,15 +161,25 @@ export default function FreeAccountPage() {
             </svg>
           </div>
           <div className="ml-3">
-            <h3 className="text-sm font-medium text-blue-800">Free Account Rules</h3>
-            <div className="mt-2 text-sm text-blue-700">
-              <ul className="list-disc list-inside space-y-1">
-                <li>Can earn all income types (ROI, Binary, Referral, etc.)</li>
-                <li>Can invest in packages normally</li>
-                <li>Withdrawal Restriction: Can only withdraw from Binary wallet</li>
-                <li>Target Required: Must complete binary target to unlock withdrawals</li>
-                <li>Withdrawal Limit: Can only withdraw amount earned from binary business (up to target)</li>
-                <li>Existing user’s referrer is not changed; no new account or downline is created</li>
+            <h3 className="text-sm font-medium text-blue-800">Free Account Rules (Official)</h3>
+            <div className="mt-2 text-sm text-blue-700 space-y-2">
+              <ul className="list-disc list-inside space-y-0.5">
+                <li>On free activation: <strong>no referral income</strong> for uplines; funded amount <strong>does not count</strong> as binary tree business</li>
+                <li>User earns <strong>ROI on the funded package</strong>; <strong>binary and referral income apply only to future paid investments</strong></li>
+              </ul>
+              <p className="font-medium mt-1">Before completing the binary target:</p>
+              <ul className="list-disc list-inside space-y-0.5 ml-2">
+                <li><strong>ROI withdrawal: locked</strong></li>
+                <li><strong>Referral + Binary: unlocked</strong> (can withdraw)</li>
+                <li>Withdrawal limited to binary/referral income earned</li>
+              </ul>
+              <p className="font-medium mt-1">After completing the binary target:</p>
+              <ul className="list-disc list-inside space-y-0.5 ml-2">
+                <li>Can withdraw from <strong>ROI wallet</strong></li>
+                <li>All eligible incomes withdrawable as per system rules</li>
+              </ul>
+              <ul className="list-disc list-inside space-y-0.5 mt-1">
+                <li>Existing referrer and downline structure <strong>remain unchanged</strong>; no new account or downline is created</li>
               </ul>
             </div>
           </div>
@@ -250,7 +266,7 @@ export default function FreeAccountPage() {
             className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 text-black placeholder:text-gray-500"
           />
           <p className="mt-1 text-xs text-gray-600">
-            User can only withdraw from binary wallet, up to this target amount, after completing it.
+            Binary target to unlock ROI withdrawals. Before completion, user can withdraw Binary and Referral only; after completion, all eligible wallets.
           </p>
         </div>
 
@@ -282,6 +298,7 @@ export default function FreeAccountPage() {
         ) : freeAccounts.length === 0 ? (
           <div className="px-6 py-12 text-center text-gray-500">No free accounts yet.</div>
         ) : (
+          <>
           <div className="overflow-x-auto">
             <table className="w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
@@ -296,7 +313,7 @@ export default function FreeAccountPage() {
                   <th className="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase">Binary Target</th>
                   <th className="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase">Target Status</th>
                   <th className="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase">Withdraw</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase">Created</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase">Activation Date</th>
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
@@ -323,12 +340,41 @@ export default function FreeAccountPage() {
                         {row.withdrawEnabled ? 'Enabled' : 'Locked'}
                       </span>
                     </td>
-                    <td className="px-4 py-3 text-sm text-gray-600">{row.createdAt ? new Date(row.createdAt).toLocaleString() : '—'}</td>
+                    <td className="px-4 py-3 text-sm text-black">{row.activationDate ? new Date(row.activationDate).toLocaleString() : '—'}</td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
+          {freePagination.pages > 1 && (
+            <div className="px-6 py-4 border-t border-gray-200 flex items-center justify-between">
+              <p className="text-sm text-gray-600">
+                Showing {(freePagination.page - 1) * freePagination.limit + 1}–{Math.min(freePagination.page * freePagination.limit, freePagination.total)} of {freePagination.total}
+              </p>
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  onClick={() => setFreePage((p) => Math.max(1, p - 1))}
+                  disabled={freePage <= 1 || loadingFreeAccounts}
+                  className="px-3 py-1.5 text-sm font-medium text-indigo-600 bg-indigo-50 rounded-md hover:bg-indigo-100 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Previous
+                </button>
+                <span className="px-3 py-1.5 text-sm text-gray-700">
+                  Page {freePagination.page} of {freePagination.pages}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setFreePage((p) => Math.min(freePagination.pages, p + 1))}
+                  disabled={freePage >= freePagination.pages || loadingFreeAccounts}
+                  className="px-3 py-1.5 text-sm font-medium text-indigo-600 bg-indigo-50 rounded-md hover:bg-indigo-100 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Next
+                </button>
+              </div>
+            </div>
+          )}
+          </>
         )}
       </div>
     </div>

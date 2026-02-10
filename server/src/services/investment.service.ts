@@ -451,13 +451,15 @@ export async function updateWallet(
 
 /**
  * Process investment and update all related tables
+ * @param isFreeAccount - When true, no referral income for upline and no business volume added to binary tree (funded/free accounts)
  */
 export async function processInvestment(
   userId: Types.ObjectId,
   packageId: Types.ObjectId,
   amount: number,
   paymentId?: string,
-  voucherId?: string
+  voucherId?: string,
+  isFreeAccount: boolean = false
 ) {
   try {
     console.log(`[Investment Service] 🚀 Starting investment processing...`);
@@ -466,6 +468,7 @@ export async function processInvestment(
     console.log(`[Investment Service] Amount: $${amount}`);
     console.log(`[Investment Service] Payment ID: ${paymentId || 'none'}`);
     console.log(`[Investment Service] Voucher ID: ${voucherId || 'none'}`);
+    if (isFreeAccount) console.log(`[Investment Service] Free/funded account: no referral, no BV`);
     
     // Get user and package
     const user = await User.findById(userId);
@@ -612,7 +615,7 @@ export async function processInvestment(
       investedAmount: Types.Decimal128.fromString(amount.toString()),
       principal: Types.Decimal128.fromString(amount.toString()), // Starts equal to investedAmount
       depositAmount: Types.Decimal128.fromString(amount.toString()),
-      type: "self",
+      type: isFreeAccount ? "free" : "self",
       isBinaryUpdated: false,
       referralPaid: false,
       voucherId: voucherId || paymentId, // Store voucherId if provided, otherwise paymentId
@@ -659,18 +662,14 @@ export async function processInvestment(
 
     // Process referral bonus for direct sponsor (level 1) - one-time per USER (not per investment)
     // Referral bonus is paid IMMEDIATELY when investment is activated
-    // 
+    // SKIP for free/funded accounts: no referral income for uplines on funded activations.
+    //
     // IMPORTANT RULES:
     // 1. Referral bonus should only be paid ONCE per user (on their first investment)
-    //    - If User B invests $100, User A gets referral bonus
-    //    - If User B invests again $500, User A does NOT get referral bonus again
-    //
     // 2. Referral bonus goes to the direct referrer (sponsor), not the binary tree parent
-    //    - user.referrer is the person who invited them (the direct sponsor)
-    //    - Example: User A invites User D, even if D is placed under B or C in binary tree,
-    //      User A gets the referral bonus when D invests (not B or C)
+    // 3. Free/funded accounts: do NOT pay referral bonus to upline
     //
-    if (user.referrer) {
+    if (!isFreeAccount && user.referrer) {
       // Check if this is the user's FIRST investment (referral bonus should only be paid once per user)
       const existingInvestments = await Investment.find({ 
         user: userId,
@@ -680,7 +679,6 @@ export async function processInvestment(
       // Only pay referral bonus if this is the user's FIRST investment
       if (existingInvestments === 0) {
         // This is the user's first investment, pay referral bonus to their direct referrer (sponsor)
-        // Note: user.referrer is the person who invited them, not the binary tree parent
         console.log(`[Investment Service] Processing referral bonus for first investment...`);
         console.log(`[Investment Service] Referrer ID: ${user.referrer}`);
         await processReferralBonus(user.referrer, amount, pkg, investment._id.toString(), userId);
@@ -693,22 +691,27 @@ export async function processInvestment(
         // User has made investments before, referral bonus already paid - skip
         console.log(`[Investment Service] ℹ️ User ${userId} has existing investments, skipping referral bonus (already paid on first investment)`);
       }
+    } else if (isFreeAccount) {
+      console.log(`[Investment Service] ℹ️ Free/funded account: skipping referral bonus`);
     }
 
     // Add business volume up the tree (binary bonuses will be calculated daily via cron)
+    // SKIP for free/funded accounts: funded amount must not count in binary tree business.
     // This only adds BV to parent's business volume, does NOT calculate bonuses immediately
     // Binary bonuses are calculated at end of day via cron job (just like ROI)
-    console.log(`[Investment Service] Adding business volume up the tree...`);
-    await addBusinessVolumeUpTree(
-      userId, 
-      amount, 
-      position,
-      false // Regular investment, not powerleg
-    );
-    console.log(`[Investment Service] ✅ Business volume added to parent tree`);
-
-    // Mark investment as binary updated (BV added, but bonus calculation happens in daily cron)
-    investment.isBinaryUpdated = true;
+    if (!isFreeAccount) {
+      console.log(`[Investment Service] Adding business volume up the tree...`);
+      await addBusinessVolumeUpTree(
+        userId, 
+        amount, 
+        position,
+        false // Regular investment, not powerleg
+      );
+      console.log(`[Investment Service] ✅ Business volume added to parent tree`);
+      investment.isBinaryUpdated = true;
+    } else {
+      console.log(`[Investment Service] ℹ️ Free/funded account: skipping business volume (no BV in binary tree)`);
+    }
     await investment.save();
 
     console.log(`[Investment Service] ✅✅✅ Investment processing completed successfully! ✅✅✅`);

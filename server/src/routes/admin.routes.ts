@@ -30,6 +30,7 @@ import {
   changeUserPassword,
   getAdminReports,
   getDailyBusinessReport,
+  getDailyBusinessSummary,
   getNOWPaymentsReport,
   getCountryBusinessReport,
   getInvestmentsReport,
@@ -128,6 +129,7 @@ router.delete("/users/:userId", requireAdminAuth, deleteUser);
 
 // Admin statistics
 router.get("/statistics", requireAdminAuth, getAdminStatistics);
+router.get("/daily-business-summary", requireAdminAuth, getDailyBusinessSummary);
 
 // Admin reports
 router.get("/reports", requireAdminAuth, getAdminReports);

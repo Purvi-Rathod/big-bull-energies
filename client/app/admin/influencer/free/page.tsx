@@ -155,15 +155,25 @@ export default function FreeAccountPage() {
             </svg>
           </div>
           <div className="ml-3">
-            <h3 className="text-sm font-medium text-blue-800">Free Account Rules</h3>
-            <div className="mt-2 text-sm text-blue-700">
-              <ul className="list-disc list-inside space-y-1">
-                <li>Can earn all income types (ROI, Binary, Referral, etc.)</li>
-                <li>Can invest in packages normally</li>
-                <li>Withdrawal Restriction: Can only withdraw from Binary wallet</li>
-                <li>Target Required: Must complete binary target to unlock withdrawals</li>
-                <li>Withdrawal Limit: Can only withdraw amount earned from binary business (up to target)</li>
-                <li>Existing user’s referrer is not changed; no new account or downline is created</li>
+            <h3 className="text-sm font-medium text-blue-800">Free Account Rules (Official)</h3>
+            <div className="mt-2 text-sm text-blue-700 space-y-2">
+              <ul className="list-disc list-inside space-y-0.5">
+                <li>On free activation: <strong>no referral income</strong> for uplines; funded amount <strong>does not count</strong> as binary tree business</li>
+                <li>User earns <strong>ROI on the funded package</strong>; <strong>binary and referral income apply only to future paid investments</strong></li>
+              </ul>
+              <p className="font-medium mt-1">Before completing the binary target:</p>
+              <ul className="list-disc list-inside space-y-0.5 ml-2">
+                <li><strong>ROI withdrawal: locked</strong></li>
+                <li><strong>Referral + Binary: unlocked</strong> (can withdraw)</li>
+                <li>Withdrawal limited to binary/referral income earned</li>
+              </ul>
+              <p className="font-medium mt-1">After completing the binary target:</p>
+              <ul className="list-disc list-inside space-y-0.5 ml-2">
+                <li>Can withdraw from <strong>ROI wallet</strong></li>
+                <li>All eligible incomes withdrawable as per system rules</li>
+              </ul>
+              <ul className="list-disc list-inside space-y-0.5 mt-1">
+                <li>Existing referrer and downline structure <strong>remain unchanged</strong>; no new account or downline is created</li>
               </ul>
             </div>
           </div>
@@ -250,7 +260,7 @@ export default function FreeAccountPage() {
             className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 text-black placeholder:text-gray-500"
           />
           <p className="mt-1 text-xs text-gray-600">
-            User can only withdraw from binary wallet, up to this target amount, after completing it.
+            Binary target to unlock ROI withdrawals. Before completion, user can withdraw Binary and Referral only; after completion, all eligible wallets.
           </p>
         </div>
 

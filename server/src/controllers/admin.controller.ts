@@ -3716,23 +3716,19 @@ export const createFreeAccounts = asyncHandler(async (req, res) => {
   user.withdrawEnabled = targetAmount > 0 ? false : true;
   
   // OPTIMIZATION 5: Process investment (this will also activate user if inactive)
-  // Note: processInvestment will fetch user/package again internally, but saves are batched
+  // isFreeAccount=true: no referral income for upline, no business volume in binary tree
   const investmentDoc = await processInvestment(
     user._id as Types.ObjectId,
     new Types.ObjectId(packageId),
     amount,
     paymentId,
-    undefined
+    undefined,
+    true // isFreeAccount: skip referral bonus and BV for funded accounts
   );
 
-  // OPTIMIZATION 6: Update investment type and save user in parallel (if investment created)
+  // OPTIMIZATION 6: Save user (investment already created with type "free" and no referral/BV)
   if (investmentDoc) {
-    investmentDoc.type = "free";
-    // Save both in parallel - user.save() updates accountType/target fields, investmentDoc.save() updates type
-    await Promise.all([
-      investmentDoc.save(),
-      user.save()
-    ]);
+    await user.save();
   } else {
     // Fallback: save user if investment creation failed
     await user.save();

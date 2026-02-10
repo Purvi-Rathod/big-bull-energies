@@ -101,7 +101,7 @@ export default function WithdrawPage() {
         // Free accounts: before target = Binary + Referral only; after target = all wallets
         const isFreeAccount = userProfileRes.data?.user?.accountType === 'free';
         const targetCompleted = targetStatusRes.data?.isCompleted ?? true;
-        const freeBeforeTarget = isFreeAccount && targetStatusRes.data?.binaryTargetAmount > 0 && !targetCompleted;
+        const freeBeforeTarget = isFreeAccount && (targetStatusRes.data?.binaryTargetAmount ?? 0) > 0 && !targetCompleted;
         const withdrawableWallets = walletsRes.data.wallets.filter((w: Wallet) => {
           if (isFreeAccount) {
             if (freeBeforeTarget) return w.type === 'binary' || w.type === 'referral';

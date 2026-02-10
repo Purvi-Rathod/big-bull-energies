@@ -82,7 +82,10 @@ export default function AdminPanel() {
         endDate: endDate || undefined,
       });
       if (response.data) {
-        setUsers(response.data.users || []);
+        const list = response.data.users || [];
+        // Ensure latest users first (by joinedAt / createdAt descending)
+        list.sort((a: User, b: User) => new Date(b.joinedAt).getTime() - new Date(a.joinedAt).getTime());
+        setUsers(list);
         setPagination(response.data.pagination || { total: 0, pages: 0, limit: 50 });
       }
     } catch (err: any) {

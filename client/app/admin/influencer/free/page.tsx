@@ -36,23 +36,29 @@ export default function FreeAccountPage() {
     withdrawEnabled: boolean;
     packageName: string;
     amount: number;
-    createdAt: string;
+    activationDate: string | null;
   }>>([]);
   const [loadingFreeAccounts, setLoadingFreeAccounts] = useState(false);
+  const [freePage, setFreePage] = useState(1);
+  const [freePagination, setFreePagination] = useState({ page: 1, limit: 10, total: 0, pages: 1 });
   const hasFetchedPackages = useRef(false);
 
   useEffect(() => {
     if (hasFetchedPackages.current) return;
     hasFetchedPackages.current = true;
     fetchPackages();
-    fetchFreeAccounts();
   }, []);
 
-  const fetchFreeAccounts = async () => {
+  useEffect(() => {
+    fetchFreeAccounts(freePage);
+  }, [freePage]);
+
+  const fetchFreeAccounts = async (page: number = 1) => {
     try {
       setLoadingFreeAccounts(true);
-      const res = await api.getFreeAccountsList();
+      const res = await api.getFreeAccountsList({ page, limit: 10 });
       if (res.data?.accounts) setFreeAccounts(res.data.accounts);
+      if (res.data?.pagination) setFreePagination(res.data.pagination);
     } catch (err) {
       setFreeAccounts([]);
     } finally {
@@ -127,7 +133,7 @@ export default function FreeAccountPage() {
       setSelectedPackageId('');
       setAmount('');
       setBinaryTarget('');
-      await fetchFreeAccounts();
+      await fetchFreeAccounts(freePage);
     } catch (err: any) {
       toast.error(err.message || 'Failed to activate free account');
     } finally {
@@ -292,6 +298,7 @@ export default function FreeAccountPage() {
         ) : freeAccounts.length === 0 ? (
           <div className="px-6 py-12 text-center text-gray-500">No free accounts yet.</div>
         ) : (
+          <>
           <div className="overflow-x-auto">
             <table className="w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
@@ -306,7 +313,7 @@ export default function FreeAccountPage() {
                   <th className="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase">Binary Target</th>
                   <th className="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase">Target Status</th>
                   <th className="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase">Withdraw</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase">Created</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase">Activation Date</th>
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
@@ -333,12 +340,41 @@ export default function FreeAccountPage() {
                         {row.withdrawEnabled ? 'Enabled' : 'Locked'}
                       </span>
                     </td>
-                    <td className="px-4 py-3 text-sm text-gray-600">{row.createdAt ? new Date(row.createdAt).toLocaleString() : '—'}</td>
+                    <td className="px-4 py-3 text-sm text-black">{row.activationDate ? new Date(row.activationDate).toLocaleString() : '—'}</td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
+          {freePagination.pages > 1 && (
+            <div className="px-6 py-4 border-t border-gray-200 flex items-center justify-between">
+              <p className="text-sm text-gray-600">
+                Showing {(freePagination.page - 1) * freePagination.limit + 1}–{Math.min(freePagination.page * freePagination.limit, freePagination.total)} of {freePagination.total}
+              </p>
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  onClick={() => setFreePage((p) => Math.max(1, p - 1))}
+                  disabled={freePage <= 1 || loadingFreeAccounts}
+                  className="px-3 py-1.5 text-sm font-medium text-indigo-600 bg-indigo-50 rounded-md hover:bg-indigo-100 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Previous
+                </button>
+                <span className="px-3 py-1.5 text-sm text-gray-700">
+                  Page {freePagination.page} of {freePagination.pages}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setFreePage((p) => Math.min(freePagination.pages, p + 1))}
+                  disabled={freePage >= freePagination.pages || loadingFreeAccounts}
+                  className="px-3 py-1.5 text-sm font-medium text-indigo-600 bg-indigo-50 rounded-md hover:bg-indigo-100 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Next
+                </button>
+              </div>
+            </div>
+          )}
+          </>
         )}
       </div>
     </div>

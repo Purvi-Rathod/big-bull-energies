@@ -1,19 +1,29 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { api } from '@/lib/api';
 import toast from 'react-hot-toast';
 
 export default function InvestmentsReportPage() {
+  const searchParams = useSearchParams();
+  const urlStart = searchParams.get('startDate') ?? '';
+  const urlEnd = searchParams.get('endDate') ?? '';
+
   const [report, setReport] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'inactive'>('all');
   const [typeFilter, setTypeFilter] = useState<string>('all');
-  const [startDate, setStartDate] = useState('');
-  const [endDate, setEndDate] = useState('');
+  const [startDate, setStartDate] = useState(urlStart);
+  const [endDate, setEndDate] = useState(urlEnd);
   const hasFetchedRef = useRef(false);
+
+  useEffect(() => {
+    if (urlStart) setStartDate(urlStart);
+    if (urlEnd) setEndDate(urlEnd);
+  }, [urlStart, urlEnd]);
 
   useEffect(() => {
     if (hasFetchedRef.current) {

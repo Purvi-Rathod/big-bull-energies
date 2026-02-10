@@ -7,6 +7,69 @@ import { Play, Image as ImageIcon, Video, Filter } from "lucide-react";
 import Footer from "@/components/Footer";
 import { table } from "console";
 
+/** YouTube embed params: no branding, no title, no controls — raw video only. */
+function getYouTubeEmbedParams(autoplay: boolean): string {
+  const params = new URLSearchParams();
+  if (autoplay) {
+    params.set("autoplay", "1");
+    params.set("mute", "1");
+    params.set("playsinline", "1");
+  }
+  params.set("modestbranding", "1");  // hide YouTube logo in controls
+  params.set("rel", "0");             // no related videos at end
+  params.set("showinfo", "0");        // hide title (legacy)
+  params.set("controls", "0");         // hide controls — raw video only
+  params.set("iv_load_policy", "3");   // hide annotations
+  return params.toString();
+}
+
+/** Get embed URL for YouTube/Vimeo so iframe can play. Direct video URLs returned as-is. Optionally add autoplay. */
+function getVideoEmbedUrl(url: string, autoplay = true): string {
+  if (!url || typeof url !== "string") return url;
+  const u = url.trim();
+  // YouTube: youtu.be/VIDEO_ID or youtube.com/watch?v=VIDEO_ID
+  const ytShort = u.match(/(?:youtu\.be\/)([a-zA-Z0-9_-]+)/);
+  if (ytShort) {
+    const base = `https://www.youtube.com/embed/${ytShort[1]}`;
+    return `${base}?${getYouTubeEmbedParams(autoplay)}`;
+  }
+  const ytWatch = u.match(/(?:youtube\.com\/watch\?.*v=)([a-zA-Z0-9_-]+)/);
+  if (ytWatch) {
+    const base = `https://www.youtube.com/embed/${ytWatch[1]}`;
+    return `${base}?${getYouTubeEmbedParams(autoplay)}`;
+  }
+  const ytEmbed = u.match(/youtube\.com\/embed\/([a-zA-Z0-9_-]+)/);
+  if (ytEmbed) {
+    const base = u.split("?")[0];
+    return `${base}?${getYouTubeEmbedParams(autoplay)}`;
+  }
+  // Vimeo: vimeo.com/123456789
+  const vimeo = u.match(/(?:vimeo\.com\/)(\d+)/);
+  if (vimeo) {
+    const base = `https://player.vimeo.com/video/${vimeo[1]}`;
+    return autoplay ? `${base}?autoplay=1` : base;
+  }
+  return u;
+}
+
+/** Optional: get YouTube thumbnail for grid when no thumbnailUrl is set */
+function getYouTubeThumbnail(url: string): string | null {
+  if (!url || typeof url !== "string") return null;
+  const ytShort = url.match(/(?:youtu\.be\/)([a-zA-Z0-9_-]+)/);
+  const ytWatch = url.match(/(?:youtube\.com\/watch\?.*v=)([a-zA-Z0-9_-]+)/);
+  const ytEmbed = url.match(/youtube\.com\/embed\/([a-zA-Z0-9_-]+)/);
+  const id = ytShort?.[1] || ytWatch?.[1] || ytEmbed?.[1];
+  if (id) return `https://img.youtube.com/vi/${id}/hqdefault.jpg`;
+  return null;
+}
+
+/** True if URL is YouTube or Vimeo (use iframe). Otherwise use <video> for direct links. */
+function isEmbeddableVideoUrl(url: string): boolean {
+  if (!url || typeof url !== "string") return false;
+  const u = url.trim();
+  return /youtu\.be\/|youtube\.com\/(watch\?|embed\/)|vimeo\.com\//.test(u);
+}
+
 interface GalleryItem {
   _id?: string;
   id?: string;
@@ -175,53 +238,51 @@ export default function GalleryPage() {
                       {groupedItems[category].map((item) => (
                         <div
                           key={item._id || item.id}
-                          onClick={() => handleItemClick(item)}
-                          className="group relative aspect-square bg-gray-100 rounded-lg overflow-hidden cursor-pointer hover:shadow-xl transition-all"
+                          className="group relative aspect-square bg-gray-100 rounded-lg overflow-hidden hover:shadow-xl transition-all"
                         >
                           {item.mediaType === "video" ? (
                             <>
-                              {item.thumbnailUrl ? (
-                                <img
-                                  src={item.thumbnailUrl}
-                                  alt={item.title}
-                                  className="w-full h-full object-cover"
-                                  onError={(e) => {
-                                    const target = e.target as HTMLImageElement;
-                                    target.src = item.mediaUrl;
-                                  }}
-                                />
-                              ) : (
-                                <div className="w-full h-full bg-gray-200 flex items-center justify-center">
-                                  <Video className="w-16 h-16 text-gray-400" />
-                                </div>
-                              )}
-                              <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-40 transition-all flex items-center justify-center">
-                                <Play className="w-16 h-16 text-white opacity-0 group-hover:opacity-100 transition-opacity" />
+                              <div className="absolute inset-0 w-full h-full" onClick={(e) => { e.stopPropagation(); handleItemClick(item); }}>
+                                {isEmbeddableVideoUrl(item.mediaUrl) ? (
+                                  <iframe
+                                    src={getVideoEmbedUrl(item.mediaUrl, true)}
+                                    className="w-full h-full pointer-events-auto"
+                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                    allowFullScreen
+                                    title={item.title}
+                                  />
+                                ) : (
+                                  <video src={item.mediaUrl} autoPlay muted loop playsInline controls className="w-full h-full object-contain bg-black" title={item.title} />
+                                )}
+                              </div>
+                              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-3 pointer-events-none">
+                                <h3 className="text-white font-semibold text-sm">{item.title}</h3>
+                                {item.description && <p className="text-white/80 text-xs mt-0.5 line-clamp-2">{item.description}</p>}
                               </div>
                             </>
                           ) : (
-                            <img
-                              src={item.mediaUrl}
-                              alt={item.title}
-                              className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
-                              onError={(e) => {
-                                const target = e.target as HTMLImageElement;
-                                target.parentElement!.innerHTML = `
-                                  <div class="w-full h-full flex items-center justify-center bg-gray-200">
-                                    <svg class="w-16 h-16 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                    </svg>
-                                  </div>
-                                `;
-                              }}
-                            />
+                            <div onClick={() => handleItemClick(item)} className="cursor-pointer w-full h-full">
+                              <img
+                                src={item.mediaUrl}
+                                alt={item.title}
+                                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                                onError={(e) => {
+                                  const target = e.target as HTMLImageElement;
+                                  target.parentElement!.innerHTML = `
+                                    <div class="w-full h-full flex items-center justify-center bg-gray-200">
+                                      <svg class="w-16 h-16 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                      </svg>
+                                    </div>
+                                  `;
+                                }}
+                              />
+                              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-4 opacity-0 group-hover:opacity-100 transition-opacity">
+                                <h3 className="text-white font-semibold text-sm sm:text-base">{item.title}</h3>
+                                {item.description && <p className="text-white/80 text-xs sm:text-sm mt-1 line-clamp-2">{item.description}</p>}
+                              </div>
+                            </div>
                           )}
-                          <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-4 opacity-0 group-hover:opacity-100 transition-opacity">
-                            <h3 className="text-white font-semibold text-sm sm:text-base">{item.title}</h3>
-                            {item.description && (
-                              <p className="text-white/80 text-xs sm:text-sm mt-1 line-clamp-2">{item.description}</p>
-                            )}
-                          </div>
                         </div>
                       ))}
                     </div>
@@ -232,49 +293,51 @@ export default function GalleryPage() {
                   {items.map((item) => (
                     <div
                       key={item._id || item.id}
-                      onClick={() => handleItemClick(item)}
-                      className="group relative aspect-square bg-gray-100 rounded-lg overflow-hidden cursor-pointer hover:shadow-xl transition-all"
+                      className="group relative aspect-square bg-gray-100 rounded-lg overflow-hidden hover:shadow-xl transition-all"
                     >
                       {item.mediaType === "video" ? (
                         <>
-                          {item.thumbnailUrl ? (
-                            <img
-                              src={item.thumbnailUrl}
-                              alt={item.title}
-                              className="w-full h-full object-cover"
-                            />
-                          ) : (
-                            <div className="w-full h-full bg-gray-200 flex items-center justify-center">
-                              <Video className="w-16 h-16 text-gray-400" />
-                            </div>
-                          )}
-                          <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-40 transition-all flex items-center justify-center">
-                            <Play className="w-16 h-16 text-white opacity-0 group-hover:opacity-100 transition-opacity" />
+                          <div className="absolute inset-0 w-full h-full" onClick={(e) => { e.stopPropagation(); handleItemClick(item); }}>
+                            {isEmbeddableVideoUrl(item.mediaUrl) ? (
+                              <iframe
+                                src={getVideoEmbedUrl(item.mediaUrl, true)}
+                                className="w-full h-full pointer-events-auto"
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                allowFullScreen
+                                title={item.title}
+                              />
+                            ) : (
+                              <video src={item.mediaUrl} controls className="w-full h-full object-contain bg-black" title={item.title} />
+                            )}
+                          </div>
+                          <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-3 pointer-events-none">
+                            <h3 className="text-white font-semibold text-sm">{item.title}</h3>
+                            {item.description && <p className="text-white/80 text-xs mt-0.5 line-clamp-2">{item.description}</p>}
                           </div>
                         </>
                       ) : (
-                        <img
-                          src={item.mediaUrl}
-                          alt={item.title}
-                          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
-                          onError={(e) => {
-                            const target = e.target as HTMLImageElement;
-                            target.parentElement!.innerHTML = `
-                              <div class="w-full h-full flex items-center justify-center bg-gray-200">
-                                <svg class="w-16 h-16 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                </svg>
-                              </div>
-                            `;
-                          }}
-                        />
+                        <div onClick={() => handleItemClick(item)} className="cursor-pointer w-full h-full">
+                          <img
+                            src={item.mediaUrl}
+                            alt={item.title}
+                            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                            onError={(e) => {
+                              const target = e.target as HTMLImageElement;
+                              target.parentElement!.innerHTML = `
+                                <div class="w-full h-full flex items-center justify-center bg-gray-200">
+                                  <svg class="w-16 h-16 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                  </svg>
+                                </div>
+                              `;
+                            }}
+                          />
+                          <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-4 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <h3 className="text-white font-semibold text-sm sm:text-base">{item.title}</h3>
+                            {item.description && <p className="text-white/80 text-xs sm:text-sm mt-1 line-clamp-2">{item.description}</p>}
+                          </div>
+                        </div>
                       )}
-                      <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-4 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <h3 className="text-white font-semibold text-sm sm:text-base">{item.title}</h3>
-                        {item.description && (
-                          <p className="text-white/80 text-xs sm:text-sm mt-1 line-clamp-2">{item.description}</p>
-                        )}
-                      </div>
                     </div>
                   ))}
                 </div>
@@ -301,13 +364,26 @@ export default function GalleryPage() {
             </button>
             <div className="bg-white rounded-lg overflow-hidden">
               {selectedItem.mediaType === "video" ? (
-                <div className="relative w-full" style={{ paddingBottom: "56.25%" }}>
-                  <iframe
-                    src={selectedItem.mediaUrl}
-                    className="absolute inset-0 w-full h-full"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    allowFullScreen
-                  />
+                <div className="relative w-full bg-black rounded-t-lg" style={{ paddingBottom: "56.25%" }}>
+                  {isEmbeddableVideoUrl(selectedItem.mediaUrl) ? (
+                    <iframe
+                      key={`video-${selectedItem._id ?? selectedItem.id ?? selectedItem.mediaUrl}`}
+                      src={getVideoEmbedUrl(selectedItem.mediaUrl)}
+                      className="absolute inset-0 w-full h-full rounded-t-lg"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen
+                      title={selectedItem.title}
+                    />
+                  ) : (
+                    <video
+                      key={`video-${selectedItem._id ?? selectedItem.id ?? selectedItem.mediaUrl}`}
+                      src={selectedItem.mediaUrl}
+                      controls
+                      autoPlay
+                      className="absolute inset-0 w-full h-full rounded-t-lg object-contain"
+                      title={selectedItem.title}
+                    />
+                  )}
                 </div>
               ) : (
                 <img

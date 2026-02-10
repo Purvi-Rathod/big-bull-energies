@@ -387,11 +387,11 @@ export const getAllUsers = asyncHandler(async (req, res) => {
       }
     }
 
-    // Get users with pagination
+    // Get users with pagination — latest users first (createdAt descending, then _id for tie-break)
     const users = await User.find(searchQuery)
       .select("_id userId name email phone country status referrer position createdAt")
       .populate("referrer", "userId name email")
-      .sort({ createdAt: -1 })
+      .sort({ createdAt: -1, _id: -1 })
       .skip(skip)
       .limit(Number(limit))
       .lean();
@@ -2394,6 +2394,121 @@ export const getDailyBusinessReport = asyncHandler(async (req, res) => {
 });
 
 /**
+ * Get Daily Business Summary (for dashboard cards: today's signups, investments, free/powerleg activations, withdrawals)
+ * GET /api/v1/admin/daily-business-summary?date=YYYY-MM-DD
+ */
+export const getDailyBusinessSummary = asyncHandler(async (req, res) => {
+  const { date } = req.query;
+  const targetDate = date ? new Date(date as string) : new Date();
+  const startOfDay = new Date(targetDate);
+  startOfDay.setHours(0, 0, 0, 0);
+  const endOfDay = new Date(targetDate);
+  endOfDay.setHours(23, 59, 59, 999);
+
+  const dateFilter = { $gte: startOfDay, $lte: endOfDay };
+
+  // Today's signups
+  const signupsList = await User.find({ createdAt: dateFilter })
+    .select("userId name email country createdAt")
+    .sort({ createdAt: -1 })
+    .lean();
+  const todaySignups = signupsList.length;
+
+  // Today's investments (all types)
+  const investmentsList = await Investment.find({ createdAt: dateFilter })
+    .populate("user", "userId name email")
+    .populate("packageId", "packageName")
+    .sort({ createdAt: -1 })
+    .lean();
+  const todayInvestmentsCount = investmentsList.length;
+  const todayInvestmentsAmount = investmentsList.reduce((sum, inv) => sum + parseFloat(inv.investedAmount.toString()), 0);
+
+  // Today's free account activations (investments type=free created today)
+  const freeList = await Investment.find({ createdAt: dateFilter, type: "free" })
+    .populate("user", "userId name email")
+    .populate("packageId", "packageName")
+    .sort({ createdAt: -1 })
+    .lean();
+  const todayFreeActivations = freeList.length;
+
+  // Today's powerleg account activations (investments type=powerleg created today)
+  const powerlegList = await Investment.find({ createdAt: dateFilter, type: "powerleg" })
+    .populate("user", "userId name email")
+    .populate("packageId", "packageName")
+    .sort({ createdAt: -1 })
+    .lean();
+  const todayPowerlegActivations = powerlegList.length;
+
+  // Today's withdrawals
+  const withdrawalsList = await Withdrawal.find({ createdAt: dateFilter })
+    .populate("user", "userId name email")
+    .sort({ createdAt: -1 })
+    .lean();
+  const todayWithdrawCount = withdrawalsList.length;
+  const todayWithdrawAmount = withdrawalsList.reduce((sum, w) => sum + parseFloat(w.amount.toString()), 0);
+
+  const response = res as any;
+  response.status(200).json({
+    status: "success",
+    data: {
+      date: targetDate.toISOString().split("T")[0],
+      todaySignups,
+      signupsList: signupsList.map((u) => ({
+        userId: (u as any).userId,
+        name: (u as any).name,
+        email: (u as any).email || "—",
+        country: (u as any).country || "—",
+        createdAt: (u as any).createdAt,
+      })),
+      todayInvestmentsCount,
+      todayInvestmentsAmount,
+      investmentsList: investmentsList.map((inv) => ({
+        id: inv._id,
+        userId: (inv.user as any)?.userId || "N/A",
+        userName: (inv.user as any)?.name || "Unknown",
+        userEmail: (inv.user as any)?.email || "N/A",
+        packageName: (inv.packageId as any)?.packageName || "N/A",
+        investedAmount: parseFloat(inv.investedAmount.toString()),
+        type: inv.type,
+        createdAt: inv.createdAt,
+      })),
+      todayFreeActivations,
+      freeList: freeList.map((inv) => ({
+        id: inv._id,
+        userId: (inv.user as any)?.userId || "N/A",
+        userName: (inv.user as any)?.name || "Unknown",
+        userEmail: (inv.user as any)?.email || "N/A",
+        packageName: (inv.packageId as any)?.packageName || "N/A",
+        investedAmount: parseFloat(inv.investedAmount.toString()),
+        createdAt: inv.createdAt,
+      })),
+      todayPowerlegActivations,
+      powerlegList: powerlegList.map((inv) => ({
+        id: inv._id,
+        userId: (inv.user as any)?.userId || "N/A",
+        userName: (inv.user as any)?.name || "Unknown",
+        userEmail: (inv.user as any)?.email || "N/A",
+        packageName: (inv.packageId as any)?.packageName || "N/A",
+        investedAmount: parseFloat(inv.investedAmount.toString()),
+        createdAt: inv.createdAt,
+      })),
+      todayWithdrawCount,
+      todayWithdrawAmount,
+      withdrawalsList: withdrawalsList.map((w) => ({
+        id: w._id,
+        userId: (w.user as any)?.userId || "N/A",
+        userName: (w.user as any)?.name || "Unknown",
+        userEmail: (w.user as any)?.email || "N/A",
+        amount: parseFloat(w.amount.toString()),
+        status: w.status,
+        walletType: (w as any).walletType || "—",
+        createdAt: w.createdAt,
+      })),
+    },
+  });
+});
+
+/**
  * Get NOWPayments Report
  * GET /api/v1/admin/reports/nowpayments
  */
@@ -3751,13 +3866,17 @@ export const createFreeAccounts = asyncHandler(async (req, res) => {
 });
 
 /**
- * Admin: List all free accounts
- * GET /api/v1/admin/influencer/free/list
+ * Admin: List all free accounts (paginated, sorted by free activation date)
+ * GET /api/v1/admin/influencer/free/list?page=1&limit=10
  */
 export const getFreeAccountsList = asyncHandler(async (req, res) => {
+  const { page = 1, limit = 10 } = req.query;
+  const pageNum = Math.max(1, Number(page));
+  const limitNum = Math.min(100, Math.max(1, Number(limit)));
+  const skip = (pageNum - 1) * limitNum;
+
   const freeUsers = await User.find({ accountType: "free" })
     .populate("referrer", "userId name email")
-    .sort({ createdAt: -1 })
     .lean();
 
   const userIds = freeUsers.map((u) => u._id);
@@ -3766,18 +3885,19 @@ export const getFreeAccountsList = asyncHandler(async (req, res) => {
     .sort({ createdAt: -1 })
     .lean();
 
-  const investmentByUser = new Map<string, { packageName: string; amount: number }>();
+  const investmentByUser = new Map<string, { packageName: string; amount: number; activatedAt: Date }>();
   freeInvestments.forEach((inv: any) => {
     const uid = (inv.user as any)?.toString?.() ?? inv.user?.toString?.();
     if (uid && !investmentByUser.has(uid)) {
       investmentByUser.set(uid, {
         packageName: (inv.packageId as any)?.packageName ?? "N/A",
         amount: parseFloat(inv.investedAmount?.toString() ?? "0"),
+        activatedAt: inv.createdAt,
       });
     }
   });
 
-  const list = freeUsers.map((u: any) => ({
+  let list = freeUsers.map((u: any) => ({
     userId: u.userId,
     name: u.name,
     email: u.email ?? "",
@@ -3789,13 +3909,25 @@ export const getFreeAccountsList = asyncHandler(async (req, res) => {
     withdrawEnabled: u.withdrawEnabled ?? false,
     packageName: investmentByUser.get(u._id.toString())?.packageName ?? "—",
     amount: investmentByUser.get(u._id.toString())?.amount ?? 0,
-    createdAt: u.createdAt,
+    activationDate: investmentByUser.get(u._id.toString())?.activatedAt ?? null,
   }));
+
+  list.sort((a: any, b: any) => {
+    const da = a.activationDate ? new Date(a.activationDate).getTime() : 0;
+    const db = b.activationDate ? new Date(b.activationDate).getTime() : 0;
+    return db - da;
+  });
+
+  const total = list.length;
+  list = list.slice(skip, skip + limitNum);
 
   const response = res as any;
   response.status(200).json({
     status: "success",
-    data: { accounts: list },
+    data: {
+      accounts: list,
+      pagination: { page: pageNum, limit: limitNum, total, pages: Math.ceil(total / limitNum) || 1 },
+    },
   });
 });
 

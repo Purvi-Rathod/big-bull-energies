@@ -788,6 +788,13 @@ class ApiClient {
     });
   }
 
+  async getDailyBusinessSummary(date?: string) {
+    const params = date ? `?date=${encodeURIComponent(date)}` : '';
+    return this.request<any>(`/admin/daily-business-summary${params}`, {
+      method: 'GET',
+    });
+  }
+
   async getNOWPaymentsReport() {
     return this.request<any>('/admin/reports/nowpayments', {
       method: 'GET',
@@ -1127,7 +1134,11 @@ class ApiClient {
     });
   }
 
-  async getFreeAccountsList() {
+  async getFreeAccountsList(params?: { page?: number; limit?: number }) {
+    const query = new URLSearchParams();
+    if (params?.page != null) query.set('page', String(params.page));
+    if (params?.limit != null) query.set('limit', String(params.limit));
+    const qs = query.toString();
     return this.request<{
       accounts: Array<{
         userId: string;
@@ -1141,9 +1152,10 @@ class ApiClient {
         withdrawEnabled: boolean;
         packageName: string;
         amount: number;
-        createdAt: string;
+        activationDate: string | null;
       }>;
-    }>('/admin/influencer/free/list', { method: 'GET' });
+      pagination: { page: number; limit: number; total: number; pages: number };
+    }>(`/admin/influencer/free/list${qs ? `?${qs}` : ''}`, { method: 'GET' });
   }
 
   // Free Account Management (Admin) - give existing user free investment + binary target (no referrer, no new account)

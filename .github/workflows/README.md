@@ -41,6 +41,19 @@ See **[ADVANCED_DEPLOYMENT_GUIDE.md](./ADVANCED_DEPLOYMENT_GUIDE.md)** for detai
 - Performs health checks on backend and frontend
 - Cleans up unused Docker resources
 
+### 3. Deploy to Stagging (`deploy-stagging.yml`)
+
+**Triggers:**
+- Push to `staging` branch
+- Manual trigger via GitHub Actions UI (`workflow_dispatch`)
+
+**What it does:**
+- Connects to the same production server via SSH
+- Pulls latest code from the `staging` branch
+- Deploys using `docker-compose.stagging.yml` (API on 4000, Frontend on 3002)
+- Only affects stagging containers (`binary-system-*-stagging`)
+- Production containers remain untouched
+
 ## Required GitHub Secrets
 
 Make sure you have the following secrets configured in your GitHub repository settings:
@@ -54,8 +67,12 @@ Make sure you have the following secrets configured in your GitHub repository se
 3. **PROD_USER** - SSH user for the production server
    - Example: `root` (as per your server setup)
 
-4. **PROD_PATH** - Path to the application directory on the server
+4. **PROD_PATH** - Path to the production application directory on the server
    - Example: `/root/webapps/binary_system` (as per your server setup)
+
+5. **STAGGING_PATH** - Path to the stagging application directory (same or different server)
+   - Example: `/home/deployer/apps/stagging/crown-bankers`
+   - Required for the Deploy to Stagging workflow
 
 ## How to Configure Secrets
 

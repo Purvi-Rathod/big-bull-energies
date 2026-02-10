@@ -395,7 +395,7 @@ export default function WithdrawPage() {
                       .filter((w) => {
                         // Free: before target = binary + referral only; after target = all
                         if (userProfile?.accountType === 'free') {
-                          if (targetStatus?.binaryTargetAmount > 0 && !targetStatus?.isCompleted) {
+                          if ((targetStatus?.binaryTargetAmount ?? 0) > 0 && !targetStatus?.isCompleted) {
                             return w.type === 'binary' || w.type === 'referral';
                           }
                           return ['roi', 'interest', 'referral', 'binary', 'career_level'].includes(w.type);

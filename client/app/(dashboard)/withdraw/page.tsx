@@ -142,7 +142,7 @@ export default function WithdrawPage() {
   const handleWithdraw = async () => {
     // For non-free accounts: require target completion to withdraw
     const isFreeAccount = userProfile?.accountType === 'free';
-    if (!isFreeAccount && targetStatus && targetStatus.binaryTargetAmount > 0 && !targetStatus.isCompleted) {
+    if (!isFreeAccount && targetStatus && (targetStatus.binaryTargetAmount ?? 0) > 0 && !targetStatus.isCompleted) {
       const errorMsg = targetStatus.message || 'Your target is not completed. Complete your binary target to unlock withdrawal.';
       setError(errorMsg);
       toast.error(errorMsg);
@@ -305,7 +305,7 @@ export default function WithdrawPage() {
           )}
 
           {/* Target Completion Lock Message (non-free: full lock; free: ROI locked, Binary/Referral allowed) */}
-          {targetStatus && targetStatus.binaryTargetAmount > 0 && !targetStatus.isCompleted && (
+          {targetStatus && (targetStatus.binaryTargetAmount ?? 0) > 0 && !targetStatus.isCompleted && (
             <div className="mb-6 bg-amber-900/30 border-2 border-amber-500/50 text-amber-300 px-6 py-4 rounded-xl backdrop-blur-sm">
               <div className="flex items-start gap-3">
                 <svg className="w-6 h-6 text-amber-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -324,7 +324,7 @@ export default function WithdrawPage() {
                   <div className="mt-3 space-y-1 text-sm">
                     <div className="flex justify-between">
                       <span className={userProfile?.accountType === 'free' ? 'text-amber-200' : 'text-red-200'}>Target Amount:</span>
-                      <span className="text-white font-semibold">${targetStatus.binaryTargetAmount.toFixed(2)}</span>
+                      <span className="text-white font-semibold">${(targetStatus.binaryTargetAmount ?? 0).toFixed(2)}</span>
                     </div>
                     <div className="flex justify-between">
                       <span className={userProfile?.accountType === 'free' ? 'text-amber-200' : 'text-red-200'}>Left Leg Business:</span>
@@ -356,7 +356,7 @@ export default function WithdrawPage() {
                 </svg>
                 <div className="flex-1">
                   <h3 className="text-lg font-bold text-blue-400 mb-2">Free Account Withdrawal Rules</h3>
-                  {targetStatus.binaryTargetAmount > 0 && !targetStatus.isCompleted ? (
+                  {(targetStatus.binaryTargetAmount ?? 0) > 0 && !targetStatus.isCompleted ? (
                     <p className="text-blue-300 mb-2">
                       Before target: <strong>ROI withdrawal locked</strong>. Only <strong>Referral + Binary unlocked</strong> (can withdraw). Limited to your binary/referral income (wallet balance).
                     </p>
@@ -422,7 +422,7 @@ export default function WithdrawPage() {
                         );
                       })}
                   </select>
-                  {userProfile?.accountType === 'free' && targetStatus?.binaryTargetAmount > 0 && !targetStatus?.isCompleted && (
+                  {userProfile?.accountType === 'free' && (targetStatus?.binaryTargetAmount ?? 0) > 0 && !targetStatus?.isCompleted && (
                     <p className="mt-2 text-sm text-blue-400 font-semibold">
                       Before target: ROI locked; only Referral + Binary unlocked.
                     </p>
@@ -502,7 +502,7 @@ export default function WithdrawPage() {
                         parseFloat(withdrawAmount) <= 0 || 
                         !walletAddress ||
                         // Non-free accounts: require target completed to withdraw
-                        (userProfile?.accountType !== 'free' && targetStatus && targetStatus.binaryTargetAmount > 0 && !targetStatus.isCompleted)
+                        (userProfile?.accountType !== 'free' && targetStatus && (targetStatus.binaryTargetAmount ?? 0) > 0 && !targetStatus.isCompleted)
                       )}
                       className="w-full px-6 py-4 bg-gradient-to-r from-yellow-500 to-yellow-600 text-black rounded-xl hover:from-yellow-400 hover:to-yellow-500 font-bold transition-all shadow-lg shadow-yellow-500/30 hover:shadow-yellow-500/50 hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
@@ -513,7 +513,7 @@ export default function WithdrawPage() {
                         Please set your USDT TRC20 wallet address to proceed
                       </p>
                     )}
-                    {userProfile?.accountType !== 'free' && targetStatus && targetStatus.binaryTargetAmount > 0 && !targetStatus.isCompleted && (
+                    {userProfile?.accountType !== 'free' && targetStatus && (targetStatus.binaryTargetAmount ?? 0) > 0 && !targetStatus.isCompleted && (
                       <p className="mt-3 text-sm text-red-400 text-center font-semibold">
                         Complete your binary target to unlock withdrawal
                       </p>

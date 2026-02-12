@@ -34,6 +34,7 @@
     "reconcile:user": "ts-node -r dotenv/config src/scripts/runReconciliation.ts",
     "diagnose:binary-tree": "ts-node -r dotenv/config src/scripts/diagnoseBinaryTree.ts",
     "fix:binary-tree": "ts-node -r dotenv/config src/scripts/fixBinaryTreeIssues.ts",
+    "remove:right-business": "ts-node -r dotenv/config src/scripts/removeRightBusiness.ts",
     "backup:database": "ts-node -r dotenv/config src/scripts/backupDatabase.ts"
   },
   "mochaJunitReporterReporterOptions": {

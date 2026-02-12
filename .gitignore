@@ -17,6 +17,8 @@ Thumbs.db
 # Logs
 *.log
 logs/
+.server-ci-production.log
+.server-ci-production.pid
 
 # Environment variables
 .env

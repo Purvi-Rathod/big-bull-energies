@@ -1,0 +1,65 @@
+# Production: run using pre-built images from Docker Hub with env from .env
+# Usage:
+#   1. Copy server/.env to .env in this directory (or symlink) with production values
+#   2. docker compose -f docker-compose.prod.yml pull
+#   3. docker compose -f docker-compose.prod.yml --env-file .env up -d
+#
+# Images: mayank934/crown-prod-b (backend), mayank934/crown-prod-f (frontend)
+
+services:
+  backend:
+    image: mayank934/crown-prod-b:latest
+    container_name: crown-prod-backend
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    environment:
+      - NODE_ENV=production
+      - PORT=8000
+    restart: unless-stopped
+    read_only: true
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add:
+      - NET_BIND_SERVICE
+    tmpfs:
+      - /tmp:noexec,nosuid,size=100m
+      - /usr/src/app/logs:noexec,nosuid,size=50m
+      - /usr/src/app/tmp:noexec,nosuid,size=50m
+    networks:
+      - crown-prod-network
+
+  frontend:
+    image: mayank934/crown-prod-f:latest
+    container_name: crown-prod-frontend
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env
+    environment:
+      - NODE_ENV=production
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add:
+      - NET_BIND_SERVICE
+    tmpfs:
+      - /tmp:noexec,nosuid,size=100m
+    volumes:
+      - crown-frontend-next:/app/.next:rw
+    depends_on:
+      - backend
+    networks:
+      - crown-prod-network
+
+networks:
+  crown-prod-network:
+    driver: bridge
+
+volumes:
+  crown-frontend-next:

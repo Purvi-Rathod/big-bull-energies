@@ -749,6 +749,12 @@ class ApiClient {
       totalROI: string;
       totalReferralBonus: string;
       totalBinaryBonus: string;
+      totalReferralWithdrawalPaid: string;
+      totalBinaryWithdrawalPaid: string;
+      totalCareerWithdrawalPaid: string;
+      totalROIWithdrawalPaid: string;
+      freeInvestmentCount: number;
+      powerlegAccountCount: number;
     }>('/admin/statistics', {
       method: 'GET',
     });
@@ -781,9 +787,35 @@ class ApiClient {
     });
   }
 
-  async getDailyBusinessReport(date?: string) {
-    const params = date ? `?date=${date}` : '';
-    return this.request<any>(`/admin/reports/daily-business${params}`, {
+  async getDailyBusinessReport(params?: { date?: string; startDate?: string; endDate?: string }) {
+    const q = new URLSearchParams();
+    if (params?.date) q.set('date', params.date);
+    if (params?.startDate) q.set('startDate', params.startDate);
+    if (params?.endDate) q.set('endDate', params.endDate);
+    const query = q.toString();
+    return this.request<{
+      rows?: Array<{
+        date: string;
+        noSignups: number;
+        cashInvestment: number;
+        voucherInvestment: number;
+        freeInvestment: number;
+        powerlegInvestment: number;
+        roiWithdrawal: number;
+      }>;
+      date?: string;
+      summary?: any;
+      investments?: any[];
+      transactions?: number;
+      withdrawals?: number;
+    }>(`/admin/reports/daily-business${query ? `?${query}` : ''}`, {
+      method: 'GET',
+    });
+  }
+
+  async getDailyBusinessSummary(date?: string) {
+    const params = date ? `?date=${encodeURIComponent(date)}` : '';
+    return this.request<any>(`/admin/daily-business-summary${params}`, {
       method: 'GET',
     });
   }
@@ -1127,7 +1159,11 @@ class ApiClient {
     });
   }
 
-  async getFreeAccountsList() {
+  async getFreeAccountsList(params?: { page?: number; limit?: number }) {
+    const query = new URLSearchParams();
+    if (params?.page != null) query.set('page', String(params.page));
+    if (params?.limit != null) query.set('limit', String(params.limit));
+    const qs = query.toString();
     return this.request<{
       accounts: Array<{
         userId: string;
@@ -1141,9 +1177,10 @@ class ApiClient {
         withdrawEnabled: boolean;
         packageName: string;
         amount: number;
-        createdAt: string;
+        activationDate: string | null;
       }>;
-    }>('/admin/influencer/free/list', { method: 'GET' });
+      pagination: { page: number; limit: number; total: number; pages: number };
+    }>(`/admin/influencer/free/list${qs ? `?${qs}` : ''}`, { method: 'GET' });
   }
 
   // Free Account Management (Admin) - give existing user free investment + binary target (no referrer, no new account)

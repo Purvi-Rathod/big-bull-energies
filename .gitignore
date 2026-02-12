@@ -22,6 +22,7 @@ logs/
 .env
 .env.local
 .env.*.local
+.env.stagging
 
 # Temporary files
 *.tmp
@@ -35,11 +36,12 @@ build/
 
 # Node modules (already covered in subdirectories)
 node_modules/
-
-
+backups/
+diagnostic-reports
+reconciliation-reports
 binary_sytem.pem
 backups
 
 diagnostic-reports
-
+.env.stagging
 reconciliation-reports

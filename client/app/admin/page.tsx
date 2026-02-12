@@ -82,7 +82,10 @@ export default function AdminPanel() {
         endDate: endDate || undefined,
       });
       if (response.data) {
-        setUsers(response.data.users || []);
+        const list = response.data.users || [];
+        // Ensure latest users first (by joinedAt / createdAt descending)
+        list.sort((a: User, b: User) => new Date(b.joinedAt).getTime() - new Date(a.joinedAt).getTime());
+        setUsers(list);
         setPagination(response.data.pagination || { total: 0, pages: 0, limit: 50 });
       }
     } catch (err: any) {
@@ -290,7 +293,7 @@ export default function AdminPanel() {
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
                   placeholder="Search by name, email, userId, or phone..."
-                  className="flex-1 min-w-[200px] px-4 py-2 border border-gray-300 rounded-md text-black bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                  className="flex-1 w-[250px] px-2 py-2 border border-gray-300 rounded-md text-black bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                 />
                 <select
                   value={countryFilter}
@@ -376,43 +379,25 @@ export default function AdminPanel() {
 
           {/* Users Table */}
           {!loading && (
-            <div className="overflow-x-auto">
-              <table className="w-[10%]  divide-y divide-gray-200">
+            <div className="max-w-full overflow-x-auto">
+              <table className="w-full divide-y divide-gray-200 admin-compact-table">
                 <thead className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white">
                   <tr>
-                    <th className="px-4 py-4 text-left text-xs font-medium text-white uppercase tracking-wider w-[280px]">
-                      User
-                    </th>
-                    <th className="px-4 py-4 text-left text-xs font-medium text-white uppercase tracking-wider w-[300px]">
-                      Position
-                    </th>
-                    <th className="px-4 py-4 text-left text-xs font-medium text-white uppercase tracking-wider w-[220px]">
-                      Sponsor
-                    </th>
-                    <th className="px-4 py-4 text-left text-xs font-medium text-white uppercase tracking-wider w-[180px]">
-                      Country&Phone
-                    </th>
-                    <th className="px-4 py-4 text-left text-xs font-medium text-white uppercase tracking-wider w-[90px]">
-                      Status
-                    </th>
-                    <th className="px-4 py-4 text-left text-xs font-medium text-white uppercase tracking-wider w-[130px]">
-                      Investment
-                    </th>
-                    <th className="px-4 py-4 text-left text-xs font-medium text-white uppercase tracking-wider w-[110px]">
-                      Joined
-                    </th>
-                    <th className="px-4 py-4 text-left text-xs font-medium text-white uppercase tracking-wider w-[90px]">
-                      Tree
-                    </th>
-                    <th className="px-4 py-4 text-left text-xs font-medium text-white uppercase tracking-wider w-[140px]">
-                      Actions
-                    </th>
+                    <th className="text-left w-[14%]">User</th>
+                    <th className="text-left w-[12%]">Position</th>
+                    <th className="text-left w-[12%]">Sponsor</th>
+                    <th className="text-left w-[10%]">Country&Phone</th>
+                    <th className="text-left w-[8%]">Status</th>
+                    <th className="text-left w-[10%]">Investment</th>
+                    <th className="text-left w-[8%]">Joined</th>
+                    <th className="text-left w-[6%]">Tree</th>
+                    <th className="text-left w-[12%]">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
                   {users.length === 0 ? (
                     <tr>
-                      <td colSpan={9} className="px-6 py-8 text-center text-black">
+                      <td colSpan={9} className="py-6 text-center text-black">
                         No users found
                       </td>
                     </tr>
@@ -420,28 +405,28 @@ export default function AdminPanel() {
                     users.map((user) => (
                       <tr key={user.id} className="hover:bg-gray-50">
                         {/* User Column */}
-                        <td className="px-4 py-5">
-                          <div className="flex flex-col gap-2">
-                            <div className="text-xs text-black font-mono font-semibold" title={user.userId}>
+                        <td>
+                          <div className="flex flex-col gap-0.5 min-w-0">
+                            <div className="text-black font-mono font-semibold truncate" title={user.userId}>
                               {user.userId}
                             </div>
-                            <div className="text-sm font-medium text-black" title={user.name}>
+                            <div className="font-medium text-black truncate" title={user.name}>
                               {user.name}
                             </div>
-                            <div className="text-xs text-gray-600 truncate max-w-[250px]" title={user.email}>
+                            <div className="text-gray-600 truncate" title={user.email}>
                               {user.email}
                             </div>
-                            <div className="flex gap-2 mt-1">
+                            <div className="flex flex-wrap gap-1 mt-0.5">
                               <button
                                 onClick={() => handleViewBio(user.userId)}
-                                className="px-2 py-1 text-xs bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+                                className="px-1.5 py-0.5 text-[10px] bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
                                 title="View user dashboard"
                               >
                                 Bio
                               </button>
                               <button
                                 onClick={() => handleImpersonate(user.userId)}
-                                className="px-2 py-1 text-xs bg-indigo-500 text-white rounded hover:bg-indigo-600 transition-colors"
+                                className="px-1.5 py-0.5 text-[10px] bg-indigo-500 text-white rounded hover:bg-indigo-600 transition-colors"
                                 title="Login as user"
                               >
                                 Login
@@ -450,53 +435,53 @@ export default function AdminPanel() {
                           </div>
                         </td>
                         {/* Position Column */}
-                        <td className="px-4 py-5">
-                          <div className="flex flex-col gap-1">
+                        <td>
+                          <div className="flex flex-col gap-0.5 min-w-0">
                             {user.position ? (
-                              <span className="text-xs font-semibold text-black">{user.position}</span>
+                              <span className="font-semibold text-black truncate">{user.position}</span>
                             ) : (
-                              <span className="text-xs text-gray-400">-</span>
+                              <span className="text-gray-400">-</span>
                             )}
                             {user.referrer ? (
-                              <span className="text-xs text-gray-500 font-mono">Parent: {user.referrer.userId}</span>
+                              <span className="text-gray-500 font-mono truncate">Parent: {user.referrer.userId}</span>
                             ) : (
-                              <span className="text-xs text-gray-400">No parent</span>
+                              <span className="text-gray-400">No parent</span>
                             )}
                           </div>
                         </td>
                         {/* Sponsor Column */}
-                        <td className="px-4 py-5">
+                        <td>
                           {user.referrer ? (
-                            <div className="flex flex-col gap-1">
-                              <div className="text-xs font-semibold text-black" title={user.referrer.name}>
+                            <div className="flex flex-col gap-0.5 min-w-0">
+                              <div className="font-semibold text-black truncate" title={user.referrer.name}>
                                 {user.referrer.name}
                               </div>
-                              <div className="text-xs text-gray-600 truncate max-w-[200px]" title={user.referrer.email || ''}>
+                              <div className="text-gray-600 truncate" title={user.referrer.email || ''}>
                                 {user.referrer.email || '-'}
                               </div>
-                              <div className="text-xs text-gray-500 font-mono" title={user.referrer.userId}>
+                              <div className="text-gray-500 font-mono truncate" title={user.referrer.userId}>
                                 {user.referrer.userId}
                               </div>
                             </div>
                           ) : (
-                            <div className="text-xs text-gray-400">-</div>
+                            <div className="text-gray-400">-</div>
                           )}
                         </td>
                         {/* Country&Phone Column */}
-                        <td className="px-4 py-5">
-                          <div className="flex flex-col gap-1">
-                            <div className="text-xs text-black font-medium" title={user.country}>
+                        <td>
+                          <div className="flex flex-col gap-0.5 min-w-0">
+                            <div className="text-black font-medium truncate" title={user.country}>
                               {user.country || '-'}
                             </div>
-                            <div className="text-xs text-gray-600 font-mono" title={user.phone}>
+                            <div className="text-gray-600 font-mono truncate" title={user.phone}>
                               {user.phone || '-'}
                             </div>
                           </div>
                         </td>
                         {/* Status Column */}
-                        <td className="px-4 py-5">
+                        <td>
                           <span
-                            className={`px-3 py-1 inline-flex text-xs leading-5 font-bold rounded-full border-2 shadow-sm ${getStatusColor(
+                            className={`px-2 py-0.5 inline-flex text-[10px] leading-tight font-bold rounded-full border shadow-sm ${getStatusColor(
                               user.status
                             )}`}
                           >
@@ -504,20 +489,20 @@ export default function AdminPanel() {
                           </span>
                         </td>
                         {/* Investment Column */}
-                        <td className="px-4 py-5">
-                          <div className="flex flex-col gap-1">
-                            <div className="text-xs text-black font-semibold">
+                        <td>
+                          <div className="flex flex-col gap-0.5 min-w-0">
+                            <div className="text-black font-semibold">
                               ${parseFloat(user.totalInvestment).toLocaleString('en-US', {
                                 minimumFractionDigits: 2,
                                 maximumFractionDigits: 2,
                               })}
                             </div>
                             {user.packageNames && user.packageNames.length > 0 ? (
-                              <div className="flex flex-wrap gap-1">
+                              <div className="flex flex-wrap gap-0.5">
                                 {user.packageNames.map((pkgName, idx) => (
                                   <span
                                     key={idx}
-                                    className="text-xs px-1.5 py-0.5 bg-indigo-100 text-indigo-700 rounded font-medium"
+                                    className="text-[10px] px-1 py-0.5 bg-indigo-100 text-indigo-700 rounded font-medium truncate max-w-full"
                                     title={pkgName}
                                   >
                                     {pkgName}
@@ -530,22 +515,22 @@ export default function AdminPanel() {
                           </div>
                         </td>
                         {/* Joined Column */}
-                        <td className="px-4 py-5">
-                          <div className="text-xs text-black">{formatDate(user.joinedAt)}</div>
+                        <td>
+                          <div className="text-black whitespace-nowrap">{formatDate(user.joinedAt)}</div>
                         </td>
                         {/* Tree Column */}
-                        <td className="px-4 py-5">
+                        <td>
                           <a
                             href={user.treeLink}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="text-indigo-600 hover:text-indigo-900 text-xs"
+                            className="text-indigo-600 hover:text-indigo-900"
                           >
                             View
                           </a>
                         </td>
                         {/* Actions Column */}
-                        <td className="px-4 py-5 text-xs font-medium">
+                        <td className="font-medium">
                           <div className="relative dropdown-container">
                             <button
                               onClick={(e) => {

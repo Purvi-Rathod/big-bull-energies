@@ -675,7 +675,7 @@ function AdminLayoutContent({
       </aside>
 
       {/* Main Content */}
-      <div className={`flex-1 transition-all duration-300 ${sidebarOpen ? 'md:ml-72' : 'md:ml-20'}`}>
+      <div className={`flex-1 min-w-0 max-w-full overflow-x-hidden transition-all duration-300 ${sidebarOpen ? 'md:ml-72' : 'md:ml-20'}`}>
         {/* Mobile menu button */}
         <div className="md:hidden fixed top-4 left-4 z-10">
           <button
@@ -688,7 +688,7 @@ function AdminLayoutContent({
             </svg>
           </button>
         </div>
-        <main className="p-2 md:p-4 pt-16 md:pt-4">
+        <main className="admin-main min-w-0 max-w-full p-2 md:p-4 pt-16 md:pt-4">
           {children}
         </main>
       </div>

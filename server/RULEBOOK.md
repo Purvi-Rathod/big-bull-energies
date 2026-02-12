@@ -722,6 +722,23 @@ When a user is created, all wallet types are initialized with:
 - Check balance is not reserved
 - Validate withdrawal amount is positive
 
+### Free Account (Funded) Rules (Official)
+
+**Activation**
+- On free activation: **no referral income** is credited to uplines.
+- The funded amount **does not count** as binary tree business.
+- User earns **ROI on the funded package**.
+- **Binary and referral income** apply only to **future paid investments** (not the free activation).
+- Existing referrer and downline structure **remain unchanged**; no new account or downline is created.
+
+**Withdrawal — Before completing the binary target**
+- **ROI withdrawal: locked.**
+- **Referral + Binary: unlocked** (can withdraw). Withdrawal amount limited to binary/referral income earned (wallet balance).
+
+**Withdrawal — After completing the binary target**
+- User can withdraw from **ROI wallet**.
+- All eligible incomes become withdrawable as per system rules.
+
 ---
 
 ## Daily Cron Job Operations

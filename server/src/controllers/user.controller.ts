@@ -906,55 +906,23 @@ export const createWithdrawal = asyncHandler(async (req, res) => {
   const { checkTargetCompletion } = await import("../services/target-completion.service");
   const targetCheck = await checkTargetCompletion(userId);
   
-  // For free accounts: special withdrawal rules
+  // For free accounts: official withdrawal rules
+  // Before target: can withdraw Referral and Binary only; ROI locked.
+  // After target: all eligible wallets withdrawable as per system rules.
   if (user.accountType === "free") {
-    // Free accounts can only withdraw from binary wallet
-    if (walletType !== "binary") {
-      throw new AppError(
-        "Free accounts can only withdraw from binary wallet. You can only withdraw the amount earned from binary business.",
-        403
-      );
-    }
+    const targetCompleted = targetCheck.isCompleted;
 
-    // Free accounts must have a target set
-    if (!user.binaryTargetAmount || user.binaryTargetAmount === 0) {
-      throw new AppError(
-        "Free accounts require a binary target to be set. Please contact admin to set your binary target.",
-        403
-      );
+    if (!targetCompleted) {
+      // Before completing binary target: only Binary and Referral wallets; ROI withdrawal is locked
+      if (walletType !== "binary" && walletType !== "referral") {
+        throw new AppError(
+          "Before completing your binary target, you can only withdraw from Binary and Referral wallets. ROI withdrawal is locked until your target is completed.",
+          403
+        );
+      }
+      // Withdrawal amount is limited to balance in that wallet (binary/referral income earned) — checked below via wallet balance
     }
-
-    // Free accounts must complete their binary target first
-    if (!targetCheck.isCompleted) {
-      const message = targetCheck.message || "Your binary target is not completed. Complete your binary target to unlock withdrawal.";
-      throw new AppError(message, 403);
-    }
-
-    // Get binary wallet to check balance
-    const binaryWallet = await Wallet.findOne({ user: userId, type: WalletType.BINARY });
-    if (!binaryWallet) {
-      throw new AppError("Binary wallet not found", 404);
-    }
-
-    const binaryBalance = parseFloat(binaryWallet.balance.toString());
-    
-    // Free accounts can only withdraw up to their binary wallet balance
-    if (amount > binaryBalance) {
-      throw new AppError(
-        `Insufficient binary balance. Available: $${binaryBalance.toFixed(2)}. Free accounts can only withdraw from binary earnings.`,
-        400
-      );
-    }
-
-    // Free accounts can only withdraw up to their target amount
-    // They can withdraw the amount they've earned from binary business (up to target)
-    const maxWithdrawable = Math.min(binaryBalance, user.binaryTargetAmount);
-    if (amount > maxWithdrawable) {
-      throw new AppError(
-        `Free accounts can withdraw up to $${maxWithdrawable.toFixed(2)} (target: $${user.binaryTargetAmount.toFixed(2)}, binary balance: $${binaryBalance.toFixed(2)}). You can only withdraw the amount earned from binary business.`,
-        400
-      );
-    }
+    // After target completed: no extra restriction; all wallet types allowed (falls through to normal checks)
   } else {
     // For normal and powerleg accounts: standard target check
     if (!targetCheck.isCompleted) {

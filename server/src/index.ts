@@ -5,6 +5,7 @@ import  app  from './app';
 import verifyEnvVariables from './utils/checkURI';
 import connectdb from "./db/index";
 import { setupROICron } from './cron/roi-cron';
+import { reconciliationCron } from './cron/reconciliation-cron';
 import chalk from 'chalk'
 
 // ./src/index.ts
@@ -44,6 +45,10 @@ connectdb()
     .then(() => {
         // Setup cron jobs
         setupROICron();
+        
+        // Setup reconciliation cron (runs daily at 2:00 AM)
+        // reconciliationCron.start(); // Uncomment to enable daily reconciliation
+        console.log("[Cron] Reconciliation cron available (currently disabled - uncomment in index.ts to enable)");
         
         const server = app.listen(PORT as number,'0.0.0.0' , () => {
             console.log(`🚀 Server is running at port: ${PORT}`);

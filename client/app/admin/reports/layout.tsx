@@ -21,7 +21,7 @@ export default function ReportsLayout({ children }: { children: React.ReactNode 
   const activeTab = reportTabs.find(tab => pathname?.startsWith(tab.href))?.id || 'all-transactions';
 
   return (
-    <div className="w-full">
+    <div className="w-full min-w-0 max-w-full">
       <div className="mb-8">
         <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 bg-clip-text text-transparent">Reports</h1>
         <p className="mt-2 text-base text-gray-700">View detailed reports and analytics</p>
@@ -58,8 +58,8 @@ export default function ReportsLayout({ children }: { children: React.ReactNode 
         </div>
       </div>
 
-      {/* Content from child routes */}
-      <div className="mt-6">
+      {/* Content from child routes - constrain width so table scroll is internal */}
+      <div className="mt-6 min-w-0 max-w-full">
         {children}
       </div>
     </div>

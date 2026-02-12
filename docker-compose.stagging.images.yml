@@ -1,0 +1,32 @@
+# Stagging - run pre-built images (no build)
+# Frontend: 3002 | Backend: 4000
+# Usage: docker compose -f docker-compose.stagging.images.yml --env-file .env.stagging up -d
+
+services:
+  backend:
+    image: mayank934/crown-backend-image:stagging
+    container_name: binary-system-backend-stagging
+    ports:
+      - "4000:8000"
+    env_file: .env.stagging
+    restart: unless-stopped
+    networks:
+      - binary-network-stagging
+
+  frontend:
+    image: mayank934/crown-frontend-image:stagging
+    container_name: binary-system-frontend-stagging
+    ports:
+      - "3002:8000"
+    env_file: .env.stagging
+    environment:
+      - NEXT_PUBLIC_API_URL=https://api.stagging.crownbankers.com/api/v1
+    depends_on:
+      - backend
+    restart: unless-stopped
+    networks:
+      - binary-network-stagging
+
+networks:
+  binary-network-stagging:
+    driver: bridge

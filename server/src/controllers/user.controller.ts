@@ -625,14 +625,16 @@ export const getUserReports = asyncHandler(async (req, res) => {
   // Get investments for investment transactions
   const investmentIds = investmentTransactions
     .map((tx) => tx.txRef)
-    .filter((id): id is string => !!id);
+    .filter((id): id is string => !!id && Types.ObjectId.isValid(id));
   
-  const investments = await Investment.find({
-    _id: { $in: investmentIds.map((id) => new Types.ObjectId(id)) },
-  })
-    .populate("packageId", "packageName roi duration referralPct levelOneReferral")
-    .populate("user", "userId name")
-    .lean();
+  const investments = investmentIds.length > 0
+    ? await Investment.find({
+        _id: { $in: investmentIds.map((id) => new Types.ObjectId(id)) },
+      })
+        .populate("packageId", "packageName roi duration referralPct levelOneReferral")
+        .populate("user", "userId name")
+        .lean()
+    : [];
 
   const investmentMap = new Map();
   investments.forEach((inv) => {
@@ -642,34 +644,48 @@ export const getUserReports = asyncHandler(async (req, res) => {
   // Get referral source information (investments that generated referral bonuses)
   const referralInvestmentIds = referralTransactions
     .map((tx) => tx.txRef)
-    .filter((id): id is string => !!id);
+    .filter((id): id is string => !!id && Types.ObjectId.isValid(id));
   
-  const referralInvestments = await Investment.find({
-    _id: { $in: referralInvestmentIds.map((id) => new Types.ObjectId(id)) },
-  })
-    .populate("packageId", "packageName referralPct levelOneReferral")
-    .populate("user", "userId name")
-    .lean();
+  const referralInvestments = referralInvestmentIds.length > 0
+    ? await Investment.find({
+        _id: { $in: referralInvestmentIds.map((id) => new Types.ObjectId(id)) },
+      })
+        .populate("packageId", "packageName referralPct levelOneReferral")
+        .populate("user", "userId name")
+        .lean()
+    : [];
 
   const referralInvestmentMap = new Map();
   referralInvestments.forEach((inv) => {
     referralInvestmentMap.set(inv._id.toString(), inv);
   });
 
-  // Get source users from meta field
+  // Get source users from meta field (meta.fromUser can be ObjectId string or userId like CROWN-000097)
   const referralSourceUserIds = referralTransactions
     .map((tx) => tx.meta?.fromUser)
     .filter((id): id is string => !!id);
   
-  const referralSourceUsers = await User.find({
-    _id: { $in: referralSourceUserIds.map((id) => new Types.ObjectId(id)) },
-  })
-    .select("userId name")
-    .lean();
+  const validObjectIds = referralSourceUserIds.filter((id) => Types.ObjectId.isValid(id));
+  const userIds = referralSourceUserIds.filter((id) => !Types.ObjectId.isValid(id));
+
+  const orConditions: any[] = [];
+  if (validObjectIds.length > 0) {
+    orConditions.push({ _id: { $in: validObjectIds.map((id) => new Types.ObjectId(id)) } });
+  }
+  if (userIds.length > 0) {
+    orConditions.push({ userId: { $in: userIds } });
+  }
+
+  const referralSourceUsers = orConditions.length > 0
+    ? await User.find({ $or: orConditions })
+        .select("_id userId name")
+        .lean()
+    : [];
 
   const referralSourceUserMap = new Map();
   referralSourceUsers.forEach((u: any) => {
     referralSourceUserMap.set(u._id.toString(), u);
+    if (u.userId) referralSourceUserMap.set(u.userId, u);
   });
 
   const formatTransaction = (tx: any) => ({

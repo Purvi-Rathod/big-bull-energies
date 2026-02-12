@@ -1,23 +1,21 @@
 # Documentation
 
-This directory contains all project documentation organized by category.
+## Structure
 
-## 📂 Directory Structure
+| Folder | Description |
+|--------|-------------|
+| [api/](./api/) | API documentation |
+| [architecture/](./architecture/) | System architecture |
+| [deployment/](./deployment/) | Deployment guides, Docker, production setup |
+| [development/](./development/) | Development notes, releases, testing |
+| [fixes/](./fixes/) | Bug fix and feature implementation notes |
+| [performance/](./performance/) | Performance analysis and tree optimizations |
+| [security/](./security/) | Security audits and fixes |
+| [ci/](./ci/) | CI/CD, SSH, GitHub Actions setup |
+| [archive/](./archive/) | Superseded or historical docs |
 
-### `/api`
-API documentation and endpoint references
+## Quick Links
 
-### `/deployment`
-Deployment guides, Docker setup, and production configuration
-
-### `/development`
-Development guides, troubleshooting, release notes, and implementation details
-
-### `/architecture`
-System architecture, design decisions, and technical specifications
-
-## 📖 Quick Links
-
-- [Deployment Guide](./deployment/)
-- [Development Guide](./development/)
-- [API Documentation](./api/)
+- [Server Deployment Guide](./deployment/SERVER_DEPLOYMENT_GUIDE.md)
+- [Stagging Setup](./deployment/STAGGING_SETUP.md)
+- [Docker Quick Reference](./deployment/DOCKER_QUICK_REFERENCE.md)

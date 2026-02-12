@@ -82,16 +82,16 @@ See: **[DEPLOYMENT_USER_SETUP.md](./DEPLOYMENT_USER_SETUP.md)**
 ## 📁 File Structure
 
 ```
-.github/
-├── workflows/
-│   ├── ci.yml              # Continuous Integration
-│   ├── deploy.yml          # Main deployment (zero-downtime)
-│   ├── deploy-advanced.yml # Advanced deployment strategy
-│   └── release.yml         # Versioned releases
-├── ADVANCED_DEPLOYMENT_GUIDE.md  # Full feature documentation
-├── DEPLOYMENT_USER_SETUP.md      # Security setup guide
-├── SSH_SETUP_GUIDE.md            # SSH key setup
-└── QUICK_REFERENCE.md            # This file
+.github/workflows/
+├── ci.yml              # Continuous Integration
+├── deploy.yml          # Production deployment
+└── deploy-stagging.yml # Stagging deployment
+
+docs/ci/
+├── ADVANCED_DEPLOYMENT_GUIDE.md
+├── DEPLOYMENT_USER_SETUP.md
+├── SSH_SETUP_GUIDE.md
+└── QUICK_REFERENCE.md (this file)
 ```
 
 ---

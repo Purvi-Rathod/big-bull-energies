@@ -91,7 +91,7 @@ Current State → Save State → Deploy New → Health Check
 
 ### Setup Steps
 
-See **`.github/DEPLOYMENT_USER_SETUP.md`** for detailed instructions.
+See **`docs/ci/DEPLOYMENT_USER_SETUP.md`** for detailed instructions.
 
 **Quick Summary:**
 

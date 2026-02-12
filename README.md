@@ -41,9 +41,13 @@ binary_system/
 │
 ├── docs/                  # Documentation
 │   ├── api/               # API documentation
-│   ├── deployment/        # Deployment guides
-│   ├── development/       # Development guides
-│   └── architecture/      # Architecture documentation
+│   ├── deployment/        # Deployment guides (Docker, production, stagging)
+│   ├── development/       # Development notes, releases
+│   ├── fixes/             # Bug fix and feature implementation notes
+│   ├── performance/       # Performance analysis
+│   ├── security/          # Security audits and fixes
+│   ├── ci/                # CI/CD and SSH setup guides
+│   └── archive/           # Superseded docs
 │
 ├── .github/               # GitHub workflows
 │   └── workflows/         # CI/CD pipelines
@@ -152,9 +156,11 @@ See `docs/deployment/` for detailed deployment guides.
 ## 📚 Documentation
 
 - **API Documentation**: Available at `/api-docs` when server is running
-- **Deployment Guides**: `docs/deployment/`
-- **Development Guides**: `docs/development/`
+- **Deployment**: `docs/deployment/` - Docker, production, stagging
+- **Development**: `docs/development/` - Releases, testing
+- **CI/CD**: `docs/ci/` - GitHub Actions, SSH setup
 - **Architecture**: `docs/architecture/`
+- **Full index**: [docs/README.md](./docs/README.md)
 
 ## 🧪 Testing
 

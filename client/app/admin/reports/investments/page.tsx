@@ -319,7 +319,7 @@ export default function InvestmentsReportPage() {
                 </div>
               </div>
             </div>
-            <div className="overflow-x-auto">
+            <div className="max-w-full overflow-x-auto">
               <table className="w-full divide-y divide-gray-200">
                 <thead className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white">
                   <tr>

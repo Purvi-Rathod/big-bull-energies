@@ -114,7 +114,7 @@ export default function NOWPaymentsReportPage() {
           </div>
 
           {/* Payments Table */}
-          <div className="bg-white rounded-lg shadow overflow-hidden">
+          <div className="max-w-full bg-white rounded-lg shadow overflow-hidden">
             <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
               <h3 className="text-lg font-semibold text-black">NOWPayments Transactions ({report.payments.length})</h3>
               {report.payments.length > 0 && (
@@ -126,20 +126,20 @@ export default function NOWPaymentsReportPage() {
                 </button>
               )}
             </div>
-            <div className="overflow-x-auto">
+            <div className="max-w-full overflow-x-auto">
               <table className="w-full divide-y divide-gray-200">
                 <thead className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white">
                   <tr>
-                    <th className="px-3 py-3 text-left text-xs font-medium text-white uppercase w-[70px]">SL NO</th>
-                    <th className="px-3 py-3 text-left text-xs font-medium text-white uppercase min-w-[180px]">User</th>
-                    <th className="px-3 py-3 text-left text-xs font-medium text-white uppercase w-[100px]">Country</th>
-                    <th className="px-3 py-3 text-left text-xs font-medium text-white uppercase w-[120px]">Payment ID</th>
-                    <th className="px-3 py-3 text-left text-xs font-medium text-white uppercase w-[140px]">Package</th>
-                    <th className="px-3 py-3 text-left text-xs font-medium text-white uppercase w-[100px]">USD</th>
-                    <th className="px-3 py-3 text-left text-xs font-medium text-white uppercase w-[140px]">Crypto</th>
-                    <th className="px-3 py-3 text-left text-xs font-medium text-white uppercase w-[140px]">Received</th>
-                    <th className="px-3 py-3 text-left text-xs font-medium text-white uppercase w-[100px]">Status</th>
-                    <th className="px-3 py-3 text-left text-xs font-medium text-white uppercase w-[140px]">Date</th>
+                    <th className="text-left">SL NO</th>
+                    <th className="text-left">User</th>
+                    <th className="text-left">Country</th>
+                    <th className="text-left">Payment ID</th>
+                    <th className="text-left">Package</th>
+                    <th className="text-left">USD</th>
+                    <th className="text-left">Crypto</th>
+                    <th className="text-left">Received</th>
+                    <th className="text-left">Status</th>
+                    <th className="text-left">Date</th>
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">

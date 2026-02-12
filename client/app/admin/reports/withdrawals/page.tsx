@@ -293,15 +293,15 @@ export default function WithdrawalsReportPage() {
               <table className="w-full divide-y divide-gray-200">
                 <thead className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white">
                   <tr>
-                    <th className="px-3 py-3 text-left text-xs font-medium text-white uppercase w-[140px]">Date</th>
-                    <th className="px-3 py-3 text-left text-xs font-medium text-white uppercase w-[130px]">User ID</th>
-                    <th className="px-3 py-3 text-left text-xs font-medium text-white uppercase w-[120px]">User Name</th>
-                    <th className="px-3 py-3 text-left text-xs font-medium text-white uppercase w-[120px]">Withdrawal ID</th>
-                    <th className="px-3 py-3 text-left text-xs font-medium text-white uppercase w-[100px]">Amount</th>
-                    <th className="px-3 py-3 text-left text-xs font-medium text-white uppercase w-[90px]">Charges</th>
-                    <th className="px-3 py-3 text-left text-xs font-medium text-white uppercase w-[110px]">Final Amount</th>
-                    <th className="px-3 py-3 text-left text-xs font-medium text-white uppercase w-[100px]">Wallet Type</th>
-                    <th className="px-3 py-3 text-left text-xs font-medium text-white uppercase w-[90px]">Status</th>
+                    <th className="text-left">Date</th>
+                    <th className="text-left">User ID</th>
+                    <th className="text-left">User Name</th>
+                    <th className="text-left">Withdrawal ID</th>
+                    <th className="text-left">Amount</th>
+                    <th className="text-left">Charges</th>
+                    <th className="text-left">Final Amount</th>
+                    <th className="text-left">Wallet Type</th>
+                    <th className="text-left">Status</th>
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">

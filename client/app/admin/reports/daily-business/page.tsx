@@ -1,77 +1,99 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { api } from '@/lib/api';
 import toast from 'react-hot-toast';
 
+function formatTableDate(isoDate: string): string {
+  const d = new Date(isoDate + 'T12:00:00');
+  const day = d.getDate();
+  const month = d.getMonth() + 1;
+  const year = String(d.getFullYear()).slice(-2);
+  return `${day}-${month}-${year}`;
+}
+
+function formatNumber(value: number): string {
+  if (value === 0) return '0';
+  return value.toLocaleString('en-US', { maximumFractionDigits: 0, minimumFractionDigits: 0 });
+}
+
+function formatCurrency(value: number): string {
+  return new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 2,
+  }).format(value);
+}
+
 export default function DailyBusinessReportPage() {
-  const [report, setReport] = useState<any>(null);
+  const [rows, setRows] = useState<Array<{
+    date: string;
+    noSignups: number;
+    cashInvestment: number;
+    voucherInvestment: number;
+    freeInvestment: number;
+    powerlegInvestment: number;
+    roiWithdrawal: number;
+  }>>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
-  const hasFetchedRef = useRef(false);
+  const [startDate, setStartDate] = useState(() => {
+    const d = new Date();
+    d.setDate(d.getDate() - 6);
+    return d.toISOString().split('T')[0];
+  });
+  const [endDate, setEndDate] = useState(() => new Date().toISOString().split('T')[0]);
 
-  useEffect(() => {
-    if (hasFetchedRef.current) {
-      return;
-    }
-    hasFetchedRef.current = true;
-    fetchReport();
-  }, []);
-
-  const fetchReport = async (date?: string) => {
+  const fetchReport = async () => {
     try {
       setLoading(true);
       setError('');
-      const response = await api.getDailyBusinessReport(date || selectedDate);
-      if (response.data) {
-        setReport(response.data);
+      const response = await api.getDailyBusinessReport({ startDate, endDate });
+      if (response.data?.rows) {
+        setRows(response.data.rows);
+      } else {
+        setRows([]);
       }
     } catch (err: any) {
       setError(err.message || 'Failed to load report');
       toast.error(err.message || 'Failed to load report');
+      setRows([]);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSelectedDate(e.target.value);
-    fetchReport(e.target.value);
-  };
+  useEffect(() => {
+    fetchReport();
+  }, [startDate, endDate]);
 
-  const exportToCSV = () => {
-    if (!report) return;
-
-    const headers = ['User ID', 'User Name', 'User Email', 'Package Name', 'Invested Amount', 'Investment Type', 'Date'];
-    const rows = report.investments.map((inv: any) => [
-      inv.userId,
-      inv.userName,
-      inv.userEmail,
-      inv.packageName,
-      `$${inv.investedAmount.toFixed(2)}`,
-      inv.type,
-      new Date(inv.createdAt).toLocaleDateString(),
+  const handleExportCSV = () => {
+    const headers = ['Date', 'No. Signups', 'Cash Investment', 'Voucher Investment', 'Free Investment', 'Powerleg Investment', 'ROI Withdrawal'];
+    const csvRows = rows.map((r) => [
+      formatTableDate(r.date),
+      r.noSignups,
+      formatCurrency(r.cashInvestment),
+      formatCurrency(r.voucherInvestment),
+      formatCurrency(r.freeInvestment),
+      formatCurrency(r.powerlegInvestment),
+      formatCurrency(r.roiWithdrawal),
     ]);
-
-    const csvContent = [headers.join(','), ...rows.map((row: any[]) => row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(','))].join('\n');
+    const csvContent = [headers.join(','), ...csvRows.map((row) => row.join(','))].join('\n');
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement('a');
-    const url = URL.createObjectURL(blob);
-    link.setAttribute('href', url);
-    link.setAttribute('download', `daily_business_report_${selectedDate}.csv`);
-    link.style.visibility = 'hidden';
-    document.body.appendChild(link);
+    link.href = URL.createObjectURL(blob);
+    link.download = `daily_business_${startDate}_to_${endDate}.csv`;
     link.click();
-    document.body.removeChild(link);
+    URL.revokeObjectURL(link.href);
   };
 
   if (loading) {
     return (
       <div className="flex items-center justify-center py-12">
         <div className="text-center">
-          <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-slate-600"></div>
-          <p className="mt-4 text-black">Loading report...</p>
+          <div className="inline-block h-12 w-12 animate-spin rounded-full border-2 border-slate-300 border-t-slate-600" />
+          <p className="mt-4 text-slate-600">Loading report...</p>
         </div>
       </div>
     );
@@ -80,131 +102,115 @@ export default function DailyBusinessReportPage() {
   return (
     <div className="w-full">
       {error && (
-        <div className="mb-4 bg-red-50 border border-red-400 text-red-700 px-4 py-3 rounded">
+        <div className="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-red-700">
           {error}
         </div>
       )}
 
-      <div className="mb-6 flex justify-between items-center">
-        <div>
-          <label htmlFor="date" className="block text-sm font-medium text-black mb-2">
-            Select Date
-          </label>
-          <input
-            type="date"
-            id="date"
-            value={selectedDate}
-            onChange={handleDateChange}
-            className="px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
-          />
+      <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
+        <div className="flex flex-wrap items-end gap-4">
+          <div>
+            <label htmlFor="startDate" className="mb-1 block text-sm font-medium text-slate-700">
+              Start Date
+            </label>
+            <input
+              type="date"
+              id="startDate"
+              value={startDate}
+              onChange={(e) => setStartDate(e.target.value)}
+              className="rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+            />
+          </div>
+          <div>
+            <label htmlFor="endDate" className="mb-1 block text-sm font-medium text-slate-700">
+              End Date
+            </label>
+            <input
+              type="date"
+              id="endDate"
+              value={endDate}
+              onChange={(e) => setEndDate(e.target.value)}
+              className="rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+            />
+          </div>
         </div>
-        {report && (
+        {rows.length > 0 && (
           <button
-            onClick={exportToCSV}
-            className="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            type="button"
+            onClick={handleExportCSV}
+            className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
           >
             Export CSV
           </button>
         )}
       </div>
 
-      {report && (
-        <>
-          {/* Summary Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
-            <div className="bg-white rounded-lg shadow p-6">
-              <h3 className="text-sm font-medium text-black mb-2">Total Investments</h3>
-              <p className="text-2xl font-bold text-indigo-600">
-                ${report.summary.totalInvestments.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-              </p>
-            </div>
-            <div className="bg-white rounded-lg shadow p-6">
-              <h3 className="text-sm font-medium text-black mb-2">Total ROI</h3>
-              <p className="text-2xl font-bold text-green-600">
-                ${report.summary.totalROI.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-              </p>
-            </div>
-            <div className="bg-white rounded-lg shadow p-6">
-              <h3 className="text-sm font-medium text-black mb-2">Total Binary</h3>
-              <p className="text-2xl font-bold text-blue-600">
-                ${report.summary.totalBinary.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-              </p>
-            </div>
-            <div className="bg-white rounded-lg shadow p-6">
-              <h3 className="text-sm font-medium text-black mb-2">Total Referral</h3>
-              <p className="text-2xl font-bold text-purple-600">
-                ${report.summary.totalReferral.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-              </p>
-            </div>
-            <div className="bg-white rounded-lg shadow p-6">
-              <h3 className="text-sm font-medium text-black mb-2">Total Withdrawals</h3>
-              <p className="text-2xl font-bold text-red-600">
-                ${report.summary.totalWithdrawals.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-              </p>
-            </div>
-            <div className="bg-white rounded-lg shadow p-6">
-              <h3 className="text-sm font-medium text-black mb-2">Net Business</h3>
-              <p className={`text-2xl font-bold ${report.summary.netBusiness >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                ${report.summary.netBusiness.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-              </p>
-            </div>
-          </div>
-
-          {/* Investments Table */}
-          <div className="bg-white rounded-lg shadow overflow-hidden">
-            <div className="px-6 py-4 border-b border-gray-200">
-              <h3 className="text-lg font-semibold text-black">Investments ({report.investments.length})</h3>
-            </div>
-            <div className="overflow-x-auto">
-              <table className="w-full divide-y divide-gray-200">
-                <thead className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white">
-                  <tr>
-                    <th className="px-3 py-3 text-left text-xs font-medium text-white uppercase">Date</th>
-                    <th className="px-3 py-3 text-left text-xs font-medium text-white uppercase">User ID</th>
-                    <th className="px-3 py-3 text-left text-xs font-medium text-white uppercase">User Name</th>
-                    <th className="px-3 py-3 text-left text-xs font-medium text-white uppercase">Package</th>
-                    <th className="px-3 py-3 text-left text-xs font-medium text-white uppercase">Amount</th>
-                    <th className="px-3 py-3 text-left text-xs font-medium text-white uppercase">Type</th>
+      <div className="max-w-full overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+        <div className="max-w-full overflow-x-auto">
+          <table className="w-full border-collapse">
+            <thead>
+              <tr className="border-b border-slate-200 bg-slate-50">
+                <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-600">
+                  Date
+                </th>
+                <th className="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wider text-slate-600">
+                  No. Signups
+                </th>
+                <th className="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wider text-slate-600">
+                  Cash Investment
+                </th>
+                <th className="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wider text-slate-600">
+                  Voucher Investment
+                </th>
+                <th className="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wider text-slate-600">
+                  Free Investment
+                </th>
+                <th className="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wider text-slate-600">
+                  Powerleg Investment
+                </th>
+                <th className="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wider text-slate-600">
+                  ROI Withdrawal
+                </th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-100">
+              {rows.length === 0 ? (
+                <tr>
+                  <td colSpan={7} className="px-4 py-8 text-center text-slate-500">
+                    No data for the selected date range
+                  </td>
+                </tr>
+              ) : (
+                rows.map((row) => (
+                  <tr key={row.date} className="hover:bg-slate-50/50">
+                    <td className="whitespace-nowrap px-4 py-3 text-sm font-medium text-slate-900">
+                      {formatTableDate(row.date)}
+                    </td>
+                    <td className="whitespace-nowrap px-4 py-3 text-right text-sm tabular-nums text-slate-700">
+                      {formatNumber(row.noSignups)}
+                    </td>
+                    <td className="whitespace-nowrap px-4 py-3 text-right text-sm tabular-nums text-slate-700">
+                      {formatCurrency(row.cashInvestment)}
+                    </td>
+                    <td className="whitespace-nowrap px-4 py-3 text-right text-sm tabular-nums text-slate-700">
+                      {formatCurrency(row.voucherInvestment)}
+                    </td>
+                    <td className="whitespace-nowrap px-4 py-3 text-right text-sm tabular-nums text-slate-700">
+                      {formatCurrency(row.freeInvestment)}
+                    </td>
+                    <td className="whitespace-nowrap px-4 py-3 text-right text-sm tabular-nums text-slate-700">
+                      {formatCurrency(row.powerlegInvestment)}
+                    </td>
+                    <td className="whitespace-nowrap px-4 py-3 text-right text-sm tabular-nums text-slate-700">
+                      {formatCurrency(row.roiWithdrawal)}
+                    </td>
                   </tr>
-                </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
-                  {report.investments.length === 0 ? (
-                    <tr>
-                      <td colSpan={6} className="px-6 py-4 text-center text-black">
-                        No investments found for this date
-                      </td>
-                    </tr>
-                  ) : (
-                    report.investments.map((inv: any) => (
-                      <tr key={inv.id}>
-                        <td className="px-3 py-3 text-xs text-black">
-                          {new Date(inv.createdAt).toLocaleString()}
-                        </td>
-                        <td className="px-3 py-3 text-xs font-mono text-black">
-                          {inv.userId}
-                        </td>
-                        <td className="px-3 py-3 text-xs text-black">
-                          {inv.userName}
-                        </td>
-                        <td className="px-3 py-3 text-xs text-black">
-                          {inv.packageName}
-                        </td>
-                        <td className="px-3 py-3 text-xs font-medium text-black">
-                          ${inv.investedAmount.toFixed(2)}
-                        </td>
-                        <td className="px-3 py-3 text-xs text-black capitalize">
-                          {inv.type}
-                        </td>
-                      </tr>
-                    ))
-                  )}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </>
-      )}
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
   );
 }
-

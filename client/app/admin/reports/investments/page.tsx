@@ -95,7 +95,7 @@ export default function InvestmentsReportPage() {
     const filtered = getFilteredInvestments();
     const headers = ['Date', 'User ID', 'User Name', 'User Email', 'Package Name', 'Invested Amount', 'Type', 'Status', 'ROI Earned', 'Start Date', 'End Date'];
     const rows = filtered.map((inv: any) => [
-      new Date(inv.createdAt).toLocaleString(),
+      new Date(inv.createdAt).toLocaleString('en-GB', { timeZone: 'Europe/London', hour12: false }),
       inv.userId,
       inv.userName,
       inv.userEmail,
@@ -104,8 +104,8 @@ export default function InvestmentsReportPage() {
       inv.type,
       inv.isActive ? 'Active' : 'Inactive',
       `$${inv.totalRoiEarned.toFixed(2)}`,
-      new Date(inv.startDate).toLocaleDateString(),
-      new Date(inv.endDate).toLocaleDateString(),
+      new Date(inv.startDate).toLocaleDateString('en-GB', { timeZone: 'Europe/London' }),
+      new Date(inv.endDate).toLocaleDateString('en-GB', { timeZone: 'Europe/London' }),
     ]);
 
     const csvContent = [headers.join(','), ...rows.map((row: any[]) => row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(','))].join('\n');
@@ -126,7 +126,7 @@ export default function InvestmentsReportPage() {
     const filtered = getFilteredInvestments();
     const headers = ['Date', 'User ID', 'User Name', 'User Email', 'Package Name', 'Invested Amount', 'Type', 'Status', 'ROI Earned', 'Start Date', 'End Date'];
     const rows = filtered.map((inv: any) => [
-      new Date(inv.createdAt).toLocaleString(),
+      new Date(inv.createdAt).toLocaleString('en-GB', { timeZone: 'Europe/London', hour12: false }),
       inv.userId,
       inv.userName,
       inv.userEmail,
@@ -135,8 +135,8 @@ export default function InvestmentsReportPage() {
       inv.type,
       inv.isActive ? 'Active' : 'Inactive',
       inv.totalRoiEarned.toFixed(2),
-      new Date(inv.startDate).toLocaleDateString(),
-      new Date(inv.endDate).toLocaleDateString(),
+      new Date(inv.startDate).toLocaleDateString('en-GB', { timeZone: 'Europe/London' }),
+      new Date(inv.endDate).toLocaleDateString('en-GB', { timeZone: 'Europe/London' }),
     ]);
 
     const excelContent = [headers.join('\t'), ...rows.map((row: any[]) => row.join('\t'))].join('\n');
@@ -346,7 +346,7 @@ export default function InvestmentsReportPage() {
                     getFilteredInvestments().map((inv: any) => (
                       <tr key={inv.id}>
                         <td className="px-3 py-3 text-xs text-black">
-                          {new Date(inv.createdAt).toLocaleString()}
+                          {new Date(inv.createdAt).toLocaleString('en-GB', { timeZone: 'Europe/London', hour12: false })}
                         </td>
                         <td className="px-3 py-3 text-xs font-mono text-black">
                           {inv.userId}

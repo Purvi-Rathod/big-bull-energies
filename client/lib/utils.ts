@@ -75,15 +75,55 @@ export function formatCurrency(amount: number, currency: string = 'USD'): string
   }).format(amount);
 }
 
+/** UK timezone: Europe/London (GMT in winter, BST in summer). Use for all UI date/time display. */
+export const UK_TIMEZONE = 'Europe/London';
+
 /**
- * Format date string
+ * Format date string in UK time (date only)
  */
 export function formatDate(dateString: string | Date, options?: Intl.DateTimeFormatOptions): string {
   const date = typeof dateString === 'string' ? new Date(dateString) : dateString;
-  return new Intl.DateTimeFormat('en-US', {
+  return new Intl.DateTimeFormat('en-GB', {
     year: 'numeric',
     month: 'short',
     day: 'numeric',
+    timeZone: UK_TIMEZONE,
     ...options,
   }).format(date);
+}
+
+/**
+ * Format date and time in UK timezone. Returns { date, time } for separate display.
+ */
+export function formatDateTimeUK(dateString: string | Date): { date: string; time: string } {
+  const date = typeof dateString === 'string' ? new Date(dateString) : dateString;
+  return {
+    date: date.toLocaleDateString('en-GB', { year: 'numeric', month: 'short', day: 'numeric', timeZone: UK_TIMEZONE }),
+    time: date.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', second: '2-digit', timeZone: UK_TIMEZONE, hour12: false }),
+  };
+}
+
+/**
+ * Single string for date + time in UK (e.g. "13 Feb 2026, 17:47:22")
+ */
+export function formatDateTimeLongUK(dateString: string | Date): string {
+  const date = typeof dateString === 'string' ? new Date(dateString) : dateString;
+  return date.toLocaleString('en-GB', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    timeZone: UK_TIMEZONE,
+    hour12: false,
+  });
+}
+
+/**
+ * For CSV/export: compact UK datetime string
+ */
+export function formatDateTimeForExportUK(dateString: string | Date): string {
+  const date = typeof dateString === 'string' ? new Date(dateString) : dateString;
+  return date.toLocaleString('en-GB', { timeZone: UK_TIMEZONE, hour12: false });
 }

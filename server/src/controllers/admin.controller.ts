@@ -1391,7 +1391,13 @@ export const getUserReports = asyncHandler(async (req, res) => {
     createdAt: tx.createdAt,
   });
 
-  const referralTransactions = allTx.filter((tx) => (tx.wallet as any)?.type === WalletType.REFERRAL).map(formatTx);
+  const referralTransactions = allTx
+    .filter(
+      (tx) =>
+        (tx.wallet as any)?.type === WalletType.REFERRAL &&
+        (tx.meta as any)?.type !== "withdrawal"
+    )
+    .map(formatTx);
   const roiTransactions = allTx.filter((tx) => (tx.wallet as any)?.type === WalletType.ROI).map(formatTx);
   const binaryTransactions = allTx.filter((tx) => (tx.wallet as any)?.type === WalletType.BINARY).map(formatTx);
   const allTransactions = allTx.map(formatTx);
@@ -3191,29 +3197,14 @@ export const adminCreateInvestment = asyncHandler(async (req, res) => {
   try {
     if (user?.email && pkg) {
       const { sendInvestmentPurchaseEmail } = await import("../lib/mail-service/email.service");
+      const ukOpts = { year: 'numeric' as const, month: 'long' as const, day: 'numeric' as const, timeZone: 'Europe/London' as const };
       const startDateStr = investment.startDate instanceof Date 
-        ? investment.startDate.toLocaleDateString('en-US', {
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric',
-          })
-        : new Date(investment.startDate || Date.now()).toLocaleDateString('en-US', {
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric',
-          });
+        ? investment.startDate.toLocaleDateString('en-GB', ukOpts)
+        : new Date(investment.startDate || Date.now()).toLocaleDateString('en-GB', ukOpts);
 
       const endDateStr = investment.endDate instanceof Date
-        ? investment.endDate.toLocaleDateString('en-US', {
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric',
-          })
-        : new Date(investment.endDate || Date.now() + (pkg.duration || 150) * 24 * 60 * 60 * 1000).toLocaleDateString('en-US', {
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric',
-          });
+        ? investment.endDate.toLocaleDateString('en-GB', ukOpts)
+        : new Date(investment.endDate || Date.now() + (pkg.duration || 150) * 24 * 60 * 60 * 1000).toLocaleDateString('en-GB', ukOpts);
 
       const clientUrl = process.env.CLIENT_URL || process.env.FRONTEND_URL || 'http://localhost:3000';
       const dashboardLink = `${clientUrl}/investments`;

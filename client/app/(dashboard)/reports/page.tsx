@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { api } from '@/lib/api';
 import CrownLoader from '@/components/CrownLoader';
+import { formatDateTimeUK, formatDateTimeForExportUK } from '@/lib/utils';
 
 interface Transaction {
   id: string;
@@ -162,17 +163,8 @@ export default function ReportsPage() {
     );
   };
 
-  // UK time (GMT+0) for all report dates
-  const UK_TIMEZONE = 'UTC';
-  const formatDateTime = (dateString: string) => {
-    const date = new Date(dateString);
-    return {
-      date: date.toLocaleDateString('en-GB', { year: 'numeric', month: 'short', day: 'numeric', timeZone: UK_TIMEZONE }),
-      time: date.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', second: '2-digit', timeZone: UK_TIMEZONE, hour12: false })
-    };
-  };
-  const formatDateTimeForExport = (dateString: string) =>
-    new Date(dateString).toLocaleString('en-GB', { timeZone: UK_TIMEZONE, hour12: false });
+  const formatDateTime = (dateString: string) => formatDateTimeUK(dateString);
+  const formatDateTimeForExport = (dateString: string) => formatDateTimeForExportUK(dateString);
 
   const renderTransactionTable = (transactions: Transaction[], title: string, showExport: boolean = true, isReferral: boolean = false) => (
     <div className="bg-gradient-to-br from-gray-900/95 via-gray-800/95 to-gray-900/95 backdrop-blur-sm rounded-2xl shadow-2xl border border-yellow-500/30 overflow-hidden">

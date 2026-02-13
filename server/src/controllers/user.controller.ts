@@ -13,7 +13,7 @@ import { WalletType, WithdrawalStatus } from "../models/types";
 import { processInvestment } from "../services/investment.service";
 import { processMockPayment } from "../lib/payments/mock-nowpayments";
 import { exchangeWallets } from "../services/wallet-exchange.service";
-import { sendInvestmentPurchaseEmail, sendWithdrawalCreatedEmail } from "../lib/mail-service/email.service";
+import { sendInvestmentPurchaseEmail, sendWithdrawalCreatedEmail, sendVoucherCreatedEmail } from "../lib/mail-service/email.service";
 import { getUserCareerProgress } from "../services/career-level.service";
 import { getMinimumVoucherAmount as getMinVoucherAmount } from "../services/package.service";
 import { Types } from "mongoose";
@@ -290,29 +290,14 @@ export const createInvestment = asyncHandler(async (req, res) => {
     
     if (user?.email && pkg) {
       // Format dates - investment.startDate and investment.endDate are Date objects
+      const ukOpts = { year: 'numeric' as const, month: 'long' as const, day: 'numeric' as const, timeZone: 'Europe/London' };
       const startDateStr = investment.startDate instanceof Date 
-        ? investment.startDate.toLocaleDateString('en-US', {
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric',
-          })
-        : new Date(investment.startDate || Date.now()).toLocaleDateString('en-US', {
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric',
-          });
+        ? investment.startDate.toLocaleDateString('en-GB', ukOpts)
+        : new Date(investment.startDate || Date.now()).toLocaleDateString('en-GB', ukOpts);
 
       const endDateStr = investment.endDate instanceof Date
-        ? investment.endDate.toLocaleDateString('en-US', {
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric',
-          })
-        : new Date(investment.endDate || Date.now() + (pkg.duration || 150) * 24 * 60 * 60 * 1000).toLocaleDateString('en-US', {
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric',
-          });
+        ? investment.endDate.toLocaleDateString('en-GB', ukOpts)
+        : new Date(investment.endDate || Date.now() + (pkg.duration || 150) * 24 * 60 * 60 * 1000).toLocaleDateString('en-GB', ukOpts);
 
       // Generate dashboard link
       const clientUrl = process.env.CLIENT_URL || process.env.FRONTEND_URL || 'http://localhost:3000';
@@ -608,7 +593,9 @@ export const getUserReports = asyncHandler(async (req, res) => {
     (tx) => (tx.wallet as any)?.type === WalletType.BINARY
   );
   const referralTransactions = transactions.filter(
-    (tx) => (tx.wallet as any)?.type === WalletType.REFERRAL
+    (tx) =>
+      (tx.wallet as any)?.type === WalletType.REFERRAL &&
+      (tx.meta as any)?.type !== "withdrawal"
   );
   const careerLevelTransactions = transactions.filter(
     (tx) => (tx.wallet as any)?.type === WalletType.CAREER_LEVEL
@@ -862,25 +849,28 @@ export const getWithdrawalSchedule = asyncHandler(async (req, res) => {
       scheduleDescription,
       canWithdrawToday,
       nextWithdrawalDate: nextDate.toISOString(),
-      nextWithdrawalDateFormatted: nextDate.toLocaleDateString('en-US', {
+      nextWithdrawalDateFormatted: nextDate.toLocaleDateString('en-GB', {
         year: 'numeric',
         month: 'long',
         day: 'numeric',
+        timeZone: 'Europe/London',
       }),
       thisMonthDates: thisMonthDates.map((d) => ({
         date: d.toISOString(),
-        formatted: d.toLocaleDateString('en-US', {
+        formatted: d.toLocaleDateString('en-GB', {
           year: 'numeric',
           month: 'long',
           day: 'numeric',
+          timeZone: 'Europe/London',
         }),
       })),
       nextMonthDates: nextMonthDates.map((d) => ({
         date: d.toISOString(),
-        formatted: d.toLocaleDateString('en-US', {
+        formatted: d.toLocaleDateString('en-GB', {
           year: 'numeric',
           month: 'long',
           day: 'numeric',
+          timeZone: 'Europe/London',
         }),
       })),
     },
@@ -1025,10 +1015,11 @@ export const createWithdrawal = asyncHandler(async (req, res) => {
 
       if (!canWithdraw && packageName) {
         const nextDate = await getNextWithdrawalDate(packageName, new Date(), customSchedules);
-        const nextDateStr = nextDate.toLocaleDateString('en-US', {
+        const nextDateStr = nextDate.toLocaleDateString('en-GB', {
           year: 'numeric',
           month: 'long',
           day: 'numeric',
+          timeZone: 'Europe/London',
         });
         
         throw new AppError(
@@ -1268,6 +1259,22 @@ export const createVoucher = asyncHandler(async (req, res) => {
       meta: { type: "voucher_creation", voucherId },
     });
 
+    const userForEmail = await User.findById(userId).select("email name").lean();
+    if (userForEmail?.email) {
+      const clientUrl = process.env.CLIENT_URL || process.env.FRONTEND_URL || "http://localhost:3000";
+      const expiryStr = voucher.expiry ? new Date(voucher.expiry).toLocaleDateString("en-GB", { year: "numeric", month: "long", day: "numeric", timeZone: "Europe/London" }) : "N/A";
+      sendVoucherCreatedEmail({
+        to: userForEmail.email,
+        name: userForEmail.name || "User",
+        voucherId: voucher.voucherId,
+        amount: parseFloat(voucher.amount.toString()),
+        investmentValue: parseFloat(voucher.investmentValue.toString()),
+        expiryDate: expiryStr,
+        dashboardLink: `${clientUrl}/vouchers`,
+        source: "wallet",
+      }).catch((err: any) => console.error("Failed to send voucher created email:", err.message));
+    }
+
     const response = res as any;
     return response.status(201).json({
       status: "success",
@@ -1307,6 +1314,22 @@ export const createVoucher = asyncHandler(async (req, res) => {
       status: "active",
       expiry: new Date(Date.now() + expiryDays * 24 * 60 * 60 * 1000),
     });
+
+    const userForEmail = await User.findById(userId).select("email name").lean();
+    if (userForEmail?.email) {
+      const clientUrl = process.env.CLIENT_URL || process.env.FRONTEND_URL || "http://localhost:3000";
+      const expiryStr = voucher.expiry ? new Date(voucher.expiry).toLocaleDateString("en-GB", { year: "numeric", month: "long", day: "numeric", timeZone: "Europe/London" }) : "N/A";
+      sendVoucherCreatedEmail({
+        to: userForEmail.email,
+        name: userForEmail.name || "User",
+        voucherId: voucher.voucherId,
+        amount: parseFloat(voucher.amount.toString()),
+        investmentValue: parseFloat(voucher.investmentValue.toString()),
+        expiryDate: expiryStr,
+        dashboardLink: `${clientUrl}/vouchers`,
+        source: "wallet",
+      }).catch((err: any) => console.error("Failed to send voucher created email:", err.message));
+    }
 
     const response = res as any;
     return response.status(201).json({
@@ -1382,6 +1405,22 @@ export const createVoucher = asyncHandler(async (req, res) => {
       paymentId: invoiceResponse.id || invoiceResponse.token || orderId,
       orderId,
     });
+
+    const userForEmail = await User.findById(userId).select("email name").lean();
+    if (userForEmail?.email) {
+      const clientUrl = process.env.CLIENT_URL || process.env.FRONTEND_URL || "http://localhost:3000";
+      const expiryStr = voucher.expiry ? new Date(voucher.expiry).toLocaleDateString("en-GB", { year: "numeric", month: "long", day: "numeric", timeZone: "Europe/London" }) : "N/A";
+      sendVoucherCreatedEmail({
+        to: userForEmail.email,
+        name: userForEmail.name || "User",
+        voucherId: voucher.voucherId,
+        amount: parseFloat(voucher.amount.toString()),
+        investmentValue: parseFloat(voucher.investmentValue.toString()),
+        expiryDate: expiryStr,
+        dashboardLink: `${clientUrl}/vouchers`,
+        source: "payment",
+      }).catch((err: any) => console.error("Failed to send voucher created email:", err.message));
+    }
 
     // Store payment record (using Payment model if it exists, or create a simple record)
     const { Payment } = await import("../models/Payment");

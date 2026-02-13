@@ -346,7 +346,7 @@ function AllTransactionsPageContent() {
       title.toLowerCase().replace(/\s+/g, '_'),
       ['Date', 'User ID', 'User Name', 'User Email', 'Type', 'Amount', 'Balance Before', 'Balance After', 'Status', 'Transaction Ref'],
       (tx) => [
-        new Date(tx.createdAt).toLocaleString(),
+        new Date(tx.createdAt).toLocaleString('en-GB', { timeZone: 'Europe/London', hour12: false }),
         tx.userId,
         tx.userName,
         tx.userEmail,
@@ -366,7 +366,7 @@ function AllTransactionsPageContent() {
       'investment_transactions',
       ['Date', 'User ID', 'User Name', 'User Email', 'Type', 'Amount', 'Package Name', 'ROI %', 'Duration (days)', 'Invested Amount', 'Investment Type', 'Balance Before', 'Balance After', 'Status', 'Investment ID'],
       (tx) => [
-        new Date(tx.createdAt).toLocaleString(),
+        new Date(tx.createdAt).toLocaleString('en-GB', { timeZone: 'Europe/London', hour12: false }),
         tx.userId,
         tx.userName,
         tx.userEmail,
@@ -391,7 +391,7 @@ function AllTransactionsPageContent() {
       'withdrawals',
       ['Date', 'User ID', 'User Name', 'User Email', 'Withdrawal ID', 'Amount', 'Charges', 'Final Amount', 'Wallet Type', 'Method', 'Status'],
       (wd) => [
-        new Date(wd.createdAt).toLocaleString(),
+        new Date(wd.createdAt).toLocaleString('en-GB', { timeZone: 'Europe/London', hour12: false }),
         wd.userId,
         wd.userName,
         wd.userEmail,
@@ -481,7 +481,7 @@ function AllTransactionsPageContent() {
               transactions.map((tx) => (
                 <tr key={tx.id}>
                   <td className="px-3 py-3">
-                    <div className="text-xs text-black">{new Date(tx.createdAt).toLocaleString()}</div>
+                    <div className="text-xs text-black">{new Date(tx.createdAt).toLocaleString('en-GB', { timeZone: 'Europe/London', hour12: false })}</div>
                   </td>
                   <td className="px-3 py-3">
                     <div className="text-xs font-mono text-black truncate max-w-[130px]" title={tx.userId}>{tx.userId}</div>
@@ -643,7 +643,7 @@ function AllTransactionsPageContent() {
               investmentTransactions.map((tx) => (
                 <tr key={tx.id}>
                   <td className="px-3 py-3">
-                    <div className="text-xs text-black">{new Date(tx.createdAt).toLocaleString()}</div>
+                    <div className="text-xs text-black">{new Date(tx.createdAt).toLocaleString('en-GB', { timeZone: 'Europe/London', hour12: false })}</div>
                   </td>
                   <td className="px-3 py-3">
                     <div className="text-xs font-mono text-black truncate max-w-[130px]" title={tx.userId}>{tx.userId}</div>
@@ -806,7 +806,7 @@ function AllTransactionsPageContent() {
               withdrawals.map((wd) => (
                 <tr key={wd.id} className="hover:bg-gray-50">
                   <td className="px-3 py-3">
-                    <div className="text-xs text-black">{new Date(wd.createdAt).toLocaleString()}</div>
+                    <div className="text-xs text-black">{new Date(wd.createdAt).toLocaleString('en-GB', { timeZone: 'Europe/London', hour12: false })}</div>
                   </td>
                   <td className="px-3 py-3">
                     <div className="text-xs font-mono text-black truncate max-w-[130px]" title={wd.userId}>{wd.userId}</div>
@@ -960,7 +960,7 @@ function AllTransactionsPageContent() {
               payments.map((pmt) => (
                 <tr key={pmt.id} className="hover:bg-gray-50">
                   <td className="px-3 py-3">
-                    <div className="text-xs text-black">{new Date(pmt.createdAt).toLocaleString()}</div>
+                    <div className="text-xs text-black">{new Date(pmt.createdAt).toLocaleString('en-GB', { timeZone: 'Europe/London', hour12: false })}</div>
                   </td>
                   <td className="px-3 py-3">
                     <div className="text-xs font-mono text-black truncate max-w-[130px]" title={pmt.userId}>{pmt.userId}</div>

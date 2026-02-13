@@ -246,7 +246,7 @@ export default function AdminDashboard() {
         <div className="flex items-center gap-3">
           <span className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-[13px] font-medium" style={{ backgroundColor: tokens.bgPanel, color: tokens.label, border: '1px solid ' + tokens.border }}>
             <Calendar className="w-4 h-4" style={{ color: tokens.primary }} />
-            {new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+            {new Date().toLocaleDateString('en-GB', { month: 'short', day: 'numeric', year: 'numeric', timeZone: 'Europe/London' })}
           </span>
           <button
             type="button"
@@ -600,7 +600,7 @@ export default function AdminDashboard() {
                           <td className="py-2 pr-4" style={{ color: tokens.h1 }}>{u.name}</td>
                           <td className="py-2 pr-4" style={{ color: tokens.h1 }}>{u.email}</td>
                           <td className="py-2 pr-4" style={{ color: tokens.h1 }}>{u.country}</td>
-                          <td className="py-2" style={{ color: tokens.label }}>{new Date(u.createdAt).toLocaleString()}</td>
+                          <td className="py-2" style={{ color: tokens.label }}>{new Date(u.createdAt).toLocaleString('en-GB', { timeZone: 'Europe/London', hour12: false })}</td>
                         </tr>
                       ))
                     )}
@@ -628,7 +628,7 @@ export default function AdminDashboard() {
                           <td className="py-2 pr-4" style={{ color: tokens.h1 }}>{r.userName}</td>
                           <td className="py-2 pr-4" style={{ color: tokens.h1 }}>{r.packageName}</td>
                           <td className="py-2 pr-4" style={{ color: tokens.h1 }}>${r.investedAmount.toFixed(2)}</td>
-                          <td className="py-2" style={{ color: tokens.label }}>{new Date(r.createdAt).toLocaleString()}</td>
+                          <td className="py-2" style={{ color: tokens.label }}>{new Date(r.createdAt).toLocaleString('en-GB', { timeZone: 'Europe/London', hour12: false })}</td>
                         </tr>
                       ))
                     )}
@@ -656,7 +656,7 @@ export default function AdminDashboard() {
                           <td className="py-2 pr-4" style={{ color: tokens.h1 }}>{r.userName}</td>
                           <td className="py-2 pr-4" style={{ color: tokens.h1 }}>{r.packageName}</td>
                           <td className="py-2 pr-4" style={{ color: tokens.h1 }}>${r.investedAmount.toFixed(2)}</td>
-                          <td className="py-2" style={{ color: tokens.label }}>{new Date(r.createdAt).toLocaleString()}</td>
+                          <td className="py-2" style={{ color: tokens.label }}>{new Date(r.createdAt).toLocaleString('en-GB', { timeZone: 'Europe/London', hour12: false })}</td>
                         </tr>
                       ))
                     )}

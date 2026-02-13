@@ -50,7 +50,7 @@ export default function NOWPaymentsReportPage() {
       p.cryptoAmount || '—',
       p.received || '—',
       p.status,
-      new Date(p.createdAt).toLocaleString(),
+      new Date(p.createdAt).toLocaleString('en-GB', { timeZone: 'Europe/London', hour12: false }),
     ]);
 
     const csvContent = [headers.join(','), ...rows.map((row: any[]) => row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(','))].join('\n');
@@ -194,7 +194,7 @@ export default function NOWPaymentsReportPage() {
                           </span>
                         </td>
                         <td className="px-3 py-3">
-                          <div className="text-xs text-black">{new Date(p.createdAt).toLocaleString()}</div>
+                          <div className="text-xs text-black">{new Date(p.createdAt).toLocaleString('en-GB', { timeZone: 'Europe/London', hour12: false })}</div>
                         </td>
                       </tr>
                     ))

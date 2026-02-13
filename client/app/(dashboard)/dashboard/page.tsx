@@ -6,6 +6,7 @@ import { api } from '@/lib/api';
 import toast from 'react-hot-toast';
 import CrownLoader from '@/components/CrownLoader';
 import Image from 'next/image';
+import { formatDate } from '@/lib/utils';
 
 interface Wallet {
   type: string;
@@ -342,7 +343,7 @@ export default function DashboardPage() {
                                 {inv.package?.roi || 0}%
                               </td>
                               <td className="px-3 md:px-6 py-3 md:py-5 whitespace-nowrap text-xs md:text-sm text-gray-400">
-                                {new Date(inv.createdAt).toLocaleDateString()}
+                                {formatDate(inv.createdAt)}
                               </td>
                               <td className="px-3 md:px-6 py-3 md:py-5 whitespace-nowrap">
                                 <span
@@ -549,7 +550,7 @@ export default function DashboardPage() {
                                 {ref.country || '—'}
                               </td>
                               <td className="px-3 md:px-6 py-3 md:py-5 whitespace-nowrap text-xs md:text-sm text-gray-400">
-                                {ref.joinedAt ? new Date(ref.joinedAt).toLocaleDateString() : '—'}
+                                {ref.joinedAt ? formatDate(ref.joinedAt) : '—'}
                               </td>
                               <td className="px-3 md:px-6 py-3 md:py-5 whitespace-nowrap text-xs md:text-sm">
                                 <span

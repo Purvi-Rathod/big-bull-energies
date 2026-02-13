@@ -105,7 +105,7 @@ export default function AllTransactionsPage() {
       title.toLowerCase().replace(/\s+/g, '_'),
       ['Date', 'User ID', 'User Name', 'User Email', 'Type', 'Amount', 'Balance Before', 'Balance After', 'Status', 'Transaction Ref'],
       (tx) => [
-        new Date(tx.createdAt).toLocaleString(),
+        new Date(tx.createdAt).toLocaleString('en-GB', { timeZone: 'Europe/London', hour12: false }),
         tx.userId,
         tx.userName,
         tx.userEmail,
@@ -125,7 +125,7 @@ export default function AllTransactionsPage() {
       'investment_transactions',
       ['Date', 'User ID', 'User Name', 'User Email', 'Type', 'Amount', 'Package Name', 'ROI %', 'Duration (days)', 'Invested Amount', 'Investment Type', 'Balance Before', 'Balance After', 'Status', 'Investment ID'],
       (tx) => [
-        new Date(tx.createdAt).toLocaleString(),
+        new Date(tx.createdAt).toLocaleString('en-GB', { timeZone: 'Europe/London', hour12: false }),
         tx.userId,
         tx.userName,
         tx.userEmail,
@@ -150,7 +150,7 @@ export default function AllTransactionsPage() {
       'withdrawals',
       ['Date', 'User ID', 'User Name', 'User Email', 'Withdrawal ID', 'Amount', 'Charges', 'Final Amount', 'Wallet Type', 'Method', 'Status'],
       (wd) => [
-        new Date(wd.createdAt).toLocaleString(),
+        new Date(wd.createdAt).toLocaleString('en-GB', { timeZone: 'Europe/London', hour12: false }),
         wd.userId,
         wd.userName,
         wd.userEmail,
@@ -204,7 +204,7 @@ export default function AllTransactionsPage() {
               transactions.map((tx) => (
                 <tr key={tx.id}>
                   <td className="px-3 py-3 text-xs text-black">
-                    {new Date(tx.createdAt).toLocaleString()}
+                    {new Date(tx.createdAt).toLocaleString('en-GB', { timeZone: 'Europe/London', hour12: false })}
                   </td>
                   <td className="px-3 py-3 text-xs font-mono text-black">
                     {tx.userId}
@@ -294,7 +294,7 @@ export default function AllTransactionsPage() {
               investmentTransactions.map((tx) => (
                 <tr key={tx.id}>
                   <td className="px-3 py-3 text-xs text-black">
-                    {new Date(tx.createdAt).toLocaleString()}
+                    {new Date(tx.createdAt).toLocaleString('en-GB', { timeZone: 'Europe/London', hour12: false })}
                   </td>
                   <td className="px-3 py-3 text-xs font-mono text-black">
                     {tx.userId}
@@ -385,7 +385,7 @@ export default function AllTransactionsPage() {
               withdrawals.map((wd) => (
                 <tr key={wd.id} className="hover:bg-gray-50">
                   <td className="px-3 py-3 text-xs text-black">
-                    {new Date(wd.createdAt).toLocaleString()}
+                    {new Date(wd.createdAt).toLocaleString('en-GB', { timeZone: 'Europe/London', hour12: false })}
                   </td>
                   <td className="px-3 py-3 text-xs font-mono text-black">
                     {wd.userId}

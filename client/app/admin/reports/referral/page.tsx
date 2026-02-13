@@ -82,7 +82,7 @@ export default function ReferralReportPage() {
     const filtered = getFilteredTransactions();
     const headers = ['Date', 'User ID', 'User Name', 'User Email', 'Type', 'Amount', 'Balance Before', 'Balance After', 'Status'];
     const rows = filtered.map((tx: any) => [
-      new Date(tx.createdAt).toLocaleString(),
+      new Date(tx.createdAt).toLocaleString('en-GB', { timeZone: 'Europe/London', hour12: false }),
       tx.userId,
       tx.userName,
       tx.userEmail,
@@ -111,7 +111,7 @@ export default function ReferralReportPage() {
     const filtered = getFilteredTransactions();
     const headers = ['Date', 'User ID', 'User Name', 'User Email', 'Type', 'Amount', 'Balance Before', 'Balance After', 'Status'];
     const rows = filtered.map((tx: any) => [
-      new Date(tx.createdAt).toLocaleString(),
+      new Date(tx.createdAt).toLocaleString('en-GB', { timeZone: 'Europe/London', hour12: false }),
       tx.userId,
       tx.userName,
       tx.userEmail,
@@ -360,7 +360,7 @@ export default function ReferralReportPage() {
                     getFilteredTransactions().map((tx: any) => (
                       <tr key={tx.id}>
                         <td className="px-3 py-3 text-xs text-black">
-                          {new Date(tx.createdAt).toLocaleString()}
+                          {new Date(tx.createdAt).toLocaleString('en-GB', { timeZone: 'Europe/London', hour12: false })}
                         </td>
                         <td className="px-3 py-3 text-xs font-mono text-black">
                           {tx.userId}

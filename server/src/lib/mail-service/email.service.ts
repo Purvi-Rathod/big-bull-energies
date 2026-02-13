@@ -8,6 +8,9 @@ import WithdrawalRejectedEmail from './mail-templates/withdrawal-rejected';
 import PasswordResetEmail from './mail-templates/password-reset';
 import TicketCreatedEmail from './mail-templates/ticket-created';
 import TicketStatusUpdateEmail from './mail-templates/ticket-status-update';
+import VoucherCreatedEmail from './mail-templates/voucher-created';
+import VoucherUsedEmail from './mail-templates/voucher-used';
+import VoucherExpiredEmail from './mail-templates/voucher-expired';
 
 /**
  * Email Service
@@ -408,6 +411,110 @@ export const sendTicketStatusUpdateEmail = async ({
     console.log(`✅ Ticket status update email sent to ${to}`);
   } catch (error: any) {
     console.error(`❌ Failed to send ticket status update email to ${to}:`, error.message);
+  }
+};
+
+/** Voucher created: to, name, voucherId, amount, investmentValue, expiryDate, dashboardLink, source? */
+export const sendVoucherCreatedEmail = async (params: {
+  to: string;
+  name: string;
+  voucherId: string;
+  amount: number;
+  investmentValue: number;
+  expiryDate: string;
+  dashboardLink: string;
+  source?: 'wallet' | 'payment';
+}): Promise<void> => {
+  try {
+    const emailHtml = await render(
+      React.createElement(VoucherCreatedEmail, {
+        name: params.name,
+        voucherId: params.voucherId,
+        amount: params.amount,
+        investmentValue: params.investmentValue,
+        expiryDate: params.expiryDate,
+        dashboardLink: params.dashboardLink,
+        source: params.source || 'wallet',
+      })
+    );
+    const mailOptions = {
+      from: process.env.EMAIL_USER || process.env.EMAIL_FROM || 'noreply@crownbankers.com',
+      to: params.to,
+      subject: `Voucher Created - ${params.voucherId}`,
+      html: emailHtml,
+    };
+    await auth.sendMail(mailOptions);
+    console.log(`✅ Voucher created email sent to ${params.to}`);
+  } catch (error: any) {
+    console.error(`❌ Failed to send voucher created email to ${params.to}:`, error.message);
+  }
+};
+
+/** Voucher used: notify voucher owner */
+export const sendVoucherUsedEmail = async (params: {
+  to: string;
+  name: string;
+  voucherId: string;
+  amount: number;
+  investmentValue: number;
+  usedBy: string;
+  dashboardLink: string;
+}): Promise<void> => {
+  try {
+    const emailHtml = await render(
+      React.createElement(VoucherUsedEmail, {
+        name: params.name,
+        voucherId: params.voucherId,
+        amount: params.amount,
+        investmentValue: params.investmentValue,
+        usedBy: params.usedBy,
+        dashboardLink: params.dashboardLink,
+      })
+    );
+    const mailOptions = {
+      from: process.env.EMAIL_USER || process.env.EMAIL_FROM || 'noreply@crownbankers.com',
+      to: params.to,
+      subject: `Voucher Used - ${params.voucherId}`,
+      html: emailHtml,
+    };
+    await auth.sendMail(mailOptions);
+    console.log(`✅ Voucher used email sent to ${params.to}`);
+  } catch (error: any) {
+    console.error(`❌ Failed to send voucher used email to ${params.to}:`, error.message);
+  }
+};
+
+/** Voucher expired: notify voucher owner */
+export const sendVoucherExpiredEmail = async (params: {
+  to: string;
+  name: string;
+  voucherId: string;
+  amount: number;
+  investmentValue: number;
+  expiryDate: string;
+  dashboardLink: string;
+}): Promise<void> => {
+  try {
+    const emailHtml = await render(
+      React.createElement(VoucherExpiredEmail, {
+        name: params.name,
+        voucherId: params.voucherId,
+        amount: params.amount,
+        investmentValue: params.investmentValue,
+        expiryDate: params.expiryDate,
+        dashboardLink: params.dashboardLink,
+      })
+    );
+    const mailOptions = {
+      from: process.env.EMAIL_USER || process.env.EMAIL_FROM || 'noreply@crownbankers.com',
+      to: params.to,
+      subject: `Voucher Expired - ${params.voucherId}`,
+      html: emailHtml,
+    };
+    await auth.sendMail(mailOptions);
+    console.log(`✅ Voucher expired email sent to ${params.to}`);
+  } catch (error: any) {
+    console.error(`❌ Failed to send voucher expired email to ${params.to}:`, error.message);
   }
 };
 

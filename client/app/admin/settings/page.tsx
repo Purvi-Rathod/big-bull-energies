@@ -728,12 +728,12 @@ export default function SettingsPage() {
                     )}
                     {jobStatus.completedAt && (
                       <div className="mt-2 text-xs text-black">
-                        Completed at: {new Date(jobStatus.completedAt).toLocaleString()}
+                        Completed at: {new Date(jobStatus.completedAt).toLocaleString('en-GB', { timeZone: 'Europe/London', hour12: false })}
                       </div>
                     )}
                     {jobStatus.startedAt && jobStatus.status === 'processing' && (
                       <div className="mt-2 text-xs text-black">
-                        Started at: {new Date(jobStatus.startedAt).toLocaleString()}
+                        Started at: {new Date(jobStatus.startedAt).toLocaleString('en-GB', { timeZone: 'Europe/London', hour12: false })}
                       </div>
                     )}
                   </div>

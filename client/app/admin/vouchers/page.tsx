@@ -157,7 +157,7 @@ export default function AdminVouchersPage() {
 
   const formatDate = (dateString: string | null) => {
     if (!dateString) return 'N/A';
-    return new Date(dateString).toLocaleString();
+    return new Date(dateString).toLocaleString('en-GB', { timeZone: 'Europe/London', hour12: false });
   };
 
   const getStatusColor = (status: string) => {

@@ -163,6 +163,15 @@ export default function Footer() {
             <ul className="space-y-3 flex-1">
               <li>
                 <Link
+                  href="/legal"
+                  className="text-sm transition hover:opacity-80"
+                  style={{ color: "#FFFFFF", opacity: 1 }}
+                >
+                  Legal Documents
+                </Link>
+              </li>
+              <li>
+                <Link
                   href="/download"
                   className="text-sm transition hover:opacity-80"
                   style={{ color: "#FFFFFF", opacity: 1 }}
@@ -232,6 +241,13 @@ export default function Footer() {
               © 2025 Crown Banker
             </div>
             <div className="flex flex-wrap items-center gap-6">
+              <Link
+                href="/legal"
+                className="text-white text-sm transition hover:opacity-80"
+                style={{ opacity: 1 }}
+              >
+                Legal Documents
+              </Link>
               <Link
                 href="/privacy"
                 className="text-white text-sm transition hover:opacity-80"

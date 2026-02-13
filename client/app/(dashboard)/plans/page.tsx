@@ -282,8 +282,10 @@ export default function PlansPage() {
                 // roi field is the daily ROI percentage (e.g., 1.5 means 1.5% per day)
                 // If roi exists, use it directly; otherwise calculate from totalOutputPct
                 const dailyRoiRate = pkg.roi ? pkg.roi / 100 : (totalOutputPct / 100) / pkg.duration;
-                const renewablePrinciplePct = pkg.renewablePrinciplePct || pkg.principleReturn || 60;
-                const referralPct = pkg.referralPct || pkg.levelOneReferral || 7;
+                // Solar Starter: 60% renewable principal per DB; others use package value
+                const renewablePrinciplePct = pkg.packageName === 'Solar Starter' ? 60 : (pkg.renewablePrinciplePct ?? pkg.principleReturn ?? 60);
+                // Round referral % for display so e.g. 10.05% from DB shows as 10%
+                const referralPct = Math.round(pkg.referralPct ?? pkg.levelOneReferral ?? 7);
                 const binaryPct = pkg.binaryPct || pkg.binaryBonus || 10;
                 const powerCapacity = pkg.powerCapacity || pkg.cappingLimit || 1000;
                 const status = pkg.status || 'Active';
@@ -338,13 +340,13 @@ export default function PlansPage() {
                           </span>
                         </div>
 
-                        {/* Renewable Principle */}
+                        {/* Renewable Principle: Solar Starter 60%, others from package */}
                         <div className="flex justify-between items-center py-3 border-b border-yellow-500/20">
                           <span className="text-sm font-semibold text-gray-300">Renewable Principle:</span>
                           <span className="text-sm font-bold text-yellow-400">{renewablePrinciplePct}%</span>
                         </div>
 
-                        {/* Referral Bonus */}
+                        {/* Referral Bonus: rounded so 10.05% displays as 10% */}
                         <div className="flex justify-between items-center py-3 border-b border-yellow-500/20">
                           <span className="text-sm font-semibold text-gray-300">Referral Bonus:</span>
                           <span className="text-sm font-bold text-yellow-400">{referralPct}%</span>
@@ -406,7 +408,7 @@ export default function PlansPage() {
                       <div className="text-right">
                         <span className="font-bold text-yellow-400 block">
                           {(() => {
-                            const renewablePct = selectedPackage.renewablePrinciplePct || selectedPackage.principleReturn || 60;
+                            const renewablePct = selectedPackage.packageName === 'Solar Starter' ? 60 : (selectedPackage.renewablePrinciplePct ?? selectedPackage.principleReturn ?? 60);
                             return selectedPackage.roi !== undefined && selectedPackage.roi !== null
                               ? ((selectedPackage.duration * selectedPackage.roi) + renewablePct).toFixed(2)
                               : (selectedPackage.totalOutputPct || 225);
@@ -414,7 +416,7 @@ export default function PlansPage() {
                         </span>
                         {selectedPackage.roi !== undefined && selectedPackage.roi !== null && (
                           <span className="text-xs text-gray-400 block mt-0.5">
-                            ({selectedPackage.roi}% × {selectedPackage.duration} days + {(selectedPackage.renewablePrinciplePct || selectedPackage.principleReturn || 60)}% Capital Back)
+                            ({selectedPackage.roi}% × {selectedPackage.duration} days + {(selectedPackage.packageName === 'Solar Starter' ? 60 : (selectedPackage.renewablePrinciplePct ?? selectedPackage.principleReturn ?? 60))}% Capital Back)
                           </span>
                         )}
                       </div>

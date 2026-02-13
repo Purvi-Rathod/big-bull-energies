@@ -1078,24 +1078,33 @@ export const createWithdrawal = asyncHandler(async (req, res) => {
   });
 
   // Send withdrawal created email notification asynchronously (non-blocking)
+  const userEmail = user?.email;
+  const userName = user?.name || "User";
+  const amountVal = parseFloat(withdrawal.amount.toString());
+  const chargesVal = parseFloat(withdrawal.charges.toString());
+  const finalAmountVal = parseFloat(withdrawal.finalAmount.toString());
+  const withdrawalIdStr = withdrawal._id.toString();
+  const walletTypeVal = withdrawal.walletType;
   setImmediate(async () => {
     try {
-      const clientUrl = process.env.CLIENT_URL || process.env.FRONTEND_URL || 'http://localhost:3000';
+      if (!userEmail) {
+        console.warn("Skipping withdrawal created email: user has no email");
+        return;
+      }
+      const clientUrl = process.env.CLIENT_URL || process.env.FRONTEND_URL || "http://localhost:3000";
       const dashboardLink = `${clientUrl}/withdraw`;
-      
       await sendWithdrawalCreatedEmail({
-        to: user.email,
-        name: user.name,
-        amount: parseFloat(withdrawal.amount.toString()),
-        charges: parseFloat(withdrawal.charges.toString()),
-        finalAmount: parseFloat(withdrawal.finalAmount.toString()),
-        walletType: withdrawal.walletType,
-        withdrawalId: withdrawal._id.toString(),
+        to: userEmail,
+        name: userName,
+        amount: amountVal,
+        charges: chargesVal,
+        finalAmount: finalAmountVal,
+        walletType: walletTypeVal,
+        withdrawalId: withdrawalIdStr,
         dashboardLink,
       });
     } catch (emailError: any) {
-      console.error('Failed to send withdrawal created email:', emailError.message);
-      // Don't fail the withdrawal creation if email fails
+      console.error("Failed to send withdrawal created email:", emailError.message);
     }
   });
 

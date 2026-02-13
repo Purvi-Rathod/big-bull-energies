@@ -117,6 +117,8 @@ export const sendInvestmentPurchaseEmail = async ({
   }
 };
 
+/** Withdrawal emails: user receives an email on every event — created, approved, rejected. */
+
 interface SendWithdrawalCreatedEmailParams {
   to: string;
   name: string;
@@ -129,7 +131,7 @@ interface SendWithdrawalCreatedEmailParams {
 }
 
 /**
- * Send withdrawal created notification email
+ * Send withdrawal created notification email (event 1 of 3)
  */
 export const sendWithdrawalCreatedEmail = async ({
   to,
@@ -154,8 +156,9 @@ export const sendWithdrawalCreatedEmail = async ({
       })
     );
 
+    const fromAddress = process.env.EMAIL_USER || process.env.EMAIL_FROM || 'noreply@crownbankers.com';
     const mailOptions = {
-      from: process.env.EMAIL_USER || 'noreply@crown.com',
+      from: fromAddress,
       to,
       subject: `Withdrawal Request Submitted - $${amount.toFixed(2)}`,
       html: emailHtml,
@@ -182,7 +185,7 @@ interface SendWithdrawalApprovedEmailParams {
 }
 
 /**
- * Send withdrawal approved notification email
+ * Send withdrawal approved notification email (event 2 of 3)
  */
 export const sendWithdrawalApprovedEmail = async ({
   to,
@@ -209,8 +212,9 @@ export const sendWithdrawalApprovedEmail = async ({
       })
     );
 
+    const fromAddress = process.env.EMAIL_USER || process.env.EMAIL_FROM || 'noreply@crownbankers.com';
     const mailOptions = {
-      from: process.env.EMAIL_USER || 'noreply@crown.com',
+      from: fromAddress,
       to,
       subject: `Withdrawal Approved - $${amount.toFixed(2)}`,
       html: emailHtml,
@@ -220,7 +224,7 @@ export const sendWithdrawalApprovedEmail = async ({
     console.log(`✅ Withdrawal approved email sent to ${to}`);
   } catch (error: any) {
     console.error(`❌ Failed to send withdrawal approved email to ${to}:`, error.message);
-    // Don't throw error - we don't want email failures to break withdrawal flow
+    // Don't throw - withdrawal flow already succeeded; admin controller will log
   }
 };
 
@@ -237,7 +241,7 @@ interface SendWithdrawalRejectedEmailParams {
 }
 
 /**
- * Send withdrawal rejected notification email
+ * Send withdrawal rejected notification email (event 3 of 3)
  */
 export const sendWithdrawalRejectedEmail = async ({
   to,
@@ -264,8 +268,9 @@ export const sendWithdrawalRejectedEmail = async ({
       })
     );
 
+    const fromAddress = process.env.EMAIL_USER || process.env.EMAIL_FROM || 'noreply@crownbankers.com';
     const mailOptions = {
-      from: process.env.EMAIL_USER || 'noreply@crown.com',
+      from: fromAddress,
       to,
       subject: `Withdrawal Request Rejected - $${amount.toFixed(2)}`,
       html: emailHtml,
@@ -275,7 +280,7 @@ export const sendWithdrawalRejectedEmail = async ({
     console.log(`✅ Withdrawal rejected email sent to ${to}`);
   } catch (error: any) {
     console.error(`❌ Failed to send withdrawal rejected email to ${to}:`, error.message);
-    // Don't throw error - we don't want email failures to break withdrawal flow
+    // Don't throw - withdrawal flow already succeeded; admin controller will log
   }
 };
 

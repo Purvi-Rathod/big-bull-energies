@@ -115,7 +115,7 @@ export default function ReportsPage() {
       title.toLowerCase().replace(/\s+/g, '_'),
       ['Date & Time', 'Type', 'Amount', 'Status', 'Transaction ID'],
       (tx) => [
-        new Date(tx.createdAt).toLocaleString(),
+        formatDateTimeForExport(tx.createdAt),
         tx.type.toUpperCase(),
         `$${tx.amount.toFixed(2)}`,
         tx.status,
@@ -130,7 +130,7 @@ export default function ReportsPage() {
       'investment_transactions',
       ['Date & Time', 'Type', 'Amount', 'Package Name', 'ROI %', 'Duration (days)', 'Invested Amount', 'Investment Type', 'Status', 'Transaction ID'],
       (tx) => [
-        new Date(tx.createdAt).toLocaleString(),
+        formatDateTimeForExport(tx.createdAt),
         tx.type.toUpperCase(),
         `$${tx.amount.toFixed(2)}`,
         tx.investment?.packageName || 'N/A',
@@ -150,7 +150,7 @@ export default function ReportsPage() {
       'withdrawals',
       ['Date & Time', 'Withdrawal ID', 'Amount', 'Charges', 'Final Amount', 'Wallet Type', 'Method', 'Status'],
       (wd) => [
-        new Date(wd.createdAt).toLocaleString(),
+        formatDateTimeForExport(wd.createdAt),
         wd.withdrawalId || wd.id.substring(0, 8),
         `$${wd.amount.toFixed(2)}`,
         `$${wd.charges.toFixed(2)}`,
@@ -162,13 +162,17 @@ export default function ReportsPage() {
     );
   };
 
+  // UK time (GMT+0) for all report dates
+  const UK_TIMEZONE = 'UTC';
   const formatDateTime = (dateString: string) => {
     const date = new Date(dateString);
     return {
-      date: date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }),
-      time: date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' })
+      date: date.toLocaleDateString('en-GB', { year: 'numeric', month: 'short', day: 'numeric', timeZone: UK_TIMEZONE }),
+      time: date.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', second: '2-digit', timeZone: UK_TIMEZONE, hour12: false })
     };
   };
+  const formatDateTimeForExport = (dateString: string) =>
+    new Date(dateString).toLocaleString('en-GB', { timeZone: UK_TIMEZONE, hour12: false });
 
   const renderTransactionTable = (transactions: Transaction[], title: string, showExport: boolean = true, isReferral: boolean = false) => (
     <div className="bg-gradient-to-br from-gray-900/95 via-gray-800/95 to-gray-900/95 backdrop-blur-sm rounded-2xl shadow-2xl border border-yellow-500/30 overflow-hidden">

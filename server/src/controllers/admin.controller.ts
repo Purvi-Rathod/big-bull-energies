@@ -904,25 +904,33 @@ export const approveWithdrawal = asyncHandler(async (req, res) => {
     });
 
     // Send withdrawal approved email notification asynchronously (non-blocking)
+    const userEmail = user?.email;
+    const userName = user?.name || "User";
+    const withdrawalIdStr = withdrawal.withdrawalId || withdrawal._id.toString();
+    const amountVal = parseFloat(withdrawal.amount.toString());
+    const chargesVal = parseFloat(withdrawal.charges.toString());
+    const finalAmountVal = parseFloat(withdrawal.finalAmount.toString());
     setImmediate(async () => {
       try {
-        const clientUrl = process.env.CLIENT_URL || process.env.FRONTEND_URL || 'http://localhost:3000';
+        if (!userEmail) {
+          console.warn("Skipping withdrawal approved email: user has no email");
+          return;
+        }
+        const clientUrl = process.env.CLIENT_URL || process.env.FRONTEND_URL || "http://localhost:3000";
         const dashboardLink = `${clientUrl}/withdraw`;
-        
         await sendWithdrawalApprovedEmail({
-          to: user.email,
-          name: user.name,
-          amount: parseFloat(withdrawal.amount.toString()),
-          charges: parseFloat(withdrawal.charges.toString()),
-          finalAmount: parseFloat(withdrawal.finalAmount.toString()),
+          to: userEmail,
+          name: userName,
+          amount: amountVal,
+          charges: chargesVal,
+          finalAmount: finalAmountVal,
           walletType: withdrawal.walletType,
-          withdrawalId: withdrawal.withdrawalId || withdrawal._id.toString(),
-          transactionId: withdrawal.withdrawalId || withdrawal._id.toString(),
+          withdrawalId: withdrawalIdStr,
+          transactionId: withdrawalIdStr,
           dashboardLink,
         });
       } catch (emailError: any) {
-        console.error('Failed to send withdrawal approved email:', emailError.message);
-        // Don't fail the withdrawal approval if email fails
+        console.error("Failed to send withdrawal approved email:", emailError.message);
       }
     });
 
@@ -962,10 +970,10 @@ export const rejectWithdrawal = asyncHandler(async (req, res) => {
     }
 
     // Release reserved amount back to wallet
-    const user = await User.findById(withdrawal.user).select('email name');
+    const user = await User.findById(withdrawal.user).select("email name").lean();
     if (user) {
       const wallet = await Wallet.findOne({
-        user: user._id,
+        user: withdrawal.user,
         type: withdrawal.walletType,
       });
 
@@ -982,26 +990,36 @@ export const rejectWithdrawal = asyncHandler(async (req, res) => {
     withdrawal.status = WithdrawalStatus.REJECTED;
     await withdrawal.save();
 
+    // Capture values for async email (user may be null)
+    const userEmail = (user as any)?.email;
+    const userName = (user as any)?.name || "User";
+    const amountVal = parseFloat(withdrawal.amount.toString());
+    const chargesVal = parseFloat(withdrawal.charges.toString());
+    const finalAmountVal = parseFloat(withdrawal.finalAmount.toString());
+    const withdrawalIdStr = withdrawal._id.toString();
+
     // Send withdrawal rejected email notification asynchronously (non-blocking)
     setImmediate(async () => {
       try {
-        const clientUrl = process.env.CLIENT_URL || process.env.FRONTEND_URL || 'http://localhost:3000';
+        if (!userEmail) {
+          console.warn("Skipping withdrawal rejected email: user has no email");
+          return;
+        }
+        const clientUrl = process.env.CLIENT_URL || process.env.FRONTEND_URL || "http://localhost:3000";
         const dashboardLink = `${clientUrl}/withdraw`;
-        
         await sendWithdrawalRejectedEmail({
-          to: user.email,
-          name: user.name,
-          amount: parseFloat(withdrawal.amount.toString()),
-          charges: parseFloat(withdrawal.charges.toString()),
-          finalAmount: parseFloat(withdrawal.finalAmount.toString()),
+          to: userEmail,
+          name: userName,
+          amount: amountVal,
+          charges: chargesVal,
+          finalAmount: finalAmountVal,
           walletType: withdrawal.walletType,
-          withdrawalId: withdrawal._id.toString(),
+          withdrawalId: withdrawalIdStr,
           reason: reason || undefined,
           dashboardLink,
         });
       } catch (emailError: any) {
-        console.error('Failed to send withdrawal rejected email:', emailError.message);
-        // Don't fail the withdrawal rejection if email fails
+        console.error("Failed to send withdrawal rejected email:", emailError.message);
       }
     });
 

@@ -93,7 +93,7 @@ export default function WithdrawalsReportPage() {
     const filtered = getFilteredWithdrawals();
     const headers = ['Date', 'User ID', 'User Name', 'User Email', 'Withdrawal ID', 'Amount', 'Charges', 'Final Amount', 'Wallet Type', 'Method', 'Status'];
     const rows = filtered.map((wd: any) => [
-      new Date(wd.createdAt).toLocaleString(),
+      new Date(wd.createdAt).toLocaleString('en-GB', { timeZone: 'Europe/London', hour12: false }),
       wd.userId,
       wd.userName,
       wd.userEmail,
@@ -124,7 +124,7 @@ export default function WithdrawalsReportPage() {
     const filtered = getFilteredWithdrawals();
     const headers = ['Date', 'User ID', 'User Name', 'User Email', 'Withdrawal ID', 'Amount', 'Charges', 'Final Amount', 'Wallet Type', 'Method', 'Status'];
     const rows = filtered.map((wd: any) => [
-      new Date(wd.createdAt).toLocaleString(),
+      new Date(wd.createdAt).toLocaleString('en-GB', { timeZone: 'Europe/London', hour12: false }),
       wd.userId,
       wd.userName,
       wd.userEmail,
@@ -317,7 +317,7 @@ export default function WithdrawalsReportPage() {
                     getFilteredWithdrawals().map((wd: any) => (
                       <tr key={wd.id}>
                         <td className="px-3 py-3">
-                          <div className="text-xs text-black">{new Date(wd.createdAt).toLocaleString()}</div>
+                          <div className="text-xs text-black">{new Date(wd.createdAt).toLocaleString('en-GB', { timeZone: 'Europe/London', hour12: false })}</div>
                         </td>
                         <td className="px-3 py-3">
                           <div className="text-xs font-mono text-black truncate max-w-[130px]" title={wd.userId}>{wd.userId}</div>

@@ -96,7 +96,7 @@ export default function AdminInvestmentsPage() {
       row.packageId,
       row.country || '—',
       row.amount.toFixed(2),
-      row.createdAt ? new Date(row.createdAt).toLocaleString() : '—',
+      row.createdAt ? new Date(row.createdAt).toLocaleString('en-GB', { timeZone: 'Europe/London', hour12: false }) : '—',
     ]);
     const excelContent = [headers.join('\t'), ...rows.map((r) => r.join('\t'))].join('\n');
     const blob = new Blob([excelContent], { type: 'application/vnd.ms-excel' });
@@ -474,7 +474,7 @@ export default function AdminInvestmentsPage() {
                     <td className="px-4 py-3 text-sm text-black font-mono" title={row.packageName}>{row.packageId}</td>
                     <td className="px-4 py-3 text-sm text-black">{row.country || '—'}</td>
                     <td className="px-4 py-3 text-sm text-black font-semibold">${row.amount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
-                    <td className="px-4 py-3 text-sm text-black">{row.createdAt ? new Date(row.createdAt).toLocaleString() : '—'}</td>
+                    <td className="px-4 py-3 text-sm text-black">{row.createdAt ? new Date(row.createdAt).toLocaleString('en-GB', { timeZone: 'Europe/London', hour12: false }) : '—'}</td>
                   </tr>
                 ))}
               </tbody>

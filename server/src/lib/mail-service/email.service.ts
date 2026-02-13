@@ -8,6 +8,9 @@ import WithdrawalRejectedEmail from './mail-templates/withdrawal-rejected';
 import PasswordResetEmail from './mail-templates/password-reset';
 import TicketCreatedEmail from './mail-templates/ticket-created';
 import TicketStatusUpdateEmail from './mail-templates/ticket-status-update';
+import VoucherCreatedEmail from './mail-templates/voucher-created';
+import VoucherUsedEmail from './mail-templates/voucher-used';
+import VoucherExpiredEmail from './mail-templates/voucher-expired';
 
 /**
  * Email Service
@@ -117,6 +120,8 @@ export const sendInvestmentPurchaseEmail = async ({
   }
 };
 
+/** Withdrawal emails: user receives an email on every event — created, approved, rejected. */
+
 interface SendWithdrawalCreatedEmailParams {
   to: string;
   name: string;
@@ -129,7 +134,7 @@ interface SendWithdrawalCreatedEmailParams {
 }
 
 /**
- * Send withdrawal created notification email
+ * Send withdrawal created notification email (event 1 of 3)
  */
 export const sendWithdrawalCreatedEmail = async ({
   to,
@@ -154,8 +159,9 @@ export const sendWithdrawalCreatedEmail = async ({
       })
     );
 
+    const fromAddress = process.env.EMAIL_USER || process.env.EMAIL_FROM || 'noreply@crownbankers.com';
     const mailOptions = {
-      from: process.env.EMAIL_USER || 'noreply@crown.com',
+      from: fromAddress,
       to,
       subject: `Withdrawal Request Submitted - $${amount.toFixed(2)}`,
       html: emailHtml,
@@ -182,7 +188,7 @@ interface SendWithdrawalApprovedEmailParams {
 }
 
 /**
- * Send withdrawal approved notification email
+ * Send withdrawal approved notification email (event 2 of 3)
  */
 export const sendWithdrawalApprovedEmail = async ({
   to,
@@ -209,8 +215,9 @@ export const sendWithdrawalApprovedEmail = async ({
       })
     );
 
+    const fromAddress = process.env.EMAIL_USER || process.env.EMAIL_FROM || 'noreply@crownbankers.com';
     const mailOptions = {
-      from: process.env.EMAIL_USER || 'noreply@crown.com',
+      from: fromAddress,
       to,
       subject: `Withdrawal Approved - $${amount.toFixed(2)}`,
       html: emailHtml,
@@ -220,7 +227,7 @@ export const sendWithdrawalApprovedEmail = async ({
     console.log(`✅ Withdrawal approved email sent to ${to}`);
   } catch (error: any) {
     console.error(`❌ Failed to send withdrawal approved email to ${to}:`, error.message);
-    // Don't throw error - we don't want email failures to break withdrawal flow
+    // Don't throw - withdrawal flow already succeeded; admin controller will log
   }
 };
 
@@ -237,7 +244,7 @@ interface SendWithdrawalRejectedEmailParams {
 }
 
 /**
- * Send withdrawal rejected notification email
+ * Send withdrawal rejected notification email (event 3 of 3)
  */
 export const sendWithdrawalRejectedEmail = async ({
   to,
@@ -264,8 +271,9 @@ export const sendWithdrawalRejectedEmail = async ({
       })
     );
 
+    const fromAddress = process.env.EMAIL_USER || process.env.EMAIL_FROM || 'noreply@crownbankers.com';
     const mailOptions = {
-      from: process.env.EMAIL_USER || 'noreply@crown.com',
+      from: fromAddress,
       to,
       subject: `Withdrawal Request Rejected - $${amount.toFixed(2)}`,
       html: emailHtml,
@@ -275,7 +283,7 @@ export const sendWithdrawalRejectedEmail = async ({
     console.log(`✅ Withdrawal rejected email sent to ${to}`);
   } catch (error: any) {
     console.error(`❌ Failed to send withdrawal rejected email to ${to}:`, error.message);
-    // Don't throw error - we don't want email failures to break withdrawal flow
+    // Don't throw - withdrawal flow already succeeded; admin controller will log
   }
 };
 
@@ -403,6 +411,110 @@ export const sendTicketStatusUpdateEmail = async ({
     console.log(`✅ Ticket status update email sent to ${to}`);
   } catch (error: any) {
     console.error(`❌ Failed to send ticket status update email to ${to}:`, error.message);
+  }
+};
+
+/** Voucher created: to, name, voucherId, amount, investmentValue, expiryDate, dashboardLink, source? */
+export const sendVoucherCreatedEmail = async (params: {
+  to: string;
+  name: string;
+  voucherId: string;
+  amount: number;
+  investmentValue: number;
+  expiryDate: string;
+  dashboardLink: string;
+  source?: 'wallet' | 'payment';
+}): Promise<void> => {
+  try {
+    const emailHtml = await render(
+      React.createElement(VoucherCreatedEmail, {
+        name: params.name,
+        voucherId: params.voucherId,
+        amount: params.amount,
+        investmentValue: params.investmentValue,
+        expiryDate: params.expiryDate,
+        dashboardLink: params.dashboardLink,
+        source: params.source || 'wallet',
+      })
+    );
+    const mailOptions = {
+      from: process.env.EMAIL_USER || process.env.EMAIL_FROM || 'noreply@crownbankers.com',
+      to: params.to,
+      subject: `Voucher Created - ${params.voucherId}`,
+      html: emailHtml,
+    };
+    await auth.sendMail(mailOptions);
+    console.log(`✅ Voucher created email sent to ${params.to}`);
+  } catch (error: any) {
+    console.error(`❌ Failed to send voucher created email to ${params.to}:`, error.message);
+  }
+};
+
+/** Voucher used: notify voucher owner */
+export const sendVoucherUsedEmail = async (params: {
+  to: string;
+  name: string;
+  voucherId: string;
+  amount: number;
+  investmentValue: number;
+  usedBy: string;
+  dashboardLink: string;
+}): Promise<void> => {
+  try {
+    const emailHtml = await render(
+      React.createElement(VoucherUsedEmail, {
+        name: params.name,
+        voucherId: params.voucherId,
+        amount: params.amount,
+        investmentValue: params.investmentValue,
+        usedBy: params.usedBy,
+        dashboardLink: params.dashboardLink,
+      })
+    );
+    const mailOptions = {
+      from: process.env.EMAIL_USER || process.env.EMAIL_FROM || 'noreply@crownbankers.com',
+      to: params.to,
+      subject: `Voucher Used - ${params.voucherId}`,
+      html: emailHtml,
+    };
+    await auth.sendMail(mailOptions);
+    console.log(`✅ Voucher used email sent to ${params.to}`);
+  } catch (error: any) {
+    console.error(`❌ Failed to send voucher used email to ${params.to}:`, error.message);
+  }
+};
+
+/** Voucher expired: notify voucher owner */
+export const sendVoucherExpiredEmail = async (params: {
+  to: string;
+  name: string;
+  voucherId: string;
+  amount: number;
+  investmentValue: number;
+  expiryDate: string;
+  dashboardLink: string;
+}): Promise<void> => {
+  try {
+    const emailHtml = await render(
+      React.createElement(VoucherExpiredEmail, {
+        name: params.name,
+        voucherId: params.voucherId,
+        amount: params.amount,
+        investmentValue: params.investmentValue,
+        expiryDate: params.expiryDate,
+        dashboardLink: params.dashboardLink,
+      })
+    );
+    const mailOptions = {
+      from: process.env.EMAIL_USER || process.env.EMAIL_FROM || 'noreply@crownbankers.com',
+      to: params.to,
+      subject: `Voucher Expired - ${params.voucherId}`,
+      html: emailHtml,
+    };
+    await auth.sendMail(mailOptions);
+    console.log(`✅ Voucher expired email sent to ${params.to}`);
+  } catch (error: any) {
+    console.error(`❌ Failed to send voucher expired email to ${params.to}:`, error.message);
   }
 };
 

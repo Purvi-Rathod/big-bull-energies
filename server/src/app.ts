@@ -26,24 +26,7 @@ const callbackLogger = (req: express.Request, res: express.Response, next: expre
                           (req.method === 'POST' && req.originalUrl === '/');
   
   if (req.method === 'POST' && isCallbackRoute) {
-    console.log(`\n${'='.repeat(80)}`);
-    console.log(`[CALLBACK LOGGER] 📥 POST Request Received`);
-    console.log(`[CALLBACK LOGGER] Timestamp: ${new Date().toISOString()}`);
-    console.log(`[CALLBACK LOGGER] Route: ${req.originalUrl}`);
-    console.log(`[CALLBACK LOGGER] Path: ${req.path}`);
-    console.log(`[CALLBACK LOGGER] Base URL: ${req.baseUrl}`);
-    console.log(`[CALLBACK LOGGER] Method: ${req.method}`);
-    console.log(`[CALLBACK LOGGER] Protocol: ${req.protocol}`);
-    console.log(`[CALLBACK LOGGER] Secure: ${req.secure}`);
-    console.log(`[CALLBACK LOGGER] Host: ${req.get('host')}`);
-    console.log(`[CALLBACK LOGGER] IP Address: ${req.ip}`);
-    console.log(`[CALLBACK LOGGER] Remote Address: ${req.socket.remoteAddress}`);
-    console.log(`[CALLBACK LOGGER] X-Forwarded-For: ${req.get('x-forwarded-for') || 'N/A'}`);
-    console.log(`[CALLBACK LOGGER] X-Real-IP: ${req.get('x-real-ip') || 'N/A'}`);
-    console.log(`[CALLBACK LOGGER] User-Agent: ${req.get('user-agent') || 'N/A'}`);
-    console.log(`[CALLBACK LOGGER] Content-Type: ${req.get('content-type') || 'N/A'}`);
-    console.log(`[CALLBACK LOGGER] Content-Length: ${req.get('content-length') || 'N/A'}`);
-    console.log(`[CALLBACK LOGGER] All Headers:`, JSON.stringify(req.headers, null, 2));
+  
     
     // Log query parameters
     if (Object.keys(req.query).length > 0) {

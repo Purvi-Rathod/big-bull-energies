@@ -30,6 +30,11 @@ export async function exchangeWallets(
       throw new AppError("Source and destination wallets cannot be the same", 400);
     }
 
+    // Fixed wallet cannot be used for exchange (not counted for referral/binary, admin-only, non-withdrawable)
+    if (fromWalletType === WalletType.FIXED || toWalletType === WalletType.FIXED) {
+      throw new AppError("Fixed wallet cannot be used for exchange. It does not count for referral or binary.", 400);
+    }
+
     // Validate wallet types
     const validWalletTypes = Object.values(WalletType);
     if (!validWalletTypes.includes(fromWalletType) || !validWalletTypes.includes(toWalletType)) {

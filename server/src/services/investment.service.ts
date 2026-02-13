@@ -534,6 +534,24 @@ export async function processInvestment(
       voucher.status = "used";
       voucher.usedAt = new Date();
       await voucher.save();
+
+      // Notify voucher owner (may be same user or a different user if voucher was gifted)
+      const voucherOwnerId = voucher.user instanceof Types.ObjectId ? voucher.user : (voucher.user as any)?._id;
+      const ownerUser = voucherOwnerId ? await User.findById(voucherOwnerId).select("email name userId").lean() : null;
+      if (ownerUser?.email) {
+        const { sendVoucherUsedEmail } = await import("../lib/mail-service/email.service");
+        const usedByName = user.name || (user as any).userId || userId.toString();
+        const clientUrl = process.env.CLIENT_URL || process.env.FRONTEND_URL || "http://localhost:3000";
+        sendVoucherUsedEmail({
+          to: ownerUser.email,
+          name: ownerUser.name || "User",
+          voucherId: voucher.voucherId,
+          amount: parseFloat(voucher.amount.toString()),
+          investmentValue: parseFloat(voucher.investmentValue.toString()),
+          usedBy: usedByName,
+          dashboardLink: `${clientUrl}/vouchers`,
+        }).catch((err: any) => console.error("[Investment Service] Failed to send voucher used email:", err.message));
+      }
     }
 
     // Validate amount

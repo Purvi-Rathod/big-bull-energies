@@ -11,6 +11,7 @@ export enum WalletType {
   INVESTMENT = "investment",
   CAREER_LEVEL = "career_level",
   MAIN = "main",
+  FIXED = "fixed", // Admin-only fundable; no user withdraw, no ROI on this balance
 }
 
 export enum TxnStatus {

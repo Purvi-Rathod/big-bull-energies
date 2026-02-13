@@ -161,19 +161,20 @@ export default function UserBioPage() {
       token: 'Token',
       investment: 'Investment',
       career_level: 'Career Level',
+      fixed: 'Fixed (non-withdrawable)',
     };
     return names[type] || type;
   };
 
   const formatDate = (dateString: string) => {
     if (!dateString) return '-';
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', {
+    return new Date(dateString).toLocaleString('en-GB', {
       year: 'numeric',
       month: 'short',
       day: 'numeric',
       hour: '2-digit',
       minute: '2-digit',
+      timeZone: 'Europe/London',
     });
   };
 

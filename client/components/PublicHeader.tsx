@@ -59,6 +59,12 @@ export default function PublicHeader() {
           >
             Privacy & Terms
           </Link>
+          <Link
+            href="/legal"
+            className="px-3 py-2 text-white/90 hover:text-yellow-400 transition-colors font-medium text-sm"
+          >
+            Legal
+          </Link>
         </div>
 
         {/* Mobile Navigation - Dropdown or Hidden */}

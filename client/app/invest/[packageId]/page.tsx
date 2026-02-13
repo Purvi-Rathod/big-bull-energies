@@ -354,7 +354,7 @@ function InvestContent() {
                         return (
                           <option key={voucher.voucherId} value={voucher.voucherId}>
                             ${voucher.amount.toLocaleString()} voucher (Covers up to $${voucherInvestmentValue.toLocaleString()})
-                            {voucher.expiry && ` - Expires: ${new Date(voucher.expiry).toLocaleDateString()}`}
+                            {voucher.expiry && ` - Expires: ${new Date(voucher.expiry).toLocaleDateString('en-GB', { timeZone: 'Europe/London' })}`}
                           </option>
                         );
                       })}

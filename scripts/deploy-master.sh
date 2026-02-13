@@ -1,181 +1,95 @@
 #!/bin/bash
 set -e
 
-echo "🚀 Starting Master Deployment Process..."
+# Production deployment only. Does NOT touch staging containers.
+# Prod: binary-system-frontend, binary-system-backend (ports 3000, 8000)
+# Staging (untouched): binary-system-frontend-stagging, binary-system-backend-stagging (ports 3002, 4000)
+
+COMPOSE_FILE="docker-compose.yml"
+
+echo "🚀 Production Deployment (master)"
+echo "=========================================="
+echo "   Using: -f $COMPOSE_FILE (prod only; staging untouched)"
 echo "=========================================="
 
 # Navigate to project root
 cd "$(dirname "$0")/.."
 
-# Step 1: Verify we're on the latest commit
+# Step 1: Pull latest changes on main and go to latest
 echo ""
-echo "📋 Step 1: Verifying Git status..."
+echo "📋 Step 1: Pull latest changes on main..."
 git fetch origin
-LATEST_COMMIT=$(git rev-parse origin/main)
-CURRENT_COMMIT=$(git rev-parse HEAD)
+git checkout main
+git pull origin main
+echo "✅ At latest commit: $(git rev-parse --short HEAD)"
 
-if [ "$CURRENT_COMMIT" != "$LATEST_COMMIT" ]; then
-    echo "⚠️  Warning: Not on latest commit. Current: $CURRENT_COMMIT, Latest: $LATEST_COMMIT"
-    echo "   Pulling latest changes..."
-    git pull origin main
-else
-    echo "✅ Already on latest commit: $LATEST_COMMIT"
-fi
-
-# Step 2: Verify critical files exist
+# Step 2: Build new images with no cache (prod services only)
 echo ""
-echo "📋 Step 2: Verifying critical files..."
-if [ ! -f "client/app/tree/page.tsx" ]; then
-    echo "❌ Error: client/app/tree/page.tsx not found!"
-    exit 1
-fi
+echo "📋 Step 2: Building prod images (no cache)..."
+docker compose -f "$COMPOSE_FILE" build --no-cache
+echo "✅ Build complete"
 
-if [ ! -f "client/app/(dashboard)/my-tree/page.tsx" ]; then
-    echo "❌ Error: client/app/(dashboard)/my-tree/page.tsx not found!"
-    exit 1
-fi
-
-if [ ! -f "server/src/routes/tree.routes.ts" ]; then
-    echo "❌ Error: server/src/routes/tree.routes.ts not found!"
-    exit 1
-fi
-
-# Check if lazy loading code exists
-if ! grep -q "handleExpandNode" client/app/tree/page.tsx; then
-    echo "❌ Error: handleExpandNode not found in tree/page.tsx!"
-    exit 1
-fi
-
-if ! grep -q "getNodeDownlines" server/src/routes/tree.routes.ts; then
-    echo "❌ Error: getNodeDownlines route not found!"
-    exit 1
-fi
-
-echo "✅ All critical files verified"
-
-# Step 3: Stop containers and clean up conflicts
+# Step 3: Recreate prod containers only (staging containers untouched)
 echo ""
-echo "📋 Step 3: Stopping containers and cleaning up conflicts..."
-docker compose down --remove-orphans 2>/dev/null || true
+echo "📋 Step 3: Recreating prod containers..."
+docker compose -f "$COMPOSE_FILE" up -d --force-recreate
+echo "✅ Prod containers recreated"
 
-# Remove ALL containers (running or stopped) with binary-system in name
-echo "   - Removing all binary-system containers..."
-docker ps -a --filter "name=binary-system-backend" -q | while read -r cid; do
-  [ -n "$cid" ] && docker stop "$cid" 2>/dev/null || true
-  [ -n "$cid" ] && docker rm -f "$cid" 2>/dev/null || true
-done || true
-
-docker ps -a --filter "name=binary-system-frontend" -q | while read -r cid; do
-  [ -n "$cid" ] && docker stop "$cid" 2>/dev/null || true
-  [ -n "$cid" ] && docker rm -f "$cid" 2>/dev/null || true
-done || true
-
-# Remove containers with ID prefixes in names (Docker Compose legacy naming issue)
-echo "   - Removing containers with ID prefixes..."
-docker ps -a --format "{{.Names}} {{.ID}}" 2>/dev/null | grep -E "[0-9a-f]{12}_binary-system" | awk '{print $2}' | while read -r cid; do
-  [ -n "$cid" ] && docker stop "$cid" 2>/dev/null || true
-  [ -n "$cid" ] && docker rm -f "$cid" 2>/dev/null || true
-done || true
-
-# Also check for containers with underscore prefixes
-docker ps -a --format "{{.Names}} {{.ID}}" 2>/dev/null | grep -E ".*_binary-system-(backend|frontend)" | awk '{print $2}' | while read -r cid; do
-  [ -n "$cid" ] && docker stop "$cid" 2>/dev/null || true
-  [ -n "$cid" ] && docker rm -f "$cid" 2>/dev/null || true
-done || true
-
-# Step 4: Clean all caches
+# Step 4: Wait for services to be ready
 echo ""
-echo "📋 Step 4: Cleaning all caches..."
-echo "   - Removing frontend cache volume..."
-docker volume rm binary_system_frontend-next-cache 2>/dev/null || echo "     Volume doesn't exist (OK)"
-
-echo "   - Removing local build artifacts..."
-rm -rf client/.next
-rm -rf server/dist
-rm -rf client/node_modules/.cache
-
-echo "   - Pruning Docker build cache..."
-docker builder prune -f
-
-# Step 5: Rebuild everything from scratch
-echo ""
-echo "📋 Step 5: Rebuilding all services (no cache)..."
-docker compose build --no-cache --pull
-
-# Step 6: Start containers
-echo ""
-echo "📋 Step 6: Starting containers..."
-docker compose up -d
-
-# Step 7: Wait for services to be ready
-echo ""
-echo "📋 Step 7: Waiting for services to be ready..."
+echo "📋 Step 4: Waiting for services to be ready..."
 sleep 10
 
-# Step 8: Verify deployment
+# Step 5: Verify deployment (prod containers only)
 echo ""
-echo "📋 Step 8: Verifying deployment..."
+echo "📋 Step 5: Verifying deployment..."
 
-# Check if containers are running
-if ! docker ps | grep -q "binary-system-backend"; then
-    echo "❌ Error: Backend container is not running!"
-    docker compose logs backend
+if ! docker ps --format "{{.Names}}" | grep -qx "binary-system-backend"; then
+    echo "❌ Error: Prod backend (binary-system-backend) is not running!"
+    docker compose -f "$COMPOSE_FILE" logs backend
     exit 1
 fi
+echo "   ✅ binary-system-backend is running"
 
-if ! docker ps | grep -q "binary-system-frontend"; then
-    echo "❌ Error: Frontend container is not running!"
-    docker compose logs frontend
+if ! docker ps --format "{{.Names}}" | grep -qx "binary-system-frontend"; then
+    echo "❌ Error: Prod frontend (binary-system-frontend) is not running!"
+    docker compose -f "$COMPOSE_FILE" logs frontend
     exit 1
 fi
+echo "   ✅ binary-system-frontend is running"
 
-echo "✅ Containers are running"
-
-# Check backend health
+# Health checks (prod ports 8000, 3000)
 echo ""
-echo "   - Checking backend health..."
-BACKEND_HEALTH=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8000/api/v1/health || echo "000")
+echo "   - Backend health (port 8000)..."
+BACKEND_HEALTH=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8000/api/v1/health 2>/dev/null || echo "000")
 if [ "$BACKEND_HEALTH" != "200" ] && [ "$BACKEND_HEALTH" != "404" ]; then
     echo "   ⚠️  Backend health check returned: $BACKEND_HEALTH"
 else
-    echo "   ✅ Backend is responding"
+    echo "   ✅ Backend responding"
 fi
 
-# Check frontend health
-echo ""
-echo "   - Checking frontend health..."
-FRONTEND_HEALTH=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:3000 || echo "000")
+echo "   - Frontend health (port 3000)..."
+FRONTEND_HEALTH=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:3000 2>/dev/null || echo "000")
 if [ "$FRONTEND_HEALTH" != "200" ]; then
     echo "   ⚠️  Frontend health check returned: $FRONTEND_HEALTH"
 else
-    echo "   ✅ Frontend is responding"
+    echo "   ✅ Frontend responding"
 fi
 
-# Step 9: Show logs
+# Recent logs
 echo ""
-echo "📋 Step 9: Recent container logs..."
+echo "📋 Recent prod container logs..."
+echo "=== Backend (last 15 lines) ==="
+docker compose -f "$COMPOSE_FILE" logs --tail=15 backend
 echo ""
-echo "=== Backend Logs (last 20 lines) ==="
-docker compose logs --tail=20 backend
-echo ""
-echo "=== Frontend Logs (last 20 lines) ==="
-docker compose logs --tail=20 frontend
+echo "=== Frontend (last 15 lines) ==="
+docker compose -f "$COMPOSE_FILE" logs --tail=15 frontend
 
-# Step 10: Verification summary
 echo ""
 echo "=========================================="
-echo "✅ Deployment Complete!"
-echo ""
-echo "📊 Summary:"
-echo "   - Git Commit: $(git rev-parse --short HEAD)"
+echo "✅ Production deployment complete"
+echo "   - Commit: $(git rev-parse --short HEAD)"
 echo "   - Backend: http://localhost:8000"
 echo "   - Frontend: http://localhost:3000"
-echo ""
-echo "🔍 To verify tree changes:"
-echo "   1. Open http://localhost:3000/tree (or /my-tree)"
-echo "   2. Look for 'View Downlines' buttons on nodes"
-echo "   3. Check browser console for any errors"
-echo ""
-echo "📝 To view logs:"
-echo "   docker compose logs -f"
+echo "   - Staging containers were NOT modified"
 echo "=========================================="

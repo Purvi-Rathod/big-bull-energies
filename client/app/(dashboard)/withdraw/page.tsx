@@ -6,6 +6,7 @@ import { api } from '@/lib/api';
 import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
 import CrownLoader from '@/components/CrownLoader';
+import { formatDateTimeLongUK } from '@/lib/utils';
 interface Wallet {
   type: string;
   balance: number;
@@ -261,7 +262,7 @@ export default function WithdrawPage() {
   };
 
   // Wallet order: ROI, Referral, Binary Bonus, Career Level, Interest, Token, Investment, Withdrawal
-  const walletOrder = ['roi', 'referral', 'binary', 'career_level', 'interest', 'token', 'investment', 'withdrawal'];
+  const walletOrder = ['roi', 'referral', 'binary', 'career_level', 'interest', 'token', 'investment', 'withdrawal', 'fixed'];
   
   const sortWallets = (wallets: Wallet[]): Wallet[] => {
     return [...wallets].sort((a, b) => {
@@ -606,7 +607,7 @@ export default function WithdrawPage() {
                       {withdrawals.map((wd) => (
                         <tr key={wd.id} className="hover:bg-gradient-to-r hover:from-yellow-500/5 hover:via-yellow-500/10 hover:to-transparent transition-all duration-300 group">
                           <td className="px-6 py-5 whitespace-nowrap text-sm text-gray-400">
-                            {new Date(wd.createdAt).toLocaleString()}
+                            {formatDateTimeLongUK(wd.createdAt)}
                           </td>
                           <td className="px-6 py-5 whitespace-nowrap text-sm font-mono text-yellow-400 font-semibold">
                             {wd.withdrawalId || wd.id.substring(0, 8)}

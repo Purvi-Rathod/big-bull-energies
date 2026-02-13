@@ -13,7 +13,7 @@ import { WalletType, WithdrawalStatus } from "../models/types";
 import { processInvestment } from "../services/investment.service";
 import { processMockPayment } from "../lib/payments/mock-nowpayments";
 import { exchangeWallets } from "../services/wallet-exchange.service";
-import { sendInvestmentPurchaseEmail, sendWithdrawalCreatedEmail } from "../lib/mail-service/email.service";
+import { sendInvestmentPurchaseEmail, sendWithdrawalCreatedEmail, sendVoucherCreatedEmail } from "../lib/mail-service/email.service";
 import { getUserCareerProgress } from "../services/career-level.service";
 import { getMinimumVoucherAmount as getMinVoucherAmount } from "../services/package.service";
 import { Types } from "mongoose";
@@ -290,29 +290,14 @@ export const createInvestment = asyncHandler(async (req, res) => {
     
     if (user?.email && pkg) {
       // Format dates - investment.startDate and investment.endDate are Date objects
+      const ukOpts = { year: 'numeric' as const, month: 'long' as const, day: 'numeric' as const, timeZone: 'Europe/London' };
       const startDateStr = investment.startDate instanceof Date 
-        ? investment.startDate.toLocaleDateString('en-US', {
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric',
-          })
-        : new Date(investment.startDate || Date.now()).toLocaleDateString('en-US', {
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric',
-          });
+        ? investment.startDate.toLocaleDateString('en-GB', ukOpts)
+        : new Date(investment.startDate || Date.now()).toLocaleDateString('en-GB', ukOpts);
 
       const endDateStr = investment.endDate instanceof Date
-        ? investment.endDate.toLocaleDateString('en-US', {
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric',
-          })
-        : new Date(investment.endDate || Date.now() + (pkg.duration || 150) * 24 * 60 * 60 * 1000).toLocaleDateString('en-US', {
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric',
-          });
+        ? investment.endDate.toLocaleDateString('en-GB', ukOpts)
+        : new Date(investment.endDate || Date.now() + (pkg.duration || 150) * 24 * 60 * 60 * 1000).toLocaleDateString('en-GB', ukOpts);
 
       // Generate dashboard link
       const clientUrl = process.env.CLIENT_URL || process.env.FRONTEND_URL || 'http://localhost:3000';
@@ -608,7 +593,9 @@ export const getUserReports = asyncHandler(async (req, res) => {
     (tx) => (tx.wallet as any)?.type === WalletType.BINARY
   );
   const referralTransactions = transactions.filter(
-    (tx) => (tx.wallet as any)?.type === WalletType.REFERRAL
+    (tx) =>
+      (tx.wallet as any)?.type === WalletType.REFERRAL &&
+      (tx.meta as any)?.type !== "withdrawal"
   );
   const careerLevelTransactions = transactions.filter(
     (tx) => (tx.wallet as any)?.type === WalletType.CAREER_LEVEL
@@ -862,25 +849,28 @@ export const getWithdrawalSchedule = asyncHandler(async (req, res) => {
       scheduleDescription,
       canWithdrawToday,
       nextWithdrawalDate: nextDate.toISOString(),
-      nextWithdrawalDateFormatted: nextDate.toLocaleDateString('en-US', {
+      nextWithdrawalDateFormatted: nextDate.toLocaleDateString('en-GB', {
         year: 'numeric',
         month: 'long',
         day: 'numeric',
+        timeZone: 'Europe/London',
       }),
       thisMonthDates: thisMonthDates.map((d) => ({
         date: d.toISOString(),
-        formatted: d.toLocaleDateString('en-US', {
+        formatted: d.toLocaleDateString('en-GB', {
           year: 'numeric',
           month: 'long',
           day: 'numeric',
+          timeZone: 'Europe/London',
         }),
       })),
       nextMonthDates: nextMonthDates.map((d) => ({
         date: d.toISOString(),
-        formatted: d.toLocaleDateString('en-US', {
+        formatted: d.toLocaleDateString('en-GB', {
           year: 'numeric',
           month: 'long',
           day: 'numeric',
+          timeZone: 'Europe/London',
         }),
       })),
     },
@@ -1025,10 +1015,11 @@ export const createWithdrawal = asyncHandler(async (req, res) => {
 
       if (!canWithdraw && packageName) {
         const nextDate = await getNextWithdrawalDate(packageName, new Date(), customSchedules);
-        const nextDateStr = nextDate.toLocaleDateString('en-US', {
+        const nextDateStr = nextDate.toLocaleDateString('en-GB', {
           year: 'numeric',
           month: 'long',
           day: 'numeric',
+          timeZone: 'Europe/London',
         });
         
         throw new AppError(
@@ -1078,24 +1069,33 @@ export const createWithdrawal = asyncHandler(async (req, res) => {
   });
 
   // Send withdrawal created email notification asynchronously (non-blocking)
+  const userEmail = user?.email;
+  const userName = user?.name || "User";
+  const amountVal = parseFloat(withdrawal.amount.toString());
+  const chargesVal = parseFloat(withdrawal.charges.toString());
+  const finalAmountVal = parseFloat(withdrawal.finalAmount.toString());
+  const withdrawalIdStr = withdrawal._id.toString();
+  const walletTypeVal = withdrawal.walletType;
   setImmediate(async () => {
     try {
-      const clientUrl = process.env.CLIENT_URL || process.env.FRONTEND_URL || 'http://localhost:3000';
+      if (!userEmail) {
+        console.warn("Skipping withdrawal created email: user has no email");
+        return;
+      }
+      const clientUrl = process.env.CLIENT_URL || process.env.FRONTEND_URL || "http://localhost:3000";
       const dashboardLink = `${clientUrl}/withdraw`;
-      
       await sendWithdrawalCreatedEmail({
-        to: user.email,
-        name: user.name,
-        amount: parseFloat(withdrawal.amount.toString()),
-        charges: parseFloat(withdrawal.charges.toString()),
-        finalAmount: parseFloat(withdrawal.finalAmount.toString()),
-        walletType: withdrawal.walletType,
-        withdrawalId: withdrawal._id.toString(),
+        to: userEmail,
+        name: userName,
+        amount: amountVal,
+        charges: chargesVal,
+        finalAmount: finalAmountVal,
+        walletType: walletTypeVal,
+        withdrawalId: withdrawalIdStr,
         dashboardLink,
       });
     } catch (emailError: any) {
-      console.error('Failed to send withdrawal created email:', emailError.message);
-      // Don't fail the withdrawal creation if email fails
+      console.error("Failed to send withdrawal created email:", emailError.message);
     }
   });
 
@@ -1210,6 +1210,10 @@ export const createVoucher = asyncHandler(async (req, res) => {
 
   // If fromWalletType is provided, create voucher from wallet
   if (fromWalletType) {
+    // Fixed wallet cannot be used for vouchers (does not count for referral/binary, non-withdrawable)
+    if (fromWalletType === WalletType.FIXED) {
+      throw new AppError("Cannot create voucher from Fixed wallet. Fixed wallet does not count for referral or binary.", 400);
+    }
     const fromWallet = await Wallet.findOne({ user: userId, type: fromWalletType });
     if (!fromWallet) {
       throw new AppError(`Wallet of type ${fromWalletType} not found`, 404);
@@ -1255,6 +1259,22 @@ export const createVoucher = asyncHandler(async (req, res) => {
       meta: { type: "voucher_creation", voucherId },
     });
 
+    const userForEmail = await User.findById(userId).select("email name").lean();
+    if (userForEmail?.email) {
+      const clientUrl = process.env.CLIENT_URL || process.env.FRONTEND_URL || "http://localhost:3000";
+      const expiryStr = voucher.expiry ? new Date(voucher.expiry).toLocaleDateString("en-GB", { year: "numeric", month: "long", day: "numeric", timeZone: "Europe/London" }) : "N/A";
+      sendVoucherCreatedEmail({
+        to: userForEmail.email,
+        name: userForEmail.name || "User",
+        voucherId: voucher.voucherId,
+        amount: parseFloat(voucher.amount.toString()),
+        investmentValue: parseFloat(voucher.investmentValue.toString()),
+        expiryDate: expiryStr,
+        dashboardLink: `${clientUrl}/vouchers`,
+        source: "wallet",
+      }).catch((err: any) => console.error("Failed to send voucher created email:", err.message));
+    }
+
     const response = res as any;
     return response.status(201).json({
       status: "success",
@@ -1294,6 +1314,22 @@ export const createVoucher = asyncHandler(async (req, res) => {
       status: "active",
       expiry: new Date(Date.now() + expiryDays * 24 * 60 * 60 * 1000),
     });
+
+    const userForEmail = await User.findById(userId).select("email name").lean();
+    if (userForEmail?.email) {
+      const clientUrl = process.env.CLIENT_URL || process.env.FRONTEND_URL || "http://localhost:3000";
+      const expiryStr = voucher.expiry ? new Date(voucher.expiry).toLocaleDateString("en-GB", { year: "numeric", month: "long", day: "numeric", timeZone: "Europe/London" }) : "N/A";
+      sendVoucherCreatedEmail({
+        to: userForEmail.email,
+        name: userForEmail.name || "User",
+        voucherId: voucher.voucherId,
+        amount: parseFloat(voucher.amount.toString()),
+        investmentValue: parseFloat(voucher.investmentValue.toString()),
+        expiryDate: expiryStr,
+        dashboardLink: `${clientUrl}/vouchers`,
+        source: "wallet",
+      }).catch((err: any) => console.error("Failed to send voucher created email:", err.message));
+    }
 
     const response = res as any;
     return response.status(201).json({
@@ -1369,6 +1405,22 @@ export const createVoucher = asyncHandler(async (req, res) => {
       paymentId: invoiceResponse.id || invoiceResponse.token || orderId,
       orderId,
     });
+
+    const userForEmail = await User.findById(userId).select("email name").lean();
+    if (userForEmail?.email) {
+      const clientUrl = process.env.CLIENT_URL || process.env.FRONTEND_URL || "http://localhost:3000";
+      const expiryStr = voucher.expiry ? new Date(voucher.expiry).toLocaleDateString("en-GB", { year: "numeric", month: "long", day: "numeric", timeZone: "Europe/London" }) : "N/A";
+      sendVoucherCreatedEmail({
+        to: userForEmail.email,
+        name: userForEmail.name || "User",
+        voucherId: voucher.voucherId,
+        amount: parseFloat(voucher.amount.toString()),
+        investmentValue: parseFloat(voucher.investmentValue.toString()),
+        expiryDate: expiryStr,
+        dashboardLink: `${clientUrl}/vouchers`,
+        source: "payment",
+      }).catch((err: any) => console.error("Failed to send voucher created email:", err.message));
+    }
 
     // Store payment record (using Payment model if it exists, or create a simple record)
     const { Payment } = await import("../models/Payment");
@@ -1807,6 +1859,10 @@ export const exchangeWalletFunds = asyncHandler(async (req, res) => {
   }
 
   // CRITICAL: Enforce wallet exchange restrictions
+  // Fixed wallet cannot be used for exchange (not counted for referral/binary, admin-only, non-withdrawable)
+  if (fromWalletType === WalletType.FIXED || toWalletType === WalletType.FIXED) {
+    throw new AppError("Fixed wallet cannot be used for exchange. It does not count for referral or binary.", 400);
+  }
   // Users can exchange FROM: referral, binary, career_level, roi, or interest wallets
   // Career Level and ROI wallets can only be exchanged once per day
   const allowedFromWallets = [

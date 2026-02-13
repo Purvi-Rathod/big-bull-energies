@@ -340,7 +340,7 @@ export default function FreeAccountPage() {
                         {row.withdrawEnabled ? 'Enabled' : 'Locked'}
                       </span>
                     </td>
-                    <td className="px-4 py-3 text-sm text-black">{row.activationDate ? new Date(row.activationDate).toLocaleString() : '—'}</td>
+                    <td className="px-4 py-3 text-sm text-black">{row.activationDate ? new Date(row.activationDate).toLocaleString('en-GB', { timeZone: 'Europe/London', hour12: false }) : '—'}</td>
                   </tr>
                 ))}
               </tbody>

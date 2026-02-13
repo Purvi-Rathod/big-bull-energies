@@ -236,8 +236,8 @@ export default function AdminPanel() {
 
   const formatDate = (dateString: string) => {
     if (!dateString) return '-';
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', {
+    return new Date(dateString).toLocaleDateString('en-GB', {
+      timeZone: 'Europe/London',
       year: 'numeric',
       month: 'short',
       day: 'numeric',

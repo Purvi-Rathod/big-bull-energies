@@ -1,6 +1,7 @@
 import cron from "node-cron";
 import { calculateDailyROI, deactivateExpiredInvestments, deactivateUsersWithAllExpiredInvestments } from "../services/roi-cron.service";
 import { calculateDailyBinaryBonuses } from "../services/investment.service";
+import { processExpiredVouchers } from "../services/voucher-expiry.service";
 
 /**
  * Setup daily cron jobs
@@ -18,6 +19,11 @@ export function setupROICron() {
   cron.schedule("0 0 * * *", async () => {
     console.log("[Cron] Starting daily calculation job");
     try {
+      // Step 0: Process expired vouchers (mark expired, send emails)
+      const voucherResult = await processExpiredVouchers();
+      if (voucherResult.processed > 0) {
+        console.log(`[Cron] Processed ${voucherResult.processed} expired voucher(s), sent ${voucherResult.emailsSent} email(s)`);
+      }
       // Step 1: Deactivate expired investments
       await deactivateExpiredInvestments();
       

@@ -230,7 +230,7 @@ export default function AdminTicketsPage() {
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-black">
-                      {new Date(ticket.createdAt).toLocaleDateString()}
+                      {new Date(ticket.createdAt).toLocaleDateString('en-GB', { timeZone: 'Europe/London' })}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm">
                       <button

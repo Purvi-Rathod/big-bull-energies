@@ -3344,7 +3344,7 @@ export const addFundsToWallet = asyncHandler(async (req, res) => {
     throw new AppError("User not found", 404);
   }
 
-  // Update wallet balance
+  // Update wallet balance. When walletType is FIXED: no referral, no binary BV, no ROI; admin-only; user cannot withdraw or exchange from it.
   const { updateWallet } = await import("../services/investment.service");
   const wallet = await updateWallet(
     user._id as Types.ObjectId,

@@ -2,213 +2,24 @@ name: Deploy to Production
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   workflow_dispatch:
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
     name: Deploy to Production
-    
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
+    steps:
       - name: Setup SSH
         uses: webfactory/ssh-agent@v0.9.0
         with:
           ssh-private-key: ${{ secrets.PROD_SSH_KEY }}
 
-      - name: Configure SSH
+      - name: Run deploy on server (background)
         run: |
           mkdir -p ~/.ssh
-          chmod 700 ~/.ssh
-          ssh-keyscan -H ${{ secrets.PROD_HOST }} >> ~/.ssh/known_hosts
-          chmod 644 ~/.ssh/known_hosts
-          
-          # Test SSH connection
-          echo "🔍 Testing SSH connection..."
-          ssh -o BatchMode=yes -o ConnectTimeout=5 ${{ secrets.PROD_USER }}@${{ secrets.PROD_HOST }} "echo 'SSH connection successful'" || {
-            echo "⚠️ SSH connection test failed"
-            exit 1
-          }
-
-      - name: Create deployment script
-        run: |
-          cat > /tmp/deploy.sh << 'DEPLOY_SCRIPT'
-          #!/bin/bash
-          set -e
-          
-          DEPLOY_PATH="${DEPLOY_PATH}"
-          
-          echo "🚀 Starting deployment..."
-          echo "📍 Path: ${DEPLOY_PATH}"
-          
-          cd "${DEPLOY_PATH}"
-          
-          # Verify directory
-          if [ ! -f "docker-compose.yml" ]; then
-            echo "❌ Error: docker-compose.yml not found"
-            exit 1
-          fi
-          
-          # Configure GitHub SSH access
-          echo "🔐 Configuring GitHub SSH access..."
-          mkdir -p ~/.ssh
-          chmod 700 ~/.ssh
-          if ! grep -q "github.com" ~/.ssh/known_hosts 2>/dev/null; then
-            ssh-keyscan -H github.com >> ~/.ssh/known_hosts 2>/dev/null || true
-          fi
-          chmod 600 ~/.ssh/known_hosts 2>/dev/null || true
-          
-          # Detect Docker Compose command
-          if command -v docker &> /dev/null && docker compose version &> /dev/null 2>&1; then
-            DOCKER_COMPOSE="docker compose"
-          elif command -v docker-compose &> /dev/null; then
-            DOCKER_COMPOSE="docker-compose"
-          else
-            echo "❌ Docker Compose not found!"
-            exit 1
-          fi
-          
-          # Pull latest changes
-          echo "📥 Pulling latest changes from repository..."
-          git fetch origin
-          git reset --hard origin/main
-          
-          CURRENT_COMMIT=$(git rev-parse --short HEAD)
-          echo "📌 Deploying commit: ${CURRENT_COMMIT}"
-          
-          # Stop and clean up existing containers
-          echo "🛑 Stopping existing containers..."
-          $DOCKER_COMPOSE down --remove-orphans 2>/dev/null || true
-          
-          # Remove ALL containers (running or stopped) with binary-system in name
-          echo "🧹 Cleaning up containers with conflicting names..."
-          docker ps -a --filter "name=binary-system-backend" -q | while read -r cid; do
-            [ -n "$cid" ] && docker stop "$cid" 2>/dev/null || true
-            [ -n "$cid" ] && docker rm -f "$cid" 2>/dev/null || true
-          done || true
-          
-          docker ps -a --filter "name=binary-system-frontend" -q | while read -r cid; do
-            [ -n "$cid" ] && docker stop "$cid" 2>/dev/null || true
-            [ -n "$cid" ] && docker rm -f "$cid" 2>/dev/null || true
-          done || true
-          
-          # Remove containers with ID prefixes in names
-          docker ps -a --format "{{.Names}} {{.ID}}" 2>/dev/null | grep -E "[0-9a-f]{12}_binary-system" | awk '{print $2}' | while read -r cid; do
-            [ -n "$cid" ] && docker stop "$cid" 2>/dev/null || true
-            [ -n "$cid" ] && docker rm -f "$cid" 2>/dev/null || true
-          done || true
-          
-          # Also check for containers with underscore prefixes
-          docker ps -a --format "{{.Names}} {{.ID}}" 2>/dev/null | grep -E ".*_binary-system-(backend|frontend)" | awk '{print $2}' | while read -r cid; do
-            [ -n "$cid" ] && docker stop "$cid" 2>/dev/null || true
-            [ -n "$cid" ] && docker rm -f "$cid" 2>/dev/null || true
-          done || true
-          
-          # Clean up orphaned containers
-          docker container prune -f 2>/dev/null || true
-          
-          # Build new images
-          echo "🔨 Building new Docker images..."
-          $DOCKER_COMPOSE build --no-cache
-          
-          # Start containers
-          echo "🚀 Starting containers..."
-          $DOCKER_COMPOSE up -d --remove-orphans
-          
-          # Wait for services to start
-          echo "⏳ Waiting for services to start..."
-          sleep 15
-          
-          # Check if containers are running
-          echo "📊 Checking container status..."
-          if ! docker ps | grep -q "binary-system-backend"; then
-            echo "❌ Error: Backend container is not running!"
-            echo "=== Backend Logs ==="
-            $DOCKER_COMPOSE logs --tail=50 backend
-            exit 1
-          fi
-          
-          if ! docker ps | grep -q "binary-system-frontend"; then
-            echo "❌ Error: Frontend container is not running!"
-            echo "=== Frontend Logs ==="
-            $DOCKER_COMPOSE logs --tail=50 frontend
-            exit 1
-          fi
-          
-          echo "✅ Containers are running"
-          
-          # Simple health check - just verify containers are up and ports are accessible
-          echo "🏥 Verifying services..."
-          
-          # Check backend (try multiple endpoints)
-          BACKEND_HEALTH=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8000/api/v1/health 2>/dev/null || \
-                          curl -s -o /dev/null -w "%{http_code}" http://localhost:8000/api/health 2>/dev/null || \
-                          curl -s -o /dev/null -w "%{http_code}" http://localhost:8000 2>/dev/null || echo "000")
-          
-          if [ "$BACKEND_HEALTH" = "200" ] || [ "$BACKEND_HEALTH" = "404" ] || [ "$BACKEND_HEALTH" = "000" ]; then
-            echo "✅ Backend is responding (HTTP ${BACKEND_HEALTH})"
-          else
-            echo "⚠️  Backend health check returned: ${BACKEND_HEALTH}"
-            echo "=== Backend Logs ==="
-            $DOCKER_COMPOSE logs --tail=30 backend
-          fi
-          
-          # Check frontend
-          FRONTEND_HEALTH=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:3000 2>/dev/null || echo "000")
-          if [ "$FRONTEND_HEALTH" = "200" ] || [ "$FRONTEND_HEALTH" = "000" ]; then
-            echo "✅ Frontend is responding (HTTP ${FRONTEND_HEALTH})"
-          else
-            echo "⚠️  Frontend health check returned: ${FRONTEND_HEALTH}"
-            echo "=== Frontend Logs ==="
-            $DOCKER_COMPOSE logs --tail=30 frontend
-          fi
-          
-          # Show container status
-          echo ""
-          echo "📊 Final container status:"
-          $DOCKER_COMPOSE ps
-          
-          # Show recent logs
-          echo ""
-          echo "📋 Recent logs:"
-          echo "=== Backend Logs (last 20 lines) ==="
-          $DOCKER_COMPOSE logs --tail=20 backend
-          echo ""
-          echo "=== Frontend Logs (last 20 lines) ==="
-          $DOCKER_COMPOSE logs --tail=20 frontend
-          
-          # Clean up old images
-          echo ""
-          echo "🧹 Cleaning up unused Docker images..."
-          docker image prune -f 2>/dev/null || true
-          
-          echo ""
-          echo "✅ Deployment complete!"
-          echo "📌 Deployed commit: ${CURRENT_COMMIT}"
-          DEPLOY_SCRIPT
-          chmod +x /tmp/deploy.sh
-
-      - name: Deploy to server
-        env:
-          DEPLOY_PATH: ${{ secrets.PROD_PATH }}
-        run: |
-          echo "📤 Copying deployment script to server..."
-          scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=~/.ssh/known_hosts \
-            /tmp/deploy.sh ${{ secrets.PROD_USER }}@${{ secrets.PROD_HOST }}:~/deploy.sh
-          
-          echo "🚀 Executing deployment on server..."
-          ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=~/.ssh/known_hosts \
-            ${{ secrets.PROD_USER }}@${{ secrets.PROD_HOST }} \
-            "chmod +x ~/deploy.sh && DEPLOY_PATH='${{ secrets.PROD_PATH }}' bash ~/deploy.sh"
-
-      - name: Verify deployment
-        run: |
-          echo "✅ Deployment workflow completed successfully"
-          echo "🌐 Application should be accessible at:"
-          echo "   Frontend: http://${{ secrets.PROD_HOST }}:3000"
-          echo "   Backend:  http://${{ secrets.PROD_HOST }}:8000"
+          ssh-keyscan -H ${{ secrets.PROD_HOST }} >> ~/.ssh/known_hosts 2>/dev/null || true
+          ssh ${{ secrets.PROD_USER }}@${{ secrets.PROD_HOST }} \
+            "cd ${{ secrets.PROD_PATH }} && nohup bash scripts/deploy-master.sh >> /tmp/deploy-master.log 2>&1 &"
+          echo "Deploy started in background on server. Check /tmp/deploy-master.log on server for output."

@@ -161,6 +161,7 @@ export default function UserBioPage() {
       token: 'Token',
       investment: 'Investment',
       career_level: 'Career Level',
+      fixed: 'Fixed (non-withdrawable)',
     };
     return names[type] || type;
   };

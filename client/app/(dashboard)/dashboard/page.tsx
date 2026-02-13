@@ -175,6 +175,7 @@ export default function DashboardPage() {
       investment: 'Investment',
       career_level: 'Career Level',
       main: 'Main Wallet',
+      fixed: 'Fixed Wallet',
     };
     return names[type] || type;
   };
@@ -202,7 +203,7 @@ export default function DashboardPage() {
   };
 
   // Wallet order: ROI, Referral, Binary Bonus, Career Level, Interest, Token, Investment, Withdrawal
-  const walletOrder = ['roi', 'referral', 'binary', 'career_level', 'interest', 'token', 'investment', 'withdrawal'];
+  const walletOrder = ['roi', 'referral', 'binary', 'career_level', 'interest', 'token', 'investment', 'withdrawal', 'fixed'];
   
   const sortWallets = (wallets: Wallet[]): Wallet[] => {
     return [...wallets].sort((a, b) => {

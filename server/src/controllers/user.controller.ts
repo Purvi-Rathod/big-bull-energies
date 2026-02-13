@@ -1219,6 +1219,10 @@ export const createVoucher = asyncHandler(async (req, res) => {
 
   // If fromWalletType is provided, create voucher from wallet
   if (fromWalletType) {
+    // Fixed wallet cannot be used for vouchers (does not count for referral/binary, non-withdrawable)
+    if (fromWalletType === WalletType.FIXED) {
+      throw new AppError("Cannot create voucher from Fixed wallet. Fixed wallet does not count for referral or binary.", 400);
+    }
     const fromWallet = await Wallet.findOne({ user: userId, type: fromWalletType });
     if (!fromWallet) {
       throw new AppError(`Wallet of type ${fromWalletType} not found`, 404);
@@ -1816,6 +1820,10 @@ export const exchangeWalletFunds = asyncHandler(async (req, res) => {
   }
 
   // CRITICAL: Enforce wallet exchange restrictions
+  // Fixed wallet cannot be used for exchange (not counted for referral/binary, admin-only, non-withdrawable)
+  if (fromWalletType === WalletType.FIXED || toWalletType === WalletType.FIXED) {
+    throw new AppError("Fixed wallet cannot be used for exchange. It does not count for referral or binary.", 400);
+  }
   // Users can exchange FROM: referral, binary, career_level, roi, or interest wallets
   // Career Level and ROI wallets can only be exchanged once per day
   const allowedFromWallets = [

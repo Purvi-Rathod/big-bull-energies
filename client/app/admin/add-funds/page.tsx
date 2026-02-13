@@ -19,6 +19,7 @@ const WALLET_TYPES = [
   { value: 'binary', label: 'Binary' },
   { value: 'career_level', label: 'Career Level' },
   { value: 'interest', label: 'Interest' },
+  { value: 'fixed', label: 'Fixed (admin-only, no withdraw, no ROI)' },
 ];
 
 export default function AddFundsPage() {

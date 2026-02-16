@@ -27,6 +27,8 @@ interface Withdrawal {
   createdAt: string;
 }
 
+
+
 type WalletTypeTab = 'all' | 'roi' | 'referral' | 'career_level' | 'binary' | 'interest';
 
 function AdminWithdrawalsContent() {

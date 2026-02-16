@@ -278,8 +278,15 @@ export const userLogin = asyncHandler(async (req, res) => {
     throw new AppError("User ID is required", 400);
   }
 
-  // Find user by userId only
-  const user = await findUserByUserId(userId);
+  // Find user by userId (exact match, or CROWN-/CNEOX- prefix for numeric/short ids)
+  const trimmedUserId = String(userId).trim();
+  let user = await findUserByUserId(trimmedUserId);
+  if (!user && /^\d+$/.test(trimmedUserId)) {
+    user = await findUserByUserId(`CROWN-${trimmedUserId}`);
+  }
+  if (!user && /^\d+$/.test(trimmedUserId)) {
+    user = await findUserByUserId(`CNEOX-${trimmedUserId}`);
+  }
 
   if (!user) {
     throw new AppError("Invalid credentials", 401);
@@ -291,13 +298,17 @@ export const userLogin = asyncHandler(async (req, res) => {
     throw new AppError(`Account is ${user.status}. Please contact support.`, 403);
   }
 
-  // Verify password
-  if (!user.password) {
+  // Verify password: try main password first, then temporary password (48h) if set
+  if (!user.password && !user.temporaryPasswordHash) {
     throw new AppError("Invalid credentials", 401);
   }
 
   const isPasswordValid = await user.comparePassword(password);
-  if (!isPasswordValid) {
+  let isTemporaryValid = false;
+  if (typeof user.compareTemporaryPassword === "function") {
+    isTemporaryValid = await user.compareTemporaryPassword(password);
+  }
+  if (!isPasswordValid && !isTemporaryValid) {
     throw new AppError("Invalid credentials", 401);
   }
 

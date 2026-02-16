@@ -13,6 +13,7 @@ interface User {
 }
 
 const WALLET_TYPES = [
+  { value: 'main', label: 'Main (signup bonus / package payment)' },
   { value: 'investment', label: 'Investment' },
   { value: 'roi', label: 'ROI' },
   { value: 'referral', label: 'Referral' },
@@ -36,6 +37,8 @@ export default function AddFundsPage() {
   const [userSearch, setUserSearch] = useState('');
   const [searching, setSearching] = useState(false);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [signupBonusId, setSignupBonusId] = useState('');
+  const [restoringBonus, setRestoringBonus] = useState(false);
   const hasFetchedRef = useRef(false);
 
   useEffect(() => {
@@ -57,6 +60,25 @@ export default function AddFundsPage() {
       toast.error(err.message || 'Failed to fetch users');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleRestoreSignupBonus = async () => {
+    if (!signupBonusId.trim()) {
+      toast.error('Enter user ID (e.g. 000670 or CROWN-000670)');
+      return;
+    }
+    setRestoringBonus(true);
+    try {
+      const response = await api.restoreSignupBonus(signupBonusId.trim());
+      if (response.data) {
+        toast.success(`Restored $5 signup bonus to ${response.data.userId}. Main balance: $${response.data.newMainBalance.toFixed(2)}`);
+        setSignupBonusId('');
+      }
+    } catch (err: any) {
+      toast.error(err.message || 'Failed to restore signup bonus');
+    } finally {
+      setRestoringBonus(false);
     }
   };
 
@@ -148,6 +170,29 @@ export default function AddFundsPage() {
       <div className="mb-6">
         <h1 className="text-3xl font-bold text-black">Add Funds to Wallet</h1>
         <p className="mt-1 text-sm text-black">Add funds to any user's wallet</p>
+      </div>
+
+      {/* Restore signup bonus (e.g. user 000670) */}
+      <div className="bg-amber-50 border border-amber-200 rounded-lg p-6 mb-6">
+        <h2 className="text-lg font-semibold text-black mb-2">Restore $5 signup bonus</h2>
+        <p className="text-sm text-gray-700 mb-3">Use when a user lost their main-wallet signup bonus (e.g. user 000670). Credits $5 to their Main wallet.</p>
+        <div className="flex gap-2 flex-wrap items-center">
+          <input
+            type="text"
+            value={signupBonusId}
+            onChange={(e) => setSignupBonusId(e.target.value)}
+            placeholder="User ID (e.g. 000670 or CROWN-000670)"
+            className="flex-1 min-w-[200px] px-4 py-2 border border-amber-300 rounded-md focus:outline-none focus:ring-2 focus:ring-amber-500"
+          />
+          <button
+            type="button"
+            onClick={handleRestoreSignupBonus}
+            disabled={restoringBonus || !signupBonusId.trim()}
+            className="px-4 py-2 bg-amber-600 text-white rounded-md hover:bg-amber-700 disabled:opacity-50"
+          >
+            {restoringBonus ? 'Restoring...' : 'Restore $5 bonus'}
+          </button>
+        </div>
       </div>
 
       <div className="bg-white shadow rounded-lg p-6">

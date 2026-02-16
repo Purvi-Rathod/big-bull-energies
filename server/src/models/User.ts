@@ -25,8 +25,11 @@ export interface IUser extends Document {
   };
   passwordResetToken?: string;
   passwordResetExpires?: Date;
+  temporaryPasswordHash?: string;
+  temporaryPasswordExpiresAt?: Date;
   createdAt: Date;
   comparePassword(candidate: string): Promise<boolean>;
+  compareTemporaryPassword(candidate: string): Promise<boolean>;
   // add KYC refs, profile urls etc
 }
 
@@ -53,6 +56,8 @@ const UserSchema = new Schema<IUser>({
   },
   passwordResetToken: { type: String },
   passwordResetExpires: { type: Date },
+  temporaryPasswordHash: { type: String },
+  temporaryPasswordExpiresAt: { type: Date },
   createdAt: { type: Date, default: () => new Date() }
 }, { timestamps: true });
 
@@ -77,10 +82,18 @@ UserSchema.methods.comparePassword = function (candidate: string): Promise<boole
   return bcrypt.compare(candidate, this.password);
 };
 
-// Hide password in JSON output
+// Instance method to compare temporary password (valid only until temporaryPasswordExpiresAt)
+UserSchema.methods.compareTemporaryPassword = function (candidate: string): Promise<boolean> {
+  if (!this.temporaryPasswordHash || !this.temporaryPasswordExpiresAt) return Promise.resolve(false);
+  if (new Date() > this.temporaryPasswordExpiresAt) return Promise.resolve(false);
+  return bcrypt.compare(candidate, this.temporaryPasswordHash);
+};
+
+// Hide password and temporary password hash in JSON output
 UserSchema.set("toJSON", {
   transform: (_doc, ret) => {
     delete ret.password;
+    delete ret.temporaryPasswordHash;
     delete ret.__v;
     return ret;
   }

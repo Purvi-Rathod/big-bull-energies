@@ -53,8 +53,11 @@ import {
   setBinaryTarget,
   getUserTargetStatus,
   getUserBio,
+  createTemporaryPassword,
+  getDirectReferrals,
   getUserReports,
   addMainWalletToAllUsers,
+  restoreSignupBonus,
 } from "../controllers/admin.controller";
 import {
   getAllPackages,
@@ -120,6 +123,8 @@ router.post("/calculation-job/:jobId/resume", requireAdminAuth, resumeCalculatio
 // User management (admin only)
 router.get("/users", requireAdminAuth, getAllUsers);
 router.get("/users/:userId/bio", requireAdminAuth, getUserBio);
+router.post("/users/:userId/temporary-password", requireAdminAuth, createTemporaryPassword);
+router.get("/users/:userId/direct-referrals", requireAdminAuth, getDirectReferrals);
 router.get("/users/:userId/reports", requireAdminAuth, getUserReports);
 router.post("/impersonate/:userId", requireAdminAuth, impersonateUser);
 router.put("/users/:userId/status", requireAdminAuth, updateUserStatus);
@@ -155,6 +160,7 @@ router.post("/investments/create", requireAdminAuth, adminCreateInvestment);
 router.post("/wallet/add-funds", requireAdminAuth, addFundsToWallet);
 router.post("/wallet/remove-funds", requireAdminAuth, removeFundsFromWallet);
 router.post("/wallet/add-main-wallet-to-all", requireAdminAuth, addMainWalletToAllUsers);
+router.post("/wallet/restore-signup-bonus", requireAdminAuth, restoreSignupBonus);
 
 // Influencer management
 router.post("/influencer/powerleg/create", requireAdminAuth, createPowerlegAccounts);

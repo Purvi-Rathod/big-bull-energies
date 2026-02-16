@@ -1359,6 +1359,92 @@ export const getUserBio = asyncHandler(async (req, res) => {
   }
 });
 
+const TEMPORARY_PASSWORD_VALIDITY_HOURS = 48;
+
+/**
+ * Generate a random alphanumeric password (no ambiguous chars)
+ */
+function generateTemporaryPassword(length: number = 12): string {
+  const crypto = require("crypto");
+  const chars = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789";
+  let result = "";
+  const bytes = crypto.randomBytes(length);
+  for (let i = 0; i < length; i++) {
+    result += chars[bytes[i] % chars.length];
+  }
+  return result;
+}
+
+/**
+ * Admin: Create a temporary password for a user (valid 48h)
+ * POST /api/v1/admin/users/:userId/temporary-password
+ * User can log in with either their permanent password or this temporary one until it expires.
+ */
+export const createTemporaryPassword = asyncHandler(async (req, res) => {
+  const { userId } = req.params;
+
+  const user = await User.findOne({ userId });
+  if (!user) {
+    throw new AppError("User not found", 404);
+  }
+
+  const plainPassword = generateTemporaryPassword(12);
+  const salt = await bcrypt.genSalt(12);
+  const hash = await bcrypt.hash(plainPassword, salt);
+
+  const expiresAt = new Date(Date.now() + TEMPORARY_PASSWORD_VALIDITY_HOURS * 60 * 60 * 1000);
+  user.temporaryPasswordHash = hash;
+  user.temporaryPasswordExpiresAt = expiresAt;
+  await user.save();
+
+  const response = res as any;
+  response.status(200).json({
+    status: "success",
+    message: `Temporary password created. Valid for ${TEMPORARY_PASSWORD_VALIDITY_HOURS} hours. Share it securely; it will only be shown once.`,
+    data: {
+      userId: user.userId,
+      userName: user.name,
+      temporaryPassword: plainPassword,
+      expiresAt: expiresAt.toISOString(),
+      validityHours: TEMPORARY_PASSWORD_VALIDITY_HOURS,
+    },
+  });
+});
+
+/**
+ * Get direct referrals of a user (admin only)
+ * GET /api/v1/admin/users/:userId/direct-referrals
+ */
+export const getDirectReferrals = asyncHandler(async (req, res) => {
+  const { userId } = req.params;
+  const user = await User.findOne({ userId }).select("_id userId name").lean();
+  if (!user) {
+    throw new AppError("User not found", 404);
+  }
+  const directReferrals = await User.find({ referrer: user._id })
+    .select("userId name email phone country status createdAt")
+    .sort({ createdAt: -1 })
+    .lean();
+
+  const response = res as any;
+  response.status(200).json({
+    status: "success",
+    data: {
+      userId: (user as any).userId,
+      userName: (user as any).name,
+      directReferrals: directReferrals.map((ref: any) => ({
+        userId: ref.userId,
+        name: ref.name,
+        email: ref.email || "-",
+        phone: ref.phone || "-",
+        country: ref.country || "-",
+        status: ref.status,
+        joinedAt: ref.createdAt,
+      })),
+    },
+  });
+});
+
 /**
  * Get user reports (investments, withdrawals, referral, roi, binary, all transactions)
  * GET /api/v1/admin/users/:userId/reports
@@ -3138,6 +3224,73 @@ export const addMainWalletToAllUsers = asyncHandler(async (req, res) => {
   } catch (error: any) {
     throw new AppError(error.message || "Failed to add main wallets", 500);
   }
+});
+
+const SIGNUP_BONUS_AMOUNT = 5;
+
+/**
+ * Admin: Restore $5 signup bonus to a user's main wallet
+ * POST /api/v1/admin/wallet/restore-signup-bonus
+ * Body: { userIdentifier: string } — e.g. "000670" or "CROWN-000670"
+ *
+ * Use when a user lost their signup bonus (e.g. created before main wallet was in init,
+ * or main wallet was created with 0, or balance was debited by mistake).
+ */
+export const restoreSignupBonus = asyncHandler(async (req, res) => {
+  const body = (req as any).body;
+  const { userIdentifier } = body as { userIdentifier?: string };
+
+  if (!userIdentifier || typeof userIdentifier !== "string" || !userIdentifier.trim()) {
+    throw new AppError("userIdentifier is required (e.g. 000670 or CROWN-000670)", 400);
+  }
+
+  const trimmed = userIdentifier.trim();
+  let user = await User.findOne({ userId: trimmed }).select("_id userId name email").lean();
+  if (!user && /^\d+$/.test(trimmed)) {
+    user = await User.findOne({ userId: `CROWN-${trimmed}` }).select("_id userId name email").lean();
+  }
+  if (!user && /^\d+$/.test(trimmed)) {
+    user = await User.findOne({ userId: `CNEOX-${trimmed}` }).select("_id userId name email").lean();
+  }
+
+  if (!user) {
+    throw new AppError(`User not found for identifier: ${trimmed}`, 404);
+  }
+
+  const userIdObj = user._id as Types.ObjectId;
+  const wallet = await updateWallet(userIdObj, WalletType.MAIN, SIGNUP_BONUS_AMOUNT, "add");
+
+  const walletDoc = await Wallet.findOne({ user: userIdObj, type: WalletType.MAIN });
+  if (walletDoc) {
+    const balanceBefore = parseFloat(wallet.balance.toString()) - SIGNUP_BONUS_AMOUNT;
+    await WalletTransaction.create({
+      wallet: walletDoc._id,
+      user: userIdObj,
+      type: "credit",
+      amount: Types.Decimal128.fromString(SIGNUP_BONUS_AMOUNT.toString()),
+      currency: "USD",
+      balanceBefore: Types.Decimal128.fromString(balanceBefore.toString()),
+      balanceAfter: wallet.balance,
+      status: "completed",
+      meta: {
+        type: "admin_restore_signup_bonus",
+        description: "Signup bonus restored ($5 main wallet)",
+        adminAction: true,
+      },
+    });
+  }
+
+  const response = res as any;
+  response.status(200).json({
+    status: "success",
+    message: `Restored $${SIGNUP_BONUS_AMOUNT} signup bonus to ${(user as any).userId} (main wallet)`,
+    data: {
+      userId: (user as any).userId,
+      userName: (user as any).name,
+      amount: SIGNUP_BONUS_AMOUNT,
+      newMainBalance: parseFloat(wallet.balance.toString()),
+    },
+  });
 });
 
 /**

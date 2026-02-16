@@ -600,6 +600,36 @@ class ApiClient {
     });
   }
 
+  async createTemporaryPassword(userId: string) {
+    return this.request<{
+      userId: string;
+      userName: string;
+      temporaryPassword: string;
+      expiresAt: string;
+      validityHours: number;
+    }>(`/admin/users/${userId}/temporary-password`, {
+      method: 'POST',
+    });
+  }
+
+  async getDirectReferrals(userId: string) {
+    return this.request<{
+      userId: string;
+      userName: string;
+      directReferrals: Array<{
+        userId: string;
+        name: string;
+        email: string;
+        phone: string;
+        country: string;
+        status: string;
+        joinedAt: string;
+      }>;
+    }>(`/admin/users/${userId}/direct-referrals`, {
+      method: 'GET',
+    });
+  }
+
   async impersonateUser(userId: string) {
     const response = await this.request<{ user: any; token: string }>(`/admin/impersonate/${userId}`, {
       method: 'POST',
@@ -899,6 +929,13 @@ class ApiClient {
     return this.request<{ userId: string; userName: string; walletType: string; amount: number; newBalance: number }>('/admin/wallet/remove-funds', {
       method: 'POST',
       body: JSON.stringify(data),
+    });
+  }
+
+  async restoreSignupBonus(userIdentifier: string) {
+    return this.request<{ userId: string; userName: string; amount: number; newMainBalance: number }>('/admin/wallet/restore-signup-bonus', {
+      method: 'POST',
+      body: JSON.stringify({ userIdentifier }),
     });
   }
 

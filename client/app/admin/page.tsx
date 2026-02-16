@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, Fragment } from 'react';
+import { createPortal } from 'react-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { api } from '@/lib/api';
 import { countries } from '@/lib/countries';
@@ -26,6 +27,16 @@ interface User {
   } | null;
 }
 
+interface DirectReferral {
+  userId: string;
+  name: string;
+  email: string;
+  phone: string;
+  country: string;
+  status: string;
+  joinedAt: string;
+}
+
 export default function AdminPanel() {
   const { user, admin, loading: authLoading } = useAuth();
   const [users, setUsers] = useState<User[]>([]);
@@ -40,6 +51,10 @@ export default function AdminPanel() {
   const [deletingUserId, setDeletingUserId] = useState<string | null>(null);
   const [deleteConfirm, setDeleteConfirm] = useState<{ userId: string; userName: string } | null>(null);
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
+  const [dropdownPosition, setDropdownPosition] = useState<{ top: number; left: number } | null>(null);
+  const [expandedReferralsUserId, setExpandedReferralsUserId] = useState<string | null>(null);
+  const [directReferralsCache, setDirectReferralsCache] = useState<Record<string, { list: DirectReferral[]; loading?: boolean }>>({});
+  const tableWrapperRef = useRef<HTMLDivElement>(null);
   const [updatingStatus, setUpdatingStatus] = useState<string | null>(null);
   const [editingUser, setEditingUser] = useState<User | null>(null);
   const [updatingProfile, setUpdatingProfile] = useState(false);
@@ -217,16 +232,51 @@ export default function AdminPanel() {
     }
   };
 
-  // Close dropdown when clicking outside
+  // Close dropdown when clicking outside (including portal menu has class so clicking menu doesn't close)
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (openDropdown && !(event.target as Element).closest('.dropdown-container')) {
         setOpenDropdown(null);
+        setDropdownPosition(null);
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [openDropdown]);
+
+  // Close dropdown when table container or window scrolls (dropdown is fixed, would appear in wrong place)
+  useEffect(() => {
+    if (!openDropdown) return;
+    const el = tableWrapperRef.current;
+    const handleScroll = () => {
+      setOpenDropdown(null);
+      setDropdownPosition(null);
+    };
+    window.addEventListener('scroll', handleScroll, true);
+    el?.addEventListener('scroll', handleScroll);
+    return () => {
+      window.removeEventListener('scroll', handleScroll, true);
+      el?.removeEventListener('scroll', handleScroll);
+    };
+  }, [openDropdown]);
+
+  const toggleReferrals = async (userId: string) => {
+    if (expandedReferralsUserId === userId) {
+      setExpandedReferralsUserId(null);
+      return;
+    }
+    setExpandedReferralsUserId(userId);
+    if (directReferralsCache[userId]) return;
+    setDirectReferralsCache((prev) => ({ ...prev, [userId]: { list: [], loading: true } }));
+    try {
+      const response = await api.getDirectReferrals(userId);
+      const list = response.data?.directReferrals || [];
+      setDirectReferralsCache((prev) => ({ ...prev, [userId]: { list, loading: false } }));
+    } catch (err: any) {
+      toast.error(err.message || 'Failed to load referrals');
+      setDirectReferralsCache((prev) => ({ ...prev, [userId]: { list: [], loading: false } }));
+    }
+  };
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -379,7 +429,7 @@ export default function AdminPanel() {
 
           {/* Users Table */}
           {!loading && (
-            <div className="max-w-full overflow-x-auto">
+            <div ref={tableWrapperRef} className="max-w-full overflow-x-auto">
               <table className="w-full divide-y divide-gray-200 admin-compact-table">
                 <thead className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white">
                   <tr>
@@ -403,7 +453,8 @@ export default function AdminPanel() {
                     </tr>
                   ) : (
                     users.map((user) => (
-                      <tr key={user.id} className="hover:bg-gray-50">
+                      <Fragment key={user.id}>
+                      <tr className="hover:bg-gray-50">
                         {/* User Column */}
                         <td>
                           <div className="flex flex-col gap-0.5 min-w-0">
@@ -430,6 +481,13 @@ export default function AdminPanel() {
                                 title="Login as user"
                               >
                                 Login
+                              </button>
+                              <button
+                                onClick={() => toggleReferrals(user.userId)}
+                                className={`px-1.5 py-0.5 text-[10px] rounded transition-colors ${expandedReferralsUserId === user.userId ? 'bg-indigo-700 text-white ring-1 ring-indigo-400' : 'bg-violet-500 text-white hover:bg-violet-600'}`}
+                                title="Direct referrals"
+                              >
+                                Referrals
                               </button>
                             </div>
                           </div>
@@ -535,7 +593,14 @@ export default function AdminPanel() {
                             <button
                               onClick={(e) => {
                                 e.stopPropagation();
-                                setOpenDropdown(openDropdown === user.userId ? null : user.userId);
+                                if (openDropdown === user.userId) {
+                                  setOpenDropdown(null);
+                                  setDropdownPosition(null);
+                                } else {
+                                  const rect = e.currentTarget.getBoundingClientRect();
+                                  setDropdownPosition({ top: rect.bottom + 4, left: rect.right - 160 });
+                                  setOpenDropdown(user.userId);
+                                }
                               }}
                               disabled={deletingUserId === user.userId || updatingStatus === user.userId || user.userId === 'CROWN-000000' || user.userId === 'CROWN-000000'}
                               className="p-1.5 text-black hover:text-black hover:bg-gray-100 rounded-md disabled:opacity-50 disabled:cursor-not-allowed"
@@ -545,71 +610,133 @@ export default function AdminPanel() {
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
                               </svg>
                             </button>
-                            
-                            {openDropdown === user.userId && (
-                              <div className="absolute right-0 mt-1 w-40 bg-white rounded-md shadow-lg border border-gray-200 z-50">
-                                <div className="py-1">
-                                  <button
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      handleEditProfile(user);
-                                    }}
-                                    disabled={user.userId === 'CROWN-000000' || user.userId === 'CROWN-000000'}
-                                    className="w-full text-left px-4 py-2 text-sm text-blue-600 hover:bg-blue-50 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-                                  >
-                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                                    </svg>
-                                    Update Profile
-                                  </button>
-                                  <button
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      handleDeactivate(user.userId, user.status);
-                                    }}
-                                    disabled={updatingStatus === user.userId || user.userId === 'CROWN-000000' || user.userId === 'CROWN-000000'}
-                                    className="w-full text-left px-4 py-2 text-sm text-yellow-600 hover:bg-yellow-50 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-                                  >
-                                    {user.status === 'active' ? (
-                                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
-                                      </svg>
-                                    ) : (
-                                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                      </svg>
-                                    )}
-                                    {user.status === 'active' ? 'Deactivate' : 'Activate'}
-                                    {updatingStatus === user.userId && '...'}
-                                  </button>
-                                  <hr className="my-1 border-gray-200" />
-                                  <button
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      setOpenDropdown(null);
-                                      handleDeleteClick(user.userId, user.name);
-                                    }}
-                                    disabled={deletingUserId === user.userId || user.userId === 'CROWN-000000' || user.userId === 'CROWN-000000'}
-                                    className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-                                  >
-                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                    </svg>
-                                    Delete
-                                    {deletingUserId === user.userId && '...'}
-                                  </button>
-                                </div>
-                              </div>
-                            )}
                           </div>
                         </td>
                       </tr>
+                      {expandedReferralsUserId === user.userId && (
+                        <tr className="bg-violet-50/80">
+                          <td colSpan={9} className="p-0 align-top">
+                            <div className="px-4 py-3 border-t border-violet-200">
+                              <div className="text-xs font-semibold text-violet-800 mb-2">Direct referrals by {user.name} ({user.userId})</div>
+                              {directReferralsCache[user.userId]?.loading ? (
+                                <div className="text-sm text-gray-500 py-2">Loading...</div>
+                              ) : (
+                                <div className="overflow-x-auto rounded-lg border border-violet-200 bg-white">
+                                  <table className="w-full text-sm">
+                                    <thead className="bg-violet-100">
+                                      <tr>
+                                        <th className="text-left px-3 py-2 text-violet-800">User ID</th>
+                                        <th className="text-left px-3 py-2 text-violet-800">Name</th>
+                                        <th className="text-left px-3 py-2 text-violet-800">Email</th>
+                                        <th className="text-left px-3 py-2 text-violet-800">Country</th>
+                                        <th className="text-left px-3 py-2 text-violet-800">Status</th>
+                                        <th className="text-left px-3 py-2 text-violet-800">Joined</th>
+                                        <th className="text-left px-3 py-2 text-violet-800">Actions</th>
+                                      </tr>
+                                    </thead>
+                                    <tbody className="divide-y divide-violet-100">
+                                      {(!directReferralsCache[user.userId]?.list || directReferralsCache[user.userId].list.length === 0) ? (
+                                        <tr><td colSpan={7} className="px-3 py-4 text-center text-gray-500">No direct referrals</td></tr>
+                                      ) : (
+                                        directReferralsCache[user.userId].list.map((ref) => (
+                                          <tr key={ref.userId} className="hover:bg-violet-50/50">
+                                            <td className="px-3 py-2 font-mono text-black">{ref.userId}</td>
+                                            <td className="px-3 py-2 text-black">{ref.name}</td>
+                                            <td className="px-3 py-2 text-gray-600 truncate max-w-[180px]" title={ref.email}>{ref.email}</td>
+                                            <td className="px-3 py-2 text-black">{ref.country}</td>
+                                            <td className="px-3 py-2">
+                                              <span className={`px-1.5 py-0.5 text-xs font-bold rounded ${getStatusColor(ref.status)}`}>{ref.status}</span>
+                                            </td>
+                                            <td className="px-3 py-2 text-black whitespace-nowrap">{formatDate(ref.joinedAt)}</td>
+                                            <td className="px-3 py-2">
+                                              <button onClick={() => handleViewBio(ref.userId)} className="px-1.5 py-0.5 text-xs bg-blue-500 text-white rounded hover:bg-blue-600">Bio</button>
+                                            </td>
+                                          </tr>
+                                        ))
+                                      )}
+                                    </tbody>
+                                  </table>
+                                </div>
+                              )}
+                            </div>
+                          </td>
+                        </tr>
+                      )}
+                      </Fragment>
                     ))
                   )}
                 </tbody>
               </table>
             </div>
           )}
+
+          {/* Actions dropdown portal (avoids overflow clipping) */}
+          {openDropdown && dropdownPosition && typeof document !== 'undefined' && (() => {
+            const userForMenu = users.find((u) => u.userId === openDropdown);
+            if (!userForMenu) return null;
+            const menu = (
+              <div
+                className="dropdown-container fixed w-40 bg-white rounded-md shadow-lg border border-gray-200 z-[9999] py-1"
+                style={{ top: dropdownPosition.top, left: dropdownPosition.left }}
+              >
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setOpenDropdown(null);
+                    setDropdownPosition(null);
+                    handleEditProfile(userForMenu);
+                  }}
+                  disabled={userForMenu.userId === 'CROWN-000000'}
+                  className="w-full text-left px-4 py-2 text-sm text-blue-600 hover:bg-blue-50 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                  </svg>
+                  Update Profile
+                </button>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setOpenDropdown(null);
+                    setDropdownPosition(null);
+                    handleDeactivate(userForMenu.userId, userForMenu.status);
+                  }}
+                  disabled={updatingStatus === userForMenu.userId || userForMenu.userId === 'CROWN-000000'}
+                  className="w-full text-left px-4 py-2 text-sm text-yellow-600 hover:bg-yellow-50 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {userForMenu.status === 'active' ? (
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
+                    </svg>
+                  ) : (
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  )}
+                  {userForMenu.status === 'active' ? 'Deactivate' : 'Activate'}
+                  {updatingStatus === userForMenu.userId && '...'}
+                </button>
+                <hr className="my-1 border-gray-200" />
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setOpenDropdown(null);
+                    setDropdownPosition(null);
+                    handleDeleteClick(userForMenu.userId, userForMenu.name);
+                  }}
+                  disabled={deletingUserId === userForMenu.userId || userForMenu.userId === 'CROWN-000000'}
+                  className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                  </svg>
+                  Delete
+                  {deletingUserId === userForMenu.userId && '...'}
+                </button>
+              </div>
+            );
+            return createPortal(menu, document.body);
+          })()}
 
           {/* Pagination */}
           {!loading && pagination.pages > 1 && (

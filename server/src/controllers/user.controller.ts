@@ -889,9 +889,15 @@ export const createWithdrawal = asyncHandler(async (req, res) => {
 
   const { amount, walletType, method = "regular" } = req.body;
 
-  if (!amount || amount <= 0) {
+  const MIN_WITHDRAWAL_AMOUNT = 15;
+  const amountNum = typeof amount === "string" ? parseFloat(amount) : Number(amount);
+  if (!amountNum || amountNum <= 0) {
     throw new AppError("Invalid withdrawal amount", 400);
   }
+  if (amountNum < MIN_WITHDRAWAL_AMOUNT) {
+    throw new AppError(`Minimum withdrawal amount is $${MIN_WITHDRAWAL_AMOUNT}`, 400);
+  }
+  const withdrawalAmount = amountNum;
 
   if (
     !walletType ||
@@ -962,7 +968,7 @@ export const createWithdrawal = asyncHandler(async (req, res) => {
   }
 
   const cappingLimit = parseFloat(binaryTree.cappingLimit?.toString() || "0");
-  if (cappingLimit > 0 && amount > cappingLimit) {
+  if (cappingLimit > 0 && withdrawalAmount > cappingLimit) {
     throw new AppError(
       `Withdrawal amount exceeds capping limit of $${cappingLimit.toFixed(2)}`,
       400
@@ -976,7 +982,7 @@ export const createWithdrawal = asyncHandler(async (req, res) => {
   }
 
   const currentBalance = parseFloat(wallet.balance.toString());
-  if (amount > currentBalance) {
+  if (withdrawalAmount > currentBalance) {
     throw new AppError("Insufficient balance", 400);
   }
 
@@ -1031,13 +1037,13 @@ export const createWithdrawal = asyncHandler(async (req, res) => {
   }
 
   // Calculate charges (5% default)
-  const charges = amount * 0.05;
-  const finalAmount = amount - charges;
+  const charges = withdrawalAmount * 0.05;
+  const finalAmount = withdrawalAmount - charges;
 
   // Create withdrawal record
   const withdrawal = await Withdrawal.create({
     user: userId,
-    amount: Types.Decimal128.fromString(amount.toString()),
+    amount: Types.Decimal128.fromString(withdrawalAmount.toString()),
     charges: Types.Decimal128.fromString(charges.toString()),
     finalAmount: Types.Decimal128.fromString(finalAmount.toString()),
     walletType,
@@ -1048,7 +1054,7 @@ export const createWithdrawal = asyncHandler(async (req, res) => {
   // Reserve the amount in wallet
   const reservedAmount = parseFloat(wallet.reserved?.toString() || "0");
   wallet.reserved = Types.Decimal128.fromString(
-    (reservedAmount + amount).toString()
+    (reservedAmount + withdrawalAmount).toString()
   );
   await wallet.save();
 
@@ -1057,11 +1063,11 @@ export const createWithdrawal = asyncHandler(async (req, res) => {
     user: userId,
     wallet: wallet._id,
     type: "debit",
-    amount: Types.Decimal128.fromString(amount.toString()),
+    amount: Types.Decimal128.fromString(withdrawalAmount.toString()),
     currency: wallet.currency || "USD",
     balanceBefore: wallet.balance,
     balanceAfter: Types.Decimal128.fromString(
-      (currentBalance - amount).toString()
+      (currentBalance - withdrawalAmount).toString()
     ),
     status: "pending",
     txRef: withdrawal._id.toString(),

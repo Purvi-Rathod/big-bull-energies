@@ -49,6 +49,8 @@ interface Withdrawal {
   createdAt: string;
 }
 
+const MIN_WITHDRAWAL_AMOUNT = 15;
+
 export default function WithdrawPage() {
   const { user } = useAuth();
   const router = useRouter();
@@ -168,6 +170,12 @@ export default function WithdrawPage() {
     const amount = parseFloat(withdrawAmount);
     if (!amount || amount <= 0) {
       const errorMsg = 'Please enter a valid amount';
+      setError(errorMsg);
+      toast.error(errorMsg);
+      return;
+    }
+    if (amount < MIN_WITHDRAWAL_AMOUNT) {
+      const errorMsg = `Minimum withdrawal amount is $${MIN_WITHDRAWAL_AMOUNT}`;
       setError(errorMsg);
       toast.error(errorMsg);
       return;
@@ -457,13 +465,15 @@ export default function WithdrawPage() {
                         type="number"
                         value={withdrawAmount}
                         onChange={(e) => setWithdrawAmount(e.target.value)}
-                        min="0.01"
+                        min={MIN_WITHDRAWAL_AMOUNT}
                         max={availableBalance}
                         step="0.01"
                         className="w-full px-4 py-3 border border-yellow-500/40 rounded-xl bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-yellow-500/50 focus:border-yellow-500/70 font-semibold"
-                        placeholder="Enter amount"
+                        placeholder={`Min $${MIN_WITHDRAWAL_AMOUNT}`}
                       />
                       <p className="mt-2 text-xs text-gray-400 font-semibold">
+                        Minimum: <span className="text-yellow-400">${MIN_WITHDRAWAL_AMOUNT}</span>
+                        {' | '}
                         Maximum: <span className="text-yellow-400">${availableBalance.toFixed(2)}</span>
                         {binaryTree && binaryTree.cappingLimit > 0 && (
                           <> | Capping Limit: <span className="text-yellow-400">${binaryTree.cappingLimit.toFixed(2)}</span></>
@@ -500,7 +510,7 @@ export default function WithdrawPage() {
                       disabled={Boolean(
                         withdrawing || 
                         !withdrawAmount || 
-                        parseFloat(withdrawAmount) <= 0 || 
+                        parseFloat(withdrawAmount) < MIN_WITHDRAWAL_AMOUNT || 
                         !walletAddress ||
                         // Non-free accounts: require target completed to withdraw
                         (userProfile?.accountType !== 'free' && targetStatus && (targetStatus.binaryTargetAmount ?? 0) > 0 && !targetStatus.isCompleted)

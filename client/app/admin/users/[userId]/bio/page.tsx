@@ -113,6 +113,8 @@ export default function UserBioPage() {
   } | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [creatingTempPassword, setCreatingTempPassword] = useState(false);
+  const [tempPasswordModal, setTempPasswordModal] = useState<{ password: string; expiresAt: string } | null>(null);
 
   useEffect(() => {
     if (userId) {
@@ -176,6 +178,30 @@ export default function UserBioPage() {
       minute: '2-digit',
       timeZone: 'Europe/London',
     });
+  };
+
+  const handleCreateTemporaryPassword = async () => {
+    setCreatingTempPassword(true);
+    try {
+      const response = await api.createTemporaryPassword(userId);
+      if (response.data?.temporaryPassword != null) {
+        setTempPasswordModal({
+          password: response.data.temporaryPassword,
+          expiresAt: response.data.expiresAt || '',
+        });
+      }
+    } catch (err: any) {
+      toast.error(err.message || 'Failed to create temporary password');
+    } finally {
+      setCreatingTempPassword(false);
+    }
+  };
+
+  const copyTempPassword = () => {
+    if (tempPasswordModal?.password) {
+      navigator.clipboard.writeText(tempPasswordModal.password);
+      toast.success('Copied to clipboard');
+    }
   };
 
   const getStatusColor = (status: string) => {
@@ -289,6 +315,22 @@ export default function UserBioPage() {
             </div>
           )}
         </div>
+      </div>
+
+      {/* Temporary password (48h) */}
+      <div className="bg-white rounded-lg shadow-lg p-6 border border-gray-200">
+        <h2 className="text-xl font-semibold text-black mb-2">Temporary password (48h)</h2>
+        <p className="text-sm text-gray-600 mb-4">
+          Create a one-time temporary password for this user. They can log in with their User ID and this password for 48 hours. Their permanent password is unchanged.
+        </p>
+        <button
+          type="button"
+          onClick={handleCreateTemporaryPassword}
+          disabled={creatingTempPassword}
+          className="px-4 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 disabled:opacity-50 disabled:cursor-not-allowed font-medium"
+        >
+          {creatingTempPassword ? 'Creating...' : 'Create temporary password'}
+        </button>
       </div>
 
       {/* Summary Cards */}
@@ -683,6 +725,42 @@ export default function UserBioPage() {
                 </tbody>
               </table>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Temporary password modal - show password once after creation */}
+      {tempPasswordModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl shadow-xl max-w-md w-full p-6 border-2 border-amber-200">
+            <h3 className="text-lg font-bold text-black mb-2">Temporary password created</h3>
+            <p className="text-sm text-gray-600 mb-4">
+              Valid for 48 hours. Share it securely with the user — it will not be shown again.
+            </p>
+            <div className="flex items-center gap-2 mb-2">
+              <code className="flex-1 px-3 py-2 bg-gray-100 rounded-lg font-mono text-black text-sm break-all">
+                {tempPasswordModal.password}
+              </code>
+              <button
+                type="button"
+                onClick={copyTempPassword}
+                className="px-3 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 text-sm font-medium"
+              >
+                Copy
+              </button>
+            </div>
+            {tempPasswordModal.expiresAt && (
+              <p className="text-xs text-gray-500 mb-4">
+                Expires: {new Date(tempPasswordModal.expiresAt).toLocaleString('en-GB', { dateStyle: 'medium', timeStyle: 'short', timeZone: 'Europe/London' })}
+              </p>
+            )}
+            <button
+              type="button"
+              onClick={() => setTempPasswordModal(null)}
+              className="w-full px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700"
+            >
+              Close
+            </button>
           </div>
         </div>
       )}

@@ -365,7 +365,7 @@ export default function GenealogyPage() {
                 }
               }}
               placeholder="Enter User ID (e.g., CROWN-000123)"
-              className="w-full px-4 py-2.5 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all bg-white shadow-sm"
+              className="w-full px-4 py-2.5 border-2 text-black border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all bg-white shadow-sm"
             />
           </div>
           <button

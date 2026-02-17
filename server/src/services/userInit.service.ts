@@ -435,7 +435,7 @@ export async function findDeepestAvailablePositionInLeg(
 ): Promise<{ parentId: Types.ObjectId; position: "left" | "right" } | null> {
   try {
     // OPTIMIZATION: Use iterative approach with batch loading by level
-    const maxDepth = 50; // Safety limit
+    const maxDepth = 10000; // Safety limit
     let currentLevelUserIds: Types.ObjectId[] = [rootUserId];
     let depth = 0;
 
@@ -475,7 +475,14 @@ export async function findDeepestAvailablePositionInLeg(
 
       // Move to next level
       currentLevelUserIds = nextLevelUserIds;
+  
       depth++;
+    }
+
+    if (depth == 10000) {
+      console.log("This is the 10000th level");
+      console.log("currentLevelUserIds", currentLevelUserIds);
+      console.log("depth", depth);
     }
 
     // No available position found in the requested leg (reached max depth or end of tree)

@@ -89,14 +89,14 @@ export default function CountryBusinessReportPage() {
           {/* Country selector */}
           <div className="mb-6 flex flex-wrap items-end gap-4">
             <div className="min-w-[200px]">
-              <label htmlFor="country-select" className="mb-1 block text-sm font-medium text-slate-700">
+              <label htmlFor="country-select" className="mb-1 text-black  block text-sm font-medium text-slate-700">
                 Select country
               </label>
               <select
                 id="country-select"
                 value={selectedCountry}
                 onChange={(e) => setSelectedCountry(e.target.value)}
-                className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+                className="w-full text-black  rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
               >
                 <option value={ALL_COUNTRIES}>All countries</option>
                 {countries

@@ -182,7 +182,7 @@ export default function AddFundsPage() {
             value={signupBonusId}
             onChange={(e) => setSignupBonusId(e.target.value)}
             placeholder="User ID (e.g. 000670 or CROWN-000670)"
-            className="flex-1 min-w-[200px] px-4 py-2 border border-amber-300 rounded-md focus:outline-none focus:ring-2 focus:ring-amber-500"
+            className="flex-1 text-black min-w-[200px] px-4 py-2 border border-amber-300 rounded-md focus:outline-none focus:ring-2 focus:ring-amber-500"
           />
           <button
             type="button"
@@ -208,7 +208,7 @@ export default function AddFundsPage() {
                 value={userSearch}
                 onChange={(e) => setUserSearch(e.target.value)}
                 placeholder="Search by User ID, Name, or Email..."
-                className="flex-1 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="flex-1 text-black px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 onKeyPress={(e) => {
                   if (e.key === 'Enter') {
                     e.preventDefault();
@@ -240,12 +240,12 @@ export default function AddFundsPage() {
                   setSelectedUser(user || null);
                   setFormData(prev => ({ ...prev, userId: e.target.value }));
                 }}
-                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="w-full text-black px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 required
               >
                 <option value="">Select a user...</option>
                 {users.map((user) => (
-                  <option key={user.id} value={user.id}>
+                  <option key={user.id} value={user.id} className='text-black'>
                     {user.userId} - {user.name} ({user.email})
                   </option>
                 ))}
@@ -265,13 +265,13 @@ export default function AddFundsPage() {
 
           {/* Wallet Type */}
           <div>
-            <label className="block text-sm font-medium text-black mb-2">
+            <label className="block text-sm font-medium text-black text-black mb-2">
               Wallet Type <span className="text-red-500">*</span>
             </label>
             <select
               value={formData.walletType}
               onChange={(e) => setFormData(prev => ({ ...prev, walletType: e.target.value }))}
-              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full px-4 py-2 border text-black border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
               required
             >
               {WALLET_TYPES.map((type) => (
@@ -284,7 +284,7 @@ export default function AddFundsPage() {
 
           {/* Amount */}
           <div>
-            <label className="block text-sm font-medium text-black mb-2">
+            <label className="block text-black text-sm font-medium text-black mb-2">
               Amount (USD) <span className="text-red-500">*</span>
             </label>
             <input
@@ -294,7 +294,7 @@ export default function AddFundsPage() {
               value={formData.amount}
               onChange={(e) => setFormData(prev => ({ ...prev, amount: e.target.value }))}
               placeholder="0.00"
-              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full text-black px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
               required
             />
           </div>
@@ -309,7 +309,7 @@ export default function AddFundsPage() {
               onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
               placeholder="Add a description for this transaction..."
               rows={3}
-              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full px-4 py-2 text-black border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
             />
           </div>
 

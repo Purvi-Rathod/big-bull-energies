@@ -538,14 +538,7 @@ export default function UserGenealogyPage() {
                     <label className="text-sm font-medium text-gray-500">Name</label>
                     <p className="mt-1 text-sm text-gray-900">{selectedBusinessNode.name || 'N/A'}</p>
                   </div>
-                  <div>
-                    <label className="text-sm font-medium text-gray-500">Email</label>
-                    <p className="mt-1 text-sm text-gray-900">{selectedBusinessNode.email || 'N/A'}</p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-gray-500">Phone</label>
-                    <p className="mt-1 text-sm text-gray-900">{selectedBusinessNode.phone || 'N/A'}</p>
-                  </div>
+                  
                   <div>
                     <label className="text-sm font-medium text-gray-500">Status</label>
                     <span className={`mt-1 inline-block px-2 py-1 rounded-full text-xs font-medium ${selectedBusinessNode.status === 'active'

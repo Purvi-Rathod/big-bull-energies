@@ -58,6 +58,7 @@ import {
   getUserReports,
   addMainWalletToAllUsers,
   restoreSignupBonus,
+  testEmailTemplate,
 } from "../controllers/admin.controller";
 import {
   getAllPackages,
@@ -178,6 +179,9 @@ router.delete("/flush-user-data", requireAdminAuth, flushAllUserData);
 // Ticket management
 router.get("/tickets", requireAdminAuth, getAllTickets);
 router.put("/tickets/:ticketId", requireAdminAuth, updateTicket);
+
+// Email templates test (temporary – admin only)
+router.post("/email-templates/test", requireAdminAuth, testEmailTemplate);
 
 // Settings management
 router.get("/settings/nowpayments", requireAdminAuth, getNOWPaymentsStatus);

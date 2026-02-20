@@ -1,21 +1,29 @@
-import React from 'react';
-import { auth, render } from './nodemailer';
-import SignupWelcomeEmail from './mail-templates/signup-welcome';
-import InvestmentPurchaseEmail from './mail-templates/investment-purchase';
-import WithdrawalCreatedEmail from './mail-templates/withdrawal-created';
-import WithdrawalApprovedEmail from './mail-templates/withdrawal-approved';
-import WithdrawalRejectedEmail from './mail-templates/withdrawal-rejected';
-import PasswordResetEmail from './mail-templates/password-reset';
-import TicketCreatedEmail from './mail-templates/ticket-created';
-import TicketStatusUpdateEmail from './mail-templates/ticket-status-update';
-import VoucherCreatedEmail from './mail-templates/voucher-created';
-import VoucherUsedEmail from './mail-templates/voucher-used';
-import VoucherExpiredEmail from './mail-templates/voucher-expired';
-
 /**
  * Email Service
- * Provides utility functions for sending various types of emails
+ * Sends emails via Elastic Email API using pre-built templates and merge fields.
+ * Set ELASTICMAIL_API_KEY in env. Create templates in Elastic Email dashboard with the names and merge tags below.
  */
+
+import { sendWithTemplate } from "./elastic-email";
+
+const defaultFrom = () =>
+  process.env.EMAIL_USER || process.env.EMAIL_FROM || "noreply@crownbankers.com";
+
+/** Elastic Email template names (must match templates in your Elastic Email dashboard) */
+const TEMPLATES = {
+  SignupWelcome: "SignupWelcome",
+  InvestmentConfirmation: "InvestmentConfirmation",
+  WithdrawalCreated: "WithdrawalCreated",
+  WithdrawalApproved: "WithdrawalApproved",
+  WithdrawalRejected: "WithdrawalRejected",
+  PasswordReset: "PasswordReset",
+  TicketCreated: "TicketCreated",
+  TicketStatusUpdate: "TicketStatusUpdate",
+  VoucherCreated: "VoucherCreated",
+  VoucherUsed: "VoucherUsed",
+  VoucherExpired: "VoucherExpired",
+  CalculationFailure: "CalculationFailure",
+} as const;
 
 interface SendSignupEmailParams {
   to: string;
@@ -23,10 +31,7 @@ interface SendSignupEmailParams {
   userId: string;
   loginLink: string;
 }
-
-/**
- * Send welcome email after successful signup
- */
+// migrated 
 export const sendSignupWelcomeEmail = async ({
   to,
   name,
@@ -34,30 +39,19 @@ export const sendSignupWelcomeEmail = async ({
   loginLink,
 }: SendSignupEmailParams): Promise<void> => {
   try {
-    // Render the React email template to HTML
-    const emailHtml = await render(
-      React.createElement(SignupWelcomeEmail, {
-        name,
-        userId,
-        loginLink,
-      })
-    );
 
-    // Email options
-    const mailOptions = {
-      from: process.env.EMAIL_USER || 'noreply@crown.com',
+    console.log({ name, userId, loginLink }, "sendSignupWelcomeEmail");
+    
+    await sendWithTemplate({
+      from: defaultFrom(),
       to,
-      subject: 'Welcome to CROWN - Your Account is Ready!',
-      html: emailHtml,
-    };
-
-    // Send email
-    await auth.sendMail(mailOptions);
+      subject: "Welcome to Crown Bankers - Your Account is Ready!",
+      template: TEMPLATES.SignupWelcome,
+      merge: { name, userId, loginLink },
+    });
     console.log(`✅ Signup welcome email sent to ${to}`);
   } catch (error: any) {
     console.error(`❌ Failed to send signup welcome email to ${to}:`, error.message);
-    // Don't throw error - we don't want email failures to break signup flow
-    // Log the error but allow signup to complete
   }
 };
 
@@ -71,11 +65,11 @@ interface SendInvestmentPurchaseEmailParams {
   startDate: string;
   endDate: string;
   dashboardLink: string;
+  /** User ID (e.g. CROWN-000123) for template {userId} */
+  userId?: string;
 }
+// migrated 
 
-/**
- * Send investment purchase confirmation email
- */
 export const sendInvestmentPurchaseEmail = async ({
   to,
   name,
@@ -86,11 +80,15 @@ export const sendInvestmentPurchaseEmail = async ({
   startDate,
   endDate,
   dashboardLink,
+  userId,
 }: SendInvestmentPurchaseEmailParams): Promise<void> => {
   try {
-    // Render the React email template to HTML
-    const emailHtml = await render(
-      React.createElement(InvestmentPurchaseEmail, {
+    await sendWithTemplate({
+      from: defaultFrom(),
+      to,
+      subject: `Investment Confirmation - ${packageName}`,
+      template: TEMPLATES.InvestmentConfirmation,
+      merge: {
         name,
         packageName,
         investmentAmount,
@@ -99,28 +97,18 @@ export const sendInvestmentPurchaseEmail = async ({
         startDate,
         endDate,
         dashboardLink,
-      })
-    );
-
-    // Email options
-    const mailOptions = {
-      from: process.env.EMAIL_USER || 'noreply@crown.com',
-      to,
-      subject: `Investment Confirmation - ${packageName}`,
-      html: emailHtml,
-    };
-
-    // Send email
-    await auth.sendMail(mailOptions);
+        // Template fields: User ID, Package Amount, Package Name, Date of Purchase
+        userId: userId ?? "",
+        amount: investmentAmount,
+        package: packageName,
+        date: startDate,
+      },
+    });
     console.log(`✅ Investment purchase confirmation email sent to ${to}`);
   } catch (error: any) {
     console.error(`❌ Failed to send investment purchase email to ${to}:`, error.message);
-    // Don't throw error - we don't want email failures to break investment flow
-    // Log the error but allow investment to complete
   }
 };
-
-/** Withdrawal emails: user receives an email on every event — created, approved, rejected. */
 
 interface SendWithdrawalCreatedEmailParams {
   to: string;
@@ -132,10 +120,7 @@ interface SendWithdrawalCreatedEmailParams {
   withdrawalId: string;
   dashboardLink: string;
 }
-
-/**
- * Send withdrawal created notification email (event 1 of 3)
- */
+// migrated 
 export const sendWithdrawalCreatedEmail = async ({
   to,
   name,
@@ -147,31 +132,24 @@ export const sendWithdrawalCreatedEmail = async ({
   dashboardLink,
 }: SendWithdrawalCreatedEmailParams): Promise<void> => {
   try {
-    const emailHtml = await render(
-      React.createElement(WithdrawalCreatedEmail, {
+    await sendWithTemplate({
+      from: defaultFrom(),
+      to,
+      subject: `Withdrawal Request Submitted - $${amount.toFixed(2)}`,
+      template: TEMPLATES.WithdrawalCreated,
+      merge: {
         name,
-        amount,
-        charges,
-        finalAmount,
+        amount: amount.toFixed(2),
+        charges: charges.toFixed(2),
+        finalAmount: finalAmount.toFixed(2),
         walletType,
         withdrawalId,
         dashboardLink,
-      })
-    );
-
-    const fromAddress = process.env.EMAIL_USER || process.env.EMAIL_FROM || 'noreply@crownbankers.com';
-    const mailOptions = {
-      from: fromAddress,
-      to,
-      subject: `Withdrawal Request Submitted - $${amount.toFixed(2)}`,
-      html: emailHtml,
-    };
-
-    await auth.sendMail(mailOptions);
+      },
+    });
     console.log(`✅ Withdrawal created email sent to ${to}`);
   } catch (error: any) {
     console.error(`❌ Failed to send withdrawal created email to ${to}:`, error.message);
-    // Don't throw error - we don't want email failures to break withdrawal flow
   }
 };
 
@@ -186,10 +164,7 @@ interface SendWithdrawalApprovedEmailParams {
   transactionId: string;
   dashboardLink: string;
 }
-
-/**
- * Send withdrawal approved notification email (event 2 of 3)
- */
+// migrated 
 export const sendWithdrawalApprovedEmail = async ({
   to,
   name,
@@ -202,32 +177,25 @@ export const sendWithdrawalApprovedEmail = async ({
   dashboardLink,
 }: SendWithdrawalApprovedEmailParams): Promise<void> => {
   try {
-    const emailHtml = await render(
-      React.createElement(WithdrawalApprovedEmail, {
+    await sendWithTemplate({
+      from: defaultFrom(),
+      to,
+      subject: `Withdrawal Approved - $${amount.toFixed(2)}`,
+      template: TEMPLATES.WithdrawalApproved,
+      merge: {
         name,
-        amount,
-        charges,
-        finalAmount,
+        amount: amount.toFixed(2),
+        charges: charges.toFixed(2),
+        finalAmount: finalAmount.toFixed(2),
         walletType,
         withdrawalId,
         transactionId,
         dashboardLink,
-      })
-    );
-
-    const fromAddress = process.env.EMAIL_USER || process.env.EMAIL_FROM || 'noreply@crownbankers.com';
-    const mailOptions = {
-      from: fromAddress,
-      to,
-      subject: `Withdrawal Approved - $${amount.toFixed(2)}`,
-      html: emailHtml,
-    };
-
-    await auth.sendMail(mailOptions);
+      },
+    });
     console.log(`✅ Withdrawal approved email sent to ${to}`);
   } catch (error: any) {
     console.error(`❌ Failed to send withdrawal approved email to ${to}:`, error.message);
-    // Don't throw - withdrawal flow already succeeded; admin controller will log
   }
 };
 
@@ -242,10 +210,7 @@ interface SendWithdrawalRejectedEmailParams {
   reason?: string;
   dashboardLink: string;
 }
-
-/**
- * Send withdrawal rejected notification email (event 3 of 3)
- */
+// migrated 
 export const sendWithdrawalRejectedEmail = async ({
   to,
   name,
@@ -258,32 +223,25 @@ export const sendWithdrawalRejectedEmail = async ({
   dashboardLink,
 }: SendWithdrawalRejectedEmailParams): Promise<void> => {
   try {
-    const emailHtml = await render(
-      React.createElement(WithdrawalRejectedEmail, {
-        name,
-        amount,
-        charges,
-        finalAmount,
-        walletType,
-        withdrawalId,
-        reason,
-        dashboardLink,
-      })
-    );
-
-    const fromAddress = process.env.EMAIL_USER || process.env.EMAIL_FROM || 'noreply@crownbankers.com';
-    const mailOptions = {
-      from: fromAddress,
+    await sendWithTemplate({
+      from: defaultFrom(),
       to,
       subject: `Withdrawal Request Rejected - $${amount.toFixed(2)}`,
-      html: emailHtml,
-    };
-
-    await auth.sendMail(mailOptions);
+      template: TEMPLATES.WithdrawalRejected,
+      merge: {
+        name,
+        amount: amount.toFixed(2),
+        charges: charges.toFixed(2),
+        finalAmount: finalAmount.toFixed(2),
+        walletType,
+        withdrawalId,
+        reason: reason ?? "",
+        dashboardLink,
+      },
+    });
     console.log(`✅ Withdrawal rejected email sent to ${to}`);
   } catch (error: any) {
     console.error(`❌ Failed to send withdrawal rejected email to ${to}:`, error.message);
-    // Don't throw - withdrawal flow already succeeded; admin controller will log
   }
 };
 
@@ -292,35 +250,26 @@ interface SendPasswordResetEmailParams {
   name: string;
   resetLink: string;
 }
+// migrated 
 
-/**
- * Send password reset email
- */
 export const sendPasswordResetEmail = async ({
   to,
   name,
   resetLink,
 }: SendPasswordResetEmailParams): Promise<void> => {
   try {
-    const emailHtml = await render(
-      React.createElement(PasswordResetEmail, {
-        name,
-        resetLink,
-      })
-    );
-
-    const mailOptions = {
-      from: process.env.EMAIL_USER || 'noreply@crown.com',
+    console.log({ name, resetLink }, "sendPasswordResetEmail");
+    
+    await sendWithTemplate({
+      from: defaultFrom(),
       to,
-      subject: 'Reset Your Password - CROWN',
-      html: emailHtml,
-    };
-
-    await auth.sendMail(mailOptions);
+      subject: "Reset Your Password - CROWN",
+      template: TEMPLATES.PasswordReset,
+      merge: { name, resetLink },
+    });
     console.log(`✅ Password reset email sent to ${to}`);
   } catch (error: any) {
     console.error(`❌ Failed to send password reset email to ${to}:`, error.message);
-    // Don't throw error - we don't want email failures to break password reset flow
   }
 };
 
@@ -331,10 +280,8 @@ interface SendTicketCreatedEmailParams {
   subject: string;
   department: string;
 }
+// migrated 
 
-/**
- * Send ticket created email
- */
 export const sendTicketCreatedEmail = async ({
   to,
   name,
@@ -343,23 +290,13 @@ export const sendTicketCreatedEmail = async ({
   department,
 }: SendTicketCreatedEmailParams): Promise<void> => {
   try {
-    const emailHtml = await render(
-      React.createElement(TicketCreatedEmail, {
-        name,
-        ticketId,
-        subject,
-        department,
-      })
-    );
-
-    const mailOptions = {
-      from: process.env.EMAIL_USER || 'noreply@crown.com',
+    await sendWithTemplate({
+      from: defaultFrom(),
       to,
       subject: `Support Ticket Created - ${subject}`,
-      html: emailHtml,
-    };
-
-    await auth.sendMail(mailOptions);
+      template: TEMPLATES.TicketCreated,
+      merge: { name, ticketId, subject, department },
+    });
     console.log(`✅ Ticket created email sent to ${to}`);
   } catch (error: any) {
     console.error(`❌ Failed to send ticket created email to ${to}:`, error.message);
@@ -375,10 +312,7 @@ interface SendTicketStatusUpdateEmailParams {
   newStatus: string;
   reply?: string;
 }
-
-/**
- * Send ticket status update email
- */
+// migrated 
 export const sendTicketStatusUpdateEmail = async ({
   to,
   name,
@@ -389,32 +323,20 @@ export const sendTicketStatusUpdateEmail = async ({
   reply,
 }: SendTicketStatusUpdateEmailParams): Promise<void> => {
   try {
-    const emailHtml = await render(
-      React.createElement(TicketStatusUpdateEmail, {
-        name,
-        ticketId,
-        subject,
-        oldStatus,
-        newStatus,
-        reply,
-      })
-    );
-
-    const mailOptions = {
-      from: process.env.EMAIL_USER || 'noreply@crown.com',
+    await sendWithTemplate({
+      from: defaultFrom(),
       to,
       subject: `Ticket Status Updated - ${subject}`,
-      html: emailHtml,
-    };
-
-    await auth.sendMail(mailOptions);
+      template: TEMPLATES.TicketStatusUpdate,
+      merge: { name, ticketId, subject, oldStatus, newStatus, reply: reply ?? "" },
+    });
     console.log(`✅ Ticket status update email sent to ${to}`);
   } catch (error: any) {
     console.error(`❌ Failed to send ticket status update email to ${to}:`, error.message);
   }
 };
+// migrated 
 
-/** Voucher created: to, name, voucherId, amount, investmentValue, expiryDate, dashboardLink, source? */
 export const sendVoucherCreatedEmail = async (params: {
   to: string;
   name: string;
@@ -423,34 +345,30 @@ export const sendVoucherCreatedEmail = async (params: {
   investmentValue: number;
   expiryDate: string;
   dashboardLink: string;
-  source?: 'wallet' | 'payment';
+  source?: "wallet" | "payment";
 }): Promise<void> => {
   try {
-    const emailHtml = await render(
-      React.createElement(VoucherCreatedEmail, {
-        name: params.name,
-        voucherId: params.voucherId,
-        amount: params.amount,
-        investmentValue: params.investmentValue,
-        expiryDate: params.expiryDate,
-        dashboardLink: params.dashboardLink,
-        source: params.source || 'wallet',
-      })
-    );
-    const mailOptions = {
-      from: process.env.EMAIL_USER || process.env.EMAIL_FROM || 'noreply@crownbankers.com',
+    await sendWithTemplate({
+      from: defaultFrom(),
       to: params.to,
       subject: `Voucher Created - ${params.voucherId}`,
-      html: emailHtml,
-    };
-    await auth.sendMail(mailOptions);
+      template: TEMPLATES.VoucherCreated,
+      merge: {
+        name: params.name,
+        voucherId: params.voucherId,
+        amount: params.amount.toFixed(2),
+        investmentValue: params.investmentValue.toFixed(2),
+        expiryDate: params.expiryDate,
+        dashboardLink: params.dashboardLink,
+        source: params.source ?? "wallet",
+      },
+    });
     console.log(`✅ Voucher created email sent to ${params.to}`);
   } catch (error: any) {
     console.error(`❌ Failed to send voucher created email to ${params.to}:`, error.message);
   }
 };
 
-/** Voucher used: notify voucher owner */
 export const sendVoucherUsedEmail = async (params: {
   to: string;
   name: string;
@@ -461,30 +379,26 @@ export const sendVoucherUsedEmail = async (params: {
   dashboardLink: string;
 }): Promise<void> => {
   try {
-    const emailHtml = await render(
-      React.createElement(VoucherUsedEmail, {
-        name: params.name,
-        voucherId: params.voucherId,
-        amount: params.amount,
-        investmentValue: params.investmentValue,
-        usedBy: params.usedBy,
-        dashboardLink: params.dashboardLink,
-      })
-    );
-    const mailOptions = {
-      from: process.env.EMAIL_USER || process.env.EMAIL_FROM || 'noreply@crownbankers.com',
+    await sendWithTemplate({
+      from: defaultFrom(),
       to: params.to,
       subject: `Voucher Used - ${params.voucherId}`,
-      html: emailHtml,
-    };
-    await auth.sendMail(mailOptions);
+      template: TEMPLATES.VoucherUsed,
+      merge: {
+        name: params.name,
+        voucherId: params.voucherId,
+        amount: params.amount.toFixed(2),
+        investmentValue: params.investmentValue.toFixed(2),
+        usedBy: params.usedBy,
+        dashboardLink: params.dashboardLink,
+      },
+    });
     console.log(`✅ Voucher used email sent to ${params.to}`);
   } catch (error: any) {
     console.error(`❌ Failed to send voucher used email to ${params.to}:`, error.message);
   }
 };
 
-/** Voucher expired: notify voucher owner */
 export const sendVoucherExpiredEmail = async (params: {
   to: string;
   name: string;
@@ -495,23 +409,20 @@ export const sendVoucherExpiredEmail = async (params: {
   dashboardLink: string;
 }): Promise<void> => {
   try {
-    const emailHtml = await render(
-      React.createElement(VoucherExpiredEmail, {
-        name: params.name,
-        voucherId: params.voucherId,
-        amount: params.amount,
-        investmentValue: params.investmentValue,
-        expiryDate: params.expiryDate,
-        dashboardLink: params.dashboardLink,
-      })
-    );
-    const mailOptions = {
-      from: process.env.EMAIL_USER || process.env.EMAIL_FROM || 'noreply@crownbankers.com',
+    await sendWithTemplate({
+      from: defaultFrom(),
       to: params.to,
       subject: `Voucher Expired - ${params.voucherId}`,
-      html: emailHtml,
-    };
-    await auth.sendMail(mailOptions);
+      template: TEMPLATES.VoucherExpired,
+      merge: {
+        name: params.name,
+        voucherId: params.voucherId,
+        amount: params.amount.toFixed(2),
+        investmentValue: params.investmentValue.toFixed(2),
+        expiryDate: params.expiryDate,
+        dashboardLink: params.dashboardLink,
+      },
+    });
     console.log(`✅ Voucher expired email sent to ${params.to}`);
   } catch (error: any) {
     console.error(`❌ Failed to send voucher expired email to ${params.to}:`, error.message);
@@ -527,9 +438,6 @@ interface SendCalculationFailureEmailParams {
   totalItems: number;
 }
 
-/**
- * Send calculation job failure notification email
- */
 export const sendCalculationFailureEmail = async ({
   to,
   jobId,
@@ -539,79 +447,26 @@ export const sendCalculationFailureEmail = async ({
   totalItems,
 }: SendCalculationFailureEmailParams): Promise<void> => {
   try {
-    const emailHtml = `
-      <!DOCTYPE html>
-      <html>
-        <head>
-          <meta charset="utf-8">
-          <style>
-            body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
-            .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-            .header { background-color: #dc2626; color: white; padding: 20px; text-align: center; }
-            .content { background-color: #f9fafb; padding: 20px; border: 1px solid #e5e7eb; }
-            .error-box { background-color: #fee2e2; border-left: 4px solid #dc2626; padding: 15px; margin: 15px 0; }
-            .info-box { background-color: #dbeafe; border-left: 4px solid #2563eb; padding: 15px; margin: 15px 0; }
-            .footer { text-align: center; padding: 20px; color: #6b7280; font-size: 12px; }
-            .button { display: inline-block; padding: 10px 20px; background-color: #2563eb; color: white; text-decoration: none; border-radius: 5px; margin-top: 10px; }
-          </style>
-        </head>
-        <body>
-          <div class="container">
-            <div class="header">
-              <h1>⚠️ Calculation Job Failed</h1>
-            </div>
-            <div class="content">
-              <p>Dear Admin,</p>
-              <p>A daily calculation job has failed and requires your attention.</p>
-              
-              <div class="error-box">
-                <h3>Error Details</h3>
-                <p><strong>Job ID:</strong> ${jobId}</p>
-                <p><strong>Job Type:</strong> ${jobType}</p>
-                <p><strong>Error:</strong> ${error}</p>
-              </div>
-              
-              <div class="info-box">
-                <h3>Progress Information</h3>
-                <p><strong>Processed Items:</strong> ${processedItems}</p>
-                <p><strong>Total Items:</strong> ${totalItems}</p>
-                <p><strong>Progress:</strong> ${totalItems > 0 ? Math.round((processedItems / totalItems) * 100) : 0}%</p>
-              </div>
-              
-              <p><strong>Action Required:</strong></p>
-              <ul>
-                <li>Review the error details above</li>
-                <li>Check server logs for more information</li>
-                <li>You can resume the job from the admin panel if it was partially completed</li>
-                <li>The job will continue from where it left off, skipping already processed items</li>
-              </ul>
-              
-              <p style="margin-top: 20px;">
-                <a href="${process.env.CLIENT_URL || 'https://crownbankers.com'}/admin/settings" class="button">
-                  View Admin Panel
-                </a>
-              </p>
-            </div>
-            <div class="footer">
-              <p>This is an automated notification from Crown Bankers System</p>
-              <p>Please do not reply to this email</p>
-            </div>
-          </div>
-        </body>
-      </html>
-    `;
+    const progressPct = totalItems > 0 ? Math.round((processedItems / totalItems) * 100) : 0;
+    const adminLink = `${process.env.CLIENT_URL || "https://crownbankers.com"}/admin/settings`;
 
-    const mailOptions = {
-      from: process.env.EMAIL_USER || 'noreply@crownbankers.com',
+    await sendWithTemplate({
+      from: defaultFrom(),
       to,
       subject: `⚠️ Calculation Job Failed - ${jobType}`,
-      html: emailHtml,
-    };
-
-    await auth.sendMail(mailOptions);
+      template: TEMPLATES.CalculationFailure,
+      merge: {
+        jobId,
+        jobType,
+        error,
+        processedItems: String(processedItems),
+        totalItems: String(totalItems),
+        progressPct: String(progressPct),
+        adminLink,
+      },
+    });
     console.log(`✅ Calculation failure email sent to ${to}`);
   } catch (error: any) {
     console.error(`❌ Failed to send calculation failure email to ${to}:`, error.message);
   }
 };
-

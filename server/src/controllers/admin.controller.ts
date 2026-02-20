@@ -21,7 +21,20 @@ import { Voucher } from "../models/Voucher";
 import { Ticket } from "../models/Ticket";
 import { Settings } from "../models/Settings";
 import { UserCareerProgress } from "../models/UserCareerProgress";
-import { sendWithdrawalApprovedEmail, sendWithdrawalRejectedEmail } from "../lib/mail-service/email.service";
+import {
+  sendWithdrawalApprovedEmail,
+  sendWithdrawalRejectedEmail,
+  sendSignupWelcomeEmail,
+  sendInvestmentPurchaseEmail,
+  sendWithdrawalCreatedEmail,
+  sendPasswordResetEmail,
+  sendTicketCreatedEmail,
+  sendTicketStatusUpdateEmail,
+  sendVoucherCreatedEmail,
+  sendVoucherUsedEmail,
+  sendVoucherExpiredEmail,
+  sendCalculationFailureEmail,
+} from "../lib/mail-service/email.service";
 import { getMinimumVoucherAmount as getMinVoucherAmount } from "../services/package.service";
 import { generateNextUserId, findUserByUserId } from "../services/userId.service";
 import { initializeUser } from "../services/userInit.service";
@@ -3346,39 +3359,7 @@ export const adminCreateInvestment = asyncHandler(async (req, res) => {
   // Get package details for response
   const pkg = await Package.findById(packageId);
   
-  // Send investment confirmation email
-  try {
-    if (user?.email && pkg) {
-      const { sendInvestmentPurchaseEmail } = await import("../lib/mail-service/email.service");
-      const ukOpts = { year: 'numeric' as const, month: 'long' as const, day: 'numeric' as const, timeZone: 'Europe/London' as const };
-      const startDateStr = investment.startDate instanceof Date 
-        ? investment.startDate.toLocaleDateString('en-GB', ukOpts)
-        : new Date(investment.startDate || Date.now()).toLocaleDateString('en-GB', ukOpts);
-
-      const endDateStr = investment.endDate instanceof Date
-        ? investment.endDate.toLocaleDateString('en-GB', ukOpts)
-        : new Date(investment.endDate || Date.now() + (pkg.duration || 150) * 24 * 60 * 60 * 1000).toLocaleDateString('en-GB', ukOpts);
-
-      const clientUrl = process.env.CLIENT_URL || process.env.FRONTEND_URL || 'http://localhost:3000';
-      const dashboardLink = `${clientUrl}/investments`;
-
-      sendInvestmentPurchaseEmail({
-        to: user.email,
-        name: user.name || 'User',
-        packageName: pkg.packageName || 'Investment Package',
-        investmentAmount: Number(amount),
-        duration: investment.durationDays || pkg.duration || 150,
-        totalOutputPct: investment.totalOutputPct || pkg.totalOutputPct || 225,
-        startDate: startDateStr,
-        endDate: endDateStr,
-        dashboardLink,
-      }).catch((error) => {
-        console.error('Failed to send investment purchase confirmation email:', error);
-      });
-    }
-  } catch (error) {
-    console.error('Error preparing investment purchase confirmation email:', error);
-  }
+  // Investment confirmation email is sent by processInvestment (investment.service)
 
   const response = res as any;
   response.status(201).json({
@@ -3898,6 +3879,27 @@ export const createPowerlegInvestment = asyncHandler(async (req, res) => {
   // Mark investment as binary updated
   investment.isBinaryUpdated = true;
   await investment.save();
+
+  // Send investment confirmation email (this path does not use processInvestment)
+  if (user?.email) {
+    const { sendInvestmentPurchaseEmail } = await import("../lib/mail-service/email.service");
+    const ukOpts = { year: "numeric" as const, month: "long" as const, day: "numeric" as const, timeZone: "Europe/London" };
+    const startDateStr = startDate instanceof Date ? startDate.toLocaleDateString("en-GB", ukOpts) : new Date(startDate).toLocaleDateString("en-GB", ukOpts);
+    const endDateStr = endDate instanceof Date ? endDate.toLocaleDateString("en-GB", ukOpts) : new Date(endDate).toLocaleDateString("en-GB", ukOpts);
+    const clientUrl = process.env.CLIENT_URL || process.env.FRONTEND_URL || "http://localhost:3000";
+    sendInvestmentPurchaseEmail({
+      to: user.email,
+      name: user.name || "User",
+      packageName: packageData.packageName || "Investment Package",
+      investmentAmount: amount,
+      duration: packageData.duration || 150,
+      totalOutputPct: packageData.totalOutputPct || 225,
+      startDate: startDateStr,
+      endDate: endDateStr,
+      dashboardLink: `${clientUrl}/investments`,
+      userId: (user as any).userId,
+    }).catch((err: any) => console.error("Failed to send powerleg investment confirmation email:", err?.message));
+  }
 
   const response = res as any;
   response.status(201).json({
@@ -4531,6 +4533,168 @@ export const createVoucherForUser = asyncHandler(async (req, res) => {
         createdAt: (voucher as any).createdAt,
       },
     },
+  });
+});
+
+/**
+ * Test email template (admin only) – temporary panel for testing Elastic Email templates.
+ * POST /api/v1/admin/email-templates/test
+ * Body: { template: string, to: string, merge: Record<string, string | number> }
+ */
+export const testEmailTemplate = asyncHandler(async (req, res) => {
+  const { template, to, merge } = (req as any).body || {};
+  if (!template || !to) {
+    throw new AppError("template and to are required", 400);
+  }
+  const m = merge && typeof merge === "object" ? merge : {};
+  const get = (k: string) => (m[k] != null && m[k] !== "" ? String(m[k]) : undefined);
+  const getNum = (k: string) => {
+    const v = m[k];
+    if (v == null || v === "") return undefined;
+    const n = Number(v);
+    return isNaN(n) ? undefined : n;
+  };
+
+  switch (template) {
+    case "SignupWelcome":
+      await sendSignupWelcomeEmail({
+        to,
+        name: get("name") || "Test User",
+        userId: get("userId") || "CROWN-000000",
+        loginLink: get("loginLink") || "https://crownbankers.com/login",
+      });
+      break;
+    case "InvestmentConfirmation":
+      await sendInvestmentPurchaseEmail({
+        to,
+        name: get("name") || "Test User",
+        packageName: get("packageName") || "Solar Starter",
+        investmentAmount: getNum("investmentAmount") ?? 1000,
+        duration: getNum("duration") ?? 150,
+        totalOutputPct: getNum("totalOutputPct") ?? 225,
+        startDate: get("startDate") || new Date().toISOString().slice(0, 10),
+        endDate: get("endDate") || new Date(Date.now() + 150 * 864e5).toISOString().slice(0, 10),
+        dashboardLink: get("dashboardLink") || "https://crownbankers.com/dashboard",
+        userId: get("userId"),
+      });
+      break;
+    case "WithdrawalCreated":
+      await sendWithdrawalCreatedEmail({
+        to,
+        name: get("name") || "Test User",
+        amount: getNum("amount") ?? 100,
+        charges: getNum("charges") ?? 5,
+        finalAmount: getNum("finalAmount") ?? 95,
+        walletType: get("walletType") || "roi",
+        withdrawalId: get("withdrawalId") || "WD-TEST-001",
+        dashboardLink: get("dashboardLink") || "https://crownbankers.com/withdraw",
+      });
+      break;
+    case "WithdrawalApproved":
+      await sendWithdrawalApprovedEmail({
+        to,
+        name: get("name") || "Test User",
+        amount: getNum("amount") ?? 100,
+        charges: getNum("charges") ?? 5,
+        finalAmount: getNum("finalAmount") ?? 95,
+        walletType: get("walletType") || "roi",
+        withdrawalId: get("withdrawalId") || "WD-TEST-001",
+        transactionId: get("transactionId") || "WD-TEST-001",
+        dashboardLink: get("dashboardLink") || "https://crownbankers.com/withdraw",
+      });
+      break;
+    case "WithdrawalRejected":
+      await sendWithdrawalRejectedEmail({
+        to,
+        name: get("name") || "Test User",
+        amount: getNum("amount") ?? 100,
+        charges: getNum("charges") ?? 5,
+        finalAmount: getNum("finalAmount") ?? 95,
+        walletType: get("walletType") || "roi",
+        withdrawalId: get("withdrawalId") || "WD-TEST-001",
+        reason: get("reason"),
+        dashboardLink: get("dashboardLink") || "https://crownbankers.com/withdraw",
+      });
+      break;
+    case "PasswordReset":
+      await sendPasswordResetEmail({
+        to,
+        name: get("name") || "Test User",
+        resetLink: get("resetLink") || "https://crownbankers.com/reset-password?token=test",
+      });
+      break;
+    case "TicketCreated":
+      await sendTicketCreatedEmail({
+        to,
+        name: get("name") || "Test User",
+        ticketId: get("ticketId") || "TKT-001",
+        subject: get("subject") || "Test ticket",
+        department: get("department") || "Support",
+      });
+      break;
+    case "TicketStatusUpdate":
+      await sendTicketStatusUpdateEmail({
+        to,
+        name: get("name") || "Test User",
+        ticketId: get("ticketId") || "TKT-001",
+        subject: get("subject") || "Test ticket",
+        oldStatus: get("oldStatus") || "open",
+        newStatus: get("newStatus") || "resolved",
+        reply: get("reply"),
+      });
+      break;
+    case "VoucherCreated":
+      await sendVoucherCreatedEmail({
+        to,
+        name: get("name") || "Test User",
+        voucherId: get("voucherId") || "VCH-001",
+        amount: getNum("amount") ?? 100,
+        investmentValue: getNum("investmentValue") ?? 100,
+        expiryDate: get("expiryDate") || new Date(Date.now() + 30 * 864e5).toISOString().slice(0, 10),
+        dashboardLink: get("dashboardLink") || "https://crownbankers.com/plans",
+        source: (get("source") as "wallet" | "payment") || "wallet",
+      });
+      break;
+    case "VoucherUsed":
+      await sendVoucherUsedEmail({
+        to,
+        name: get("name") || "Test User",
+        voucherId: get("voucherId") || "VCH-001",
+        amount: getNum("amount") ?? 100,
+        investmentValue: getNum("investmentValue") ?? 100,
+        usedBy: get("usedBy") || "CROWN-000001",
+        dashboardLink: get("dashboardLink") || "https://crownbankers.com/plans",
+      });
+      break;
+    case "VoucherExpired":
+      await sendVoucherExpiredEmail({
+        to,
+        name: get("name") || "Test User",
+        voucherId: get("voucherId") || "VCH-001",
+        amount: getNum("amount") ?? 100,
+        investmentValue: getNum("investmentValue") ?? 100,
+        expiryDate: get("expiryDate") || new Date().toISOString().slice(0, 10),
+        dashboardLink: get("dashboardLink") || "https://crownbankers.com/plans",
+      });
+      break;
+    case "CalculationFailure":
+      await sendCalculationFailureEmail({
+        to,
+        jobId: get("jobId") || "job-001",
+        jobType: get("jobType") || "ROI",
+        error: get("error") || "Test error message",
+        processedItems: getNum("processedItems") ?? 10,
+        totalItems: getNum("totalItems") ?? 100,
+      });
+      break;
+    default:
+      throw new AppError(`Unknown template: ${template}. Use one of: SignupWelcome, InvestmentConfirmation, WithdrawalCreated, WithdrawalApproved, WithdrawalRejected, PasswordReset, TicketCreated, TicketStatusUpdate, VoucherCreated, VoucherUsed, VoucherExpired, CalculationFailure`, 400);
+  }
+
+  const response = res as any;
+  response.status(200).json({
+    status: "success",
+    message: `Test email sent to ${to} using template ${template}`,
   });
 });
 

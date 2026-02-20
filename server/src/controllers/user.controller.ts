@@ -13,7 +13,7 @@ import { WalletType, WithdrawalStatus } from "../models/types";
 import { processInvestment } from "../services/investment.service";
 import { processMockPayment } from "../lib/payments/mock-nowpayments";
 import { exchangeWallets } from "../services/wallet-exchange.service";
-import { sendInvestmentPurchaseEmail, sendWithdrawalCreatedEmail, sendVoucherCreatedEmail } from "../lib/mail-service/email.service";
+import { sendWithdrawalCreatedEmail, sendVoucherCreatedEmail } from "../lib/mail-service/email.service";
 import { getUserCareerProgress } from "../services/career-level.service";
 import { getMinimumVoucherAmount as getMinVoucherAmount } from "../services/package.service";
 import { Types } from "mongoose";
@@ -283,46 +283,7 @@ export const createInvestment = asyncHandler(async (req, res) => {
     .select("leftBusiness rightBusiness leftCarry rightCarry")
     .lean();
 
-  // Send investment purchase confirmation email if user has email
-  try {
-    const user = await User.findById(userId).select('email name').lean();
-    const pkg = await Package.findById(packageId).select('packageName duration totalOutputPct').lean();
-    
-    if (user?.email && pkg) {
-      // Format dates - investment.startDate and investment.endDate are Date objects
-      const ukOpts = { year: 'numeric' as const, month: 'long' as const, day: 'numeric' as const, timeZone: 'Europe/London' };
-      const startDateStr = investment.startDate instanceof Date 
-        ? investment.startDate.toLocaleDateString('en-GB', ukOpts)
-        : new Date(investment.startDate || Date.now()).toLocaleDateString('en-GB', ukOpts);
-
-      const endDateStr = investment.endDate instanceof Date
-        ? investment.endDate.toLocaleDateString('en-GB', ukOpts)
-        : new Date(investment.endDate || Date.now() + (pkg.duration || 150) * 24 * 60 * 60 * 1000).toLocaleDateString('en-GB', ukOpts);
-
-      // Generate dashboard link
-      const clientUrl = process.env.CLIENT_URL || process.env.FRONTEND_URL || 'http://localhost:3000';
-      const dashboardLink = `${clientUrl}/investments`;
-
-      // Send email asynchronously (don't wait for it)
-      sendInvestmentPurchaseEmail({
-        to: user.email,
-        name: user.name || 'User',
-        packageName: pkg.packageName || 'Investment Package',
-        investmentAmount: Number(amount),
-        duration: investment.durationDays || pkg.duration || 150,
-        totalOutputPct: investment.totalOutputPct || pkg.totalOutputPct || 225,
-        startDate: startDateStr,
-        endDate: endDateStr,
-        dashboardLink,
-      }).catch((error) => {
-        // Log error but don't fail investment if email fails
-        console.error('Failed to send investment purchase confirmation email:', error);
-      });
-    }
-  } catch (error) {
-    // Log error but don't fail investment if email fails
-    console.error('Error preparing investment purchase confirmation email:', error);
-  }
+  // Investment confirmation email is sent by processInvestment (investment.service)
 
   const response = res as any;
   response.status(201).json({

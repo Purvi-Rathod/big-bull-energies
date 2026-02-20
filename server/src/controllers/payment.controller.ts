@@ -863,32 +863,8 @@ export const handlePaymentCallback = asyncHandler(async (req, res) => {
           payment.investmentId = investment._id as Types.ObjectId;
           await payment.save();
 
-          // Send deposit / investment confirmation email (NowPayments activation)
-          const userObj = payment.user as any;
-          if (userObj?.email) {
-            const { sendInvestmentPurchaseEmail } = await import("../lib/mail-service/email.service");
-            const pkg = payment.package as any;
-            const ukOpts = { year: "numeric" as const, month: "long" as const, day: "numeric" as const, timeZone: "Europe/London" };
-            const startDateStr = investment.startDate instanceof Date
-              ? investment.startDate.toLocaleDateString("en-GB", ukOpts)
-              : new Date(investment.startDate).toLocaleDateString("en-GB", ukOpts);
-            const endDateStr = investment.endDate instanceof Date
-              ? investment.endDate.toLocaleDateString("en-GB", ukOpts)
-              : new Date(investment.endDate).toLocaleDateString("en-GB", ukOpts);
-            const clientUrl = process.env.CLIENT_URL || process.env.FRONTEND_URL || "http://localhost:3000";
-            sendInvestmentPurchaseEmail({
-              to: userObj.email,
-              name: userObj.name || "User",
-              packageName: pkg?.packageName || "Investment Package",
-              investmentAmount: parseFloat(payment.amount.toString()),
-              duration: investment.durationDays || 150,
-              totalOutputPct: investment.totalOutputPct || 225,
-              startDate: startDateStr,
-              endDate: endDateStr,
-              dashboardLink: `${clientUrl}/investments`,
-            }).catch((err: any) => console.error("[NOWPayments Callback] Failed to send deposit email:", err.message));
-          }
-          
+          // Investment confirmation email is sent by processInvestment (investment.service)
+
           console.log(`[NOWPayments Callback] ✅✅✅ INVESTMENT CREATED SUCCESSFULLY ✅✅✅`);
           console.log(`[NOWPayments Callback] Investment Details:`);
           console.log(`[NOWPayments Callback]   - Investment ID: ${investment._id}`);

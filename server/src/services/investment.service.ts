@@ -732,6 +732,34 @@ export async function processInvestment(
     }
     await investment.save();
 
+    // Send investment confirmation email for every investment (user has email)
+    if (user?.email) {
+      setImmediate(() => {
+        const { sendInvestmentPurchaseEmail } = require("../lib/mail-service/email.service");
+        const ukOpts = { year: "numeric" as const, month: "long" as const, day: "numeric" as const, timeZone: "Europe/London" };
+        const startDateStr = investment.startDate instanceof Date
+          ? investment.startDate.toLocaleDateString("en-GB", ukOpts)
+          : new Date(investment.startDate).toLocaleDateString("en-GB", ukOpts);
+        const endDateStr = investment.endDate instanceof Date
+          ? investment.endDate.toLocaleDateString("en-GB", ukOpts)
+          : new Date(investment.endDate).toLocaleDateString("en-GB", ukOpts);
+        const clientUrl = process.env.CLIENT_URL || process.env.FRONTEND_URL || "http://localhost:3000";
+        const dashboardLink = `${clientUrl}/investments`;
+        sendInvestmentPurchaseEmail({
+          to: user.email,
+          name: user.name || "User",
+          packageName: pkg.packageName || "Investment Package",
+          investmentAmount: amount,
+          duration: investment.durationDays ?? pkg.duration ?? 150,
+          totalOutputPct: investment.totalOutputPct ?? pkg.totalOutputPct ?? 225,
+          startDate: startDateStr,
+          endDate: endDateStr,
+          dashboardLink,
+          userId: (user as any).userId,
+        }).catch((err: any) => console.error("[Investment Service] Failed to send confirmation email:", err?.message));
+      });
+    }
+
     console.log(`[Investment Service] ✅✅✅ Investment processing completed successfully! ✅✅✅`);
     console.log(`[Investment Service] Summary:`);
     console.log(`[Investment Service]   - Investment ID: ${investment._id}`);

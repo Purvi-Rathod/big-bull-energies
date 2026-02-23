@@ -6,8 +6,7 @@ import AuthProviderWrapper from "@/providers/AuthProvider";
 import { ConfirmProvider } from "@/contexts/ConfirmContext";
 import { Toaster } from "react-hot-toast";
 import ConditionalNavbar from "@/components/ConditionalNavbar";
-import WhatsAppButton from "@/components/WhatsAppButton";
-import SupportChatBot from "@/components/SupportChatBot";
+import SupportFloatingButtons from "@/components/SupportFloatingButtons";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -175,10 +174,9 @@ export default function RootLayout({
           <ConfirmProvider>
             <ConditionalNavbar />
             {children}
+            <SupportFloatingButtons />
           </ConfirmProvider>
         </AuthProviderWrapper>
-        <WhatsAppButton />
-        <SupportChatBot />
         <Toaster
           position="top-right"
           toastOptions={{

@@ -106,10 +106,12 @@ export default function AdminVouchersPage() {
   };
 
   const handleCreateVoucher = async () => {
-    if (!formUserId || !formAmount) {
+    const idPart = formUserId.trim().toUpperCase().replace(/^CROWN-/, '');
+    if (!idPart || !formAmount) {
       setError('User ID and amount are required');
       return;
     }
+    const fullUserId = `CROWN-${idPart}`;
 
     const amount = parseFloat(formAmount);
     if (isNaN(amount) || amount <= 0) {
@@ -132,7 +134,7 @@ export default function AdminVouchersPage() {
       setCreating(true);
       setError('');
       await api.createVoucherForUser({
-        userId: formUserId,
+        userId: fullUserId,
         amount,
         expiryDays,
       });
@@ -419,13 +421,16 @@ export default function AdminVouchersPage() {
                 <label className="block text-sm font-medium text-black mb-2">
                   User ID *
                 </label>
-                <input
-                  type="text"
-                  value={formUserId}
-                  onChange={(e) => setFormUserId(e.target.value)}
-                  placeholder="e.g., CROWN-000001"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                />
+                <div className="flex items-center w-full rounded-md border border-gray-300 bg-white focus-within:ring-2 focus-within:ring-indigo-500">
+                  <span className="inline-flex items-center pl-3 py-2 text-gray-600 font-mono border-r border-gray-300 bg-gray-50 rounded-l-md text-sm">CROWN-</span>
+                  <input
+                    type="text"
+                    value={formUserId}
+                    onChange={(e) => setFormUserId(e.target.value.toUpperCase().replace(/^CROWN-/, ''))}
+                    placeholder="e.g. 000001"
+                    className="flex-1 min-w-0 px-3 py-2 border-0 rounded-r-md focus:outline-none focus:ring-0 text-black placeholder:text-gray-500 font-mono"
+                  />
+                </div>
               </div>
 
               <div className="mb-4">

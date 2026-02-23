@@ -1,14 +1,30 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { api } from '@/lib/api';
 import toast from 'react-hot-toast';
+
+const PAGE_SIZES = [10, 25, 50, 100];
+const SORT_OPTIONS = [
+  { value: 'date-desc', label: 'Date (newest first)', key: 'createdAt', order: 'desc' as const },
+  { value: 'date-asc', label: 'Date (oldest first)', key: 'createdAt', order: 'asc' as const },
+  { value: 'amount-desc', label: 'Amount (high to low)', key: 'amount', order: 'desc' as const },
+  { value: 'amount-asc', label: 'Amount (low to high)', key: 'amount', order: 'asc' as const },
+  { value: 'user', label: 'User ID (A–Z)', key: 'userId', order: 'asc' as const },
+  { value: 'status', label: 'Status (A–Z)', key: 'status', order: 'asc' as const },
+];
 
 export default function NOWPaymentsReportPage() {
   const [report, setReport] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const hasFetchedRef = useRef(false);
+
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(25);
+  const [search, setSearch] = useState('');
+  const [statusFilter, setStatusFilter] = useState('');
+  const [sortBy, setSortBy] = useState('date-desc');
 
   useEffect(() => {
     if (hasFetchedRef.current) {
@@ -34,11 +50,51 @@ export default function NOWPaymentsReportPage() {
     }
   };
 
+  const { filteredPayments, paginatedPayments, totalPages, totalFiltered } = useMemo(() => {
+    if (!report?.payments?.length) {
+      return { filteredPayments: [], paginatedPayments: [], totalPages: 0, totalFiltered: 0 };
+    }
+    const searchLower = search.trim().toLowerCase();
+    const statusLower = statusFilter.trim().toLowerCase();
+    let list = report.payments.filter((p: any) => {
+      if (searchLower) {
+        const match =
+          (p.userId || '').toLowerCase().includes(searchLower) ||
+          (p.userName || '').toLowerCase().includes(searchLower) ||
+          (p.userEmail || '').toLowerCase().includes(searchLower) ||
+          (p.paymentId || '').toLowerCase().includes(searchLower) ||
+          (p.packageName || '').toLowerCase().includes(searchLower) ||
+          (p.country || '').toLowerCase().includes(searchLower);
+        if (!match) return false;
+      }
+      if (statusLower && (p.status || '').toLowerCase() !== statusLower) return false;
+      return true;
+    });
+    const opt = SORT_OPTIONS.find((o) => o.value === sortBy) || SORT_OPTIONS[0];
+    list = [...list].sort((a: any, b: any) => {
+      let va = a[opt.key];
+      let vb = b[opt.key];
+      if (opt.key === 'createdAt') {
+        va = new Date(va).getTime();
+        vb = new Date(vb).getTime();
+      }
+      if (va == null) va = '';
+      if (vb == null) vb = '';
+      if (opt.order === 'asc') return va < vb ? -1 : va > vb ? 1 : 0;
+      return va > vb ? -1 : va < vb ? 1 : 0;
+    });
+    const totalFiltered = list.length;
+    const totalPages = Math.max(1, Math.ceil(totalFiltered / pageSize));
+    const start = (page - 1) * pageSize;
+    const paginatedPayments = list.slice(start, start + pageSize);
+    return { filteredPayments: list, paginatedPayments, totalPages, totalFiltered };
+  }, [report?.payments, search, statusFilter, sortBy, page, pageSize]);
+
   const exportToCSV = () => {
     if (!report) return;
-
+    const toExport = filteredPayments.length > 0 ? filteredPayments : report.payments;
     const headers = ['SL NO', 'User ID', 'User Name', 'User Email', 'Country', 'Payment ID', 'Package', 'USD Amount', 'Crypto Amount', 'Received', 'Status', 'Date'];
-    const rows = report.payments.map((p: any, idx: number) => [
+    const rows = toExport.map((p: any, idx: number) => [
       idx + 1,
       p.userId,
       p.userName,
@@ -115,16 +171,62 @@ export default function NOWPaymentsReportPage() {
 
           {/* Payments Table */}
           <div className="max-w-full bg-white rounded-lg shadow overflow-hidden">
-            <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
-              <h3 className="text-lg font-semibold text-black">NOWPayments Transactions ({report.payments.length})</h3>
-              {report.payments.length > 0 && (
-                <button
-                  onClick={exportToCSV}
-                  className="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            <div className="px-6 py-4 border-b border-gray-200 space-y-4">
+              <div className="flex flex-wrap justify-between items-center gap-4">
+                <h3 className="text-lg font-semibold text-black">
+                  NOWPayments Transactions {search || statusFilter ? `(${totalFiltered} of ${report.payments.length})` : `(${report.payments.length})`}
+                </h3>
+                {(filteredPayments.length > 0 || report.payments.length > 0) && (
+                  <button
+                    onClick={exportToCSV}
+                    className="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  >
+                    Export CSV {search || statusFilter ? `(${totalFiltered})` : ''}
+                  </button>
+                )}
+              </div>
+              {/* Filter and sort */}
+              <div className="flex flex-wrap gap-3 items-center">
+                <input
+                  type="text"
+                  value={search}
+                  onChange={(e) => { setSearch(e.target.value); setPage(1); }}
+                  placeholder="Search by User ID, name, email, payment ID, package, country..."
+                  className="flex-1 min-w-[200px] px-3 py-2 border border-gray-300 rounded-md text-black placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
+                />
+                <select
+                  value={statusFilter}
+                  onChange={(e) => { setStatusFilter(e.target.value); setPage(1); }}
+                  className="px-3 py-2 border border-gray-300 rounded-md text-black bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
                 >
-                  Export CSV
-                </button>
-              )}
+                  <option value="">All statuses</option>
+                  {([...new Set(report.payments.map((p: any) => (p.status || '').toLowerCase()).filter(Boolean))] as string[]).sort().map((s: string) => (
+                    <option key={s} value={s}>{s}</option>
+                  ))}
+                </select>
+                <select
+                  value={sortBy}
+                  onChange={(e) => { setSortBy(e.target.value); setPage(1); }}
+                  className="px-3 py-2 border border-gray-300 rounded-md text-black bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
+                >
+                  {SORT_OPTIONS.map((o) => (
+                    <option key={o.value} value={o.value}>{o.label}</option>
+                  ))}
+                </select>
+                <label className="flex items-center gap-2 text-sm text-black">
+                  Show
+                  <select
+                    value={pageSize}
+                    onChange={(e) => { setPageSize(Number(e.target.value)); setPage(1); }}
+                    className="px-2 py-1 border border-gray-300 rounded text-black bg-white"
+                  >
+                    {PAGE_SIZES.map((n) => (
+                      <option key={n} value={n}>{n}</option>
+                    ))}
+                  </select>
+                  per page
+                </label>
+              </div>
             </div>
             <div className="max-w-full overflow-x-auto">
               <table className="w-full divide-y divide-gray-200">
@@ -143,17 +245,17 @@ export default function NOWPaymentsReportPage() {
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
-                  {report.payments.length === 0 ? (
+                  {paginatedPayments.length === 0 ? (
                     <tr>
                       <td colSpan={10} className="px-6 py-4 text-center text-black">
-                        No payments found
+                        {report.payments.length === 0 ? 'No payments found' : 'No entries match your filters'}
                       </td>
                     </tr>
                   ) : (
-                    report.payments.map((p: any, index: number) => (
-                      <tr key={p.id} className="hover:bg-gray-50">
+                    paginatedPayments.map((p: any, index: number) => (
+                      <tr key={p.id || p.paymentId || index} className="hover:bg-gray-50">
                         <td className="px-3 py-3">
-                          <div className="text-xs font-medium text-black">{index + 1}</div>
+                          <div className="text-xs font-medium text-black">{(page - 1) * pageSize + index + 1}</div>
                         </td>
                         <td className="px-3 py-3">
                           <div className="flex flex-col gap-0.5">
@@ -202,6 +304,51 @@ export default function NOWPaymentsReportPage() {
                 </tbody>
               </table>
             </div>
+            {/* Pagination */}
+            {totalFiltered > 0 && (
+              <div className="px-6 py-4 border-t border-gray-200 flex flex-wrap items-center justify-between gap-4">
+                <p className="text-sm text-black">
+                  Showing {((page - 1) * pageSize) + 1}–{Math.min(page * pageSize, totalFiltered)} of {totalFiltered}
+                </p>
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setPage((p) => Math.max(1, p - 1))}
+                    disabled={page <= 1}
+                    className="px-3 py-1.5 border border-gray-300 rounded-md text-sm font-medium text-black bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    Previous
+                  </button>
+                  <span className="flex items-center gap-1">
+                    {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                      let pn: number;
+                      if (totalPages <= 5) pn = i + 1;
+                      else if (page <= 3) pn = i + 1;
+                      else if (page >= totalPages - 2) pn = totalPages - 4 + i;
+                      else pn = page - 2 + i;
+                      return (
+                        <button
+                          key={pn}
+                          type="button"
+                          onClick={() => setPage(pn)}
+                          className={`w-9 h-9 rounded-md text-sm font-medium ${page === pn ? 'bg-indigo-600 text-white' : 'border border-gray-300 text-black bg-white hover:bg-gray-50'}`}
+                        >
+                          {pn}
+                        </button>
+                      );
+                    })}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                    disabled={page >= totalPages}
+                    className="px-3 py-1.5 border border-gray-300 rounded-md text-sm font-medium text-black bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    Next
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         </>
       )}

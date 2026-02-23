@@ -100,13 +100,19 @@ export default function FreeAccountPage() {
   const amountValid = selectedPackage && !isNaN(amountNum) && amountNum >= selectedPackage.minAmount && amountNum <= selectedPackage.maxAmount;
   const targetValid = !isNaN(targetNum) && targetNum >= 0;
 
+  const handleUserIdChange = (value: string) => {
+    const v = value.toUpperCase().replace(/^CROWN-/, '').trim();
+    setUserId(v);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const trimmedUserId = userId.trim();
     if (!trimmedUserId) {
-      toast.error('Please enter an existing User ID');
+      toast.error('Please enter User ID number');
       return;
     }
+    const idToSend = `CROWN-${trimmedUserId}`;
     if (!selectedPackageId || !selectedPackage) {
       toast.error('Please select a package');
       return;
@@ -123,12 +129,12 @@ export default function FreeAccountPage() {
     try {
       setCreating(true);
       await api.createFreeAccounts({
-        userId: trimmedUserId,
+        userId: idToSend,
         packageId: selectedPackageId,
         amount: amountNum,
         binaryTargetAmount: targetNum,
       });
-      toast.success(`Package and target applied to ${trimmedUserId}. No new account created.`);
+      toast.success(`Package and target applied to ${idToSend}. No new account created.`);
       setUserId('');
       setSelectedPackageId('');
       setAmount('');
@@ -192,14 +198,17 @@ export default function FreeAccountPage() {
           <label className="block text-sm font-medium text-black mb-2">
             Existing User ID <span className="text-red-500">*</span>
           </label>
-          <input
-            type="text"
-            value={userId}
-            onChange={(e) => setUserId(e.target.value)}
-            placeholder="e.g. CROWN-00024"
-            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 text-black placeholder:text-gray-500 font-mono"
-          />
-          <p className="mt-1 text-xs text-gray-600">The same account will receive the package and target. No new account is created.</p>
+          <div className="flex items-center w-full rounded-md border border-gray-300 bg-white focus-within:ring-2 focus-within:ring-indigo-500">
+            <span className="inline-flex items-center pl-4 text-gray-600 font-mono border-r border-gray-300 bg-gray-50 rounded-l-md py-2">CROWN-</span>
+            <input
+              type="text"
+              value={userId}
+              onChange={(e) => handleUserIdChange(e.target.value)}
+              placeholder="e.g. 00024"
+              className="flex-1 min-w-0 px-4 py-2 border-0 focus:outline-none focus:ring-0 text-black placeholder:text-gray-500 font-mono rounded-r-md"
+            />
+          </div>
+          <p className="mt-1 text-xs text-gray-600">Enter only the number. The same account will receive the package and target. No new account is created.</p>
         </div>
 
         {/* 2. Package */}

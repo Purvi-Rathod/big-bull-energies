@@ -64,16 +64,18 @@ export default function AddFundsPage() {
   };
 
   const handleRestoreSignupBonus = async () => {
-    if (!signupBonusId.trim()) {
-      toast.error('Enter user ID (e.g. 000670 or CROWN-000670)');
+    const idPart = signupBonusId.trim().toUpperCase().replace(/^CROWN-/, '');
+    if (!idPart) {
+      toast.error('Enter User ID number');
       return;
     }
+    const fullId = `CROWN-${idPart}`;
     setRestoringBonus(true);
     try {
-      const response = await api.restoreSignupBonus(signupBonusId.trim());
+      const response = await api.restoreSignupBonus(fullId);
       if (response.data) {
         toast.success(`Restored $5 signup bonus to ${response.data.userId}. Main balance: $${response.data.newMainBalance.toFixed(2)}`);
-        setSignupBonusId('');
+        setSignupBonusId(''); // number part only
       }
     } catch (err: any) {
       toast.error(err.message || 'Failed to restore signup bonus');
@@ -175,15 +177,18 @@ export default function AddFundsPage() {
       {/* Restore signup bonus (e.g. user 000670) */}
       <div className="bg-amber-50 border border-amber-200 rounded-lg p-6 mb-6">
         <h2 className="text-lg font-semibold text-black mb-2">Restore $5 signup bonus</h2>
-        <p className="text-sm text-gray-700 mb-3">Use when a user lost their main-wallet signup bonus (e.g. user 000670). Credits $5 to their Main wallet.</p>
+        <p className="text-sm text-gray-700 mb-3">Use when a user lost their main-wallet signup bonus. Enter User ID number below. Credits $5 to their Main wallet.</p>
         <div className="flex gap-2 flex-wrap items-center">
-          <input
-            type="text"
-            value={signupBonusId}
-            onChange={(e) => setSignupBonusId(e.target.value)}
-            placeholder="User ID (e.g. 000670 or CROWN-000670)"
-            className="flex-1 text-black min-w-[200px] px-4 py-2 border border-amber-300 rounded-md focus:outline-none focus:ring-2 focus:ring-amber-500"
-          />
+          <div className="flex items-center flex-1 min-w-[200px] rounded-md border border-amber-300 bg-white focus-within:ring-2 focus-within:ring-amber-500">
+            <span className="inline-flex items-center pl-4 text-gray-600 font-mono border-r border-amber-300 bg-amber-50/50 rounded-l-md py-2">CROWN-</span>
+            <input
+              type="text"
+              value={signupBonusId}
+              onChange={(e) => setSignupBonusId(e.target.value.toUpperCase().replace(/^CROWN-/, ''))}
+              placeholder="e.g. 000670"
+              className="flex-1 min-w-0 text-black px-4 py-2 border-0 rounded-r-md focus:outline-none focus:ring-0"
+            />
+          </div>
           <button
             type="button"
             onClick={handleRestoreSignupBonus}

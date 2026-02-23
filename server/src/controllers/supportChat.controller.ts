@@ -53,7 +53,10 @@ export const supportChat = asyncHandler(async (req: Request, res: Response) => {
   const rulebook = getRulebookContent();
   const systemContent = SYSTEM_PROMPT + rulebook;
 
-  const { OpenRouter } = await import("@openrouter/sdk");
+  // ESM-only package: use Function so tsc doesn't compile to require() (not supported for ESM)
+  const dynamicImport = new Function("specifier", "return import(specifier)");
+  const sdk = await dynamicImport("@openrouter/sdk");
+  const OpenRouter = sdk.OpenRouter;
   const openRouter = new OpenRouter({
     apiKey,
     httpReferer: SITE_URL,

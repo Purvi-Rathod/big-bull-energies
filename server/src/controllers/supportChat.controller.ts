@@ -1,9 +1,10 @@
 import { Request, Response } from "express";
 import * as fs from "fs";
 import * as path from "path";
-import { OpenRouter } from "@openrouter/sdk";
 import { asyncHandler } from "../utils/asyncHandler";
 import { AppError } from "../utils/AppError";
+
+// @openrouter/sdk is ESM-only; use dynamic import so it works when server is compiled to CommonJS
 
 const CHAT_BOT_API_KEY = process.env.CHAT_BOT_API_KEY;
 const CHAT_BOT_MODEL = process.env.CHAT_BOT_MODEL || "openai/gpt-4o-mini";
@@ -52,6 +53,7 @@ export const supportChat = asyncHandler(async (req: Request, res: Response) => {
   const rulebook = getRulebookContent();
   const systemContent = SYSTEM_PROMPT + rulebook;
 
+  const { OpenRouter } = await import("@openrouter/sdk");
   const openRouter = new OpenRouter({
     apiKey,
     httpReferer: SITE_URL,

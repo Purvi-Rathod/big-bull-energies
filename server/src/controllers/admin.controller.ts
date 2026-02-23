@@ -2468,12 +2468,12 @@ export const getDailyBusinessReport = asyncHandler(async (req, res) => {
   const { date, startDate, endDate } = req.query;
   const response = res as any;
 
-  // Date range: return one row per day (table format)
+  // Date range: return one row per day (table format). Use UTC day boundaries so DB timestamps (UTC) match correctly.
   if (startDate && endDate) {
-    const start = new Date(startDate as string);
-    start.setHours(0, 0, 0, 0);
-    const end = new Date(endDate as string);
-    end.setHours(23, 59, 59, 999);
+    const [sY, sM, sD] = (startDate as string).split("-").map(Number);
+    const [eY, eM, eD] = (endDate as string).split("-").map(Number);
+    const start = new Date(Date.UTC(sY, (sM || 1) - 1, sD || 1, 0, 0, 0, 0));
+    const end = new Date(Date.UTC(eY, (eM || 1) - 1, eD || 1, 23, 59, 59, 999));
     const rows: Array<{
       date: string;
       noSignups: number;
@@ -2485,11 +2485,12 @@ export const getDailyBusinessReport = asyncHandler(async (req, res) => {
     }> = [];
     const cursor = new Date(start);
     while (cursor <= end) {
-      const dayStart = new Date(cursor);
-      dayStart.setHours(0, 0, 0, 0);
-      const dayEnd = new Date(cursor);
-      dayEnd.setHours(23, 59, 59, 999);
-      const dateStr = dayStart.toISOString().split("T")[0];
+      const y = cursor.getUTCFullYear();
+      const m = cursor.getUTCMonth();
+      const d = cursor.getUTCDate();
+      const dayStart = new Date(Date.UTC(y, m, d, 0, 0, 0, 0));
+      const dayEnd = new Date(Date.UTC(y, m, d, 23, 59, 59, 999));
+      const dateStr = `${y}-${String(m + 1).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
 
       const [signupsCount, investments, withdrawals] = await Promise.all([
         User.countDocuments({ createdAt: { $gte: dayStart, $lte: dayEnd } }),
@@ -2497,21 +2498,41 @@ export const getDailyBusinessReport = asyncHandler(async (req, res) => {
         Withdrawal.find({ createdAt: { $gte: dayStart, $lte: dayEnd } }).lean(),
       ]);
 
+      // Cash = only payment gateway (completed Payment). Voucher = VCH-*. Free = admin-activated / rest.
+      const nonVoucherIds = (investments as any[])
+        .map((inv) => String(inv.voucherId || "").trim())
+        .filter((id) => id !== "" && !id.toUpperCase().startsWith("VCH-"));
+      const gatewayIds = new Set<string>();
+      if (nonVoucherIds.length > 0) {
+        const { Payment } = await import("../models/Payment");
+        const gatewayPayments = await Payment.find({
+          status: "completed",
+          $or: [{ paymentId: { $in: nonVoucherIds } }, { orderId: { $in: nonVoucherIds } }],
+        })
+          .select("paymentId orderId")
+          .lean();
+        for (const p of gatewayPayments) {
+          if ((p as any).paymentId) gatewayIds.add(String((p as any).paymentId));
+          if ((p as any).orderId) gatewayIds.add(String((p as any).orderId));
+        }
+      }
+
       let cashInvestment = 0;
       let voucherInvestment = 0;
       let freeInvestment = 0;
       let powerlegInvestment = 0;
       for (const inv of investments) {
         const amt = parseFloat((inv as any).investedAmount?.toString() || "0");
-        const depAmt = parseFloat((inv as any).depositAmount?.toString() || "0");
-        const hasVoucher = (inv as any).voucherId != null && String((inv as any).voucherId).trim() !== "";
         const type = (inv as any).type || "self";
-        if (hasVoucher) {
+        const rawVoucherId = String((inv as any).voucherId || "").trim();
+        const hasRealVoucher = rawVoucherId !== "" && rawVoucherId.toUpperCase().startsWith("VCH-");
+        if (hasRealVoucher) {
           voucherInvestment += amt;
+        } else if (rawVoucherId !== "" && gatewayIds.has(rawVoucherId)) {
+          cashInvestment += amt;
         } else {
-          cashInvestment += depAmt;
+          freeInvestment += amt;
         }
-        if (type === "free") freeInvestment += amt;
         if (type === "powerleg") powerlegInvestment += amt;
       }
       const roiWithdrawal = withdrawals
@@ -2527,7 +2548,7 @@ export const getDailyBusinessReport = asyncHandler(async (req, res) => {
         powerlegInvestment: Math.round(powerlegInvestment * 100) / 100,
         roiWithdrawal: Math.round(roiWithdrawal * 100) / 100,
       });
-      cursor.setDate(cursor.getDate() + 1);
+      cursor.setUTCDate(cursor.getUTCDate() + 1);
     }
     // Newest first
     rows.sort((a, b) => (b.date > a.date ? 1 : -1));

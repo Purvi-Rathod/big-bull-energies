@@ -521,15 +521,10 @@ export const impersonateUser = asyncHandler(async (req, res) => {
       role: "buyer",
     });
 
-    // Set token in cookie
+    // Do NOT set token in cookie - the client opens impersonation in a new tab and
+    // stores the token in that tab's sessionStorage. Setting a cookie here would
+    // overwrite the browser's token cookie and log the admin out in their tab.
     const response = res as any;
-    response.cookie("token", token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
-      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-    });
-
     response.status(200).json({
       status: "success",
       message: "Impersonation successful",

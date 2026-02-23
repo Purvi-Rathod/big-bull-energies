@@ -44,6 +44,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@openrouter/sdk": "^0.8.0",
     "@react-email/components": "^0.0.41",
     "@react-email/render": "^1.0.5",
     "@types/express": "^4.17.21",

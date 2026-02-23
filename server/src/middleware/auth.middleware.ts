@@ -17,12 +17,13 @@ declare global {
  */
 export function requireAuth(req: Request, res: Response, next: NextFunction) {
   try {
-    const token = 
-      req.cookies?.token || 
-      (req.headers.authorization?.startsWith("Bearer ") 
-        ? req.headers.authorization.split(" ")[1] 
-        : null);
-    
+    // Prefer Authorization header over cookie so impersonation (Bearer token) wins over
+    // any existing token cookie (e.g. admin's user session in another tab).
+    const token =
+      (req.headers.authorization?.startsWith("Bearer ")
+        ? req.headers.authorization.split(" ")[1]
+        : null) || req.cookies?.token;
+
     if (!token) {
       throw new AppError("User token required", 401);
     }

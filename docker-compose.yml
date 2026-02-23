@@ -40,6 +40,7 @@ services:
       - NOWPAYMENTS_CALLBACK_URL=${NOWPAYMENTS_CALLBACK_URL}
       - ELASTICMAIL_API_KEY=${ELASTICMAIL_API_KEY}
       - NOWPAYMENTS_IPN_SECRET=${NOWPAYMENTS_IPN_SECRET}
+      - CHAT_BOT_API_KEY=${CHAT_BOT_API_KEY}
       - CLIENT_URL=${CLIENT_URL:-http://localhost:3000}
       - API_URL=${API_URL:-https://api.crownbankers.com}
     restart: unless-stopped

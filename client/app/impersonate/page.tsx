@@ -2,11 +2,12 @@
 
 import { useEffect, useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { api } from '@/lib/api';
+import { useAuth } from '@/contexts/AuthContext';
 
 function ImpersonateContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { refreshAuth } = useAuth();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
@@ -20,30 +21,26 @@ function ImpersonateContent() {
       return;
     }
 
-    // Store the user token in sessionStorage (per-tab, so admin tab won't be affected)
-    // Also store in localStorage with a special key to indicate it's an impersonation
+    // Opened in a new tab by admin panel. sessionStorage = per-tab, so admin tab stays logged in.
+    // Set impersonation token first, then refresh auth so context shows the impersonated user
+    // (not admin from shared localStorage) before redirecting to dashboard.
     if (typeof window !== 'undefined') {
-      // Store in sessionStorage for this tab only
       sessionStorage.setItem('token', token);
       sessionStorage.setItem('impersonatedUserId', userId);
       sessionStorage.setItem('isImpersonating', 'true');
-      
-      // Also store in localStorage but with a flag
       localStorage.setItem('impersonatedToken', token);
       localStorage.setItem('impersonatedUserId', userId);
-      
-      // Refresh auth context by calling the API to verify the token
-      // Then redirect to dashboard
-      api.getUserProfile()
+
+      refreshAuth()
         .then(() => {
-          // Successfully authenticated, redirect to dashboard
           router.push('/dashboard');
         })
         .catch((err) => {
-          setError(err.message || 'Failed to authenticate as user');
+          setError(err?.message || 'Failed to authenticate as user');
           setLoading(false);
         });
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- run once when token/userId are in URL
   }, [searchParams, router]);
 
   if (loading) {

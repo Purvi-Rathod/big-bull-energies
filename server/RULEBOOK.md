@@ -1,8 +1,8 @@
-# CNEOX Platform - Complete Rule Book
+# Crown Bankers Platform - Complete Rule Book
 
 **Version:** 1.0  
 **Last Updated:** 2024  
-**Platform:** Binary MLM System with ROI, Referral, and Binary Bonuses
+**Platform:** Crown Bankers is a solar investment system that provides massive returns based on investors' network. It combines Binary MLM with ROI, Referral, and Binary Bonuses.
 
 ---
 
@@ -1235,7 +1235,7 @@ Admins can:
 
 ## Conclusion
 
-This rule book defines all business rules, calculations, and workflows for the CNEOX platform. All calculations and operations must follow these rules exactly to ensure system consistency and accuracy.
+This rule book defines all business rules, calculations, and workflows for the Crown Bankers platform—a solar investment system that delivers massive returns based on investors' network. All calculations and operations must follow these rules exactly to ensure system consistency and accuracy.
 
 **Key Principles:**
 1. Referral bonuses: One-time, immediate, first investment only

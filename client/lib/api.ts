@@ -641,6 +641,14 @@ class ApiClient {
     return response;
   }
 
+  /** AI support chat (public, uses RULEBOOK). messages: [{ role: 'user'|'assistant', content: string }] */
+  async sendSupportChatMessage(messages: Array<{ role: 'user' | 'assistant'; content: string }>) {
+    return this.request<{ message: string }>('/support/chat', {
+      method: 'POST',
+      body: JSON.stringify({ messages }),
+    });
+  }
+
   async updateUserStatus(userId: string, status: 'active' | 'inactive' | 'suspended' | 'blocked' | 'suspected') {
     return this.request<{ userId: string; name: string; email: string; status: string }>(`/admin/users/${userId}/status`, {
       method: 'PUT',

@@ -59,7 +59,7 @@ export default function LeadershipPage() {
       {/* Hero Section */}
       <section className="relative w-full h-[50vh] sm:h-[55vh] md:h-[60vh] lg:h-[70vh] overflow-hidden">
         <Image
-          src="/about-hero.webp"
+          src="https://res.cloudinary.com/dygdftjr8/image/upload/v1771927306/Screenshot_2026-02-24_at_15.31.36_sbqtdp.png"
           alt="Leadership - Our Team"
           fill
           className="object-cover"

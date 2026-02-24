@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { api } from '@/lib/api';
+import AdminUserSearchInput, { getEffectiveUserSearch } from '@/components/AdminUserSearchInput';
 
 interface Voucher {
   id: string;
@@ -36,6 +37,7 @@ export default function AdminVouchersPage() {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [creating, setCreating] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
+  const [searchUseCrownPrefix, setSearchUseCrownPrefix] = useState(true);
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
@@ -184,11 +186,13 @@ export default function AdminVouchersPage() {
     return new Date(expiry) < new Date();
   };
 
+  const effectiveSearch = getEffectiveUserSearch(searchTerm, searchUseCrownPrefix);
+
   // Filter vouchers
   const filteredVouchers = vouchers.filter((voucher) => {
     const matchesSearch = 
       voucher.voucherId.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      voucher.user?.userId.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (voucher.user?.userId && voucher.user.userId.toLowerCase().includes(effectiveSearch.toLowerCase())) ||
       voucher.user?.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       voucher.user?.email.toLowerCase().includes(searchTerm.toLowerCase());
     
@@ -239,12 +243,12 @@ export default function AdminVouchersPage() {
             <label className="block text-sm font-medium text-black mb-2">
               Search
             </label>
-            <input
-              type="text"
+            <AdminUserSearchInput
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="Search by voucher ID, user ID, name, or email..."
-              className="w-full text-black px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+              onChange={setSearchTerm}
+              useCrownPrefix={searchUseCrownPrefix}
+              onUseCrownPrefixChange={setSearchUseCrownPrefix}
+              placeholderWithoutPrefix="Voucher ID, name, email..."
             />
           </div>
           <div>

@@ -2934,6 +2934,12 @@ export const getInvestmentsReport = asyncHandler(async (req, res) => {
         investedAmount: parseFloat(inv.investedAmount.toString()),
         type: inv.type,
         isActive: inv.isActive,
+        status: (inv as any).removedByAdminAt
+          ? "Removed by admin"
+          : inv.isActive
+            ? "Active"
+            : "Inactive",
+        removedByAdminAt: (inv as any).removedByAdminAt ?? null,
         isBinaryUpdated: inv.isBinaryUpdated,
         totalRoiEarned: parseFloat((inv.totalRoiEarned?.toString() || "0")),
         startDate: inv.startDate,
@@ -4200,6 +4206,71 @@ export const getFreeAccountsList = asyncHandler(async (req, res) => {
     data: {
       accounts: list,
       pagination: { page: pageNum, limit: limitNum, total, pages: Math.ceil(total / limitNum) || 1 },
+    },
+  });
+});
+
+/**
+ * Admin: Remove free investment for a user (soft-deactivate investments, deduct from wallet, clear binary target)
+ * POST /api/v1/admin/influencer/free/remove
+ * Body: { userId: string }
+ */
+export const removeFreeInvestment = asyncHandler(async (req, res) => {
+  const body = (req as any).body;
+  const { userId: rawUserId } = body as { userId?: string };
+  if (!rawUserId || typeof rawUserId !== "string") {
+    throw new AppError("User ID is required", 400);
+  }
+  const userId = rawUserId.trim();
+  const normalizedId = /^\d+$/.test(userId) ? `CROWN-${userId}` : userId;
+
+  const user = await findUserByUserId(normalizedId);
+  if (!user) {
+    throw new AppError("User not found", 404);
+  }
+
+  const freeInvestments = await Investment.find({ user: user._id, type: "free", isActive: true });
+  if (freeInvestments.length === 0) {
+    throw new AppError("User has no active free investment to remove", 400);
+  }
+
+  const { updateWallet } = await import("../services/investment.service");
+  const { createWalletTransaction } = await import("../services/transaction.service");
+  const { WalletType } = await import("../models/types");
+
+  let totalDeducted = 0;
+  for (const inv of freeInvestments) {
+    const amount = parseFloat(inv.investedAmount?.toString() ?? "0");
+    if (amount <= 0) continue;
+    await updateWallet(user._id as Types.ObjectId, WalletType.INVESTMENT, amount, "subtract");
+    await createWalletTransaction(
+      user._id as Types.ObjectId,
+      WalletType.INVESTMENT,
+      "debit",
+      amount,
+      `admin-remove-free-${inv._id}-${Date.now()}`,
+      { description: `Free investment removed by admin (investment ${inv._id})` }
+    );
+    totalDeducted += amount;
+    inv.isActive = false;
+    (inv as any).removedByAdminAt = new Date();
+    await inv.save();
+  }
+
+  user.binaryTargetAmount = 0;
+  user.targetStatus = undefined;
+  user.accountType = undefined;
+  user.withdrawEnabled = true;
+  await user.save();
+
+  const response = res as any;
+  response.status(200).json({
+    status: "success",
+    message: `Free investment removed for ${user.userId}. ${freeInvestments.length} investment(s) deactivated, $${totalDeducted.toFixed(2)} deducted from investment wallet.`,
+    data: {
+      userId: user.userId,
+      investmentsRemoved: freeInvestments.length,
+      amountDeductedFromWallet: totalDeducted,
     },
   });
 });

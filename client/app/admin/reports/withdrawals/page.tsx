@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { api } from '@/lib/api';
 import toast from 'react-hot-toast';
+import AdminUserSearchInput, { getEffectiveUserSearch } from '@/components/AdminUserSearchInput';
 
 export default function WithdrawalsReportPage() {
   const searchParams = useSearchParams();
@@ -14,6 +15,7 @@ export default function WithdrawalsReportPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
+  const [searchUseCrownPrefix, setSearchUseCrownPrefix] = useState(true);
   const [statusFilter, setStatusFilter] = useState<'all' | 'approved' | 'pending' | 'rejected' | 'completed' | 'failed'>('all');
   const [walletTypeFilter, setWalletTypeFilter] = useState<string>('all');
   const [startDate, setStartDate] = useState(urlStart);
@@ -56,8 +58,9 @@ export default function WithdrawalsReportPage() {
     
     if (searchTerm) {
       const term = searchTerm.toLowerCase();
+      const effectiveTerm = getEffectiveUserSearch(searchTerm, searchUseCrownPrefix).toLowerCase();
       filtered = filtered.filter((wd: any) =>
-        wd.userId.toLowerCase().includes(term) ||
+        wd.userId.toLowerCase().includes(effectiveTerm) ||
         wd.userName.toLowerCase().includes(term) ||
         wd.userEmail.toLowerCase().includes(term) ||
         (wd.withdrawalId && wd.withdrawalId.toLowerCase().includes(term))
@@ -226,12 +229,12 @@ export default function WithdrawalsReportPage() {
 
               {/* Filters */}
               <div className="space-y-4">
-                <input
-                  type="text"
+                <AdminUserSearchInput
                   value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  placeholder="Search by User ID, Name, Email, or Withdrawal ID..."
-                  className="w-full text-black px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  onChange={setSearchTerm}
+                  useCrownPrefix={searchUseCrownPrefix}
+                  onUseCrownPrefixChange={setSearchUseCrownPrefix}
+                  placeholderWithoutPrefix="Name, email, withdrawal ID..."
                 />
 
                 <div className="flex gap-4 flex-wrap items-center">

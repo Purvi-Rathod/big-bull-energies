@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { api } from '@/lib/api';
 import toast from 'react-hot-toast';
+import AdminUserSearchInput, { getEffectiveUserSearch } from '@/components/AdminUserSearchInput';
 
 interface Package {
   id: string;
@@ -25,6 +26,7 @@ interface User {
 export default function PowerlegAccountPage() {
   const { admin } = useAuth();
   const [userSearch, setUserSearch] = useState('');
+  const [userSearchUseCrownPrefix, setUserSearchUseCrownPrefix] = useState(true);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [users, setUsers] = useState<User[]>([]);
   const [packages, setPackages] = useState<Package[]>([]);
@@ -109,7 +111,7 @@ export default function PowerlegAccountPage() {
 
     setSearching(true);
     try {
-      const response = await api.getAdminUsers({ page: 1, limit: 100, search: userSearch });
+      const response = await api.getAdminUsers({ page: 1, limit: 100, search: getEffectiveUserSearch(userSearch, userSearchUseCrownPrefix) });
       if (response.data?.users && response.data.users.length > 0) {
         const foundUsers = response.data.users;
         setUsers(foundUsers);
@@ -231,18 +233,16 @@ export default function PowerlegAccountPage() {
             User ID <span className="text-red-500">*</span>
           </label>
           <div className="flex gap-2 mb-2">
-            <input
-              type="text"
+            <AdminUserSearchInput
               value={userSearch}
-              onChange={(e) => {
-                setUserSearch(e.target.value);
-                if (selectedUser && e.target.value !== selectedUser.userId) {
-                  setSelectedUser(null);
-                }
+              onChange={(v) => {
+                setUserSearch(v);
+                if (selectedUser && v !== selectedUser.userId) setSelectedUser(null);
               }}
-              onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), handleSearch())}
-              placeholder="Search by User ID, Name, or Email..."
-              className="flex-1 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 text-black placeholder:text-black"
+              useCrownPrefix={userSearchUseCrownPrefix}
+              onUseCrownPrefixChange={setUserSearchUseCrownPrefix}
+              className="flex-1"
+              onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), handleSearch())}
             />
             <button
               type="button"

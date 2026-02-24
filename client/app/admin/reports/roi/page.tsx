@@ -3,12 +3,14 @@
 import { useState, useEffect, useRef } from 'react';
 import { api } from '@/lib/api';
 import toast from 'react-hot-toast';
+import AdminUserSearchInput, { getEffectiveUserSearch } from '@/components/AdminUserSearchInput';
 
 export default function ROIReportPage() {
   const [report, setReport] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
+  const [searchUseCrownPrefix, setSearchUseCrownPrefix] = useState(true);
   const [typeFilter, setTypeFilter] = useState<'all' | 'credit' | 'debit'>('all');
   const [statusFilter, setStatusFilter] = useState<'all' | 'completed' | 'pending' | 'failed'>('all');
   const [startDate, setStartDate] = useState('');
@@ -47,8 +49,9 @@ export default function ROIReportPage() {
     // Apply search filter
     if (searchTerm) {
       const term = searchTerm.toLowerCase();
+      const effectiveTerm = getEffectiveUserSearch(searchTerm, searchUseCrownPrefix).toLowerCase();
       filtered = filtered.filter((tx: any) =>
-        tx.userId.toLowerCase().includes(term) ||
+        tx.userId.toLowerCase().includes(effectiveTerm) ||
         tx.userName.toLowerCase().includes(term) ||
         tx.userEmail.toLowerCase().includes(term)
       );
@@ -217,12 +220,11 @@ export default function ROIReportPage() {
               <div className="space-y-4">
                 {/* Search Bar */}
                 <div>
-                  <input
-                    type="text"
+                  <AdminUserSearchInput
                     value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    placeholder="Search by User ID, Name, or Email..."
-                    className="w-full  text-black   px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    onChange={setSearchTerm}
+                    useCrownPrefix={searchUseCrownPrefix}
+                    onUseCrownPrefixChange={setSearchUseCrownPrefix}
                   />
                 </div>
 

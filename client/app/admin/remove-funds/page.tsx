@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { api } from '@/lib/api';
 import toast from 'react-hot-toast';
+import AdminUserSearchInput, { getEffectiveUserSearch } from '@/components/AdminUserSearchInput';
 
 interface User {
   id: string;
@@ -33,6 +34,7 @@ export default function RemoveFundsPage() {
     description: '',
   });
   const [userSearch, setUserSearch] = useState('');
+  const [userSearchUseCrownPrefix, setUserSearchUseCrownPrefix] = useState(true);
   const [searching, setSearching] = useState(false);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const hasFetchedRef = useRef(false);
@@ -67,7 +69,7 @@ export default function RemoveFundsPage() {
 
     setSearching(true);
     try {
-      const response = await api.getAdminUsers({ page: 1, limit: 100, search: userSearch });
+      const response = await api.getAdminUsers({ page: 1, limit: 100, search: getEffectiveUserSearch(userSearch, userSearchUseCrownPrefix) });
       if (response.data?.users && response.data.users.length > 0) {
         const users = response.data.users;
         setUsers(users);
@@ -166,13 +168,13 @@ export default function RemoveFundsPage() {
               Search User
             </label>
             <div className="flex gap-2">
-              <input
-                type="text"
+              <AdminUserSearchInput
                 value={userSearch}
-                onChange={(e) => setUserSearch(e.target.value)}
-                placeholder="Search by User ID, Name, or Email..."
-                className="flex-1 text-black px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                onKeyPress={(e) => {
+                onChange={setUserSearch}
+                useCrownPrefix={userSearchUseCrownPrefix}
+                onUseCrownPrefixChange={setUserSearchUseCrownPrefix}
+                className="flex-1"
+                onKeyDown={(e) => {
                   if (e.key === 'Enter') {
                     e.preventDefault();
                     handleSearch();

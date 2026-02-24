@@ -27,7 +27,7 @@ export default function HeroSection() {
         {/* YouTube iframe embed - optimized for performance */}
         <iframe
           className="absolute inset-0 w-full h-full object-cover"
-          src={`https://www.youtube.com/embed/${youtubeVideoId}?autoplay=1&mute=1&loop=1&playlist=${youtubeVideoId}&controls=0&showinfo=0&rel=0&iv_load_policy=3&modestbranding=1&playsinline=1&enablejsapi=1&origin=${typeof window !== 'undefined' ? window.location.origin : ''}`}
+          src={`https://www.youtube.com/embed/${youtubeVideoId}?autoplay=1&mute=1&loop=1&playlist=${youtubeVideoId}&start=23&controls=0&showinfo=0&rel=0&iv_load_policy=3&modestbranding=1&playsinline=1&enablejsapi=1&origin=${typeof window !== 'undefined' ? window.location.origin : ''}`}
           title="Crown Bankers Solar Plant Video"
           allow="autoplay; encrypted-media; picture-in-picture"
           allowFullScreen

@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
 import { api } from '@/lib/api';
 import toast from 'react-hot-toast';
+import AdminUserSearchInput, { getEffectiveUserSearch } from '@/components/AdminUserSearchInput';
 
 const PAGE_SIZES = [10, 25, 50, 100];
 const SORT_OPTIONS = [
@@ -23,6 +24,7 @@ export default function NOWPaymentsReportPage() {
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(25);
   const [search, setSearch] = useState('');
+  const [searchUseCrownPrefix, setSearchUseCrownPrefix] = useState(true);
   const [statusFilter, setStatusFilter] = useState('');
   const [sortBy, setSortBy] = useState('date-desc');
 
@@ -55,11 +57,12 @@ export default function NOWPaymentsReportPage() {
       return { filteredPayments: [], paginatedPayments: [], totalPages: 0, totalFiltered: 0 };
     }
     const searchLower = search.trim().toLowerCase();
+    const effectiveSearchLower = getEffectiveUserSearch(search, searchUseCrownPrefix).toLowerCase();
     const statusLower = statusFilter.trim().toLowerCase();
     let list = report.payments.filter((p: any) => {
-      if (searchLower) {
+      if (searchLower || effectiveSearchLower) {
         const match =
-          (p.userId || '').toLowerCase().includes(searchLower) ||
+          (p.userId || '').toLowerCase().includes(effectiveSearchLower) ||
           (p.userName || '').toLowerCase().includes(searchLower) ||
           (p.userEmail || '').toLowerCase().includes(searchLower) ||
           (p.paymentId || '').toLowerCase().includes(searchLower) ||
@@ -88,7 +91,7 @@ export default function NOWPaymentsReportPage() {
     const start = (page - 1) * pageSize;
     const paginatedPayments = list.slice(start, start + pageSize);
     return { filteredPayments: list, paginatedPayments, totalPages, totalFiltered };
-  }, [report?.payments, search, statusFilter, sortBy, page, pageSize]);
+  }, [report?.payments, search, searchUseCrownPrefix, statusFilter, sortBy, page, pageSize]);
 
   const exportToCSV = () => {
     if (!report) return;
@@ -187,12 +190,13 @@ export default function NOWPaymentsReportPage() {
               </div>
               {/* Filter and sort */}
               <div className="flex flex-wrap gap-3 items-center">
-                <input
-                  type="text"
+                <AdminUserSearchInput
                   value={search}
-                  onChange={(e) => { setSearch(e.target.value); setPage(1); }}
-                  placeholder="Search by User ID, name, email, payment ID, package, country..."
-                  className="flex-1 min-w-[200px] px-3 py-2 border border-gray-300 rounded-md text-black placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
+                  onChange={(v) => { setSearch(v); setPage(1); }}
+                  useCrownPrefix={searchUseCrownPrefix}
+                  onUseCrownPrefixChange={setSearchUseCrownPrefix}
+                  placeholderWithoutPrefix="Name, email, payment ID, package, country..."
+                  className="flex-1 min-w-[200px] text-sm"
                 />
                 <select
                   value={statusFilter}

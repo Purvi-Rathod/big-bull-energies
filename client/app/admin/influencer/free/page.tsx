@@ -41,6 +41,7 @@ export default function FreeAccountPage() {
   const [loadingFreeAccounts, setLoadingFreeAccounts] = useState(false);
   const [freePage, setFreePage] = useState(1);
   const [freePagination, setFreePagination] = useState({ page: 1, limit: 10, total: 0, pages: 1 });
+  const [removingUserId, setRemovingUserId] = useState<string | null>(null);
   const hasFetchedPackages = useRef(false);
 
   useEffect(() => {
@@ -63,6 +64,22 @@ export default function FreeAccountPage() {
       setFreeAccounts([]);
     } finally {
       setLoadingFreeAccounts(false);
+    }
+  };
+
+  const handleRemoveFreeInvestment = async (rowUserId: string) => {
+    if (!window.confirm(`Remove free investment for ${rowUserId}? This will delete the free investment and clear their binary target. The user will no longer appear in the free accounts list.`)) {
+      return;
+    }
+    setRemovingUserId(rowUserId);
+    try {
+      await api.removeFreeInvestment(rowUserId);
+      toast.success(`Free investment removed for ${rowUserId}`);
+      await fetchFreeAccounts(freePage);
+    } catch (err: any) {
+      toast.error(err.message || 'Failed to remove free investment');
+    } finally {
+      setRemovingUserId(null);
     }
   };
 
@@ -323,6 +340,7 @@ export default function FreeAccountPage() {
                   <th className="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase">Target Status</th>
                   <th className="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase">Withdraw</th>
                   <th className="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase">Activation Date</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase">Actions</th>
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
@@ -350,6 +368,17 @@ export default function FreeAccountPage() {
                       </span>
                     </td>
                     <td className="px-4 py-3 text-sm text-black">{row.activationDate ? new Date(row.activationDate).toLocaleString('en-GB', { timeZone: 'Europe/London', hour12: false }) : '—'}</td>
+                    <td className="px-4 py-3">
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveFreeInvestment(row.userId)}
+                        disabled={removingUserId === row.userId}
+                        className="px-2 py-1 text-xs font-medium text-red-700 bg-red-50 rounded hover:bg-red-100 disabled:opacity-50 disabled:cursor-not-allowed"
+                        title="Remove free investment for this user"
+                      >
+                        {removingUserId === row.userId ? 'Removing...' : 'Remove free'}
+                      </button>
+                    </td>
                   </tr>
                 ))}
               </tbody>

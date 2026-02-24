@@ -1228,6 +1228,13 @@ class ApiClient {
     }>(`/admin/influencer/free/list${qs ? `?${qs}` : ''}`, { method: 'GET' });
   }
 
+  async removeFreeInvestment(userId: string) {
+    return this.request<{ userId: string; investmentsRemoved: number }>(
+      '/admin/influencer/free/remove',
+      { method: 'POST', body: JSON.stringify({ userId }) }
+    );
+  }
+
   // Free Account Management (Admin) - give existing user free investment + binary target (no referrer, no new account)
   async createFreeAccounts(data: {
     userId: string;

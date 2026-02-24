@@ -26,6 +26,7 @@ export interface IInvestment extends Document {
   totalRoiEarned?: Types.Decimal128; // Total ROI earned so far (cash payout only, excludes reinvest)
   totalReinvested?: Types.Decimal128; // Total amount reinvested into principal
   isActive: boolean; // Whether investment is still active
+  removedByAdminAt?: Date; // Set when admin removes free investment (soft-delete for audit)
 }
 
 const InvestmentSchema = new Schema<IInvestment>({
@@ -51,7 +52,8 @@ const InvestmentSchema = new Schema<IInvestment>({
   totalRoiEarned: { type: Schema.Types.Decimal128, default: "0" },
   totalReinvested: { type: Schema.Types.Decimal128, default: "0" },
   expiresOn: { type: Date }, // Legacy field
-  isActive: { type: Boolean, default: true }
+  isActive: { type: Boolean, default: true },
+  removedByAdminAt: { type: Date }
 }, { timestamps: true });
 
 export const Investment = model<IInvestment>("Investment", InvestmentSchema);

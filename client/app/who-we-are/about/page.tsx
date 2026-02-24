@@ -11,7 +11,7 @@ export default function AboutPage() {
       {/* Hero Section */}
       <section className="relative w-full h-[60vh] md:h-[70vh] overflow-hidden">
         <Image
-          src="/about-hero.webp"
+          src="https://res.cloudinary.com/dygdftjr8/image/upload/v1771927407/Screenshot_2026-02-24_at_15.33.19_dxynvj.png"
           alt="About Us - Our People"
           fill
           className="object-cover"
@@ -80,25 +80,18 @@ export default function AboutPage() {
             {/* Right Column - Image */}
             <div className="flex flex-col">
               <div className="relative w-full h-[400px] md:h-[500px] lg:h-[600px]">
-                <Image
-                  src="/about1.webp"
-                  alt="Innovation and Solutions"
-                  fill
-                  className="object-cover"
-                  priority
+                <video
+                  src="https://res.cloudinary.com/dygdftjr8/video/upload/v1771928547/WhatsApp_Video_2026-02-09_at_14.18.35_tworfv.mp4"
+                  title="Innovation and Solutions"
+                  className="absolute inset-0 w-full h-full object-cover"
+                  playsInline
+                  muted
+                  loop
+                  autoPlay
                 />
                 {/* Play Button Overlay */}
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <button
-                    className="w-16 h-16 md:w-20 md:h-20 rounded-full flex items-center justify-center shadow-lg transition hover:scale-110"
-                    style={{ backgroundColor: "#ffcf0B" }}
-                    aria-label="Watch Now"
-                  >
-                    <Play
-                      className="w-8 h-8 md:w-10 md:h-10 text-gray-900 ml-1"
-                      fill="currentColor"
-                    />
-                  </button>
+                  
                 </div>
               </div>
               <div className="mt-6">

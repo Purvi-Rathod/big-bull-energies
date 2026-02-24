@@ -70,7 +70,7 @@ export default function SolarPage() {
       {/* Hero Section with Background Image */}
       <section className="relative w-full h-[50vh] sm:h-[55vh] md:h-[60vh] lg:h-[70vh] overflow-hidden">
         <Image
-          src="/hero-solar.webp"
+          src="https://res.cloudinary.com/dygdftjr8/image/upload/v1771927306/Screenshot_2026-02-24_at_15.31.36_sbqtdp.png"
           alt="Solar Energy"
           fill
           className="object-cover"
@@ -199,7 +199,7 @@ export default function SolarPage() {
               <div className="relative w-full aspect-square max-w-[350px] sm:max-w-[400px] md:max-w-[450px] lg:max-w-[500px] mx-auto mb-4 sm:mb-6">
                 <div className="relative w-full h-full rounded-full overflow-hidden">
                   <Image
-                    src="/img4.webp"
+                    src="https://res.cloudinary.com/dygdftjr8/image/upload/v1771656810/Screenshot_2026-02-21_at_12.23.11_fdjt2y.png"
                     alt="Solar Power Plant"
                     fill
                     className="object-cover"

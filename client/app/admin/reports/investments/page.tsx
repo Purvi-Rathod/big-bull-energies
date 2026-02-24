@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { api } from '@/lib/api';
 import toast from 'react-hot-toast';
+import AdminUserSearchInput, { getEffectiveUserSearch } from '@/components/AdminUserSearchInput';
 
 export default function InvestmentsReportPage() {
   const searchParams = useSearchParams();
@@ -14,7 +15,8 @@ export default function InvestmentsReportPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'inactive'>('all');
+  const [searchUseCrownPrefix, setSearchUseCrownPrefix] = useState(true);
+  const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'inactive' | 'removed'>('all');
   const [typeFilter, setTypeFilter] = useState<string>('all');
   const [startDate, setStartDate] = useState(urlStart);
   const [endDate, setEndDate] = useState(urlEnd);
@@ -56,8 +58,9 @@ export default function InvestmentsReportPage() {
     
     if (searchTerm) {
       const term = searchTerm.toLowerCase();
+      const effectiveTerm = getEffectiveUserSearch(searchTerm, searchUseCrownPrefix).toLowerCase();
       filtered = filtered.filter((inv: any) =>
-        inv.userId.toLowerCase().includes(term) ||
+        inv.userId.toLowerCase().includes(effectiveTerm) ||
         inv.userName.toLowerCase().includes(term) ||
         inv.userEmail.toLowerCase().includes(term) ||
         inv.packageName.toLowerCase().includes(term)
@@ -65,9 +68,12 @@ export default function InvestmentsReportPage() {
     }
     
     if (statusFilter !== 'all') {
-      filtered = filtered.filter((inv: any) => 
-        statusFilter === 'active' ? inv.isActive : !inv.isActive
-      );
+      filtered = filtered.filter((inv: any) => {
+        if (statusFilter === 'removed') return (inv.status === 'Removed by admin') || inv.removedByAdminAt;
+        if (statusFilter === 'active') return inv.isActive && inv.status !== 'Removed by admin';
+        if (statusFilter === 'inactive') return !inv.isActive && inv.status !== 'Removed by admin';
+        return true;
+      });
     }
     
     if (typeFilter !== 'all') {
@@ -102,7 +108,7 @@ export default function InvestmentsReportPage() {
       inv.packageName,
       `$${inv.investedAmount.toFixed(2)}`,
       inv.type,
-      inv.isActive ? 'Active' : 'Inactive',
+      inv.status ?? (inv.isActive ? 'Active' : 'Inactive'),
       `$${inv.totalRoiEarned.toFixed(2)}`,
       new Date(inv.startDate).toLocaleDateString('en-GB', { timeZone: 'Europe/London' }),
       new Date(inv.endDate).toLocaleDateString('en-GB', { timeZone: 'Europe/London' }),
@@ -133,7 +139,7 @@ export default function InvestmentsReportPage() {
       inv.packageName,
       inv.investedAmount.toFixed(2),
       inv.type,
-      inv.isActive ? 'Active' : 'Inactive',
+      inv.status ?? (inv.isActive ? 'Active' : 'Inactive'),
       inv.totalRoiEarned.toFixed(2),
       new Date(inv.startDate).toLocaleDateString('en-GB', { timeZone: 'Europe/London' }),
       new Date(inv.endDate).toLocaleDateString('en-GB', { timeZone: 'Europe/London' }),
@@ -259,12 +265,12 @@ export default function InvestmentsReportPage() {
 
               {/* Filters */}
               <div className="space-y-4">
-                <input
-                  type="text"
+                <AdminUserSearchInput
                   value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  placeholder="Search by User ID, Name, Email, or Package..."
-                  className="w-full text-black  px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  onChange={setSearchTerm}
+                  useCrownPrefix={searchUseCrownPrefix}
+                  onUseCrownPrefixChange={setSearchUseCrownPrefix}
+                  placeholderWithoutPrefix="Name, email, package..."
                 />
 
                 <div className="flex gap-4 flex-wrap items-center">
@@ -276,6 +282,7 @@ export default function InvestmentsReportPage() {
                     <option value="all">All Status</option>
                     <option value="active">Active</option>
                     <option value="inactive">Inactive</option>
+                    <option value="removed">Removed by admin</option>
                   </select>
 
                   <select
@@ -368,9 +375,13 @@ export default function InvestmentsReportPage() {
                         </td>
                         <td className="px-3 py-3 text-xs">
                           <span className={`px-3 py-1 inline-flex text-xs leading-5 font-bold rounded-full border-2 shadow-sm ${
-                            inv.isActive ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-black'
+                            inv.status === 'Removed by admin'
+                              ? 'bg-amber-100 text-amber-800 border-amber-300'
+                              : inv.isActive
+                                ? 'bg-green-100 text-green-800'
+                                : 'bg-gray-100 text-black'
                           }`}>
-                            {inv.isActive ? 'Active' : 'Inactive'}
+                            {inv.status ?? (inv.isActive ? 'Active' : 'Inactive')}
                           </span>
                         </td>
                       </tr>

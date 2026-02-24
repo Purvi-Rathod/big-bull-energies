@@ -50,6 +50,7 @@ import {
   createPowerlegInvestment,
   createFreeAccounts,
   getFreeAccountsList,
+  removeFreeInvestment,
   setBinaryTarget,
   getUserTargetStatus,
   getUserBio,
@@ -168,6 +169,7 @@ router.post("/influencer/powerleg/create", requireAdminAuth, createPowerlegAccou
 router.post("/influencer/powerleg/investment", requireAdminAuth, createPowerlegInvestment);
 router.get("/influencer/free/list", requireAdminAuth, getFreeAccountsList);
 router.post("/influencer/free/create", requireAdminAuth, createFreeAccounts);
+router.post("/influencer/free/remove", requireAdminAuth, removeFreeInvestment);
 
 // Binary target management
 router.post("/users/:userId/set-binary-target", requireAdminAuth, setBinaryTarget);

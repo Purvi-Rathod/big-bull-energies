@@ -3,12 +3,14 @@
 import { useState, useEffect, useRef } from 'react';
 import { api } from '@/lib/api';
 import toast from 'react-hot-toast';
+import AdminUserSearchInput, { getEffectiveUserSearch } from '@/components/AdminUserSearchInput';
 
 export default function ROIStatisticsPage() {
   const [report, setReport] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
+  const [searchUseCrownPrefix, setSearchUseCrownPrefix] = useState(true);
   const [sortBy, setSortBy] = useState<'totalROI' | 'roiCount'>('totalROI');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
   const hasFetchedRef = useRef(false);
@@ -96,8 +98,9 @@ export default function ROIStatisticsPage() {
     // Apply search filter
     if (searchTerm) {
       const term = searchTerm.toLowerCase();
+      const effectiveTerm = getEffectiveUserSearch(searchTerm, searchUseCrownPrefix).toLowerCase();
       filtered = filtered.filter((u: any) =>
-        u.userId.toLowerCase().includes(term) ||
+        u.userId.toLowerCase().includes(effectiveTerm) ||
         u.userName.toLowerCase().includes(term) ||
         u.userEmail.toLowerCase().includes(term)
       );
@@ -199,12 +202,12 @@ export default function ROIStatisticsPage() {
             {/* Search and Filters */}
             <div className="mb-4 space-y-4">
               <div className="flex gap-4 items-center flex-wrap">
-                <input
-                  type="text"
+                <AdminUserSearchInput
                   value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  placeholder="Search by User ID, Name, or Email..."
-                  className="flex-1 text-black  min-w-[200px] px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  onChange={setSearchTerm}
+                  useCrownPrefix={searchUseCrownPrefix}
+                  onUseCrownPrefixChange={setSearchUseCrownPrefix}
+                  className="flex-1 min-w-[200px]"
                 />
                 <div className="flex gap-2">
                   <button

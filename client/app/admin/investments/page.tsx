@@ -45,6 +45,7 @@ export default function AdminInvestmentsPage() {
     amount: '',
   });
   const [userSearch, setUserSearch] = useState('');
+  const [userSearchUseCrownPrefix, setUserSearchUseCrownPrefix] = useState(true);
   const [searching, setSearching] = useState(false);
   const [adminCreatedList, setAdminCreatedList] = useState<AdminCreatedInvestment[]>([]);
   const [loadingReport, setLoadingReport] = useState(false);
@@ -231,8 +232,17 @@ export default function AdminInvestmentsPage() {
     }
   };
 
+  const getEffectiveUserSearch = () => {
+    const q = userSearch.trim();
+    if (!q) return '';
+    if (userSearchUseCrownPrefix) return 'CROWN-' + q.replace(/^CROWN-?/i, '').trim();
+    return q;
+  };
+
+  const effectiveUserSearch = getEffectiveUserSearch();
+
   const filteredUsers = users.filter(user =>
-    user.userId.toLowerCase().includes(userSearch.toLowerCase()) ||
+    user.userId.toLowerCase().includes(effectiveUserSearch.toLowerCase()) ||
     user.name.toLowerCase().includes(userSearch.toLowerCase()) ||
     (user.email && user.email.toLowerCase().includes(userSearch.toLowerCase()))
   );
@@ -278,19 +288,44 @@ export default function AdminInvestmentsPage() {
               Search User <span className="text-red-500">*</span>
             </label>
             <div className="relative">
-              <input
-                type="text"
-                id="userSearch"
-                value={userSearch}
-                onChange={(e) => {
-                  setUserSearch(e.target.value);
-                  if (!e.target.value) {
-                    setFormData({ ...formData, userId: '' });
-                  }
-                }}
-                placeholder="Search by User ID, Name, or Email"
-                className="w-full px-4 py-2 pr-10 border text-black border-gray-600 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
-              />
+              <div className="flex w-full items-center rounded-md border border-gray-600 bg-white focus-within:ring-2 focus-within:ring-indigo-500 focus-within:border-indigo-500 pr-10">
+                {userSearchUseCrownPrefix ? (
+                  <span className="flex items-center gap-1 shrink-0 pl-3 pr-1 py-2 text-gray-600 font-medium">
+                    CROWN-
+                    <button
+                      type="button"
+                      onClick={() => setUserSearchUseCrownPrefix(false)}
+                      className="rounded p-0.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100"
+                      title="Remove prefix to search by name or email"
+                      aria-label="Remove CROWN- prefix"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+                    </button>
+                  </span>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => setUserSearchUseCrownPrefix(true)}
+                    className="shrink-0 pl-2 pr-1 py-2 text-xs text-indigo-600 hover:text-indigo-800 font-medium"
+                    title="Use CROWN- prefix for user ID search"
+                  >
+                    + CROWN-
+                  </button>
+                )}
+                <input
+                  type="text"
+                  id="userSearch"
+                  value={userSearch}
+                  onChange={(e) => {
+                    setUserSearch(e.target.value);
+                    if (!e.target.value) {
+                      setFormData({ ...formData, userId: '' });
+                    }
+                  }}
+                  placeholder={userSearchUseCrownPrefix ? "e.g. 000123" : "Name or email..."}
+                  className="w-full min-w-0 px-2 py-2 text-black bg-transparent border-0 focus:outline-none focus:ring-0"
+                />
+              </div>
               {searching && userSearch && (
                 <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
                   <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-indigo-600"></div>

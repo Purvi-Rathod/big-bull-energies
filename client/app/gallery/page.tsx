@@ -140,7 +140,7 @@ export default function GalleryPage() {
   return (
     <main className="min-h-screen w-full overflow-x-hidden pt-24 sm:pt-28 md:pt-32 lg:pt-[126px]">
       {/* Hero Section */}
-      <section className="relative w-full bg-[#E8F5F0] py-12 sm:py-16 md:py-20 lg:py-24">
+      {/* <section className="relative w-full bg-[#E8F5F0] py-12 sm:py-16 md:py-20 lg:py-24">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-4xl mx-auto text-center">
             <div className="flex items-center justify-center gap-2 sm:gap-3 mb-4 sm:mb-6">
@@ -172,11 +172,11 @@ export default function GalleryPage() {
             </p>
           </div>
         </div>
-      </section>
+      </section> */}
 
       {/* Category Filter */}
       {categories.length > 0 && (
-        <section className="relative w-full bg-white py-6 sm:py-8 border-b-2" style={{ borderColor: "#042B19", opacity: 0.1 }}>
+        <section className="relative w-full bg-white py-6 sm:py-8 border-b-2" style={{ borderColor: "#042B19", opacity: 0.9 }}>
           <div className="container mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex items-center gap-2 sm:gap-4 flex-wrap justify-center">
               <Filter className="w-5 h-5" style={{ color: "#042B19" }} />

@@ -43,6 +43,7 @@ export default function AdminPanel() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [search, setSearch] = useState('');
+  const [searchUseCrownPrefix, setSearchUseCrownPrefix] = useState(true);
   const [countryFilter, setCountryFilter] = useState('');
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
@@ -82,7 +83,14 @@ export default function AdminPanel() {
     if (isAdminUser || isAdminAccount) {
       fetchUsers();
     }
-  }, [page, search, countryFilter, startDate, endDate, user, admin]);
+  }, [page, search, searchUseCrownPrefix, countryFilter, startDate, endDate, user, admin]);
+
+  const getEffectiveSearch = () => {
+    const q = search.trim();
+    if (!q) return '';
+    if (searchUseCrownPrefix) return 'CROWN-' + q.replace(/^CROWN-?/i, '').trim();
+    return q;
+  };
 
   const fetchUsers = async () => {
     try {
@@ -91,7 +99,7 @@ export default function AdminPanel() {
       const response = await api.getAdminUsers({ 
         page, 
         limit: 50, 
-        search,
+        search: getEffectiveSearch(),
         country: countryFilter || undefined,
         startDate: startDate || undefined,
         endDate: endDate || undefined,
@@ -338,13 +346,38 @@ export default function AdminPanel() {
             <form onSubmit={handleSearch} className="space-y-4">
               {/* Search and Country Filter Row */}
               <div className="flex gap-4 flex-wrap">
-                <input
-                  type="text"
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                  placeholder="Search by name, email, userId, or phone..."
-                  className="flex-1 w-[250px] px-2 py-2 border border-gray-300 rounded-md text-black bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                />
+                <div className="flex flex-1 w-[250px] min-w-0 items-center rounded-md border border-gray-300 bg-white focus-within:ring-2 focus-within:ring-indigo-500 focus-within:border-transparent">
+                  {searchUseCrownPrefix ? (
+                    <span className="flex items-center gap-1 shrink-0 pl-3 pr-1 py-2 text-gray-600 font-medium">
+                      CROWN-
+                      <button
+                        type="button"
+                        onClick={() => setSearchUseCrownPrefix(false)}
+                        className="rounded p-0.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100"
+                        title="Remove prefix to search by name, email, phone"
+                        aria-label="Remove CROWN- prefix"
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+                      </button>
+                    </span>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => setSearchUseCrownPrefix(true)}
+                      className="shrink-0 pl-2 pr-1 py-2 text-xs text-indigo-600 hover:text-indigo-800 font-medium"
+                      title="Use CROWN- prefix for user ID search"
+                    >
+                      + CROWN-
+                    </button>
+                  )}
+                  <input
+                    type="text"
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                    placeholder={searchUseCrownPrefix ? "e.g. 000123" : "Name, email, phone..."}
+                    className="w-full min-w-0 px-2 py-2 text-black bg-transparent border-0 focus:outline-none focus:ring-0"
+                  />
+                </div>
                 <select
                   value={countryFilter}
                   onChange={(e) => {
@@ -371,6 +404,7 @@ export default function AdminPanel() {
                     type="button"
                     onClick={() => {
                       setSearch('');
+                      setSearchUseCrownPrefix(true);
                       setCountryFilter('');
                       setStartDate('');
                       setEndDate('');

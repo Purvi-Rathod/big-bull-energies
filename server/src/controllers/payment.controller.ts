@@ -128,31 +128,32 @@ export const createPayment = asyncHandler(async (req, res) => {
       );
     }
     
-    console.log(`[Voucher] Voucher ID: ${voucher.voucherId}, Amount: ${voucher.amount}, Investment Value: ${voucherInvestmentValue}, Investment Amount: ${investmentAmount}`);
-    
-    remainingAmount = Math.max(0, investmentAmount - voucherInvestmentValue);
+    // Business rule: Voucher can cover at most 50% of the package. The rest must be paid via gateway or main wallet.
+    const VOUCHER_MAX_COVERAGE_PCT = 0.5;
+    const maxVoucherCoverage = investmentAmount * VOUCHER_MAX_COVERAGE_PCT;
+    const voucherCredit = Math.min(voucherInvestmentValue, maxVoucherCoverage);
+    remainingAmount = Math.max(0, investmentAmount - voucherCredit);
 
-    // If voucher covers full amount or more, no payment needed
-    // IMPORTANT: Voucher investment value can be greater than or equal to investment amount - that's fine
-    // Examples:
-    // - $100 voucher (investment value $200) can cover $100 investment ✅
-    // - $100 voucher (investment value $200) can cover $200 investment ✅
-    // - $100 voucher (investment value $200) can cover $150 investment ✅
-    // - $100 voucher (investment value $200) can cover $300 investment (partial - user pays $100) ✅
-    console.log(`[Voucher] Remaining amount: ${remainingAmount}, Voucher covers: ${voucherInvestmentValue >= investmentAmount}`);
-    
-    // Use main wallet balance to reduce remaining amount (if user selected to use it)
+    if (remainingAmount <= 0) {
+      throw new AppError(
+        "Vouchers can cover at most 50% of the package value. You must pay the remaining amount via payment gateway or main wallet.",
+        400
+      );
+    }
+
+    console.log(`[Voucher] Voucher ID: ${voucher.voucherId}, Investment Value: ${voucherInvestmentValue}, Package: ${investmentAmount}, Voucher credit (max 50%): ${voucherCredit}, Remaining to pay: ${remainingAmount}`);
+
+    // Use main wallet ONLY when it fully covers the remainder — then we activate immediately and deduct now.
+    // When remainder will be paid via gateway, do NOT deduct here (deduct only on payment success so bonus isn't lost if user abandons).
     if (useMainWallet && mainWallet && mainWalletBalance > 0 && remainingAmount > 0) {
-      mainWalletUsed = Math.min(mainWalletBalance, remainingAmount);
-      remainingAmount = remainingAmount - mainWalletUsed;
-      
-      // Deduct from main wallet
-      if (mainWalletUsed > 0) {
+      const potentialMainUse = Math.min(mainWalletBalance, remainingAmount);
+      if (potentialMainUse >= remainingAmount) {
+        // Main wallet fully covers remainder — deduct now and activate in this request
+        mainWalletUsed = remainingAmount;
+        remainingAmount = 0;
         const newBalance = mainWalletBalance - mainWalletUsed;
         mainWallet.balance = Types.Decimal128.fromString(newBalance.toString());
         await mainWallet.save();
-        
-        // Create transaction record
         await createWalletTransaction(
           userId,
           WalletType.MAIN,
@@ -162,10 +163,11 @@ export const createPayment = asyncHandler(async (req, res) => {
           { description: `Investment package activation - $${mainWalletUsed} used from main wallet` }
         );
       }
+      // Else: remainder would be paid via gateway — do not deduct main wallet here
     }
-    
-    if (remainingAmount === 0 || (voucherInvestmentValue + mainWalletUsed >= investmentAmount)) {
-      // Process investment directly (fully covered by voucher + main wallet)
+
+    if (remainingAmount === 0) {
+      // Process investment directly (voucher up to 50% + remainder paid via main wallet)
       const { processInvestment } = await import("../services/investment.service");
       const investment = await processInvestment(
         userId,
@@ -255,8 +257,14 @@ export const createPayment = asyncHandler(async (req, res) => {
   const nowpaymentsSetting = await Settings.findOne({ key: "nowpayments_enabled" });
   const isNOWPaymentsEnabled = nowpaymentsSetting === null || nowpaymentsSetting.value === true || nowpaymentsSetting.value === "true";
 
-  // If NOWPayments is disabled, allow direct investment (with or without voucher)
+  // If NOWPayments is disabled, allow direct investment only when fully covered (no voucher remainder or no voucher)
   if (!isNOWPaymentsEnabled) {
+    if (voucherId && remainingAmount > 0) {
+      throw new AppError(
+        `When using a voucher, at least 50% of the package must be paid separately. Payment gateway is disabled. Please pay the remaining $${remainingAmount.toFixed(2)} from your main wallet (ensure "Use main wallet" is selected and you have sufficient balance) or try again when the payment gateway is enabled.`,
+        400
+      );
+    }
     // Process investment directly without payment gateway
     const { processInvestment } = await import("../services/investment.service");
     
@@ -290,28 +298,13 @@ export const createPayment = asyncHandler(async (req, res) => {
     });
   }
   
-  // Use main wallet balance to reduce payment amount (if user selected to use it and no voucher was used)
-  if (useMainWallet && !voucher && mainWallet && mainWalletBalance > 0 && investmentAmount > 0) {
-    mainWalletUsed = Math.min(mainWalletBalance, investmentAmount);
-    remainingAmount = investmentAmount - mainWalletUsed;
-    
-    // Deduct from main wallet
-    if (mainWalletUsed > 0) {
-      const newBalance = mainWalletBalance - mainWalletUsed;
-      mainWallet.balance = Types.Decimal128.fromString(newBalance.toString());
-      await mainWallet.save();
-      
-      // Create transaction record
-      await createWalletTransaction(
-        userId,
-        WalletType.MAIN,
-        "debit",
-        mainWalletUsed,
-        `main-wallet-${Date.now()}-${userId}`,
-        { description: `Investment package activation - $${mainWalletUsed} used from main wallet` }
-      );
-    }
+  // When gateway payment will be created: allow main wallet to reduce the invoice amount, but do NOT
+  // deduct from main wallet here — deduct only in callback when payment succeeds (so bonus isn't lost if user abandons).
+  let mainWalletToApply = 0;
+  if (useMainWallet && mainWallet && mainWalletBalance > 0 && remainingAmount > 0) {
+    mainWalletToApply = Math.min(mainWalletBalance, remainingAmount);
   }
+  const gatewayAmount = remainingAmount - mainWalletToApply;
 
   // Get user email for invoice
   const user = await User.findById(userId).select("email").lean();
@@ -322,8 +315,8 @@ export const createPayment = asyncHandler(async (req, res) => {
   try {
     console.log('Creating NOWPayments invoice for order:', orderId);
 
-    // Calculate final payment amount after voucher and main wallet
-    const paymentAmount = remainingAmount;
+    // Invoice amount = remainder minus main wallet portion (main wallet is deducted on payment success)
+    const paymentAmount = gatewayAmount;
     
     // Build order description
     let orderDescription = `Investment in ${pkg.packageName} - $${investmentAmount}`;
@@ -333,6 +326,9 @@ export const createPayment = asyncHandler(async (req, res) => {
     }
     if (mainWalletUsed > 0) {
       parts.push(`Main Wallet: $${mainWalletUsed}`);
+    }
+    if (mainWalletToApply > 0) {
+      parts.push(`Main Wallet (on success): $${mainWalletToApply}`);
     }
     if (paymentAmount > 0) {
       parts.push(`Payment: $${paymentAmount}`);
@@ -401,6 +397,9 @@ export const createPayment = asyncHandler(async (req, res) => {
         ...(mainWalletUsed > 0 ? {
           mainWalletUsed: mainWalletUsed,
         } : {}),
+        ...(mainWalletToApply > 0 ? {
+          mainWalletToApply: mainWalletToApply,
+        } : {}),
         remainingAmount: remainingAmount,
         totalInvestmentAmount: investmentAmount,
       },
@@ -426,6 +425,7 @@ export const createPayment = asyncHandler(async (req, res) => {
           amount: parseFloat(voucher.amount.toString()),
           investmentValue: voucherInvestmentValue,
         } : null,
+        mainWalletToApply: mainWalletToApply > 0 ? mainWalletToApply : null,
         remainingAmount: remainingAmount,
         orderId,
       },
@@ -838,6 +838,34 @@ export const handlePaymentCallback = asyncHandler(async (req, res) => {
       if (!payment.investmentId) {
         console.log(`[NOWPayments Callback] 💼 Investment does not exist, creating now...`);
         try {
+          // Deduct main wallet portion (stored at create time; deduct only on success so user doesn't lose bonus if they abandon)
+          const mainWalletToApply = payment.meta && typeof (payment.meta as any).mainWalletToApply === "number" ? (payment.meta as any).mainWalletToApply : 0;
+          if (mainWalletToApply > 0) {
+            const { Wallet } = await import("../models/Wallet");
+            const { WalletType } = await import("../models/types");
+            const { createWalletTransaction } = await import("../services/transaction.service");
+            const mainWallet = await Wallet.findOne({ user: new Types.ObjectId(userId), type: WalletType.MAIN });
+            if (mainWallet) {
+              const balance = parseFloat(mainWallet.balance.toString());
+              const toDeduct = Math.min(mainWalletToApply, balance);
+              if (toDeduct > 0) {
+                mainWallet.balance = Types.Decimal128.fromString((balance - toDeduct).toString());
+                await mainWallet.save();
+                await createWalletTransaction(
+                  new Types.ObjectId(userId),
+                  WalletType.MAIN,
+                  "debit",
+                  toDeduct,
+                  `main-wallet-${Date.now()}-${userId}`,
+                  { description: `Investment package activation - $${toDeduct} used from main wallet (payment completed)` }
+                );
+                console.log(`[NOWPayments Callback] Deducted $${toDeduct} from main wallet (mainWalletToApply: $${mainWalletToApply})`);
+              } else {
+                console.warn(`[NOWPayments Callback] mainWalletToApply was $${mainWalletToApply} but user balance is $${balance}; skipping main wallet deduction`);
+              }
+            }
+          }
+
           // Extract voucherId from payment meta if available
           const voucherId = payment.meta && (payment.meta as any).voucherId 
             ? (payment.meta as any).voucherId 

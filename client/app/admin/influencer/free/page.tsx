@@ -1,9 +1,22 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { api } from '@/lib/api';
 import toast from 'react-hot-toast';
+
+const FREE_ACCOUNTS_SORT_OPTIONS = [
+  { value: 'userId-asc', label: 'User ID (A–Z)' },
+  { value: 'userId-desc', label: 'User ID (Z–A)' },
+  { value: 'name-asc', label: 'Name (A–Z)' },
+  { value: 'name-desc', label: 'Name (Z–A)' },
+  { value: 'amount-desc', label: 'Amount (high → low)' },
+  { value: 'amount-asc', label: 'Amount (low → high)' },
+  { value: 'activationDate-desc', label: 'Activation date (newest)' },
+  { value: 'activationDate-asc', label: 'Activation date (oldest)' },
+  { value: 'binaryTarget-desc', label: 'Binary target (high → low)' },
+  { value: 'binaryTarget-asc', label: 'Binary target (low → high)' },
+] as const;
 
 interface Package {
   id: string;
@@ -42,7 +55,52 @@ export default function FreeAccountPage() {
   const [freePage, setFreePage] = useState(1);
   const [freePagination, setFreePagination] = useState({ page: 1, limit: 10, total: 0, pages: 1 });
   const [removingUserId, setRemovingUserId] = useState<string | null>(null);
+  const [searchFree, setSearchFree] = useState('');
+  const [sortFree, setSortFree] = useState<string>(FREE_ACCOUNTS_SORT_OPTIONS[0].value);
   const hasFetchedPackages = useRef(false);
+
+  const freeAccountsFilteredAndSorted = useMemo(() => {
+    const term = searchFree.trim().toLowerCase();
+    let list = term
+      ? freeAccounts.filter(
+          (row) =>
+            (row.userId || '').toLowerCase().includes(term) ||
+            (row.name || '').toLowerCase().includes(term) ||
+            (row.email || '').toLowerCase().includes(term) ||
+            (row.country || '').toLowerCase().includes(term) ||
+            (row.influencerUserId || '').toLowerCase().includes(term) ||
+            (row.influencerName || '').toLowerCase().includes(term) ||
+            (row.packageName || '').toLowerCase().includes(term)
+        )
+      : [...freeAccounts];
+    const [key, order] = sortFree.split('-') as [string, 'asc' | 'desc'];
+    list.sort((a, b) => {
+      let aVal: string | number | null = null;
+      let bVal: string | number | null = null;
+      if (key === 'userId') {
+        aVal = (a.userId || '').toLowerCase();
+        bVal = (b.userId || '').toLowerCase();
+      } else if (key === 'name') {
+        aVal = (a.name || '').toLowerCase();
+        bVal = (b.name || '').toLowerCase();
+      } else if (key === 'amount') {
+        aVal = a.amount;
+        bVal = b.amount;
+      } else if (key === 'activationDate') {
+        aVal = a.activationDate ? new Date(a.activationDate).getTime() : 0;
+        bVal = b.activationDate ? new Date(b.activationDate).getTime() : 0;
+      } else if (key === 'binaryTarget') {
+        aVal = a.binaryTargetAmount;
+        bVal = b.binaryTargetAmount;
+      } else {
+        return 0;
+      }
+      if (aVal === null || bVal === null) return 0;
+      const cmp = aVal < bVal ? -1 : aVal > bVal ? 1 : 0;
+      return order === 'asc' ? cmp : -cmp;
+    });
+    return list;
+  }, [freeAccounts, searchFree, sortFree]);
 
   useEffect(() => {
     if (hasFetchedPackages.current) return;
@@ -318,11 +376,39 @@ export default function FreeAccountPage() {
         <div className="px-6 py-4 border-b border-gray-200">
           <h2 className="text-xl font-semibold text-black">Free Accounts</h2>
           <p className="text-sm text-gray-600 mt-0.5">Existing users who received a free investment and binary target (no new account created)</p>
+          {!loadingFreeAccounts && freeAccounts.length > 0 && (
+            <div className="mt-4 flex flex-wrap items-center gap-3">
+              <div className="flex-1 min-w-[200px] max-w-md">
+                <input
+                  type="text"
+                  value={searchFree}
+                  onChange={(e) => setSearchFree(e.target.value)}
+                  placeholder="Search by User ID, name, email, country, referrer, package..."
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-black placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm"
+                />
+              </div>
+              <div className="flex items-center gap-2">
+                <label htmlFor="sort-free" className="text-sm font-medium text-gray-700 whitespace-nowrap">Sort by</label>
+                <select
+                  id="sort-free"
+                  value={sortFree}
+                  onChange={(e) => setSortFree(e.target.value)}
+                  className="px-3 py-2 border border-gray-300 rounded-lg text-black bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm min-w-[180px]"
+                >
+                  {FREE_ACCOUNTS_SORT_OPTIONS.map((opt) => (
+                    <option key={opt.value} value={opt.value}>{opt.label}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+          )}
         </div>
         {loadingFreeAccounts ? (
           <div className="px-6 py-12 text-center text-gray-500">Loading...</div>
         ) : freeAccounts.length === 0 ? (
           <div className="px-6 py-12 text-center text-gray-500">No free accounts yet.</div>
+        ) : freeAccountsFilteredAndSorted.length === 0 ? (
+          <div className="px-6 py-12 text-center text-gray-500">No matches on this page for &quot;{searchFree.trim()}&quot;.</div>
         ) : (
           <>
           <div className="overflow-x-auto">
@@ -344,7 +430,7 @@ export default function FreeAccountPage() {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {freeAccounts.map((row) => (
+                {freeAccountsFilteredAndSorted.map((row) => (
                   <tr key={row.userId} className="hover:bg-gray-50">
                     <td className="px-4 py-3 text-sm font-mono font-medium text-black">{row.userId}</td>
                     <td className="px-4 py-3 text-sm text-black">{row.name}</td>
@@ -384,10 +470,12 @@ export default function FreeAccountPage() {
               </tbody>
             </table>
           </div>
-          {freePagination.pages > 1 && (
-            <div className="px-6 py-4 border-t border-gray-200 flex items-center justify-between">
+          {(freePagination.pages > 1 || searchFree.trim()) && (
+            <div className="px-6 py-4 border-t border-gray-200 flex items-center justify-between flex-wrap gap-2">
               <p className="text-sm text-gray-600">
-                Showing {(freePagination.page - 1) * freePagination.limit + 1}–{Math.min(freePagination.page * freePagination.limit, freePagination.total)} of {freePagination.total}
+                {searchFree.trim()
+                  ? `Showing ${freeAccountsFilteredAndSorted.length} of ${freeAccounts.length} on this page`
+                  : `Showing ${(freePagination.page - 1) * freePagination.limit + 1}–${Math.min(freePagination.page * freePagination.limit, freePagination.total)} of ${freePagination.total}`}
               </p>
               <div className="flex gap-2">
                 <button

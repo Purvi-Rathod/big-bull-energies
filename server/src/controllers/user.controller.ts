@@ -323,7 +323,7 @@ export const getUserInvestments = asyncHandler(async (req, res) => {
     throw new AppError("User not authenticated", 401);
   }
 
-  const investments = await Investment.find({ user: userId })
+  const investments = await Investment.find({ user: userId, isActive: true })
     .populate("packageId", "packageName roi duration")
     .sort({ createdAt: -1 })
     .lean();

@@ -12,6 +12,7 @@ const SITE_URL = process.env.CLIENT_URL || process.env.FRONTEND_URL || "https://
 const SITE_NAME = "Crown Bankers";
 
 let rulebookCache: string | null = null;
+let faqCache: string | null = null;
 
 function getRulebookContent(): string {
   if (rulebookCache) return rulebookCache;
@@ -27,9 +28,29 @@ function getRulebookContent(): string {
   return "Platform rule book could not be loaded. Answer based on general Crown Bankers binary MLM, ROI, referral, and binary bonus knowledge.";
 }
 
-const SYSTEM_PROMPT = `You are a helpful AI support assistant for Crown Bankers. Crown Bankers is a solar investment system that provides massive returns based on investors' network (binary MLM with ROI, referral bonuses, and binary matching bonuses). You answer questions using the following official rule book. Be concise, accurate, and friendly. If the answer is not in the rule book, say so and suggest contacting support or checking the dashboard. Do not make up rules or percentages. Use the rule book below.
+function getFaqContent(): string {
+  if (faqCache) return faqCache;
+  try {
+    const faqPath = path.join(__dirname, "../../FAQ_KNOWLEDGEBASE.md");
+    if (fs.existsSync(faqPath)) {
+      faqCache = fs.readFileSync(faqPath, "utf-8");
+      return faqCache;
+    }
+  } catch (err) {
+    console.warn("[SupportChat] Could not read FAQ_KNOWLEDGEBASE.md:", (err as Error).message);
+  }
+  return "";
+}
 
---- RULE BOOK ---
+const SYSTEM_PROMPT = `You are a helpful AI support assistant for Crown Bankers. Crown Bankers is a solar investment system that provides massive returns based on investors' network (binary MLM with ROI, referral bonuses, and binary matching bonuses). Answer questions using the official FAQ and rule book below. Prefer FAQ answers for company info, packages, ROI, referral, binary, withdrawals, support, and security. Use the rule book for detailed platform rules and calculations. Be concise, accurate, and friendly. If the answer is not in the FAQ or rule book, say so and suggest contacting support (WhatsApp +44 7452321010) or checking the dashboard. Do not make up rules or percentages.
+
+--- OFFICIAL FAQ (Crown Bankers – FAQ for Chatbot) ---
+
+`;
+
+const RULEBOOK_HEADER = `
+
+--- RULE BOOK (detailed platform rules) ---
 
 `;
 
@@ -50,8 +71,9 @@ export const supportChat = asyncHandler(async (req: Request, res: Response) => {
     throw new AppError("messages array is required and must not be empty", 400);
   }
 
+  const faq = getFaqContent();
   const rulebook = getRulebookContent();
-  const systemContent = SYSTEM_PROMPT + rulebook;
+  const systemContent = SYSTEM_PROMPT + faq + RULEBOOK_HEADER + rulebook;
 
   // ESM-only package: use Function so tsc doesn't compile to require() (not supported for ESM)
   const dynamicImport = new Function("specifier", "return import(specifier)");

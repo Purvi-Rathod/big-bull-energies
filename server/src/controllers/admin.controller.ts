@@ -2148,6 +2148,78 @@ export const updateWithdrawalSchedule = asyncHandler(async (req, res) => {
 });
 
 /**
+ * Get ROI cron schedule (which days of week ROI is distributed)
+ * GET /api/v1/admin/settings/roi-cron-schedule
+ * Returns enabledDays: number[] (0=Sunday .. 6=Saturday). Empty or missing = all days (default).
+ */
+export const getROICronSchedule = asyncHandler(async (req, res) => {
+  let setting = await Settings.findOne({ key: "roi_cron_schedule" });
+  if (!setting) {
+    // Default: all days enabled (current behavior)
+    const response = res as any;
+    return response.status(200).json({
+      status: "success",
+      data: {
+        enabledDays: [0, 1, 2, 3, 4, 5, 6],
+        description: "ROI is distributed every day. Configure to restrict which days ROI runs.",
+      },
+    });
+  }
+  const value = (setting.value as any) || {};
+  const enabledDays = Array.isArray(value.enabledDays) ? value.enabledDays : [0, 1, 2, 3, 4, 5, 6];
+  const response = res as any;
+  response.status(200).json({
+    status: "success",
+    data: {
+      enabledDays,
+      description: value.description || "Days of week when ROI cron runs (0=Sun, 6=Sat).",
+    },
+  });
+});
+
+/**
+ * Update ROI cron schedule
+ * PUT /api/v1/admin/settings/roi-cron-schedule
+ * Body: { enabledDays: number[] } (0=Sunday .. 6=Saturday). Empty array = no ROI days (cron will skip).
+ */
+export const updateROICronSchedule = asyncHandler(async (req, res) => {
+  const { enabledDays } = req.body;
+  if (!Array.isArray(enabledDays)) {
+    throw new AppError("enabledDays must be an array of numbers (0-6)", 400);
+  }
+  const valid = enabledDays.every((d: number) => typeof d === "number" && d >= 0 && d <= 6);
+  if (!valid) {
+    throw new AppError("Each day must be 0 (Sunday) through 6 (Saturday)", 400);
+  }
+  const uniqueDays = [...new Set(enabledDays)].sort((a, b) => a - b);
+
+  let setting = await Settings.findOne({ key: "roi_cron_schedule" });
+  const value = {
+    enabledDays: uniqueDays,
+    description: "Days of week when ROI cron runs (0=Sun, 6=Sat). Empty = no days (ROI skipped).",
+  };
+  if (!setting) {
+    setting = await Settings.create({
+      key: "roi_cron_schedule",
+      value,
+      description: value.description,
+    });
+  } else {
+    setting.value = value;
+    await setting.save();
+  }
+
+  const response = res as any;
+  response.status(200).json({
+    status: "success",
+    message: uniqueDays.length === 0
+      ? "ROI cron schedule updated. ROI will not run on any day until you add days."
+      : `ROI cron schedule updated. ROI will run on ${uniqueDays.length} day(s) per week.`,
+    data: { enabledDays: uniqueDays },
+  });
+});
+
+/**
  * Change user password by userId (Admin only)
  * PUT /api/v1/admin/users/:userId/password
  */

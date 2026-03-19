@@ -59,6 +59,12 @@ export default function SettingsPage() {
     enabled: true,
   });
 
+  // ROI Cron Schedule (which days ROI is distributed)
+  const [roiCronEnabledDays, setRoiCronEnabledDays] = useState<number[]>([0, 1, 2, 3, 4, 5, 6]);
+  const [roiCronLoading, setRoiCronLoading] = useState(false);
+  const [roiCronSaving, setRoiCronSaving] = useState(false);
+  const [roiCronMessage, setRoiCronMessage] = useState('');
+
   useEffect(() => {
     const isAdminUser = user?.userId === 'CROWN-000000' || user?.userId === 'CNEOX-000000';
     const isAdminAccount = !!admin;
@@ -67,6 +73,7 @@ export default function SettingsPage() {
       fetchNOWPaymentsStatus();
       fetchRateLimitingStatus();
       fetchSchedules();
+      fetchROICronSchedule();
     }
   }, [user, admin]);
 
@@ -572,6 +579,46 @@ export default function SettingsPage() {
       toast.error(errorMessage);
       setTimeout(() => setSchedulesError(''), 5000);
     }
+  };
+
+  const fetchROICronSchedule = async () => {
+    try {
+      setRoiCronLoading(true);
+      const response = await api.getROICronSchedule();
+      if (response.data?.enabledDays) {
+        setRoiCronEnabledDays(response.data.enabledDays);
+      }
+    } catch (err: any) {
+      console.error('Failed to fetch ROI cron schedule:', err);
+    } finally {
+      setRoiCronLoading(false);
+    }
+  };
+
+  const handleSaveROICronSchedule = async () => {
+    try {
+      setRoiCronSaving(true);
+      setRoiCronMessage('');
+      await api.updateROICronSchedule(roiCronEnabledDays);
+      setRoiCronMessage(roiCronEnabledDays.length === 0
+        ? 'ROI will not run on any day until you enable at least one day.'
+        : `ROI will run on ${roiCronEnabledDays.length} day(s) per week.`);
+      toast.success('ROI cron schedule saved');
+    } catch (err: any) {
+      const msg = err.message || 'Failed to save ROI cron schedule';
+      setRoiCronMessage('');
+      toast.error(msg);
+    } finally {
+      setRoiCronSaving(false);
+    }
+  };
+
+  const toggleRoiCronDay = (dayIndex: number) => {
+    setRoiCronEnabledDays((prev) =>
+      prev.includes(dayIndex)
+        ? prev.filter((d) => d !== dayIndex)
+        : [...prev, dayIndex].sort((a, b) => a - b)
+    );
   };
 
   const formatSchedule = (pkg: PackageSchedule) => {
@@ -1130,6 +1177,57 @@ export default function SettingsPage() {
             ))}
           </div>
         )}
+
+        {/* ROI Cron Schedule - which days ROI is distributed */}
+        <div className="mt-8 pt-6 border-t border-gray-200">
+          <h3 className="text-lg font-semibold text-black mb-2">ROI Cron Schedule</h3>
+          <p className="text-sm text-black mb-4">
+            Choose which days of the week the daily ROI cron should run. Users receive ROI on their investments only on enabled days. Leave all days enabled for daily ROI (default).
+          </p>
+          {roiCronMessage && (
+            <div className="mb-4 bg-blue-50 border border-blue-200 text-blue-700 px-4 py-3 rounded text-sm">
+              {roiCronMessage}
+            </div>
+          )}
+          {roiCronLoading ? (
+            <div className="flex items-center gap-2 text-black">
+              <div className="inline-block animate-spin rounded-full h-4 w-4 border-b-2 border-indigo-600" />
+              Loading schedule...
+            </div>
+          ) : (
+            <>
+              <div className="flex flex-wrap gap-2 mb-4">
+                {['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'].map((day, index) => (
+                  <button
+                    key={index}
+                    type="button"
+                    onClick={() => toggleRoiCronDay(index)}
+                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                      roiCronEnabledDays.includes(index)
+                        ? 'bg-indigo-600 text-white hover:bg-indigo-700'
+                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                    }`}
+                  >
+                    {day}
+                  </button>
+                ))}
+              </div>
+              <p className="text-sm text-gray-600 mb-3">
+                Enabled: {roiCronEnabledDays.length === 0
+                  ? 'None (ROI will not run on any day)'
+                  : roiCronEnabledDays.map((d) => ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][d]).join(', ')}
+              </p>
+              <button
+                type="button"
+                onClick={handleSaveROICronSchedule}
+                disabled={roiCronSaving}
+                className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {roiCronSaving ? 'Saving...' : 'Save ROI Cron Schedule'}
+              </button>
+            </>
+          )}
+        </div>
       </div>
     </div>
   );

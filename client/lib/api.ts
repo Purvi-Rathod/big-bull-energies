@@ -1080,6 +1080,19 @@ class ApiClient {
     });
   }
 
+  async getROICronSchedule() {
+    return this.request<{ enabledDays: number[]; description?: string }>('/admin/settings/roi-cron-schedule', {
+      method: 'GET',
+    });
+  }
+
+  async updateROICronSchedule(enabledDays: number[]) {
+    return this.request<{ enabledDays: number[] }>('/admin/settings/roi-cron-schedule', {
+      method: 'PUT',
+      body: JSON.stringify({ enabledDays }),
+    });
+  }
+
   // Career Level Management (Admin)
   async getAllCareerLevels() {
     return this.request<{ levels: any[] }>('/admin/career-levels', {

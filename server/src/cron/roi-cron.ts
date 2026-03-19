@@ -2,6 +2,7 @@ import cron from "node-cron";
 import { calculateDailyROI, deactivateExpiredInvestments, deactivateUsersWithAllExpiredInvestments } from "../services/roi-cron.service";
 import { calculateDailyBinaryBonuses } from "../services/investment.service";
 import { processExpiredVouchers } from "../services/voucher-expiry.service";
+import { Settings } from "../models/Settings";
 
 /**
  * Setup daily cron jobs
@@ -34,9 +35,17 @@ export function setupROICron() {
       // This aggregates daily business volumes from active principals and calculates binary matching
       await calculateDailyBinaryBonuses();
       
-      // Step 3: Calculate ROI for active investments (with renewable principle split)
-      // This splits ROI into 50% cashable and 50% renewable principal
-      await calculateDailyROI();
+      // Step 3: Calculate ROI only if today is an enabled day (admin-configured ROI cron schedule)
+      const roiSchedule = await Settings.findOne({ key: "roi_cron_schedule" }).lean();
+      const enabledDays: number[] = roiSchedule?.value?.enabledDays ?? [0, 1, 2, 3, 4, 5, 6];
+      const todayDay = new Date().getDay(); // 0 = Sunday, 6 = Saturday
+      if (enabledDays.length > 0 && enabledDays.includes(todayDay)) {
+        await calculateDailyROI();
+      } else if (enabledDays.length === 0) {
+        console.log("[Cron] ROI skipped: no days enabled in ROI cron schedule.");
+      } else {
+        console.log(`[Cron] ROI skipped: today (day ${todayDay}) is not in enabled days [${enabledDays.join(", ")}].`);
+      }
       
       console.log("[Cron] Daily calculation job completed (Binary → ROI)");
     } catch (error) {

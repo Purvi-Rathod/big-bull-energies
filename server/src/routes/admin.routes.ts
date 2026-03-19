@@ -27,6 +27,8 @@ import {
   deactivateAllUsers,
   getWithdrawalSchedules,
   updateWithdrawalSchedule,
+  getROICronSchedule,
+  updateROICronSchedule,
   changeUserPassword,
   getAdminReports,
   getDailyBusinessReport,
@@ -193,6 +195,8 @@ router.put("/settings/auth-rate-limiting", requireAdminAuth, updateAuthRateLimit
 router.post("/settings/deactivate-all-users", requireAdminAuth, deactivateAllUsers);
 router.get("/settings/withdrawal-schedules", requireAdminAuth, getWithdrawalSchedules);
 router.put("/settings/withdrawal-schedules", requireAdminAuth, updateWithdrawalSchedule);
+router.get("/settings/roi-cron-schedule", requireAdminAuth, getROICronSchedule);
+router.put("/settings/roi-cron-schedule", requireAdminAuth, updateROICronSchedule);
 
 // Career level management
 router.get("/career-levels", requireAdminAuth, getAllCareerLevels);

@@ -509,8 +509,33 @@ export const getMyTree = asyncHandler(async (req, res) => {
  * Query params: maxDepth (default: 10, max: 20)
  */
 /**
+ * Check if targetUser has requestingUser in their referrer chain (User.referrer).
+ * Used as fallback when binary tree traversal doesn't find the link (e.g. user was
+ * "registered under" referrer but tree placement is under a different node or inconsistent).
+ */
+async function isTargetInRequestingUserReferralDownline(
+  requestingUserObjId: Types.ObjectId,
+  targetUserObjId: Types.ObjectId,
+  maxDepth: number = 100
+): Promise<boolean> {
+  let currentId: Types.ObjectId | null = targetUserObjId;
+  let depth = 0;
+  while (currentId && depth < maxDepth) {
+    const u = await User.findById(currentId).select("referrer").lean();
+    const referrerId = (u as any)?.referrer;
+    if (!referrerId) break;
+    const referrerObjId = referrerId instanceof Types.ObjectId ? referrerId : new Types.ObjectId(referrerId.toString());
+    if (referrerObjId.equals(requestingUserObjId)) return true;
+    currentId = referrerObjId;
+    depth++;
+  }
+  return false;
+}
+
+/**
  * Check if targetUser is in requestingUser's downline
- * Returns true if targetUser is a descendant of requestingUser (or same user)
+ * Returns true if targetUser is a descendant of requestingUser (or same user).
+ * Checks: (1) binary tree traversal, (2) referrer chain fallback for "registered under me".
  */
 async function isUserInDownline(
   requestingUserObjId: Types.ObjectId,
@@ -529,7 +554,7 @@ async function isUserInDownline(
     return true; // Admins can view any tree
   }
 
-  // Traverse downline to find target user
+  // Traverse downline to find target user (binary tree: leftChild, rightChild, and admin's parent-linked children)
   const visited = new Set<string>();
   const queue: { userId: Types.ObjectId; level: number }[] = [{ userId: requestingUserObjId, level: 0 }];
   
@@ -584,6 +609,11 @@ async function isUserInDownline(
       }
     }
   }
+  
+  // Fallback: if target was "registered under" requesting user (referrer chain), allow access.
+  // Handles cases where binary tree placement is under a different node or data is inconsistent.
+  const inReferralDownline = await isTargetInRequestingUserReferralDownline(requestingUserObjId, targetUserObjId);
+  if (inReferralDownline) return true;
   
   return false;
 }

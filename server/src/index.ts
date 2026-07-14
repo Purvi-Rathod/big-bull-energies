@@ -1,3 +1,4 @@
+import dns from 'dns';
 import dotenv from 'dotenv';
 // SECURITY FIX: Removed execSync import - dangerous and not needed
 // import { execSync } from 'child_process';
@@ -17,6 +18,9 @@ export const ConnectionConfig = {};
 
 
 dotenv.config({ path: './.env' });
+
+// Fix SRV DNS failures for mongodb+srv (local resolver at 127.0.0.1 refuses querySrv)
+dns.setServers(['8.8.8.8', '1.1.1.1']);
 
 console.log(chalk.blue(`Environment set to ${process.env.NODE_ENV}`));
 

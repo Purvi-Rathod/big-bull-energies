@@ -26,7 +26,7 @@ export default function AboutUsPage() {
       </section>
 
       {/* Main Content */}
-      <section className="relative py-12 px-6 bg-gray-900">
+      <section className="relative py-12 px-6 bg-#05627C">
         <div className="max-w-4xl mx-auto space-y-12">
           {/* Our Mission */}
           <div className="p-8 bg-yellow-500/5 backdrop-blur-md rounded-2xl border border-yellow-500/20">
@@ -107,7 +107,7 @@ export default function AboutUsPage() {
               <div className="p-6 bg-yellow-500/5 rounded-xl">
                 <h3 className="text-xl font-bold text-yellow-400 mb-3">Community</h3>
                 <p className="text-white/70">
-                  We're building more than a platform—we're creating a community of entrepreneurs 
+                  We&#39;re building more than a platform—we&apos;re creating a community of entrepreneurs 
                   helping each other succeed.
                 </p>
               </div>
@@ -161,7 +161,7 @@ export default function AboutUsPage() {
       </section>
 
       {/* Footer */}
-      <footer className="relative z-10 border-t border-yellow-500/20 mt-20 bg-gray-900">
+      <footer className="relative z-10 border-t border-yellow-500/20 mt-20 bg-#05627C">
         <div className="max-w-7xl mx-auto px-6 py-8 text-center text-white/70">
           <p>&copy; {new Date().getFullYear()} CROWN. All rights reserved.</p>
           <div className="mt-4 flex justify-center gap-6">

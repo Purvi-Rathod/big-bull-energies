@@ -104,7 +104,7 @@ export default function TestimonialMarquee() {
               <p
                 className="text-base sm:text-lg md:text-xl lg:text-2xl leading-relaxed px-2 sm:px-0"
                 style={{
-                  color: "#16a34a",
+                  color: "#05627C",
                   fontFamily: "var(--font-custom), 'CustomFont', sans-serif",
                 }}
               >

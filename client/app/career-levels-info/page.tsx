@@ -57,7 +57,7 @@ export default function CareerLevelsInfoPage() {
       </section>
 
       {/* Main Content */}
-      <section className="relative py-12 px-6 bg-gray-900">
+      <section className="relative py-12 px-6 bg-#05627C">
         <div className="max-w-4xl mx-auto space-y-12">
           {/* What is Career Levels */}
           <div className="p-8 bg-yellow-500/5 backdrop-blur-md rounded-2xl border border-yellow-500/20">
@@ -303,7 +303,7 @@ export default function CareerLevelsInfoPage() {
       </section>
 
       {/* Footer */}
-      <footer className="relative z-10 border-t border-yellow-500/20 mt-20 bg-gray-900">
+      <footer className="relative z-10 border-t border-yellow-500/20 mt-20 bg-#05627C">
         <div className="max-w-7xl mx-auto px-6 py-8 text-center text-white/70">
           <p>&copy; {new Date().getFullYear()} CROWN. All rights reserved.</p>
           <div className="mt-4 flex justify-center gap-6">

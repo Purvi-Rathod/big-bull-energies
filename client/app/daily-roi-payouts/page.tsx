@@ -26,7 +26,7 @@ export default function DailyROIPayoutsPage() {
       </section>
 
       {/* Main Content */}
-      <section className="relative py-12 px-6 bg-gray-900">
+      <section className="relative py-12 px-6 bg-#05627C">
         <div className="max-w-4xl mx-auto space-y-12">
           {/* What is Daily ROI */}
           <div className="p-8 bg-yellow-500/5 backdrop-blur-md rounded-2xl border border-yellow-500/20">
@@ -227,7 +227,7 @@ export default function DailyROIPayoutsPage() {
           </div>
 
           {/* CTA */}
-          <div className="text-center p-8 bg-gradient-to-br from-green-500/20 via-emerald-500/20 to-cyan-500/20 backdrop-blur-md rounded-2xl border border-white/20">
+          <div className="text-center p-8 bg-gradient-to-br from-yellow-500/20 to-amber-500/20 backdrop-blur-md rounded-2xl border border-white/20">
             <h2 className="text-3xl font-bold text-white mb-4">Start Earning Daily ROI Today</h2>
             <p className="text-white/80 mb-6 text-lg">
               Join CROWN and begin receiving daily returns on your investments
@@ -251,7 +251,7 @@ export default function DailyROIPayoutsPage() {
       </section>
 
       {/* Footer */}
-      <footer className="relative z-10 border-t border-yellow-500/20 mt-20 bg-gray-900">
+      <footer className="relative z-10 border-t border-yellow-500/20 mt-20 bg-#05627C">
         <div className="max-w-7xl mx-auto px-6 py-8 text-center text-white/70">
           <p>&copy; {new Date().getFullYear()} CROWN. All rights reserved.</p>
           <div className="mt-4 flex justify-center gap-6">

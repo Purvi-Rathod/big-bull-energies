@@ -149,11 +149,11 @@ export default function HowPlatformWorksPage() {
             <div className="flex items-center justify-center gap-2 sm:gap-3 mb-4 sm:mb-6">
               <div
                 className="h-px w-8 sm:w-12"
-                style={{ backgroundColor: "#042B19" }}
+                style={{ backgroundColor: "#05627C" }}
               ></div>
               <span
                 className="text-xs font-medium uppercase tracking-wide"
-                style={{ color: "#042B19" }}
+                style={{ color: "#05627C" }}
               >
                 HOW IT WORKS
               </span>
@@ -161,7 +161,7 @@ export default function HowPlatformWorksPage() {
             <h1
               className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl 2xl:text-7xl font-normal leading-tight mb-4 sm:mb-6 px-2"
               style={{
-                color: "#042B19",
+                color: "#05627C",
                 fontFamily: "var(--font-font4), sans-serif",
               }}
             >
@@ -170,7 +170,7 @@ export default function HowPlatformWorksPage() {
             <p
               className="text-sm sm:text-base md:text-lg lg:text-xl leading-relaxed max-w-2xl mx-auto px-2"
               style={{
-                color: "#042B19",
+                color: "#05627C",
                 fontFamily: "var(--font-font4), sans-serif",
               }}
             >
@@ -187,7 +187,7 @@ export default function HowPlatformWorksPage() {
           <div className="max-w-6xl mx-auto">
             <h2
               className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-8 sm:mb-10 md:mb-12 text-center px-2"
-              style={{ color: "#042B19" }}
+              style={{ color: "#05627C" }}
             >
               The Complete Process
             </h2>
@@ -203,26 +203,26 @@ export default function HowPlatformWorksPage() {
                         <div
                           className="w-16 h-16 sm:w-20 sm:h-20 rounded-full flex items-center justify-center font-bold text-2xl sm:text-3xl shadow-lg"
                           style={{
-                            backgroundColor: "#042B19",
+                            backgroundColor: "#05627C",
                             color: "#ffffff",
                           }}
                         >
                           {step.number}
                         </div>
-                        <div className="flex-1" style={{ color: "#042B19" }}>
+                        <div className="flex-1" style={{ color: "#05627C" }}>
                           {step.icon}
                         </div>
                       </div>
                       <h3
                         className="text-xl sm:text-2xl md:text-3xl font-bold mb-3 sm:mb-4"
-                        style={{ color: "#042B19" }}
+                        style={{ color: "#05627C" }}
                       >
                         {step.title}
                       </h3>
                       <p
                         className="text-sm sm:text-base md:text-lg leading-relaxed mb-4 sm:mb-6"
                         style={{
-                          color: "#042B19",
+                          color: "#05627C",
                           fontFamily: "var(--font-font4), sans-serif",
                         }}
                       >
@@ -236,11 +236,11 @@ export default function HowPlatformWorksPage() {
                           >
                             <CheckCircle
                               className="w-5 h-5 flex-shrink-0 mt-0.5"
-                              style={{ color: "#042B19" }}
+                              style={{ color: "#05627C" }}
                             />
                             <span
                               className="text-sm sm:text-base"
-                              style={{ color: "#042B19" }}
+                              style={{ color: "#05627C" }}
                             >
                               {detail}
                             </span>
@@ -253,7 +253,7 @@ export default function HowPlatformWorksPage() {
                     <div className="hidden lg:flex flex-col items-center">
                       <ArrowRight
                         className="w-8 h-8 rotate-90 lg:rotate-0"
-                        style={{ color: "#042B19" }}
+                        style={{ color: "#05627C" }}
                       />
                     </div>
                   )}
@@ -270,7 +270,7 @@ export default function HowPlatformWorksPage() {
           <div className="max-w-6xl mx-auto">
             <h2
               className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-8 sm:mb-10 md:mb-12 text-center px-2"
-              style={{ color: "#042B19" }}
+              style={{ color: "#05627C" }}
             >
               Four Ways to Earn
             </h2>
@@ -279,12 +279,12 @@ export default function HowPlatformWorksPage() {
                 <div
                   key={index}
                   className="bg-white p-6 sm:p-8 rounded-lg border-2 shadow-lg"
-                  style={{ borderColor: "#042B19" }}
+                  style={{ borderColor: "#05627C" }}
                 >
                   <div className="flex items-center justify-between mb-4">
                     <h3
                       className="text-xl sm:text-2xl md:text-3xl font-bold"
-                      style={{ color: "#042B19" }}
+                      style={{ color: "#05627C" }}
                     >
                       {stream.title}
                     </h3>
@@ -292,7 +292,7 @@ export default function HowPlatformWorksPage() {
                       className="text-lg sm:text-xl md:text-2xl font-bold px-3 sm:px-4 py-1 sm:py-2 rounded"
                       style={{
                         backgroundColor: "#E8F5F0",
-                        color: "#042B19",
+                        color: "#05627C",
                       }}
                     >
                       {stream.percentage}
@@ -301,7 +301,7 @@ export default function HowPlatformWorksPage() {
                   <p
                     className="text-sm sm:text-base md:text-lg leading-relaxed mb-4"
                     style={{
-                      color: "#042B19",
+                      color: "#05627C",
                       fontFamily: "var(--font-font4), sans-serif",
                     }}
                   >
@@ -310,7 +310,7 @@ export default function HowPlatformWorksPage() {
                   <div className="bg-[#E8F5F0] p-3 sm:p-4 rounded">
                     <p
                       className="text-xs sm:text-sm font-semibold"
-                      style={{ color: "#042B19" }}
+                      style={{ color: "#05627C" }}
                     >
                       Example: {stream.example}
                     </p>
@@ -328,7 +328,7 @@ export default function HowPlatformWorksPage() {
           <div className="max-w-4xl mx-auto">
             <h2
               className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-8 sm:mb-10 md:mb-12 text-center px-2"
-              style={{ color: "#042B19" }}
+              style={{ color: "#05627C" }}
             >
               Platform Features
             </h2>
@@ -346,11 +346,11 @@ export default function HowPlatformWorksPage() {
                 <div key={index} className="flex items-center gap-3 sm:gap-4">
                   <CheckCircle
                     className="w-6 h-6 flex-shrink-0"
-                    style={{ color: "#042B19" }}
+                    style={{ color: "#05627C" }}
                   />
                   <span
                     className="text-sm sm:text-base md:text-lg"
-                    style={{ color: "#042B19" }}
+                    style={{ color: "#05627C" }}
                   >
                     {feature}
                   </span>
@@ -362,7 +362,7 @@ export default function HowPlatformWorksPage() {
       </section>
 
       {/* CTA Section */}
-      <section className="relative w-full bg-[#042B19] py-12 sm:py-16 md:py-20 lg:py-24 text-white text-center">
+      <section className="relative w-full bg-[#05627C] py-12 sm:py-16 md:py-20 lg:py-24 text-white text-center">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl mx-auto">
             <h2
@@ -387,7 +387,7 @@ export default function HowPlatformWorksPage() {
               </Link>
               <Link
                 href="/our-plan"
-                className="inline-block bg-transparent border-2 border-white text-white font-bold px-6 sm:px-8 lg:px-12 py-3 sm:py-4 lg:py-5 text-xs sm:text-sm md:text-base uppercase tracking-wide transition hover:bg-white hover:text-[#042B19] text-center"
+                className="inline-block bg-transparent border-2 border-white text-white font-bold px-6 sm:px-8 lg:px-12 py-3 sm:py-4 lg:py-5 text-xs sm:text-sm md:text-base uppercase tracking-wide transition hover:bg-white hover:text-[#05627C] text-center"
                 style={{ borderRadius: "0" }}
               >
                 VIEW PLANS

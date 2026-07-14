@@ -137,7 +137,7 @@ export default function Navbar() {
               <a
                 href="tel:+447452321010"
                 className="flex items-center gap-2 text-xs font-bold transition hover:opacity-70"
-                style={{ color: "#042B19" }}
+                style={{ color: "#05627C" }}
               >
                 <Phone className="w-4 h-4" />
                 +44 7452321010
@@ -147,7 +147,7 @@ export default function Navbar() {
               <a
                 href="mailto:crownbankers.com@gmail.com"
                 className="flex items-center gap-2 text-xs font-bold transition hover:opacity-70"
-                style={{ color: "#042B19" }}
+                style={{ color: "#05627C" }}
               >
                 <Mail className="w-4 h-4" />
                 crownbankers.com@gmail.com
@@ -205,7 +205,7 @@ export default function Navbar() {
         className={`transition-all duration-300 ease-in-out relative ${
           isScrolled ? "mt-0" : "mt-0"
         }`}
-        style={{ backgroundColor: "#042B19", minHeight: "48px" }}
+        style={{ backgroundColor: "#05627C", minHeight: "48px" }}
       >
         <div className="container mx-auto px-3 sm:px-4 lg:px-8">
           {/* Desktop Navigation */}
@@ -296,7 +296,7 @@ export default function Navbar() {
                                 key={idx}
                                 href={item.href}
                                 className="text-base md:text-lg lg:text-xl font-medium transition hover:opacity-70"
-                                style={{ color: "#042B19" }}
+                                style={{ color: "#05627C" }}
                               >
                                 {item.label}
                               </Link>
@@ -313,7 +313,7 @@ export default function Navbar() {
                                     key={idx}
                                     href={item.href}
                                     className="text-base md:text-lg lg:text-xl font-medium transition hover:opacity-70"
-                                    style={{ color: "#042B19" }}
+                                    style={{ color: "#05627C" }}
                                   >
                                     {item.label}
                                   </Link>
@@ -328,7 +328,7 @@ export default function Navbar() {
                                     key={idx}
                                     href={item.href}
                                     className="text-base md:text-lg lg:text-xl font-medium transition hover:opacity-70"
-                                    style={{ color: "#042B19" }}
+                                    style={{ color: "#05627C" }}
                                   >
                                     {item.label}
                                   </Link>
@@ -343,7 +343,7 @@ export default function Navbar() {
                                     key={idx}
                                     href={item.href}
                                     className="text-base md:text-lg lg:text-xl font-medium transition hover:opacity-70"
-                                    style={{ color: "#042B19" }}
+                                    style={{ color: "#05627C" }}
                                   >
                                     {item.label}
                                   </Link>
@@ -425,7 +425,7 @@ export default function Navbar() {
 
         {/* Mobile Navigation Menu */}
         <div
-          className={`md:hidden overflow-hidden transition-all duration-300 ease-in-out bg-[#042B19] ${
+          className={`md:hidden overflow-hidden transition-all duration-300 ease-in-out bg-[#05627C] ${
             isMobileMenuOpen
               ? "max-h-[calc(100vh-120px)] opacity-100"
               : "max-h-0 opacity-0"
@@ -475,7 +475,7 @@ export default function Navbar() {
                     </svg>
                   </button>
                   {isOpen && link.items && (
-                    <div className="pl-4 pb-2 bg-[#042B19]/50">
+                    <div className="pl-4 pb-2 bg-[#05627C]/50">
                       {link.items.map((item, idx) => (
                         <Link
                           key={idx}

@@ -128,11 +128,11 @@ export default function CareerRewardsPage() {
             <div className="flex items-center justify-center gap-2 sm:gap-3 mb-4 sm:mb-6">
               <div
                 className="h-px w-8 sm:w-12"
-                style={{ backgroundColor: "#042B19" }}
+                style={{ backgroundColor: "#05627C" }}
               ></div>
               <span
                 className="text-xs font-medium uppercase tracking-wide"
-                style={{ color: "#042B19" }}
+                style={{ color: "#05627C" }}
               >
                 CAREER REWARDS
               </span>
@@ -140,7 +140,7 @@ export default function CareerRewardsPage() {
             <h1
               className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl 2xl:text-7xl font-normal leading-tight mb-4 sm:mb-6 px-2"
               style={{
-                color: "#042B19",
+                color: "#05627C",
                 fontFamily: "var(--font-font4), sans-serif",
               }}
             >
@@ -149,7 +149,7 @@ export default function CareerRewardsPage() {
             <p
               className="text-sm sm:text-base md:text-lg lg:text-xl leading-relaxed max-w-2xl mx-auto px-2"
               style={{
-                color: "#042B19",
+                color: "#05627C",
                 fontFamily: "var(--font-font4), sans-serif",
               }}
             >
@@ -166,7 +166,7 @@ export default function CareerRewardsPage() {
           <div className="max-w-6xl mx-auto">
             <h2
               className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-8 sm:mb-10 md:mb-12 text-center px-2"
-              style={{ color: "#042B19" }}
+              style={{ color: "#05627C" }}
             >
               What You Get
             </h2>
@@ -178,20 +178,20 @@ export default function CareerRewardsPage() {
                 >
                   <div
                     className="flex justify-center mb-4"
-                    style={{ color: "#042B19" }}
+                    style={{ color: "#05627C" }}
                   >
                     {benefit.icon}
                   </div>
                   <h3
                     className="text-lg sm:text-xl md:text-2xl font-bold mb-3 sm:mb-4"
-                    style={{ color: "#042B19" }}
+                    style={{ color: "#05627C" }}
                   >
                     {benefit.title}
                   </h3>
                   <p
                     className="text-sm sm:text-base leading-relaxed"
                     style={{
-                      color: "#042B19",
+                      color: "#05627C",
                       fontFamily: "var(--font-font4), sans-serif",
                     }}
                   >
@@ -211,13 +211,13 @@ export default function CareerRewardsPage() {
             <div className="text-center mb-8 sm:mb-10 md:mb-12">
               <h2
                 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-4 sm:mb-6 px-2"
-                style={{ color: "#042B19" }}
+                style={{ color: "#05627C" }}
               >
                 Career Levels
               </h2>
               <p
                 className="text-sm sm:text-base md:text-lg leading-relaxed max-w-3xl mx-auto px-2"
-                style={{ color: "#042B19" }}
+                style={{ color: "#05627C" }}
               >
                 Progress through five career levels, each unlocking greater
                 rewards and opportunities.
@@ -229,7 +229,7 @@ export default function CareerRewardsPage() {
                 <div
                   key={index}
                   className="bg-white rounded-lg shadow-lg border-2 overflow-hidden"
-                  style={{ borderColor: "#042B19" }}
+                  style={{ borderColor: "#05627C" }}
                 >
                   <div className="p-6 sm:p-8 md:p-10">
                     <div className="flex flex-col md:flex-row items-start md:items-center gap-4 sm:gap-6 mb-6">
@@ -242,19 +242,19 @@ export default function CareerRewardsPage() {
                       <div className="flex-1">
                         <h3
                           className="text-2xl sm:text-3xl md:text-4xl font-bold mb-2 sm:mb-3"
-                          style={{ color: "#042B19" }}
+                          style={{ color: "#05627C" }}
                         >
                           {level.level} Level
                         </h3>
                         <p
                           className="text-sm sm:text-base md:text-lg font-semibold mb-2"
-                          style={{ color: "#042B19" }}
+                          style={{ color: "#05627C" }}
                         >
                           Requirements:
                         </p>
                         <p
                           className="text-xs sm:text-sm md:text-base mb-4"
-                          style={{ color: "#042B19", opacity: 0.8 }}
+                          style={{ color: "#05627C", opacity: 0.8 }}
                         >
                           {level.requirements}
                         </p>
@@ -263,11 +263,11 @@ export default function CareerRewardsPage() {
 
                     <div
                       className="border-t-2 pt-6"
-                      style={{ borderColor: "#042B19", opacity: 0.2 }}
+                      style={{ borderColor: "#05627C", opacity: 0.2 }}
                     >
                       <h4
                         className="text-lg sm:text-xl md:text-2xl font-bold mb-4"
-                        style={{ color: "#042B19" }}
+                        style={{ color: "#05627C" }}
                       >
                         Rewards & Benefits:
                       </h4>
@@ -283,7 +283,7 @@ export default function CareerRewardsPage() {
                             />
                             <span
                               className="text-sm sm:text-base"
-                              style={{ color: "#042B19" }}
+                              style={{ color: "#05627C" }}
                             >
                               {reward}
                             </span>
@@ -305,7 +305,7 @@ export default function CareerRewardsPage() {
           <div className="max-w-4xl mx-auto">
             <h2
               className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-6 sm:mb-8 text-center px-2"
-              style={{ color: "#042B19" }}
+              style={{ color: "#05627C" }}
             >
               How to Progress
             </h2>
@@ -313,14 +313,14 @@ export default function CareerRewardsPage() {
               <div className="bg-[#E8F5F0] p-6 sm:p-8 rounded-lg">
                 <h3
                   className="text-xl sm:text-2xl md:text-3xl font-bold mb-4"
-                  style={{ color: "#042B19" }}
+                  style={{ color: "#05627C" }}
                 >
                   1. Build Your Direct Referrals
                 </h3>
                 <p
                   className="text-sm sm:text-base md:text-lg leading-relaxed"
                   style={{
-                    color: "#042B19",
+                    color: "#05627C",
                     fontFamily: "var(--font-font4), sans-serif",
                   }}
                 >
@@ -332,14 +332,14 @@ export default function CareerRewardsPage() {
               <div className="bg-[#E8F5F0] p-6 sm:p-8 rounded-lg">
                 <h3
                   className="text-xl sm:text-2xl md:text-3xl font-bold mb-4"
-                  style={{ color: "#042B19" }}
+                  style={{ color: "#05627C" }}
                 >
                   2. Grow Your Team
                 </h3>
                 <p
                   className="text-sm sm:text-base md:text-lg leading-relaxed"
                   style={{
-                    color: "#042B19",
+                    color: "#05627C",
                     fontFamily: "var(--font-font4), sans-serif",
                   }}
                 >
@@ -352,14 +352,14 @@ export default function CareerRewardsPage() {
               <div className="bg-[#E8F5F0] p-6 sm:p-8 rounded-lg">
                 <h3
                   className="text-xl sm:text-2xl md:text-3xl font-bold mb-4"
-                  style={{ color: "#042B19" }}
+                  style={{ color: "#05627C" }}
                 >
                   3. Increase Total Volume
                 </h3>
                 <p
                   className="text-sm sm:text-base md:text-lg leading-relaxed"
                   style={{
-                    color: "#042B19",
+                    color: "#05627C",
                     fontFamily: "var(--font-font4), sans-serif",
                   }}
                 >
@@ -372,14 +372,14 @@ export default function CareerRewardsPage() {
               <div className="bg-[#E8F5F0] p-6 sm:p-8 rounded-lg">
                 <h3
                   className="text-xl sm:text-2xl md:text-3xl font-bold mb-4"
-                  style={{ color: "#042B19" }}
+                  style={{ color: "#05627C" }}
                 >
                   4. Maintain Active Status
                 </h3>
                 <p
                   className="text-sm sm:text-base md:text-lg leading-relaxed"
                   style={{
-                    color: "#042B19",
+                    color: "#05627C",
                     fontFamily: "var(--font-font4), sans-serif",
                   }}
                 >
@@ -394,7 +394,7 @@ export default function CareerRewardsPage() {
       </section>
 
       {/* CTA Section */}
-      <section className="relative w-full bg-[#042B19] py-12 sm:py-16 md:py-20 lg:py-24 text-white text-center">
+      <section className="relative w-full bg-[#05627C] py-12 sm:py-16 md:py-20 lg:py-24 text-white text-center">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl mx-auto">
             <Crown
@@ -424,7 +424,7 @@ export default function CareerRewardsPage() {
               </Link>
               <Link
                 href="/career-levels-info"
-                className="inline-block bg-transparent border-2 border-white text-white font-bold px-6 sm:px-8 lg:px-12 py-3 sm:py-4 lg:py-5 text-xs sm:text-sm md:text-base uppercase tracking-wide transition hover:bg-white hover:text-[#042B19] text-center"
+                className="inline-block bg-transparent border-2 border-white text-white font-bold px-6 sm:px-8 lg:px-12 py-3 sm:py-4 lg:py-5 text-xs sm:text-sm md:text-base uppercase tracking-wide transition hover:bg-white hover:text-[#05627C] text-center"
                 style={{ borderRadius: "0" }}
               >
                 LEARN MORE

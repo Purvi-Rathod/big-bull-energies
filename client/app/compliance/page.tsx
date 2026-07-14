@@ -7,7 +7,7 @@ export default function CompliancePage() {
     <div className="min-h-screen bg-gray-50" style={{ paddingTop: "156px" }}>
       <div className="container mx-auto px-4 py-16">
         <div className="max-w-4xl mx-auto">
-          <h1 className="text-4xl font-bold mb-4" style={{ color: "#042B19" }}>
+          <h1 className="text-4xl font-bold mb-4" style={{ color: "#05627C" }}>
             Compliance
           </h1>
           <p className="text-lg text-gray-600 mb-8">
@@ -21,7 +21,7 @@ export default function CompliancePage() {
             <section>
               <h2
                 className="text-2xl font-semibold mb-4"
-                style={{ color: "#042B19" }}
+                style={{ color: "#05627C" }}
               >
                 Regulatory Compliance
               </h2>
@@ -36,7 +36,7 @@ export default function CompliancePage() {
             <section>
               <h2
                 className="text-2xl font-semibold mb-4"
-                style={{ color: "#042B19" }}
+                style={{ color: "#05627C" }}
               >
                 Financial Regulations
               </h2>
@@ -54,7 +54,7 @@ export default function CompliancePage() {
             <section>
               <h2
                 className="text-2xl font-semibold mb-4"
-                style={{ color: "#042B19" }}
+                style={{ color: "#05627C" }}
               >
                 Data Protection
               </h2>
@@ -68,7 +68,7 @@ export default function CompliancePage() {
             <section>
               <h2
                 className="text-2xl font-semibold mb-4"
-                style={{ color: "#042B19" }}
+                style={{ color: "#05627C" }}
               >
                 Contact Us
               </h2>

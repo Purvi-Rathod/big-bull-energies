@@ -37,7 +37,7 @@ export default function ExpertiseSection() {
           <p
             className="text-center text-sm sm:text-base md:text-lg lg:text-xl leading-relaxed max-w-4xl"
             style={{
-              color: "#042B19",
+              color: "#05627C",
               fontFamily: "var(--font-font4), sans-serif",
             }}
           >
@@ -836,7 +836,7 @@ export default function ExpertiseSection() {
             </p>
             <h2
               className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl mb-2 sm:mb-4 leading-[1.05]"
-              style={{ color: "#042B19" }}
+              style={{ color: "#05627C" }}
             >
               <span
                 style={{
@@ -874,7 +874,7 @@ export default function ExpertiseSection() {
                   className="h-auto text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold leading-[1.05]"
                   style={{
                     fontFamily: "'Font3', sans-serif",
-                    color: "#042B19",
+                    color: "#05627C",
                     filter: "none",
                   }}
                 />

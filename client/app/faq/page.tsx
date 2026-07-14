@@ -56,7 +56,7 @@ export default function FAQPage() {
         <div className="max-w-4xl mx-auto">
           <h1
             className="text-4xl font-bold mb-4 text-center"
-            style={{ color: "#042B19" }}
+            style={{ color: "#05627C" }}
           >
             Frequently Asked Questions
           </h1>
@@ -79,7 +79,7 @@ export default function FAQPage() {
                 >
                   <span
                     className="text-lg font-semibold"
-                    style={{ color: "#042B19" }}
+                    style={{ color: "#05627C" }}
                   >
                     {faq.question}
                   </span>

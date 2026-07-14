@@ -79,11 +79,11 @@ export default function CareersPage() {
               <div className="flex items-center gap-3 mb-6">
                 <div
                   className="h-px w-12"
-                  style={{ backgroundColor: "#042B19" }}
+                  style={{ backgroundColor: "#05627C" }}
                 ></div>
                 <span
                   className="text-xs font-medium uppercase tracking-wide"
-                  style={{ color: "#042B19" }}
+                  style={{ color: "#05627C" }}
                 >
                   CAREERS
                 </span>
@@ -91,7 +91,7 @@ export default function CareersPage() {
               <h1
                 className="text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-normal leading-tight mb-6"
                 style={{
-                  color: "#042B19",
+                  color: "#05627C",
                   fontFamily: "var(--font-font4), sans-serif",
                 }}
               >
@@ -114,7 +114,7 @@ export default function CareersPage() {
             <h2
               className="text-3xl md:text-4xl lg:text-5xl font-normal mb-4"
               style={{
-                color: "#042B19",
+                color: "#05627C",
                 fontFamily: "var(--font-font4), sans-serif",
               }}
             >
@@ -133,12 +133,12 @@ export default function CareersPage() {
                 className="p-8 border border-gray-200 hover:shadow-lg transition-shadow"
                 style={{ borderColor: "#E5E7EB" }}
               >
-                <div className="mb-4" style={{ color: "#042B19" }}>
+                <div className="mb-4" style={{ color: "#05627C" }}>
                   {benefit.icon}
                 </div>
                 <h3
                   className="text-xl font-semibold mb-3"
-                  style={{ color: "#042B19" }}
+                  style={{ color: "#05627C" }}
                 >
                   {benefit.title}
                 </h3>
@@ -159,7 +159,7 @@ export default function CareersPage() {
               <h2
                 className="text-3xl md:text-4xl lg:text-5xl font-normal mb-4"
                 style={{
-                  color: "#042B19",
+                  color: "#05627C",
                   fontFamily: "var(--font-font4), sans-serif",
                 }}
               >
@@ -181,7 +181,7 @@ export default function CareersPage() {
                     <div className="flex-1">
                       <h3
                         className="text-xl font-semibold mb-2"
-                        style={{ color: "#042B19" }}
+                        style={{ color: "#05627C" }}
                       >
                         {position.title}
                       </h3>
@@ -196,7 +196,7 @@ export default function CareersPage() {
                     <Link
                       href="/contact"
                       className="inline-flex items-center gap-2 px-6 py-3 font-semibold text-white transition hover:opacity-90 uppercase text-sm"
-                      style={{ backgroundColor: "#042B19" }}
+                      style={{ backgroundColor: "#05627C" }}
                     >
                       Apply Now
                       <ArrowRight className="w-4 h-4" />
@@ -214,7 +214,7 @@ export default function CareersPage() {
               <Link
                 href="/contact"
                 className="inline-flex items-center gap-2 px-8 py-4 font-semibold text-white transition hover:opacity-90 uppercase text-sm"
-                style={{ backgroundColor: "#042B19" }}
+                style={{ backgroundColor: "#05627C" }}
               >
                 Get in Touch
                 <ArrowRight className="w-5 h-5" />
@@ -234,7 +234,7 @@ export default function CareersPage() {
             <h2
               className="text-3xl md:text-4xl font-normal mb-4"
               style={{
-                color: "#042B19",
+                color: "#05627C",
                 fontFamily: "var(--font-font4), sans-serif",
               }}
             >

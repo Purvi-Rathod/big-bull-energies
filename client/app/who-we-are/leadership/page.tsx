@@ -73,11 +73,11 @@ export default function LeadershipPage() {
               <div className="flex items-center gap-2 sm:gap-3 mb-4 sm:mb-6">
                 <div
                   className="h-px w-8 sm:w-12"
-                  style={{ backgroundColor: "#042B19" }}
+                  style={{ backgroundColor: "#05627C" }}
                 ></div>
                 <span
                   className="text-xs font-medium uppercase tracking-wide"
-                  style={{ color: "#042B19" }}
+                  style={{ color: "#05627C" }}
                 >
                   WHO WE ARE
                 </span>
@@ -85,7 +85,7 @@ export default function LeadershipPage() {
               <h1
                 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl 2xl:text-7xl font-normal leading-tight mb-4 sm:mb-6"
                 style={{
-                  color: "#042B19",
+                  color: "#05627C",
                   fontFamily: "var(--font-font4), sans-serif",
                 }}
               >
@@ -105,11 +105,11 @@ export default function LeadershipPage() {
               <div className="flex items-center justify-center gap-2 sm:gap-3 mb-4 sm:mb-6">
                 <div
                   className="h-px w-8 sm:w-12"
-                  style={{ backgroundColor: "#042B19" }}
+                  style={{ backgroundColor: "#05627C" }}
                 ></div>
                 <span
                   className="text-xs font-medium uppercase tracking-wide"
-                  style={{ color: "#042B19" }}
+                  style={{ color: "#05627C" }}
                 >
                   OUR LEADERSHIP
                 </span>
@@ -117,7 +117,7 @@ export default function LeadershipPage() {
               <h2
                 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-normal leading-tight mb-4 sm:mb-6 px-2"
                 style={{
-                  color: "#042B19",
+                  color: "#05627C",
                   fontFamily: "var(--font-font4), sans-serif",
                 }}
               >
@@ -126,7 +126,7 @@ export default function LeadershipPage() {
               <p
                 className="text-sm sm:text-base md:text-lg lg:text-xl leading-relaxed max-w-3xl mx-auto px-2"
                 style={{
-                  color: "#042B19",
+                  color: "#05627C",
                   fontFamily: "var(--font-font4), sans-serif",
                 }}
               >
@@ -154,7 +154,7 @@ export default function LeadershipPage() {
                     {/* Green Banner Overlay */}
                     <div
                       className="absolute top-2 sm:top-3 md:top-4 left-2 sm:left-3 md:left-4 px-2 sm:px-3 py-1"
-                      style={{ backgroundColor: "#042B19" }}
+                      style={{ backgroundColor: "#05627C" }}
                     >
                       <span className="text-xs font-medium uppercase tracking-wide text-white">
                         LEADERSHIP
@@ -187,14 +187,14 @@ export default function LeadershipPage() {
                   <div className="p-4 sm:p-6 md:p-8 flex-1 flex flex-col bg-white">
                     <h4
                       className="text-lg sm:text-xl md:text-2xl font-bold mb-3 sm:mb-4"
-                      style={{ color: "#042B19" }}
+                      style={{ color: "#05627C" }}
                     >
                       {leader.title}
                     </h4>
                     <p
                       className="text-sm sm:text-base leading-relaxed mb-4 sm:mb-6 flex-1"
                       style={{
-                        color: "#042B19",
+                        color: "#05627C",
                         fontFamily: "var(--font-font4), sans-serif",
                       }}
                     >
@@ -218,7 +218,7 @@ export default function LeadershipPage() {
                           target="_blank"
                           rel="noopener noreferrer"
                           className="text-xs sm:text-sm font-medium uppercase tracking-wide transition hover:opacity-70"
-                          style={{ color: "#042B19" }}
+                          style={{ color: "#05627C" }}
                         >
                           VIEW PROFILE
                         </a>
@@ -236,7 +236,7 @@ export default function LeadershipPage() {
       <section className="relative w-full py-12 sm:py-16 md:py-20 lg:py-24 overflow-hidden">
         <div
           className="absolute inset-0"
-          style={{ backgroundColor: "#042B19" }}
+          style={{ backgroundColor: "#05627C" }}
         >
           {/* Curved Lines Pattern */}
           <svg
@@ -314,14 +314,14 @@ export default function LeadershipPage() {
               <div className="flex flex-col order-2 lg:order-1">
                 <span
                   className="text-xs font-medium uppercase tracking-wide mb-4 sm:mb-6"
-                  style={{ color: "#042B19" }}
+                  style={{ color: "#05627C" }}
                 >
                   EXECUTION
                 </span>
                 <h2
                   className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl 2xl:text-7xl font-normal leading-tight"
                   style={{
-                    color: "#042B19",
+                    color: "#05627C",
                     fontFamily: "var(--font-font4), sans-serif",
                   }}
                 >
@@ -334,7 +334,7 @@ export default function LeadershipPage() {
                 <p
                   className="text-sm sm:text-base md:text-lg lg:text-xl leading-relaxed"
                   style={{
-                    color: "#042B19",
+                    color: "#05627C",
                     fontFamily: "var(--font-font4), sans-serif",
                   }}
                 >
@@ -351,7 +351,7 @@ export default function LeadershipPage() {
       </section>
 
       {/* Employee Growth Section */}
-      <section className="relative w-full h-[50vh] sm:h-[60vh] md:h-[70vh] lg:h-[80vh] xl:h-screen bg-[#E8F5F0] overflow-hidden">
+      {/* <section className="relative w-full h-[50vh] sm:h-[60vh] md:h-[70vh] lg:h-[80vh] xl:h-screen bg-[#E8F5F0] overflow-hidden">
         <Image
           src="/employ-chart.png"
           alt="Employee Growth Chart"
@@ -359,7 +359,7 @@ export default function LeadershipPage() {
           className="object-contain sm:object-cover"
           priority
         />
-      </section>
+      </section> */}
 
       {/* CTA Section */}
       <section className="relative w-full bg-white py-12 sm:py-16 md:py-20 lg:py-24">
@@ -368,7 +368,7 @@ export default function LeadershipPage() {
             <h2
               className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-normal mb-6 sm:mb-8"
               style={{
-                color: "#042B19",
+                color: "#05627C",
                 fontFamily: "var(--font-font4), sans-serif",
               }}
             >

@@ -119,7 +119,7 @@ export default function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
           isOpen ? "w-56" : "w-20"
         }`}
         style={{
-          backgroundColor: "#042B19",
+          backgroundColor: "#05627C",
         }}
       >
         {/* Sidebar Header with Logo and Toggle */}
@@ -256,20 +256,20 @@ export default function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
             <div className="bg-white rounded-2xl p-4 space-y-3">
               {/* User Info */}
               <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#042B19] to-[#16a34a] flex items-center justify-center shadow-md flex-shrink-0">
+                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#05627C] to-[#16a34a] flex items-center justify-center shadow-md flex-shrink-0">
                   <span className="text-lg font-bold text-white">A</span>
                 </div>
                 <div className="flex-1 min-w-0">
                   <p
                     className="text-base font-semibold truncate"
-                    style={{ color: "#042B19" }}
+                    style={{ color: "#05627C" }}
                   >
                     Andrew
                   </p>
                   <div className="flex items-center gap-2 mt-1">
                     <span
                       className="text-xs font-semibold px-2 py-0.5 rounded"
-                      style={{ backgroundColor: "#E8F5F0", color: "#042B19" }}
+                      style={{ backgroundColor: "#E8F5F0", color: "#05627C" }}
                     >
                       CNB3298618
                     </span>
@@ -279,7 +279,7 @@ export default function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
                       Rank:{" "}
                       <span
                         className="font-semibold"
-                        style={{ color: "#042B19" }}
+                        style={{ color: "#05627C" }}
                       >
                         981
                       </span>
@@ -295,7 +295,7 @@ export default function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
                 </p>
                 <div
                   className="px-3 py-2 rounded-3xl font-semibold text-sm text-center"
-                  style={{ backgroundColor: "#ffcf0B", color: "#042B19" }}
+                  style={{ backgroundColor: "#ffcf0B", color: "#05627C" }}
                 >
                   Elite Energy
                 </div>
@@ -318,7 +318,7 @@ export default function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
             </div>
           ) : (
             <div className="flex items-center justify-center">
-              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#042B19] to-[#16a34a] flex items-center justify-center shadow-md">
+              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#05627C] to-[#16a34a] flex items-center justify-center shadow-md">
                 <span className="text-sm font-bold text-white">A</span>
               </div>
             </div>

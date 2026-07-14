@@ -7,7 +7,7 @@ export default function PrivacyPage() {
     <div className="min-h-screen bg-gray-50" style={{ paddingTop: "156px" }}>
       <div className="container mx-auto px-4 py-16">
         <div className="max-w-4xl mx-auto">
-          <h1 className="text-4xl font-bold mb-4" style={{ color: "#042B19" }}>
+          <h1 className="text-4xl font-bold mb-4" style={{ color: "#05627C" }}>
             Privacy Policy
           </h1>
           <p className="text-lg text-gray-600 mb-8">
@@ -21,7 +21,7 @@ export default function PrivacyPage() {
             <section>
               <h2
                 className="text-2xl font-semibold mb-4"
-                style={{ color: "#042B19" }}
+                style={{ color: "#05627C" }}
               >
                 Introduction
               </h2>
@@ -35,7 +35,7 @@ export default function PrivacyPage() {
             <section>
               <h2
                 className="text-2xl font-semibold mb-4"
-                style={{ color: "#042B19" }}
+                style={{ color: "#05627C" }}
               >
                 Information We Collect
               </h2>
@@ -57,7 +57,7 @@ export default function PrivacyPage() {
             <section>
               <h2
                 className="text-2xl font-semibold mb-4"
-                style={{ color: "#042B19" }}
+                style={{ color: "#05627C" }}
               >
                 How We Use Your Information
               </h2>
@@ -76,7 +76,7 @@ export default function PrivacyPage() {
             <section>
               <h2
                 className="text-2xl font-semibold mb-4"
-                style={{ color: "#042B19" }}
+                style={{ color: "#05627C" }}
               >
                 Data Security
               </h2>
@@ -90,7 +90,7 @@ export default function PrivacyPage() {
             <section>
               <h2
                 className="text-2xl font-semibold mb-4"
-                style={{ color: "#042B19" }}
+                style={{ color: "#05627C" }}
               >
                 Contact Us
               </h2>

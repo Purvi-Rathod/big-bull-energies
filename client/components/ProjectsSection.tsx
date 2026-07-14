@@ -71,7 +71,7 @@ function Globe({ className }: { className?: string }) {
       state.width = width * 2;
       state.height = width * 2;
     },
-    [r]
+    [r],
   );
 
   const onResize = () => {
@@ -116,7 +116,7 @@ function Globe({ className }: { className?: string }) {
         ref={canvasRef}
         onPointerDown={(e) =>
           updatePointerInteraction(
-            e.clientX - pointerInteractionMovement.current
+            e.clientX - pointerInteractionMovement.current,
           )
         }
         onPointerUp={() => updatePointerInteraction(null)}
@@ -134,7 +134,7 @@ export default function ProjectsSection() {
   return (
     <section
       className="relative w-full overflow-hidden py-8 sm:py-12 md:py-16 lg:py-20 xl:py-24"
-      style={{ backgroundColor: "#042B19" }}
+      style={{ backgroundColor: "#05627C" }}
     >
       <div className="container mx-auto px-4 sm:px-6 md:px-8 lg:px-8">
         <div className="flex flex-col lg:flex-row items-center justify-between gap-6 sm:gap-8 md:gap-10 lg:gap-12 xl:gap-16">

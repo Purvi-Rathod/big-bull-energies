@@ -44,7 +44,7 @@ export default function NewsInsightsSection() {
           <h2
             className="text-3xl sm:text-4xl md:text-5xl lg:text-5xl font-normal mb-3 sm:mb-4"
             style={{
-              color: "#042B19",
+              color: "#05627C",
               fontFamily: "var(--font-font4), sans-serif",
             }}
           >
@@ -59,7 +59,7 @@ export default function NewsInsightsSection() {
           <div className="space-y-3 sm:space-y-4">
             <p
               className="text-xs sm:text-sm font-medium uppercase tracking-wide"
-              style={{ color: "#042B19" }}
+              style={{ color: "#05627C" }}
             >
               FEATURED
             </p>
@@ -74,7 +74,7 @@ export default function NewsInsightsSection() {
             </div>
             <div
               className="flex items-center gap-2 sm:gap-3 text-xs sm:text-sm"
-              style={{ color: "#042B19" }}
+              style={{ color: "#05627C" }}
             >
               <span>{featuredArticle.date}</span>
               <svg
@@ -94,7 +94,7 @@ export default function NewsInsightsSection() {
             </div>
             <h3
               className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold leading-tight"
-              style={{ color: "#042B19" }}
+              style={{ color: "#05627C" }}
             >
               {featuredArticle.headline}
             </h3>
@@ -113,7 +113,7 @@ export default function NewsInsightsSection() {
               <div key={index} className="py-4 sm:py-5 md:py-6">
                 <div
                   className="flex items-center gap-2 sm:gap-3 text-xs sm:text-sm mb-2 sm:mb-3"
-                  style={{ color: "#042B19" }}
+                  style={{ color: "#05627C" }}
                 >
                   <span>{article.date}</span>
                   <svg
@@ -133,7 +133,7 @@ export default function NewsInsightsSection() {
                 </div>
                 <h4
                   className="text-lg sm:text-xl md:text-2xl font-bold leading-tight mb-2 sm:mb-3"
-                  style={{ color: "#042B19" }}
+                  style={{ color: "#05627C" }}
                 >
                   {article.headline}
                 </h4>

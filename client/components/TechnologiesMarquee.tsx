@@ -45,9 +45,9 @@ export default function TechnologiesMarquee() {
             <span
               className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl 2xl:text-8xl font-bold uppercase tracking-tight"
               style={{
-                color: "#042B19",
+                color: "#05627C",
                 fontFamily: "var(--font-custom), 'CustomFont', sans-serif",
-                WebkitTextStroke: "2px #042B19",
+                WebkitTextStroke: "2px #05627C",
                 WebkitTextFillColor: "transparent",
               }}
             >
@@ -55,7 +55,7 @@ export default function TechnologiesMarquee() {
             </span>
             <span
               className="mx-4 sm:mx-6 md:mx-8 lg:mx-10 xl:mx-12 text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl 2xl:text-8xl"
-              style={{ color: "#042B19" }}
+              style={{ color: "#05627C" }}
             >
               ·
             </span>

@@ -25,11 +25,11 @@ export default function AboutPage() {
               <div className="flex items-center gap-3 mb-6">
                 <div
                   className="h-px w-12"
-                  style={{ backgroundColor: "#042B19" }}
+                  style={{ backgroundColor: "#05627C" }}
                 ></div>
                 <span
                   className="text-xs font-medium uppercase tracking-wide"
-                  style={{ color: "#042B19" }}
+                  style={{ color: "#05627C" }}
                 >
                   WHO WE ARE
                 </span>
@@ -37,7 +37,7 @@ export default function AboutPage() {
               <h1
                 className="text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-normal leading-tight mb-6"
                 style={{
-                  color: "#042B19",
+                  color: "#05627C",
                   fontFamily: "var(--font-font4), sans-serif",
                 }}
               >
@@ -57,10 +57,10 @@ export default function AboutPage() {
             <div className="flex flex-col justify-center">
               {/* Breadcrumbs/Navigation */}
               <div className="flex items-center gap-3 mb-8">
-                <div className="h-px w-12 bg-[#042B19]"></div>
+                <div className="h-px w-12 bg-[#05627C]"></div>
                 <span
                   className="text-xs font-medium uppercase tracking-wide"
-                  style={{ color: "#042B19" }}
+                  style={{ color: "#05627C" }}
                 >
                   WHO WE ARE
                 </span>
@@ -70,7 +70,7 @@ export default function AboutPage() {
               <h1
                 className="text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-normal leading-tight mb-8"
                 style={{
-                  color: "#042B19",
+                  color: "#05627C",
                   fontFamily: "var(--font-font4), sans-serif",
                 }}
               >
@@ -98,7 +98,7 @@ export default function AboutPage() {
                 <h2
                   className="text-3xl md:text-4xl lg:text-5xl font-normal leading-tight mb-4"
                   style={{
-                    color: "#042B19",
+                    color: "#05627C",
                     fontFamily: "var(--font-font4), sans-serif",
                   }}
                 >
@@ -107,7 +107,7 @@ export default function AboutPage() {
                 <p
                   className="text-base md:text-lg lg:text-xl leading-relaxed"
                   style={{
-                    color: "#042B19",
+                    color: "#05627C",
                     fontFamily: "var(--font-font4), sans-serif",
                   }}
                 >
@@ -132,10 +132,10 @@ export default function AboutPage() {
             {/* Left Side - Text Content */}
             <div className="flex flex-col">
               <div className="flex items-center gap-3 mb-6">
-                <div className="h-px w-12 bg-[#042B19]"></div>
+                <div className="h-px w-12 bg-[#05627C]"></div>
                 <span
                   className="text-xs font-medium uppercase tracking-wide"
-                  style={{ color: "#042B19" }}
+                  style={{ color: "#05627C" }}
                 >
                   SAFETY
                 </span>
@@ -143,7 +143,7 @@ export default function AboutPage() {
               <h2
                 className="text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-normal leading-tight mb-6"
                 style={{
-                  color: "#042B19",
+                  color: "#05627C",
                   fontFamily: "var(--font-font4), sans-serif",
                 }}
               >
@@ -152,7 +152,7 @@ export default function AboutPage() {
               <p
                 className="text-base md:text-lg lg:text-xl leading-relaxed mb-8"
                 style={{
-                  color: "#042B19",
+                  color: "#05627C",
                   fontFamily: "var(--font-font4), sans-serif",
                 }}
               >
@@ -193,7 +193,7 @@ export default function AboutPage() {
       <section className="relative w-full py-16 md:py-20 lg:py-24 overflow-hidden">
         <div
           className="absolute inset-0"
-          style={{ backgroundColor: "#042B19" }}
+          style={{ backgroundColor: "#05627C" }}
         >
           {/* Curved Lines Pattern */}
           <svg
@@ -264,7 +264,7 @@ export default function AboutPage() {
       </section>
 
       {/* Employee Growth Section */}
-      <section className="relative w-full h-[50vh] sm:h-[60vh] md:h-[70vh] lg:h-[80vh] xl:h-screen bg-[#E8F5F0] overflow-hidden">
+      {/* <section className="relative w-full h-[50vh] sm:h-[60vh] md:h-[70vh] lg:h-[80vh] xl:h-screen bg-[#E8F5F0] overflow-hidden">
         <Image
           src="/employ-chart.png"
           alt="Employee Growth Chart"
@@ -272,7 +272,7 @@ export default function AboutPage() {
           className="object-contain sm:object-cover"
           priority
         />
-      </section>
+      </section> */}
 
       {/* Roadmap Section */}
       <section className="relative w-full bg-white py-16 md:py-20 lg:py-24">
@@ -280,7 +280,7 @@ export default function AboutPage() {
           <div className="max-w-6xl mx-auto">
             <h2
               className="text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold mb-16 text-center"
-              style={{ color: "#042B19" }}
+              style={{ color: "#05627C" }}
             >
               Big Bull Energies Roadmap (2022 – 2028)
             </h2>
@@ -290,7 +290,7 @@ export default function AboutPage() {
               {/* Vertical Timeline Line */}
               <div
                 className="hidden md:block absolute left-8 top-0 bottom-0 w-0.5"
-                style={{ backgroundColor: "#042B19", opacity: 0.2 }}
+                style={{ backgroundColor: "#05627C", opacity: 0.2 }}
               ></div>
 
               <div className="space-y-12 md:space-y-16">
@@ -304,28 +304,28 @@ export default function AboutPage() {
                       >
                         <div
                           className="text-xl md:text-2xl lg:text-3xl font-bold"
-                          style={{ color: "#042B19" }}
+                          style={{ color: "#05627C" }}
                         >
                           2022
                         </div>
                       </div>
                       <div
                         className="hidden md:block w-8 h-0.5"
-                        style={{ backgroundColor: "#042B19" }}
+                        style={{ backgroundColor: "#05627C" }}
                       ></div>
                     </div>
                   </div>
                   <div className="flex-1 bg-[#E8F5F0] p-6 md:p-8 rounded-lg">
                     <h3
                       className="text-xl md:text-2xl lg:text-3xl font-bold mb-4"
-                      style={{ color: "#042B19" }}
+                      style={{ color: "#05627C" }}
                     >
                       A Dream Takes Shape
                     </h3>
                     <p
                       className="text-base md:text-lg lg:text-xl leading-relaxed"
                       style={{
-                        color: "#042B19",
+                        color: "#05627C",
                         fontFamily: "var(--font-font4), sans-serif",
                       }}
                     >
@@ -347,28 +347,28 @@ export default function AboutPage() {
                       >
                         <div
                           className="text-xl md:text-2xl lg:text-3xl font-bold"
-                          style={{ color: "#042B19" }}
+                          style={{ color: "#05627C" }}
                         >
                           2023
                         </div>
                       </div>
                       <div
                         className="hidden md:block w-8 h-0.5"
-                        style={{ backgroundColor: "#042B19" }}
+                        style={{ backgroundColor: "#05627C" }}
                       ></div>
                     </div>
                   </div>
                   <div className="flex-1 bg-[#E8F5F0] p-6 md:p-8 rounded-lg">
                     <h3
                       className="text-xl md:text-2xl lg:text-3xl font-bold mb-4"
-                      style={{ color: "#042B19" }}
+                      style={{ color: "#05627C" }}
                     >
                       Laying the Foundation
                     </h3>
                     <p
                       className="text-base md:text-lg lg:text-xl leading-relaxed"
                       style={{
-                        color: "#042B19",
+                        color: "#05627C",
                         fontFamily: "var(--font-font4), sans-serif",
                       }}
                     >
@@ -389,28 +389,28 @@ export default function AboutPage() {
                       >
                         <div
                           className="text-xl md:text-2xl lg:text-3xl font-bold"
-                          style={{ color: "#042B19" }}
+                          style={{ color: "#05627C" }}
                         >
                           2024
                         </div>
                       </div>
                       <div
                         className="hidden md:block w-8 h-0.5"
-                        style={{ backgroundColor: "#042B19" }}
+                        style={{ backgroundColor: "#05627C" }}
                       ></div>
                     </div>
                   </div>
                   <div className="flex-1 bg-[#E8F5F0] p-6 md:p-8 rounded-lg">
                     <h3
                       className="text-xl md:text-2xl lg:text-3xl font-bold mb-4"
-                      style={{ color: "#042B19" }}
+                      style={{ color: "#05627C" }}
                     >
                       A Year of Transformation
                     </h3>
                     <p
                       className="text-base md:text-lg lg:text-xl leading-relaxed"
                       style={{
-                        color: "#042B19",
+                        color: "#05627C",
                         fontFamily: "var(--font-font4), sans-serif",
                       }}
                     >
@@ -431,28 +431,28 @@ export default function AboutPage() {
                       >
                         <div
                           className="text-xl md:text-2xl lg:text-3xl font-bold"
-                          style={{ color: "#042B19" }}
+                          style={{ color: "#05627C" }}
                         >
                           2025
                         </div>
                       </div>
                       <div
                         className="hidden md:block w-8 h-0.5"
-                        style={{ backgroundColor: "#042B19" }}
+                        style={{ backgroundColor: "#05627C" }}
                       ></div>
                     </div>
                   </div>
                   <div className="flex-1 bg-[#E8F5F0] p-6 md:p-8 rounded-lg">
                     <h3
                       className="text-xl md:text-2xl lg:text-3xl font-bold mb-4"
-                      style={{ color: "#042B19" }}
+                      style={{ color: "#05627C" }}
                     >
                       Global Expansion & Second Solar Plant
                     </h3>
                     <p
                       className="text-base md:text-lg lg:text-xl leading-relaxed"
                       style={{
-                        color: "#042B19",
+                        color: "#05627C",
                         fontFamily: "var(--font-font4), sans-serif",
                       }}
                     >
@@ -473,28 +473,28 @@ export default function AboutPage() {
                       >
                         <div
                           className="text-xl md:text-2xl lg:text-3xl font-bold"
-                          style={{ color: "#042B19" }}
+                          style={{ color: "#05627C" }}
                         >
                           2026
                         </div>
                       </div>
                       <div
                         className="hidden md:block w-8 h-0.5"
-                        style={{ backgroundColor: "#042B19" }}
+                        style={{ backgroundColor: "#05627C" }}
                       ></div>
                     </div>
                   </div>
                   <div className="flex-1 bg-[#E8F5F0] p-6 md:p-8 rounded-lg">
                     <h3
                       className="text-xl md:text-2xl lg:text-3xl font-bold mb-4"
-                      style={{ color: "#042B19" }}
+                      style={{ color: "#05627C" }}
                     >
                       Pioneering the Future
                     </h3>
                     <p
                       className="text-base md:text-lg lg:text-xl leading-relaxed"
                       style={{
-                        color: "#042B19",
+                        color: "#05627C",
                         fontFamily: "var(--font-font4), sans-serif",
                       }}
                     >
@@ -514,28 +514,28 @@ export default function AboutPage() {
                       >
                         <div
                           className="text-xl md:text-2xl lg:text-3xl font-bold"
-                          style={{ color: "#042B19" }}
+                          style={{ color: "#05627C" }}
                         >
                           2027
                         </div>
                       </div>
                       <div
                         className="hidden md:block w-8 h-0.5"
-                        style={{ backgroundColor: "#042B19" }}
+                        style={{ backgroundColor: "#05627C" }}
                       ></div>
                     </div>
                   </div>
                   <div className="flex-1 bg-[#E8F5F0] p-6 md:p-8 rounded-lg">
                     <h3
                       className="text-xl md:text-2xl lg:text-3xl font-bold mb-4"
-                      style={{ color: "#042B19" }}
+                      style={{ color: "#05627C" }}
                     >
                       Smart Technology & Clean Mobility
                     </h3>
                     <p
                       className="text-base md:text-lg lg:text-xl leading-relaxed"
                       style={{
-                        color: "#042B19",
+                        color: "#05627C",
                         fontFamily: "var(--font-font4), sans-serif",
                       }}
                     >
@@ -551,7 +551,7 @@ export default function AboutPage() {
                     <div className="flex items-center gap-4 w-full">
                       <div
                         className="w-16 h-16 rounded-full flex items-center justify-center shadow-md flex-shrink-0"
-                        style={{ backgroundColor: "#042B19" }}
+                        style={{ backgroundColor: "#05627C" }}
                       >
                         <div
                           className="text-xl md:text-2xl lg:text-3xl font-bold"
@@ -564,18 +564,18 @@ export default function AboutPage() {
                   </div>
                   <div
                     className="flex-1 bg-[#E8F5F0] p-6 md:p-8 rounded-lg border-2"
-                    style={{ borderColor: "#042B19" }}
+                    style={{ borderColor: "#05627C" }}
                   >
                     <h3
                       className="text-xl md:text-2xl lg:text-3xl font-bold mb-4"
-                      style={{ color: "#042B19" }}
+                      style={{ color: "#05627C" }}
                     >
                       Global Leader in Sustainable Finance & Energy
                     </h3>
                     <p
                       className="text-base md:text-lg lg:text-xl leading-relaxed"
                       style={{
-                        color: "#042B19",
+                        color: "#05627C",
                         fontFamily: "var(--font-font4), sans-serif",
                       }}
                     >
@@ -597,14 +597,14 @@ export default function AboutPage() {
           <div className="max-w-5xl mx-auto">
             <h2
               className="text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold mb-12 text-center"
-              style={{ color: "#042B19" }}
+              style={{ color: "#05627C" }}
             >
               Our Diversified Revenue Model
             </h2>
             <p
               className="text-base md:text-lg lg:text-xl leading-relaxed mb-12 text-center"
               style={{
-                color: "#042B19",
+                color: "#05627C",
                 fontFamily: "var(--font-font4), sans-serif",
               }}
             >
@@ -617,30 +617,30 @@ export default function AboutPage() {
               <div className="bg-white p-8 md:p-10">
                 <h3
                   className="text-2xl md:text-3xl font-bold mb-4"
-                  style={{ color: "#042B19" }}
+                  style={{ color: "#05627C" }}
                 >
                   Solar Energy
                 </h3>
                 <div className="space-y-3">
                   <div>
-                    <div className="h-px bg-[#042B19] mb-3"></div>
+                    <div className="h-px bg-[#05627C] mb-3"></div>
                     <div className="flex items-baseline gap-2">
                       <span
                         className="text-4xl md:text-5xl lg:text-6xl font-bold"
-                        style={{ color: "#042B19" }}
+                        style={{ color: "#05627C" }}
                       >
                         $9M+
                       </span>
                       <span
                         className="text-base md:text-lg"
-                        style={{ color: "#042B19" }}
+                        style={{ color: "#05627C" }}
                       >
                         annually
                       </span>
                     </div>
                     <p
                       className="text-sm md:text-base mt-2"
-                      style={{ color: "#042B19", opacity: 0.8 }}
+                      style={{ color: "#05627C", opacity: 0.8 }}
                     >
                       Generated by our solar farms
                     </p>
@@ -652,24 +652,24 @@ export default function AboutPage() {
               <div className="bg-white p-8 md:p-10">
                 <h3
                   className="text-2xl md:text-3xl font-bold mb-4"
-                  style={{ color: "#042B19" }}
+                  style={{ color: "#05627C" }}
                 >
                   EV Investments
                 </h3>
                 <div className="space-y-3">
                   <div>
-                    <div className="h-px bg-[#042B19] mb-3"></div>
+                    <div className="h-px bg-[#05627C] mb-3"></div>
                     <div className="flex items-baseline gap-2">
                       <span
                         className="text-4xl md:text-5xl lg:text-6xl font-bold"
-                        style={{ color: "#042B19" }}
+                        style={{ color: "#05627C" }}
                       >
                         15%–35%
                       </span>
                     </div>
                     <p
                       className="text-sm md:text-base mt-2"
-                      style={{ color: "#042B19", opacity: 0.8 }}
+                      style={{ color: "#05627C", opacity: 0.8 }}
                     >
                       Profit margins from EV and Forbes-listed investments
                     </p>
@@ -681,24 +681,24 @@ export default function AboutPage() {
               <div className="bg-white p-8 md:p-10">
                 <h3
                   className="text-2xl md:text-3xl font-bold mb-4"
-                  style={{ color: "#042B19" }}
+                  style={{ color: "#05627C" }}
                 >
                   Total Revenue
                 </h3>
                 <div className="space-y-3">
                   <div>
-                    <div className="h-px bg-[#042B19] mb-3"></div>
+                    <div className="h-px bg-[#05627C] mb-3"></div>
                     <div className="flex items-baseline gap-2">
                       <span
                         className="text-4xl md:text-5xl lg:text-6xl font-bold"
-                        style={{ color: "#042B19" }}
+                        style={{ color: "#05627C" }}
                       >
                         $290M+
                       </span>
                     </div>
                     <p
                       className="text-sm md:text-base mt-2"
-                      style={{ color: "#042B19", opacity: 0.8 }}
+                      style={{ color: "#05627C", opacity: 0.8 }}
                     >
                       Yearly revenue with stable daily payouts of 1.5%–2.4% to
                       users
@@ -718,7 +718,7 @@ export default function AboutPage() {
             <h2
               className="text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-normal mb-8"
               style={{
-                color: "#042B19",
+                color: "#05627C",
                 fontFamily: "var(--font-font4), sans-serif",
               }}
             >

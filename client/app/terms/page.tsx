@@ -7,7 +7,7 @@ export default function TermsPage() {
     <div className="min-h-screen bg-gray-50" style={{ paddingTop: "156px" }}>
       <div className="container mx-auto px-4 py-16">
         <div className="max-w-4xl mx-auto">
-          <h1 className="text-4xl font-bold mb-4" style={{ color: "#042B19" }}>
+          <h1 className="text-4xl font-bold mb-4" style={{ color: "#05627C" }}>
             Terms of Service
           </h1>
           <p className="text-lg text-gray-600 mb-8">
@@ -21,7 +21,7 @@ export default function TermsPage() {
             <section>
               <h2
                 className="text-2xl font-semibold mb-4"
-                style={{ color: "#042B19" }}
+                style={{ color: "#05627C" }}
               >
                 Agreement to Terms
               </h2>
@@ -36,7 +36,7 @@ export default function TermsPage() {
             <section>
               <h2
                 className="text-2xl font-semibold mb-4"
-                style={{ color: "#042B19" }}
+                style={{ color: "#05627C" }}
               >
                 Account Registration
               </h2>
@@ -57,7 +57,7 @@ export default function TermsPage() {
             <section>
               <h2
                 className="text-2xl font-semibold mb-4"
-                style={{ color: "#042B19" }}
+                style={{ color: "#05627C" }}
               >
                 Investment Terms
               </h2>
@@ -72,7 +72,7 @@ export default function TermsPage() {
             <section>
               <h2
                 className="text-2xl font-semibold mb-4"
-                style={{ color: "#042B19" }}
+                style={{ color: "#05627C" }}
               >
                 Prohibited Activities
               </h2>
@@ -98,7 +98,7 @@ export default function TermsPage() {
             <section>
               <h2
                 className="text-2xl font-semibold mb-4"
-                style={{ color: "#042B19" }}
+                style={{ color: "#05627C" }}
               >
                 Limitation of Liability
               </h2>

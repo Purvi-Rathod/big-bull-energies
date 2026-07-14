@@ -97,11 +97,11 @@ export default function ProjectsPage() {
               <div className="flex items-center gap-3 mb-6">
                 <div
                   className="h-px w-12"
-                  style={{ backgroundColor: "#042B19" }}
+                  style={{ backgroundColor: "#05627C" }}
                 ></div>
                 <span
                   className="text-xs font-medium uppercase tracking-wide"
-                  style={{ color: "#042B19" }}
+                  style={{ color: "#05627C" }}
                 >
                   OUR PROJECTS
                 </span>
@@ -109,7 +109,7 @@ export default function ProjectsPage() {
               <h1
                 className="text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-normal leading-tight mb-6"
                 style={{
-                  color: "#042B19",
+                  color: "#05627C",
                   fontFamily: "var(--font-font4), sans-serif",
                 }}
               >
@@ -132,7 +132,7 @@ export default function ProjectsPage() {
             <h2
               className="text-3xl md:text-4xl lg:text-5xl font-normal mb-4"
               style={{
-                color: "#042B19",
+                color: "#05627C",
                 fontFamily: "var(--font-font4), sans-serif",
               }}
             >
@@ -154,14 +154,14 @@ export default function ProjectsPage() {
               >
                 <div
                   className="mb-6 group-hover:scale-110 transition-transform"
-                  style={{ color: "#042B19" }}
+                  style={{ color: "#05627C" }}
                 >
                   {project.icon}
                 </div>
                 <div className="mb-4">
                   <span
                     className="text-4xl font-bold block mb-1"
-                    style={{ color: "#042B19" }}
+                    style={{ color: "#05627C" }}
                   >
                     {project.count}
                   </span>
@@ -171,7 +171,7 @@ export default function ProjectsPage() {
                 </div>
                 <h3
                   className="text-xl font-semibold mb-3"
-                  style={{ color: "#042B19" }}
+                  style={{ color: "#05627C" }}
                 >
                   {project.title}
                 </h3>
@@ -180,7 +180,7 @@ export default function ProjectsPage() {
                 </p>
                 <div
                   className="flex items-center gap-2 text-sm font-semibold"
-                  style={{ color: "#042B19" }}
+                  style={{ color: "#05627C" }}
                 >
                   Learn More
                   <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
@@ -199,7 +199,7 @@ export default function ProjectsPage() {
               <h2
                 className="text-3xl md:text-4xl lg:text-5xl font-normal mb-4"
                 style={{
-                  color: "#042B19",
+                  color: "#05627C",
                   fontFamily: "var(--font-font4), sans-serif",
                 }}
               >
@@ -223,7 +223,7 @@ export default function ProjectsPage() {
                       <div className="flex items-center gap-4 mb-3">
                         <h3
                           className="text-2xl font-semibold"
-                          style={{ color: "#042B19" }}
+                          style={{ color: "#05627C" }}
                         >
                           {project.name}
                         </h3>
@@ -244,7 +244,7 @@ export default function ProjectsPage() {
                         <div>
                           <span
                             className="font-semibold"
-                            style={{ color: "#042B19" }}
+                            style={{ color: "#05627C" }}
                           >
                             Location:
                           </span>{" "}
@@ -253,7 +253,7 @@ export default function ProjectsPage() {
                         <div>
                           <span
                             className="font-semibold"
-                            style={{ color: "#042B19" }}
+                            style={{ color: "#05627C" }}
                           >
                             Capacity:
                           </span>{" "}
@@ -262,7 +262,7 @@ export default function ProjectsPage() {
                         <div>
                           <span
                             className="font-semibold"
-                            style={{ color: "#042B19" }}
+                            style={{ color: "#05627C" }}
                           >
                             Type:
                           </span>{" "}
@@ -286,7 +286,7 @@ export default function ProjectsPage() {
               <div>
                 <div
                   className="text-4xl md:text-5xl font-bold mb-2"
-                  style={{ color: "#042B19" }}
+                  style={{ color: "#05627C" }}
                 >
                   50+
                 </div>
@@ -297,7 +297,7 @@ export default function ProjectsPage() {
               <div>
                 <div
                   className="text-4xl md:text-5xl font-bold mb-2"
-                  style={{ color: "#042B19" }}
+                  style={{ color: "#05627C" }}
                 >
                   3
                 </div>
@@ -308,7 +308,7 @@ export default function ProjectsPage() {
               <div>
                 <div
                   className="text-4xl md:text-5xl font-bold mb-2"
-                  style={{ color: "#042B19" }}
+                  style={{ color: "#05627C" }}
                 >
                   500+
                 </div>
@@ -319,7 +319,7 @@ export default function ProjectsPage() {
               <div>
                 <div
                   className="text-4xl md:text-5xl font-bold mb-2"
-                  style={{ color: "#042B19" }}
+                  style={{ color: "#05627C" }}
                 >
                   5+
                 </div>
@@ -342,7 +342,7 @@ export default function ProjectsPage() {
             <h2
               className="text-3xl md:text-4xl font-normal mb-4"
               style={{
-                color: "#042B19",
+                color: "#05627C",
                 fontFamily: "var(--font-font4), sans-serif",
               }}
             >
@@ -357,7 +357,7 @@ export default function ProjectsPage() {
               <Link
                 href="/contact"
                 className="inline-flex items-center justify-center gap-2 px-8 py-4 font-semibold text-white transition hover:opacity-90 uppercase text-sm"
-                style={{ backgroundColor: "#042B19" }}
+                style={{ backgroundColor: "#05627C" }}
               >
                 Contact Us
                 <ArrowRight className="w-5 h-5" />
@@ -365,7 +365,7 @@ export default function ProjectsPage() {
               <Link
                 href="/our-plan"
                 className="inline-flex items-center justify-center gap-2 px-8 py-4 font-semibold border transition hover:bg-gray-50 uppercase text-sm"
-                style={{ borderColor: "#042B19", color: "#042B19" }}
+                style={{ borderColor: "#05627C", color: "#05627C" }}
               >
                 View Investment Plans
               </Link>

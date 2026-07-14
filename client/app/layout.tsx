@@ -156,7 +156,7 @@ export const metadata: Metadata = {
     "apple-mobile-web-app-capable": "yes",
     "apple-mobile-web-app-status-bar-style": "black-translucent",
     "mobile-web-app-capable": "yes",
-    "theme-color": "#042B19",
+    "theme-color": "#05627C",
     "color-scheme": "light",
   },
 };

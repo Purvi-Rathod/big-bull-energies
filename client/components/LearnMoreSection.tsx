@@ -21,7 +21,7 @@ export default function LearnMoreSection() {
       description:
         "Complete step-by-step guide to understanding the Big Bull Energies platform, from registration to earning.",
       href: "/how-platform-works",
-      color: "#042B19",
+      color: "#05627C",
     },
     {
       icon: <TrendingUp className="w-8 h-8" />,
@@ -29,7 +29,7 @@ export default function LearnMoreSection() {
       description:
         "Explore our investment packages, ROI rates, and understand how daily returns work.",
       href: "/our-plan",
-      color: "#042B19",
+      color: "#05627C",
     },
     {
       icon: <Users className="w-8 h-8" />,
@@ -37,7 +37,7 @@ export default function LearnMoreSection() {
       description:
         "New to Big Bull Energies? Learn how to create an account, make your first investment, and begin earning.",
       href: "/how-to-start",
-      color: "#042B19",
+      color: "#05627C",
     },
     {
       icon: <Network className="w-8 h-8" />,
@@ -45,7 +45,7 @@ export default function LearnMoreSection() {
       description:
         "Understand how the binary tree structure works and how to maximize your binary income.",
       href: "/binary-investment-system",
-      color: "#042B19",
+      color: "#05627C",
     },
     {
       icon: <Award className="w-8 h-8" />,
@@ -53,7 +53,7 @@ export default function LearnMoreSection() {
       description:
         "Unlock exclusive rewards, bonuses, and recognition as you progress through career levels.",
       href: "/career-rewards",
-      color: "#042B19",
+      color: "#05627C",
     },
     {
       icon: <DollarSign className="w-8 h-8" />,
@@ -61,7 +61,7 @@ export default function LearnMoreSection() {
       description:
         "Learn about ROI, referral income, binary bonuses, and all the ways you can earn.",
       href: "/our-plan",
-      color: "#042B19",
+      color: "#05627C",
     },
     {
       icon: <HelpCircle className="w-8 h-8" />,
@@ -69,7 +69,7 @@ export default function LearnMoreSection() {
       description:
         "Find answers to common questions and get help from our support team.",
       href: "/support",
-      color: "#042B19",
+      color: "#05627C",
     },
     {
       icon: <ImageIcon className="w-8 h-8" />,
@@ -77,7 +77,7 @@ export default function LearnMoreSection() {
       description:
         "View photos and videos of our solar plants, office spaces, and events.",
       href: "/gallery",
-      color: "#042B19",
+      color: "#05627C",
     },
   ];
 
@@ -90,11 +90,11 @@ export default function LearnMoreSection() {
             <div className="flex items-center justify-center gap-2 sm:gap-3 mb-4 sm:mb-6">
               <div
                 className="h-px w-8 sm:w-12"
-                style={{ backgroundColor: "#042B19" }}
+                style={{ backgroundColor: "#05627C" }}
               ></div>
               <span
                 className="text-xs font-medium uppercase tracking-wide"
-                style={{ color: "#042B19" }}
+                style={{ color: "#05627C" }}
               >
                 LEARN MORE
               </span>
@@ -102,7 +102,7 @@ export default function LearnMoreSection() {
             <h2
               className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-normal leading-tight mb-4 sm:mb-6 px-2"
               style={{
-                color: "#042B19",
+                color: "#05627C",
                 fontFamily: "var(--font-font4), sans-serif",
               }}
             >
@@ -111,7 +111,7 @@ export default function LearnMoreSection() {
             <p
               className="text-sm sm:text-base md:text-lg leading-relaxed max-w-3xl mx-auto px-2"
               style={{
-                color: "#042B19",
+                color: "#05627C",
                 fontFamily: "var(--font-font4), sans-serif",
               }}
             >
@@ -127,19 +127,19 @@ export default function LearnMoreSection() {
                 key={index}
                 href={resource.href}
                 className="group bg-[#E8F5F0] p-6 sm:p-8 rounded-lg border-2 transition-all hover:shadow-xl hover:-translate-y-1"
-                style={{ borderColor: "#042B19" }}
+                style={{ borderColor: "#05627C" }}
               >
                 <div className="flex items-start gap-4 mb-4">
                   <div
                     className="flex-shrink-0 p-3 rounded-lg transition-transform group-hover:scale-110"
-                    style={{ backgroundColor: "#042B19", color: "#ffffff" }}
+                    style={{ backgroundColor: "#05627C", color: "#ffffff" }}
                   >
                     {resource.icon}
                   </div>
                   <div className="flex-1">
                     <h3
                       className="text-xl sm:text-2xl font-bold mb-2 sm:mb-3 group-hover:underline"
-                      style={{ color: "#042B19" }}
+                      style={{ color: "#05627C" }}
                     >
                       {resource.title}
                     </h3>
@@ -148,7 +148,7 @@ export default function LearnMoreSection() {
                 <p
                   className="text-sm sm:text-base leading-relaxed mb-4"
                   style={{
-                    color: "#042B19",
+                    color: "#05627C",
                     fontFamily: "var(--font-font4), sans-serif",
                   }}
                 >
@@ -156,7 +156,7 @@ export default function LearnMoreSection() {
                 </p>
                 <div
                   className="flex items-center gap-2 text-sm font-semibold"
-                  style={{ color: "#042B19" }}
+                  style={{ color: "#05627C" }}
                 >
                   <span>Learn More</span>
                   <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
@@ -169,7 +169,7 @@ export default function LearnMoreSection() {
           <div className="mt-12 sm:mt-16 text-center">
             <p
               className="text-sm sm:text-base md:text-lg mb-6"
-              style={{ color: "#042B19" }}
+              style={{ color: "#05627C" }}
             >
               Quick Links:
             </p>
@@ -184,7 +184,7 @@ export default function LearnMoreSection() {
                   key={index}
                   href={link.href}
                   className="px-4 sm:px-6 py-2 sm:py-3 bg-white border-2 rounded-lg transition hover:bg-[#E8F5F0] text-sm sm:text-base font-medium"
-                  style={{ borderColor: "#042B19", color: "#042B19" }}
+                  style={{ borderColor: "#05627C", color: "#05627C" }}
                 >
                   {link.label}
                 </Link>

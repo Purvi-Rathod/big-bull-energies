@@ -5,7 +5,7 @@ export default function Footer() {
   return (
     <footer
       className="w-full relative overflow-hidden"
-      style={{ backgroundColor: "#042B19" }}
+      style={{ backgroundColor: "#05627C" }}
     >
       {/* Footer SVG Background */}
       <div className="absolute inset-0 opacity-10">

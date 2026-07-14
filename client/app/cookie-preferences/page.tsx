@@ -27,7 +27,7 @@ export default function CookiePreferencesPage() {
     <div className="min-h-screen bg-gray-50" style={{ paddingTop: "156px" }}>
       <div className="container mx-auto px-4 py-16">
         <div className="max-w-4xl mx-auto">
-          <h1 className="text-4xl font-bold mb-4" style={{ color: "#042B19" }}>
+          <h1 className="text-4xl font-bold mb-4" style={{ color: "#05627C" }}>
             Cookie Preferences
           </h1>
           <p className="text-lg text-gray-600 mb-8">
@@ -41,7 +41,7 @@ export default function CookiePreferencesPage() {
             <section>
               <h2
                 className="text-2xl font-semibold mb-4"
-                style={{ color: "#042B19" }}
+                style={{ color: "#05627C" }}
               >
                 What are cookies?
               </h2>
@@ -61,7 +61,7 @@ export default function CookiePreferencesPage() {
                 <div className="flex-1">
                   <h3
                     className="font-semibold mb-2"
-                    style={{ color: "#042B19" }}
+                    style={{ color: "#05627C" }}
                   >
                     Essential Cookies
                   </h3>
@@ -77,7 +77,7 @@ export default function CookiePreferencesPage() {
                     disabled
                     className="sr-only peer"
                   />
-                  <div className="w-11 h-6 bg-gray-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#042B19]"></div>
+                  <div className="w-11 h-6 bg-gray-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#05627C]"></div>
                 </label>
               </div>
 
@@ -88,7 +88,7 @@ export default function CookiePreferencesPage() {
                 <div className="flex-1">
                   <h3
                     className="font-semibold mb-2"
-                    style={{ color: "#042B19" }}
+                    style={{ color: "#05627C" }}
                   >
                     Analytics Cookies
                   </h3>
@@ -105,7 +105,7 @@ export default function CookiePreferencesPage() {
                     onChange={() => handleToggle("analytics")}
                     className="sr-only peer"
                   />
-                  <div className="w-11 h-6 bg-gray-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#042B19]"></div>
+                  <div className="w-11 h-6 bg-gray-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#05627C]"></div>
                 </label>
               </div>
 
@@ -116,7 +116,7 @@ export default function CookiePreferencesPage() {
                 <div className="flex-1">
                   <h3
                     className="font-semibold mb-2"
-                    style={{ color: "#042B19" }}
+                    style={{ color: "#05627C" }}
                   >
                     Marketing Cookies
                   </h3>
@@ -132,7 +132,7 @@ export default function CookiePreferencesPage() {
                     onChange={() => handleToggle("marketing")}
                     className="sr-only peer"
                   />
-                  <div className="w-11 h-6 bg-gray-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#042B19]"></div>
+                  <div className="w-11 h-6 bg-gray-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#05627C]"></div>
                 </label>
               </div>
             </section>
@@ -141,7 +141,7 @@ export default function CookiePreferencesPage() {
               <button
                 onClick={handleSave}
                 className="px-6 py-3 rounded-lg font-semibold text-white transition hover:opacity-90"
-                style={{ backgroundColor: "#042B19" }}
+                style={{ backgroundColor: "#05627C" }}
               >
                 Save Preferences
               </button>
@@ -154,7 +154,7 @@ export default function CookiePreferencesPage() {
                   });
                 }}
                 className="px-6 py-3 rounded-lg font-semibold border transition hover:bg-gray-50"
-                style={{ borderColor: "#042B19", color: "#042B19" }}
+                style={{ borderColor: "#05627C", color: "#05627C" }}
               >
                 Reset to Default
               </button>

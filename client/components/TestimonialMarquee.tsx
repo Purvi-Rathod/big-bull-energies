@@ -55,7 +55,7 @@ export default function TestimonialMarquee() {
         <h2
           className="text-3xl sm:text-4xl md:text-5xl lg:text-5xl font-normal mb-6 sm:mb-8"
           style={{
-            color: "#042B19",
+            color: "#05627C",
             fontFamily: "var(--font-font4), sans-serif",
           }}
         >
@@ -88,7 +88,7 @@ export default function TestimonialMarquee() {
                 <h3
                   className="text-base sm:text-lg md:text-xl font-semibold mb-2 sm:mb-3 uppercase tracking-wide"
                   style={{
-                    color: "#042B19",
+                    color: "#05627C",
                     fontFamily: "var(--font-custom), 'CustomFont', sans-serif",
                   }}
                 >
@@ -96,7 +96,7 @@ export default function TestimonialMarquee() {
                 </h3>
                 <div
                   className="h-px w-16 sm:w-20 mx-auto lg:mx-0"
-                  style={{ backgroundColor: "#042B19" }}
+                  style={{ backgroundColor: "#05627C" }}
                 ></div>
               </div>
 
@@ -115,12 +115,12 @@ export default function TestimonialMarquee() {
               <div className="pt-3 sm:pt-4">
                 <div
                   className="h-px w-full mb-3 sm:mb-4"
-                  style={{ backgroundColor: "#042B19" }}
+                  style={{ backgroundColor: "#05627C" }}
                 ></div>
                 <p
                   className="text-xs sm:text-sm uppercase tracking-wide"
                   style={{
-                    color: "#042B19",
+                    color: "#05627C",
                     fontFamily: "var(--font-custom), 'CustomFont', sans-serif",
                   }}
                 >
@@ -129,7 +129,7 @@ export default function TestimonialMarquee() {
                 <p
                   className="text-xs sm:text-sm uppercase tracking-wide mt-1"
                   style={{
-                    color: "#042B19",
+                    color: "#05627C",
                     fontFamily: "var(--font-custom), 'CustomFont', sans-serif",
                   }}
                 >
@@ -150,7 +150,7 @@ export default function TestimonialMarquee() {
                 }`}
                 style={{
                   backgroundColor:
-                    index === currentIndex ? "#042B19" : "#D1D5DB",
+                    index === currentIndex ? "#05627C" : "#D1D5DB",
                 }}
                 aria-label={`Go to slide ${index + 1}`}
               />

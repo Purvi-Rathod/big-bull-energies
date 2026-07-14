@@ -68,18 +68,21 @@ const font4 = localFont({
 });
 
 // Base URL for meta tags - can be overridden with environment variable
-const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || process.env.NEXT_PUBLIC_API_URL?.replace('/api', '') || 'https://crownbanker.com';
+const baseUrl =
+  process.env.NEXT_PUBLIC_BASE_URL ||
+  process.env.NEXT_PUBLIC_API_URL?.replace("/api", "") ||
+  "https://crownbanker.com";
 
 export const metadata: Metadata = {
   metadataBase: new URL(baseUrl),
   title: {
-    default: "Crown Bankers - Revolutionary Business Opportunity Platform",
-    template: "%s | Crown Bankers",
+    default: "Big Bull Energies - Revolutionary Business Opportunity Platform",
+    template: "%s | Big Bull Energies",
   },
   description:
-    "Build your network, maximize your earnings, and unlock unlimited potential with Crown Bankers' advanced binary system. Join the future of sustainable energy investments.",
+    "Build your network, maximize your earnings, and unlock unlimited potential with Big Bull Energies' advanced binary system. Join the future of sustainable energy investments.",
   keywords: [
-    "Crown Bankers",
+    "Big Bull Energies",
     "Binary MLM",
     "Network Marketing",
     "Energy Investments",
@@ -90,9 +93,9 @@ export const metadata: Metadata = {
     "MLM Platform",
     "Binary System",
   ],
-  authors: [{ name: "Crown Bankers" }],
-  creator: "Crown Bankers",
-  publisher: "Crown Bankers",
+  authors: [{ name: "Big Bull Energies" }],
+  creator: "Big Bull Energies",
+  publisher: "Big Bull Energies",
   robots: {
     index: true,
     follow: true,
@@ -108,25 +111,25 @@ export const metadata: Metadata = {
     type: "website",
     locale: "en_US",
     url: baseUrl,
-    siteName: "Crown Bankers",
-    title: "Crown Bankers - Revolutionary Binary MLM Platform",
+    siteName: "Big Bull Energies",
+    title: "Big Bull Energies - Revolutionary Binary MLM Platform",
     description:
-      "Build your network, maximize your earnings, and unlock unlimited potential with Crown Bankers' advanced binary system. Join the future of sustainable energy investments.",
+      "Build your network, maximize your earnings, and unlock unlimited potential with Big Bull Energies' advanced binary system. Join the future of sustainable energy investments.",
     images: [
       {
         url: "/image.png",
         width: 1200,
         height: 630,
-        alt: "Crown Bankers Logo",
+        alt: "Big Bull Energies Logo",
         type: "image/png",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Crown Bankers - Revolutionary Binary MLM Platform",
+    title: "Big Bull Energies - Revolutionary Binary MLM Platform",
     description:
-      "Build your network, maximize your earnings, and unlock unlimited potential with Crown Bankers' advanced binary system.",
+      "Build your network, maximize your earnings, and unlock unlimited potential with Big Bull Energies' advanced binary system.",
     images: ["/image.png"],
     creator: "@crownbankers",
     site: "@crownbankers",
@@ -138,9 +141,7 @@ export const metadata: Metadata = {
       { url: "/icon.png", type: "image/png", sizes: "32x32" },
       { url: "/icon.png", type: "image/png", sizes: "16x16" },
     ],
-    apple: [
-      { url: "/icon.png", sizes: "180x180", type: "image/png" },
-    ],
+    apple: [{ url: "/icon.png", sizes: "180x180", type: "image/png" }],
     shortcut: "/icon.png",
   },
   manifest: "/manifest.json",
@@ -150,8 +151,8 @@ export const metadata: Metadata = {
   category: "Finance",
   classification: "Business",
   other: {
-    "application-name": "Crown Bankers",
-    "apple-mobile-web-app-title": "Crown Bankers",
+    "application-name": "Big Bull Energies",
+    "apple-mobile-web-app-title": "Big Bull Energies",
     "apple-mobile-web-app-capable": "yes",
     "apple-mobile-web-app-status-bar-style": "black-translucent",
     "mobile-web-app-capable": "yes",

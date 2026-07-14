@@ -77,7 +77,7 @@ export default function SolarPage() {
           priority
         />
         <div className="absolute inset-0 bg-gradient-to-b from-gray-900/20 to-transparent"></div>
-        
+
         {/* White Overlay on Left with Curved Lines */}
         <div className="absolute left-0 top-0 w-full sm:w-1/2 lg:w-1/3 h-full bg-white">
           {/* Curved Green Lines */}
@@ -124,7 +124,10 @@ export default function SolarPage() {
                 ENERGY TECHNOLOGIES
               </Link>
               <div className="h-4 w-px bg-gray-300"></div>
-              <SolarPanel className="w-3 h-3 sm:w-4 sm:h-4" style={{ color: "#ffcf0B" }} />
+              <SolarPanel
+                className="w-3 h-3 sm:w-4 sm:h-4"
+                style={{ color: "#ffcf0B" }}
+              />
               <span
                 className="text-xs font-medium uppercase tracking-wide"
                 style={{ color: "#042B19" }}
@@ -173,7 +176,10 @@ export default function SolarPage() {
                   ENERGY TECHNOLOGIES
                 </Link>
                 <div className="h-4 w-px bg-gray-300"></div>
-                <SolarPanel className="w-3 h-3 sm:w-4 sm:h-4" style={{ color: "#ffcf0B" }} />
+                <SolarPanel
+                  className="w-3 h-3 sm:w-4 sm:h-4"
+                  style={{ color: "#ffcf0B" }}
+                />
                 <span
                   className="text-xs font-medium uppercase tracking-wide"
                   style={{ color: "#042B19" }}
@@ -190,7 +196,8 @@ export default function SolarPage() {
                   fontFamily: "var(--font-font4), sans-serif",
                 }}
               >
-                A core component of Crown Bankers&apos; investment portfolio.
+                A core component of Big Bull Energies&apos; investment
+                portfolio.
               </h1>
             </div>
 
@@ -215,10 +222,10 @@ export default function SolarPage() {
                 }}
               >
                 Solar energy harnesses the power of the sun to generate clean,
-                renewable electricity. Crown Bankers invests in solar projects that
-                provide sustainable energy solutions, reduce carbon emissions, and
-                generate returns for our investors while supporting the transition
-                to a cleaner energy future.
+                renewable electricity. Big Bull Energies invests in solar
+                projects that provide sustainable energy solutions, reduce
+                carbon emissions, and generate returns for our investors while
+                supporting the transition to a cleaner energy future.
               </p>
             </div>
           </div>
@@ -314,7 +321,7 @@ export default function SolarPage() {
                   textUnderlineOffset: "4px",
                 }}
               >
-                VIEW CROWN BANKERS PROJECTS
+                VIEW Big Bull Energies PROJECTS
               </Link>
 
               {/* Line Art Illustration */}
@@ -386,7 +393,10 @@ export default function SolarPage() {
                   text: "Electricity is delivered to customers.",
                 },
               ].map((step) => (
-                <div key={step.number} className="flex items-start gap-3 sm:gap-4">
+                <div
+                  key={step.number}
+                  className="flex items-start gap-3 sm:gap-4"
+                >
                   <div
                     className="flex-shrink-0 w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center font-bold text-base sm:text-lg shadow-md"
                     style={{
@@ -437,8 +447,8 @@ export default function SolarPage() {
                 className="text-sm sm:text-base md:text-lg lg:text-xl leading-relaxed mb-4 sm:mb-6"
                 style={{ color: "#042B19" }}
               >
-                Solar provides many advantages because of its accessibility around
-                the world. Solar&apos;s benefits include:
+                Solar provides many advantages because of its accessibility
+                around the world. Solar&apos;s benefits include:
               </p>
               <div className="space-y-3 sm:space-y-4">
                 <div className="flex items-start gap-2 sm:gap-3">

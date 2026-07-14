@@ -24,8 +24,10 @@ export default function CTASection() {
               the energy future.
             </h2>
             <p className="text-sm sm:text-base md:text-lg text-gray-700 leading-relaxed mb-6 sm:mb-8 max-w-lg">
-              At Crown Bankers, we combine innovative binary investment systems with sustainable energy projects. 
-              Join thousands of investors building wealth while supporting renewable energy initiatives worldwide.
+              At Big Bull Energies, we combine innovative binary investment
+              systems with sustainable energy projects. Join thousands of
+              investors building wealth while supporting renewable energy
+              initiatives worldwide.
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
               <Link
@@ -60,4 +62,3 @@ export default function CTASection() {
     </section>
   );
 }
-

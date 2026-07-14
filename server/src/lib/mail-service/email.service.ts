@@ -7,7 +7,9 @@
 import { sendWithTemplate } from "./elastic-email";
 
 const defaultFrom = () =>
-  process.env.EMAIL_USER || process.env.EMAIL_FROM || "noreply@crownbankers.com";
+  process.env.EMAIL_USER ||
+  process.env.EMAIL_FROM ||
+  "noreply@crownbankers.com";
 
 /** Elastic Email template names (must match templates in your Elastic Email dashboard) */
 const TEMPLATES = {
@@ -31,7 +33,7 @@ interface SendSignupEmailParams {
   userId: string;
   loginLink: string;
 }
-// migrated 
+// migrated
 export const sendSignupWelcomeEmail = async ({
   to,
   name,
@@ -39,19 +41,21 @@ export const sendSignupWelcomeEmail = async ({
   loginLink,
 }: SendSignupEmailParams): Promise<void> => {
   try {
-
     console.log({ name, userId, loginLink }, "sendSignupWelcomeEmail");
-    
+
     await sendWithTemplate({
       from: defaultFrom(),
       to,
-      subject: "Welcome to Crown Bankers - Your Account is Ready!",
+      subject: "Welcome to Big Bull Energies - Your Account is Ready!",
       template: TEMPLATES.SignupWelcome,
       merge: { name, userId, loginLink },
     });
     console.log(`✅ Signup welcome email sent to ${to}`);
   } catch (error: any) {
-    console.error(`❌ Failed to send signup welcome email to ${to}:`, error.message);
+    console.error(
+      `❌ Failed to send signup welcome email to ${to}:`,
+      error.message,
+    );
   }
 };
 
@@ -68,7 +72,7 @@ interface SendInvestmentPurchaseEmailParams {
   /** User ID (e.g. CROWN-000123) for template {userId} */
   userId?: string;
 }
-// migrated 
+// migrated
 
 export const sendInvestmentPurchaseEmail = async ({
   to,
@@ -106,7 +110,10 @@ export const sendInvestmentPurchaseEmail = async ({
     });
     console.log(`✅ Investment purchase confirmation email sent to ${to}`);
   } catch (error: any) {
-    console.error(`❌ Failed to send investment purchase email to ${to}:`, error.message);
+    console.error(
+      `❌ Failed to send investment purchase email to ${to}:`,
+      error.message,
+    );
   }
 };
 
@@ -120,7 +127,7 @@ interface SendWithdrawalCreatedEmailParams {
   withdrawalId: string;
   dashboardLink: string;
 }
-// migrated 
+// migrated
 export const sendWithdrawalCreatedEmail = async ({
   to,
   name,
@@ -149,7 +156,10 @@ export const sendWithdrawalCreatedEmail = async ({
     });
     console.log(`✅ Withdrawal created email sent to ${to}`);
   } catch (error: any) {
-    console.error(`❌ Failed to send withdrawal created email to ${to}:`, error.message);
+    console.error(
+      `❌ Failed to send withdrawal created email to ${to}:`,
+      error.message,
+    );
   }
 };
 
@@ -164,7 +174,7 @@ interface SendWithdrawalApprovedEmailParams {
   transactionId: string;
   dashboardLink: string;
 }
-// migrated 
+// migrated
 export const sendWithdrawalApprovedEmail = async ({
   to,
   name,
@@ -195,7 +205,10 @@ export const sendWithdrawalApprovedEmail = async ({
     });
     console.log(`✅ Withdrawal approved email sent to ${to}`);
   } catch (error: any) {
-    console.error(`❌ Failed to send withdrawal approved email to ${to}:`, error.message);
+    console.error(
+      `❌ Failed to send withdrawal approved email to ${to}:`,
+      error.message,
+    );
   }
 };
 
@@ -210,7 +223,7 @@ interface SendWithdrawalRejectedEmailParams {
   reason?: string;
   dashboardLink: string;
 }
-// migrated 
+// migrated
 export const sendWithdrawalRejectedEmail = async ({
   to,
   name,
@@ -241,7 +254,10 @@ export const sendWithdrawalRejectedEmail = async ({
     });
     console.log(`✅ Withdrawal rejected email sent to ${to}`);
   } catch (error: any) {
-    console.error(`❌ Failed to send withdrawal rejected email to ${to}:`, error.message);
+    console.error(
+      `❌ Failed to send withdrawal rejected email to ${to}:`,
+      error.message,
+    );
   }
 };
 
@@ -250,7 +266,7 @@ interface SendPasswordResetEmailParams {
   name: string;
   resetLink: string;
 }
-// migrated 
+// migrated
 
 export const sendPasswordResetEmail = async ({
   to,
@@ -259,7 +275,7 @@ export const sendPasswordResetEmail = async ({
 }: SendPasswordResetEmailParams): Promise<void> => {
   try {
     console.log({ name, resetLink }, "sendPasswordResetEmail");
-    
+
     await sendWithTemplate({
       from: defaultFrom(),
       to,
@@ -269,7 +285,10 @@ export const sendPasswordResetEmail = async ({
     });
     console.log(`✅ Password reset email sent to ${to}`);
   } catch (error: any) {
-    console.error(`❌ Failed to send password reset email to ${to}:`, error.message);
+    console.error(
+      `❌ Failed to send password reset email to ${to}:`,
+      error.message,
+    );
   }
 };
 
@@ -280,7 +299,7 @@ interface SendTicketCreatedEmailParams {
   subject: string;
   department: string;
 }
-// migrated 
+// migrated
 
 export const sendTicketCreatedEmail = async ({
   to,
@@ -299,7 +318,10 @@ export const sendTicketCreatedEmail = async ({
     });
     console.log(`✅ Ticket created email sent to ${to}`);
   } catch (error: any) {
-    console.error(`❌ Failed to send ticket created email to ${to}:`, error.message);
+    console.error(
+      `❌ Failed to send ticket created email to ${to}:`,
+      error.message,
+    );
   }
 };
 
@@ -312,7 +334,7 @@ interface SendTicketStatusUpdateEmailParams {
   newStatus: string;
   reply?: string;
 }
-// migrated 
+// migrated
 export const sendTicketStatusUpdateEmail = async ({
   to,
   name,
@@ -328,14 +350,24 @@ export const sendTicketStatusUpdateEmail = async ({
       to,
       subject: `Ticket Status Updated - ${subject}`,
       template: TEMPLATES.TicketStatusUpdate,
-      merge: { name, ticketId, subject, oldStatus, newStatus, reply: reply ?? "" },
+      merge: {
+        name,
+        ticketId,
+        subject,
+        oldStatus,
+        newStatus,
+        reply: reply ?? "",
+      },
     });
     console.log(`✅ Ticket status update email sent to ${to}`);
   } catch (error: any) {
-    console.error(`❌ Failed to send ticket status update email to ${to}:`, error.message);
+    console.error(
+      `❌ Failed to send ticket status update email to ${to}:`,
+      error.message,
+    );
   }
 };
-// migrated 
+// migrated
 
 export const sendVoucherCreatedEmail = async (params: {
   to: string;
@@ -365,7 +397,10 @@ export const sendVoucherCreatedEmail = async (params: {
     });
     console.log(`✅ Voucher created email sent to ${params.to}`);
   } catch (error: any) {
-    console.error(`❌ Failed to send voucher created email to ${params.to}:`, error.message);
+    console.error(
+      `❌ Failed to send voucher created email to ${params.to}:`,
+      error.message,
+    );
   }
 };
 
@@ -395,7 +430,10 @@ export const sendVoucherUsedEmail = async (params: {
     });
     console.log(`✅ Voucher used email sent to ${params.to}`);
   } catch (error: any) {
-    console.error(`❌ Failed to send voucher used email to ${params.to}:`, error.message);
+    console.error(
+      `❌ Failed to send voucher used email to ${params.to}:`,
+      error.message,
+    );
   }
 };
 
@@ -425,7 +463,10 @@ export const sendVoucherExpiredEmail = async (params: {
     });
     console.log(`✅ Voucher expired email sent to ${params.to}`);
   } catch (error: any) {
-    console.error(`❌ Failed to send voucher expired email to ${params.to}:`, error.message);
+    console.error(
+      `❌ Failed to send voucher expired email to ${params.to}:`,
+      error.message,
+    );
   }
 };
 
@@ -447,7 +488,8 @@ export const sendCalculationFailureEmail = async ({
   totalItems,
 }: SendCalculationFailureEmailParams): Promise<void> => {
   try {
-    const progressPct = totalItems > 0 ? Math.round((processedItems / totalItems) * 100) : 0;
+    const progressPct =
+      totalItems > 0 ? Math.round((processedItems / totalItems) * 100) : 0;
     const adminLink = `${process.env.CLIENT_URL || "https://crownbankers.com"}/admin/settings`;
 
     await sendWithTemplate({
@@ -467,6 +509,9 @@ export const sendCalculationFailureEmail = async ({
     });
     console.log(`✅ Calculation failure email sent to ${to}`);
   } catch (error: any) {
-    console.error(`❌ Failed to send calculation failure email to ${to}:`, error.message);
+    console.error(
+      `❌ Failed to send calculation failure email to ${to}:`,
+      error.message,
+    );
   }
 };

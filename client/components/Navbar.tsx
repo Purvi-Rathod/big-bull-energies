@@ -86,11 +86,11 @@ export default function Navbar() {
   ];
 
   const isDashboardRoute = dashboardRoutes.some(
-    route => pathname === route || pathname?.startsWith(`${route}/`)
+    (route) => pathname === route || pathname?.startsWith(`${route}/`),
   );
 
   const isAuthenticatedRoute = authenticatedRoutes.some(
-    route => pathname === route || pathname?.startsWith(`${route}/`)
+    (route) => pathname === route || pathname?.startsWith(`${route}/`),
   );
 
   // Hide navbar on login, signup, dashboard, admin, and authenticated pages (handled by ConditionalNavbar, but also check here as safeguard)
@@ -125,7 +125,7 @@ export default function Navbar() {
             <Link href="/" className="flex items-center">
               <img
                 src="/image.png"
-                alt="Crown Bankers Logo"
+                alt="Big Bull Energies Logo"
                 className="object-contain"
                 style={{ height: "60px" }}
               />
@@ -180,7 +180,7 @@ export default function Navbar() {
             <Link href="/" className="flex items-center">
               <img
                 src="/image.png"
-                alt="Crown Bankers Logo"
+                alt="Big Bull Energies Logo"
                 className="object-contain h-8 sm:h-10"
               />
             </Link>

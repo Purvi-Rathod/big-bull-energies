@@ -1,66 +1,84 @@
 "use client";
 
 import Link from "next/link";
-import { BookOpen, TrendingUp, Users, Network, Award, DollarSign, HelpCircle, ArrowRight, Image as ImageIcon } from "lucide-react";
+import {
+  BookOpen,
+  TrendingUp,
+  Users,
+  Network,
+  Award,
+  DollarSign,
+  HelpCircle,
+  ArrowRight,
+  Image as ImageIcon,
+} from "lucide-react";
 
 export default function LearnMoreSection() {
   const learningResources = [
     {
       icon: <BookOpen className="w-8 h-8" />,
       title: "How Platform Works",
-      description: "Complete step-by-step guide to understanding the Crown Bankers platform, from registration to earning.",
+      description:
+        "Complete step-by-step guide to understanding the Big Bull Energies platform, from registration to earning.",
       href: "/how-platform-works",
-      color: "#042B19"
+      color: "#042B19",
     },
     {
       icon: <TrendingUp className="w-8 h-8" />,
       title: "Investment Plans",
-      description: "Explore our investment packages, ROI rates, and understand how daily returns work.",
+      description:
+        "Explore our investment packages, ROI rates, and understand how daily returns work.",
       href: "/our-plan",
-      color: "#042B19"
+      color: "#042B19",
     },
     {
       icon: <Users className="w-8 h-8" />,
       title: "How to Start",
-      description: "New to Crown Bankers? Learn how to create an account, make your first investment, and begin earning.",
+      description:
+        "New to Big Bull Energies? Learn how to create an account, make your first investment, and begin earning.",
       href: "/how-to-start",
-      color: "#042B19"
+      color: "#042B19",
     },
     {
       icon: <Network className="w-8 h-8" />,
       title: "Binary System",
-      description: "Understand how the binary tree structure works and how to maximize your binary income.",
+      description:
+        "Understand how the binary tree structure works and how to maximize your binary income.",
       href: "/binary-investment-system",
-      color: "#042B19"
+      color: "#042B19",
     },
     {
       icon: <Award className="w-8 h-8" />,
       title: "Career Rewards",
-      description: "Unlock exclusive rewards, bonuses, and recognition as you progress through career levels.",
+      description:
+        "Unlock exclusive rewards, bonuses, and recognition as you progress through career levels.",
       href: "/career-rewards",
-      color: "#042B19"
+      color: "#042B19",
     },
     {
       icon: <DollarSign className="w-8 h-8" />,
       title: "Earning Methods",
-      description: "Learn about ROI, referral income, binary bonuses, and all the ways you can earn.",
+      description:
+        "Learn about ROI, referral income, binary bonuses, and all the ways you can earn.",
       href: "/our-plan",
-      color: "#042B19"
+      color: "#042B19",
     },
     {
       icon: <HelpCircle className="w-8 h-8" />,
       title: "FAQ & Support",
-      description: "Find answers to common questions and get help from our support team.",
+      description:
+        "Find answers to common questions and get help from our support team.",
       href: "/support",
-      color: "#042B19"
+      color: "#042B19",
     },
     {
       icon: <ImageIcon className="w-8 h-8" />,
       title: "Gallery",
-      description: "View photos and videos of our solar plants, office spaces, and events.",
+      description:
+        "View photos and videos of our solar plants, office spaces, and events.",
       href: "/gallery",
-      color: "#042B19"
-    }
+      color: "#042B19",
+    },
   ];
 
   return (
@@ -70,7 +88,10 @@ export default function LearnMoreSection() {
           {/* Section Header */}
           <div className="text-center mb-8 sm:mb-10 md:mb-12">
             <div className="flex items-center justify-center gap-2 sm:gap-3 mb-4 sm:mb-6">
-              <div className="h-px w-8 sm:w-12" style={{ backgroundColor: "#042B19" }}></div>
+              <div
+                className="h-px w-8 sm:w-12"
+                style={{ backgroundColor: "#042B19" }}
+              ></div>
               <span
                 className="text-xs font-medium uppercase tracking-wide"
                 style={{ color: "#042B19" }}
@@ -94,7 +115,8 @@ export default function LearnMoreSection() {
                 fontFamily: "var(--font-font4), sans-serif",
               }}
             >
-              Comprehensive guides and resources to help you understand how Crown Bankers works and maximize your earning potential.
+              Comprehensive guides and resources to help you understand how Big
+              Bull Energies works and maximize your earning potential.
             </p>
           </div>
 
@@ -132,7 +154,10 @@ export default function LearnMoreSection() {
                 >
                   {resource.description}
                 </p>
-                <div className="flex items-center gap-2 text-sm font-semibold" style={{ color: "#042B19" }}>
+                <div
+                  className="flex items-center gap-2 text-sm font-semibold"
+                  style={{ color: "#042B19" }}
+                >
                   <span>Learn More</span>
                   <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
                 </div>

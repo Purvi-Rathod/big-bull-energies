@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import Link from "next/link";
 import Image from "next/image";
@@ -13,14 +13,14 @@ export default function PublicHeader() {
         <Link href="/" className="flex items-center gap-3 flex-shrink-0">
           <Image
             src="/image.png"
-            alt="Crown Bankers Logo"
+            alt="Big Bull Energies Logo"
             width={120}
             height={40}
             className="h-10 w-auto"
             priority
           />
         </Link>
-        
+
         {/* Navigation Links */}
         <div className="hidden lg:flex items-center gap-6 flex-1 justify-center">
           <Link
@@ -69,7 +69,7 @@ export default function PublicHeader() {
 
         {/* Mobile Navigation - Dropdown or Hidden */}
         <div className="lg:hidden flex-1"></div>
-        
+
         {/* Auth Buttons */}
         <div className="flex gap-4 flex-shrink-0">
           {user ? (
@@ -100,4 +100,3 @@ export default function PublicHeader() {
     </nav>
   );
 }
-

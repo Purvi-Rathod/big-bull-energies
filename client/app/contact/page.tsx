@@ -21,7 +21,9 @@ export default function ContactPage() {
   };
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >,
   ) => {
     setFormData({
       ...formData,
@@ -30,7 +32,10 @@ export default function ContactPage() {
   };
 
   return (
-    <main className="min-h-screen w-full overflow-x-hidden" style={{ paddingTop: "156px" }}>
+    <main
+      className="min-h-screen w-full overflow-x-hidden"
+      style={{ paddingTop: "156px" }}
+    >
       {/* Hero Section */}
       <section className="relative w-full bg-[#E8F5F0] py-16 md:py-20 lg:py-24">
         <div className="container mx-auto px-4 lg:px-8">
@@ -131,11 +136,8 @@ export default function ContactPage() {
               >
                 Address
               </h3>
-              <p
-                className="text-base md:text-lg"
-                style={{ color: "#042B19" }}
-              >
-                Crown Bankers Headquarters
+              <p className="text-base md:text-lg" style={{ color: "#042B19" }}>
+                Big Bull Energies Headquarters
                 <br />
                 United Kingdom
               </p>

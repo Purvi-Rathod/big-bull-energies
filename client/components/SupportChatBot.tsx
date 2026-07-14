@@ -1,22 +1,24 @@
-'use client';
+"use client";
 
-import { useState, useRef, useEffect } from 'react';
-import { api } from '@/lib/api';
+import { useState, useRef, useEffect } from "react";
+import { api } from "@/lib/api";
 
-type ChatMessage = { role: 'user' | 'assistant'; content: string };
+type ChatMessage = { role: "user" | "assistant"; content: string };
 
-const WELCOME = "Hi! I'm the Crown Bankers AI support assistant. Ask me about investments, ROI, referral bonuses, binary tree, vouchers, withdrawals, or anything in our platform rules.";
+const WELCOME =
+  "Hi! I'm the Big Bull Energies AI support assistant. Ask me about investments, ROI, referral bonuses, binary tree, vouchers, withdrawals, or anything in our platform rules.";
 
 export default function SupportChatBot() {
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
-  const [input, setInput] = useState('');
+  const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
-  const scrollToBottom = () => messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  const scrollToBottom = () =>
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
 
   useEffect(() => {
     if (open) scrollToBottom();
@@ -29,28 +31,36 @@ export default function SupportChatBot() {
   const send = async () => {
     const text = input.trim();
     if (!text || loading) return;
-    setInput('');
-    const userMessage: ChatMessage = { role: 'user', content: text };
+    setInput("");
+    const userMessage: ChatMessage = { role: "user", content: text };
     setMessages((prev) => [...prev, userMessage]);
     setLoading(true);
     setError(null);
     try {
       const history = [...messages, userMessage];
       const res = await api.sendSupportChatMessage(
-        history.map((m) => ({ role: m.role, content: m.content }))
+        history.map((m) => ({ role: m.role, content: m.content })),
       );
-      const reply = res.data?.message ?? 'Sorry, I could not get a response. Please try again.';
-      setMessages((prev) => [...prev, { role: 'assistant', content: reply }]);
+      const reply =
+        res.data?.message ??
+        "Sorry, I could not get a response. Please try again.";
+      setMessages((prev) => [...prev, { role: "assistant", content: reply }]);
     } catch (err: any) {
-      setError(err?.message || 'Failed to send. Please try again.');
-      setMessages((prev) => [...prev, { role: 'assistant', content: 'Something went wrong. Please try again or contact support.' }]);
+      setError(err?.message || "Failed to send. Please try again.");
+      setMessages((prev) => [
+        ...prev,
+        {
+          role: "assistant",
+          content: "Something went wrong. Please try again or contact support.",
+        },
+      ]);
     } finally {
       setLoading(false);
     }
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
+    if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       send();
     }
@@ -65,8 +75,19 @@ export default function SupportChatBot() {
         aria-label="Open AI support chat"
         className="fixed bottom-20 right-20 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-indigo-600 text-white shadow-lg transition-all duration-200 hover:scale-110 hover:bg-indigo-500 hover:shadow-xl focus:outline-none focus:ring-4 focus:ring-indigo-500/50 md:bottom-8 md:right-24 md:h-16 md:w-16"
       >
-        <svg className="h-7 w-7 md:h-8 md:w-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+        <svg
+          className="h-7 w-7 md:h-8 md:w-8"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+          aria-hidden
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
+          />
         </svg>
       </button>
 
@@ -74,7 +95,7 @@ export default function SupportChatBot() {
       {open && (
         <div
           className="fixed bottom-36 right-5 z-50 flex w-[calc(100vw-2.5rem)] max-w-md flex-col overflow-hidden rounded-2xl border border-gray-700 bg-gray-900 shadow-2xl md:bottom-24 md:right-24 md:h-[420px] md:w-[380px]"
-          style={{ height: 'min(75vh, 420px)' }}
+          style={{ height: "min(75vh, 420px)" }}
         >
           <div className="flex items-center justify-between border-b border-gray-700 bg-gray-800/80 px-4 py-3">
             <span className="font-semibold text-white">AI Support</span>
@@ -84,8 +105,18 @@ export default function SupportChatBot() {
               className="rounded-lg p-1.5 text-gray-400 hover:bg-gray-700 hover:text-white"
               aria-label="Close chat"
             >
-              <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              <svg
+                className="h-5 w-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
               </svg>
             </button>
           </div>
@@ -99,13 +130,13 @@ export default function SupportChatBot() {
             {messages.map((m, i) => (
               <div
                 key={i}
-                className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}
+                className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}
               >
                 <div
                   className={`max-w-[85%] rounded-2xl px-4 py-2.5 text-sm ${
-                    m.role === 'user'
-                      ? 'bg-indigo-600 text-white'
-                      : 'bg-gray-700 text-gray-100'
+                    m.role === "user"
+                      ? "bg-indigo-600 text-white"
+                      : "bg-gray-700 text-gray-100"
                   }`}
                 >
                   <p className="whitespace-pre-wrap break-words">{m.content}</p>
@@ -119,9 +150,7 @@ export default function SupportChatBot() {
                 </div>
               </div>
             )}
-            {error && (
-              <p className="text-xs text-red-400">{error}</p>
-            )}
+            {error && <p className="text-xs text-red-400">{error}</p>}
             <div ref={messagesEndRef} />
           </div>
 
@@ -144,8 +173,18 @@ export default function SupportChatBot() {
                 className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-indigo-600 text-white transition hover:bg-indigo-500 disabled:opacity-50 disabled:pointer-events-none"
                 aria-label="Send message"
               >
-                <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                <svg
+                  className="h-5 w-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"
+                  />
                 </svg>
               </button>
             </div>

@@ -23,12 +23,20 @@ export default function DownloadPage() {
               />
             </svg>
           </div>
-          <h1 className="text-4xl md:text-5xl font-bold mb-6" style={{ color: "#042B19" }}>
+          <h1
+            className="text-4xl md:text-5xl font-bold mb-6"
+            style={{ color: "#042B19" }}
+          >
             Download Brochure
           </h1>
-          <div className="bg-white rounded-lg shadow-sm p-8 md:p-12 mb-8" style={{ borderColor: "#E5E7EB" }}>
+          <div
+            className="bg-white rounded-lg shadow-sm p-8 md:p-12 mb-8"
+            style={{ borderColor: "#E5E7EB" }}
+          >
             <p className="text-lg text-gray-600 mb-6 leading-relaxed">
-              Download our comprehensive brochure to learn more about Crown Bankers, our renewable energy projects, and investment opportunities.
+              Download our comprehensive brochure to learn more about Big Bull
+              Energies, our renewable energy projects, and investment
+              opportunities.
             </p>
             <a
               href="/crown-bankers-brochure.pdf"
@@ -65,6 +73,3 @@ export default function DownloadPage() {
     </div>
   );
 }
-
-
-

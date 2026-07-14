@@ -41,7 +41,8 @@ export default function AboutPage() {
                   fontFamily: "var(--font-font4), sans-serif",
                 }}
               >
-                Empowering investors through innovative binary systems and sustainable energy
+                Empowering investors through innovative binary systems and
+                sustainable energy
               </h1>
             </div>
           </div>
@@ -73,7 +74,8 @@ export default function AboutPage() {
                   fontFamily: "var(--font-font4), sans-serif",
                 }}
               >
-                Empowering investors through innovative binary systems and sustainable energy
+                Empowering investors through innovative binary systems and
+                sustainable energy
               </h1>
             </div>
 
@@ -90,9 +92,7 @@ export default function AboutPage() {
                   autoPlay
                 />
                 {/* Play Button Overlay */}
-                <div className="absolute inset-0 flex items-center justify-center">
-                  
-                </div>
+                <div className="absolute inset-0 flex items-center justify-center"></div>
               </div>
               <div className="mt-6">
                 <h2
@@ -111,7 +111,13 @@ export default function AboutPage() {
                     fontFamily: "var(--font-font4), sans-serif",
                   }}
                 >
-                  Crown Bankers combines the power of binary network marketing with real-world renewable energy investments. We provide our members with transparent investment opportunities, consistent returns, and the satisfaction of contributing to a sustainable future. Our platform bridges traditional finance with innovative MLM structures, creating unique wealth-building opportunities.
+                  Big Bull Energies combines the power of binary network
+                  marketing with real-world renewable energy investments. We
+                  provide our members with transparent investment opportunities,
+                  consistent returns, and the satisfaction of contributing to a
+                  sustainable future. Our platform bridges traditional finance
+                  with innovative MLM structures, creating unique
+                  wealth-building opportunities.
                 </p>
               </div>
             </div>
@@ -150,7 +156,14 @@ export default function AboutPage() {
                   fontFamily: "var(--font-font4), sans-serif",
                 }}
               >
-                At Crown Bankers, we prioritize the security of our investors&apos; funds and the transparency of our operations. Our platform uses advanced security measures to protect member investments, and we maintain complete transparency in our investment processes. Every investment package is backed by real renewable energy projects, ensuring your funds contribute to tangible, sustainable infrastructure while generating consistent returns.
+                At Big Bull Energies, we prioritize the security of our
+                investors&apos; funds and the transparency of our operations.
+                Our platform uses advanced security measures to protect member
+                investments, and we maintain complete transparency in our
+                investment processes. Every investment package is backed by real
+                renewable energy projects, ensuring your funds contribute to
+                tangible, sustainable infrastructure while generating consistent
+                returns.
               </p>
               <Link
                 href="/our-plan"
@@ -229,7 +242,10 @@ export default function AboutPage() {
                 fontFamily: "var(--font-font4), sans-serif",
               }}
             >
-              We believe that our community of investors powers Crown Bankers&apos; success. Our innovative binary investment platform thrives on the diverse perspectives and experiences that our global network brings to the table.
+              We believe that our community of investors powers Big Bull
+              Energies&apos; success. Our innovative binary investment platform
+              thrives on the diverse perspectives and experiences that our
+              global network brings to the table.
             </p>
             <p
               className="text-lg md:text-xl lg:text-2xl leading-relaxed"
@@ -238,7 +254,10 @@ export default function AboutPage() {
                 fontFamily: "var(--font-font4), sans-serif",
               }}
             >
-              By fostering an inclusive environment where every member can grow their network and build wealth, we enable our community to reach their full financial potential while contributing to a sustainable energy future.
+              By fostering an inclusive environment where every member can grow
+              their network and build wealth, we enable our community to reach
+              their full financial potential while contributing to a sustainable
+              energy future.
             </p>
           </div>
         </div>
@@ -263,7 +282,7 @@ export default function AboutPage() {
               className="text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold mb-16 text-center"
               style={{ color: "#042B19" }}
             >
-              Crown Bankers Roadmap (2022 – 2028)
+              Big Bull Energies Roadmap (2022 – 2028)
             </h2>
 
             {/* Timeline Container */}
@@ -310,9 +329,10 @@ export default function AboutPage() {
                         fontFamily: "var(--font-font4), sans-serif",
                       }}
                     >
-                      Conceptualized Crown Bankers as a bridge between renewable
-                      energy and financial solutions. Built the foundation for a
-                      global platform focused on sustainable finance.
+                      Conceptualized Big Bull Energies as a bridge between
+                      renewable energy and financial solutions. Built the
+                      foundation for a global platform focused on sustainable
+                      finance.
                     </p>
                   </div>
                 </div>

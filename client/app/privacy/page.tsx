@@ -14,25 +14,40 @@ export default function PrivacyPage() {
             Last updated: {new Date().toLocaleDateString()}
           </p>
 
-          <div className="bg-white rounded-lg shadow-sm p-8 space-y-6" style={{ borderColor: "#E5E7EB" }}>
+          <div
+            className="bg-white rounded-lg shadow-sm p-8 space-y-6"
+            style={{ borderColor: "#E5E7EB" }}
+          >
             <section>
-              <h2 className="text-2xl font-semibold mb-4" style={{ color: "#042B19" }}>
+              <h2
+                className="text-2xl font-semibold mb-4"
+                style={{ color: "#042B19" }}
+              >
                 Introduction
               </h2>
               <p className="text-gray-700 leading-relaxed">
-                Crown Bankers is committed to protecting your privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our platform.
+                Big Bull Energies is committed to protecting your privacy. This
+                Privacy Policy explains how we collect, use, disclose, and
+                safeguard your information when you use our platform.
               </p>
             </section>
 
             <section>
-              <h2 className="text-2xl font-semibold mb-4" style={{ color: "#042B19" }}>
+              <h2
+                className="text-2xl font-semibold mb-4"
+                style={{ color: "#042B19" }}
+              >
                 Information We Collect
               </h2>
               <p className="text-gray-700 leading-relaxed mb-4">
-                We collect information that you provide directly to us, including:
+                We collect information that you provide directly to us,
+                including:
               </p>
               <ul className="list-disc list-inside space-y-2 text-gray-700 ml-4">
-                <li>Personal identification information (name, email, phone number)</li>
+                <li>
+                  Personal identification information (name, email, phone
+                  number)
+                </li>
                 <li>Account credentials and authentication information</li>
                 <li>Financial information for investment transactions</li>
                 <li>Communication preferences and support interactions</li>
@@ -40,7 +55,10 @@ export default function PrivacyPage() {
             </section>
 
             <section>
-              <h2 className="text-2xl font-semibold mb-4" style={{ color: "#042B19" }}>
+              <h2
+                className="text-2xl font-semibold mb-4"
+                style={{ color: "#042B19" }}
+              >
                 How We Use Your Information
               </h2>
               <p className="text-gray-700 leading-relaxed mb-4">
@@ -56,20 +74,29 @@ export default function PrivacyPage() {
             </section>
 
             <section>
-              <h2 className="text-2xl font-semibold mb-4" style={{ color: "#042B19" }}>
+              <h2
+                className="text-2xl font-semibold mb-4"
+                style={{ color: "#042B19" }}
+              >
                 Data Security
               </h2>
               <p className="text-gray-700 leading-relaxed">
-                We implement appropriate technical and organizational security measures to protect your personal information against unauthorized access, alteration, disclosure, or destruction.
+                We implement appropriate technical and organizational security
+                measures to protect your personal information against
+                unauthorized access, alteration, disclosure, or destruction.
               </p>
             </section>
 
             <section>
-              <h2 className="text-2xl font-semibold mb-4" style={{ color: "#042B19" }}>
+              <h2
+                className="text-2xl font-semibold mb-4"
+                style={{ color: "#042B19" }}
+              >
                 Contact Us
               </h2>
               <p className="text-gray-700 leading-relaxed">
-                If you have any questions about this Privacy Policy, please contact us through our support system.
+                If you have any questions about this Privacy Policy, please
+                contact us through our support system.
               </p>
             </section>
           </div>
@@ -79,6 +106,3 @@ export default function PrivacyPage() {
     </div>
   );
 }
-
-
-

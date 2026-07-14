@@ -14,18 +14,30 @@ export default function CompliancePage() {
             Last updated: {new Date().toLocaleDateString()}
           </p>
 
-          <div className="bg-white rounded-lg shadow-sm p-8 space-y-6" style={{ borderColor: "#E5E7EB" }}>
+          <div
+            className="bg-white rounded-lg shadow-sm p-8 space-y-6"
+            style={{ borderColor: "#E5E7EB" }}
+          >
             <section>
-              <h2 className="text-2xl font-semibold mb-4" style={{ color: "#042B19" }}>
+              <h2
+                className="text-2xl font-semibold mb-4"
+                style={{ color: "#042B19" }}
+              >
                 Regulatory Compliance
               </h2>
               <p className="text-gray-700 leading-relaxed">
-                Crown Bankers is committed to maintaining the highest standards of regulatory compliance. We adhere to all applicable laws and regulations governing financial services and investment platforms.
+                Big Bull Energies is committed to maintaining the highest
+                standards of regulatory compliance. We adhere to all applicable
+                laws and regulations governing financial services and investment
+                platforms.
               </p>
             </section>
 
             <section>
-              <h2 className="text-2xl font-semibold mb-4" style={{ color: "#042B19" }}>
+              <h2
+                className="text-2xl font-semibold mb-4"
+                style={{ color: "#042B19" }}
+              >
                 Financial Regulations
               </h2>
               <p className="text-gray-700 leading-relaxed mb-4">
@@ -40,20 +52,29 @@ export default function CompliancePage() {
             </section>
 
             <section>
-              <h2 className="text-2xl font-semibold mb-4" style={{ color: "#042B19" }}>
+              <h2
+                className="text-2xl font-semibold mb-4"
+                style={{ color: "#042B19" }}
+              >
                 Data Protection
               </h2>
               <p className="text-gray-700 leading-relaxed">
-                We implement robust data protection measures in accordance with applicable data protection laws. Your personal and financial information is encrypted and stored securely.
+                We implement robust data protection measures in accordance with
+                applicable data protection laws. Your personal and financial
+                information is encrypted and stored securely.
               </p>
             </section>
 
             <section>
-              <h2 className="text-2xl font-semibold mb-4" style={{ color: "#042B19" }}>
+              <h2
+                className="text-2xl font-semibold mb-4"
+                style={{ color: "#042B19" }}
+              >
                 Contact Us
               </h2>
               <p className="text-gray-700 leading-relaxed">
-                For any compliance-related inquiries, please contact us through our support system.
+                For any compliance-related inquiries, please contact us through
+                our support system.
               </p>
             </section>
           </div>

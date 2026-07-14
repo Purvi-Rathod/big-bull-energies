@@ -96,7 +96,7 @@ export default function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
     menuItems.forEach((item) => {
       if (item.subItems) {
         newOpenSubMenus[item.name] = item.subItems.some(
-          (sub) => pathname === sub.href
+          (sub) => pathname === sub.href,
         );
       }
     });
@@ -131,7 +131,7 @@ export default function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
             <div className="w-10 h-10 rounded-lg flex items-center justify-center shadow-md p-2 bg-white flex-shrink-0">
               <Image
                 src="/image.png"
-                alt="Crown Bankers Logo"
+                alt="Big Bull Energies Logo"
                 width={32}
                 height={32}
                 className="object-contain"
@@ -139,7 +139,7 @@ export default function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
             </div>
             {isOpen && (
               <span className="text-lg font-bold text-white">
-                Crown Bankers
+                Big Bull Energies
               </span>
             )}
           </Link>

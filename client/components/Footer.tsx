@@ -20,12 +20,12 @@ export default function Footer() {
       <div className="container mx-auto px-4 lg:px-8 py-12 lg:py-16 relative z-10">
         {/* Main Footer Content */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8 lg:gap-12 mb-12">
-          {/* Crown Bankers Logo */}
+          {/* Big Bull Energies Logo */}
           <div className="md:col-span-2 lg:col-span-1">
             <Link href="/" className="flex items-start">
               <Image
                 src="/image.png"
-                alt="Crown Bankers Logo"
+                alt="Big Bull Energies Logo"
                 width={200}
                 height={100}
                 className="object-contain"
@@ -148,7 +148,6 @@ export default function Footer() {
                   Our Plan
                 </Link>
               </li>
-              
             </ul>
           </div>
 
@@ -210,7 +209,7 @@ export default function Footer() {
           </div>
         </div>
 
-        {/* Crown Bankers Section */}
+        {/* Big Bull Energies Section */}
         <div
           className="border-t pt-8 mb-8"
           style={{ borderColor: "#CDE5DA", opacity: 0.3 }}

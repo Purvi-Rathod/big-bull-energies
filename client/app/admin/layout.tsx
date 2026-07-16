@@ -370,7 +370,7 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
     const isAdminAccount = !!admin;
 
     if (!isAdminUser && !isAdminAccount) {
-      router.push("/login");
+      router.push("/admin/login");
     }
   }, [user, admin, authLoading, router]);
 
@@ -934,7 +934,18 @@ export default function AdminLayout({
         </div>
       }
     >
-      <AdminLayoutContent>{children}</AdminLayoutContent>
+      <AdminLayoutRouter>{children}</AdminLayoutRouter>
     </Suspense>
   );
+}
+
+function AdminLayoutRouter({ children }: { children: React.ReactNode }) {
+  const pathname = usePathname();
+
+  // The admin sign-in page must not be wrapped in the protected admin shell.
+  if (pathname === "/admin/login") {
+    return <>{children}</>;
+  }
+
+  return <AdminLayoutContent>{children}</AdminLayoutContent>;
 }

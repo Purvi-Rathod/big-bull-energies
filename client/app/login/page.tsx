@@ -11,7 +11,6 @@ function LoginContent() {
   const [userId, setUserId] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [isAdmin, setIsAdmin] = useState(false);
   const [error, setError] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const [loading, setLoading] = useState(false);
@@ -54,7 +53,7 @@ function LoginContent() {
     setLoading(true);
 
     try {
-      await login(userId, password, isAdmin);
+      await login(userId, password);
       // Redirect will be handled by useEffect when user/admin state updates
     } catch (err: any) {
       setError(err.message || "Login failed. Please check your credentials.");
@@ -352,7 +351,7 @@ function LoginContent() {
                   htmlFor="user-id"
                   className="block text-xs font-semibold tracking-[0.15em] uppercase mb-2 text-[#9FB8C9]"
                 >
-                  {isAdmin ? "Email Address" : "User ID"}
+                  User ID
                 </label>
                 <input
                   id="user-id"
@@ -360,9 +359,7 @@ function LoginContent() {
                   type="text"
                   required
                   className="underline-input w-full py-2.5 text-[#F6F5EC] placeholder-[#9FB8C9]/50 text-sm font-medium"
-                  placeholder={
-                    isAdmin ? "Enter your email" : "CROWN-XXXXXX"
-                  }
+                  placeholder="CROWN-XXXXXX"
                   value={userId}
                   onChange={(e) => setUserId(e.target.value)}
                 />
@@ -434,30 +431,14 @@ function LoginContent() {
             </div>
 
             <div className="flex items-center justify-between pt-1">
-              {!isAdmin && (
-                <a
-                  href="/forgot-password"
-                  className="text-sm font-medium transition-colors hover:opacity-80"
-                  style={{ color: "#FBF676" }}
-                >
-                  Forgot password?
-                </a>
-              )}
+              <a
+                href="/forgot-password"
+                className="text-sm font-medium transition-colors hover:opacity-80"
+                style={{ color: "#FBF676" }}
+              >
+                Forgot password?
+              </a>
             </div>
-
-            {/* <div className="flex items-center">
-              <input
-                id="is-admin"
-                name="is-admin"
-                type="checkbox"
-                className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded cursor-pointer"
-                checked={isAdmin}
-                onChange={(e) => setIsAdmin(e.target.checked)}
-              />
-              <label htmlFor="is-admin" className="ml-2 block text-sm font-medium text-black cursor-pointer">
-                Login as Admin
-              </label>
-            </div> */}
 
             <button
               type="submit"
@@ -498,6 +479,16 @@ function LoginContent() {
               )}
             </button>
           </form>
+          <p className="mt-7 text-center text-sm text-[#9FB8C9]">
+            Administrator?{" "}
+            <Link
+              href="/admin/login"
+              className="font-semibold transition-colors hover:opacity-80"
+              style={{ color: "#FBF676" }}
+            >
+              Admin login
+            </Link>
+          </p>
         </div>
       </div>
     </div>

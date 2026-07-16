@@ -91,10 +91,9 @@ function LoginContent() {
   return (
     <div className="min-h-screen grid grid-cols-1 md:grid-cols-[1.1fr_1fr] font-[var(--font-body)]">
       <style jsx global>{`
-        @import url("https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600;700&display=swap");
         :root {
-          --font-display: "Fraunces", serif;
-          --font-body: "Inter", sans-serif;
+          --font-display: var(--font-fraunces), serif;
+          --font-body: var(--font-inter), sans-serif;
         }
         @keyframes drawLine {
           from {

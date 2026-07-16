@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Fraunces, Inter } from "next/font/google";
 import localFont from "next/font/local";
 import "./globals.css";
 import AuthProviderWrapper from "@/providers/AuthProvider";
@@ -8,7 +8,15 @@ import { Toaster } from "react-hot-toast";
 import ConditionalNavbar from "@/components/ConditionalNavbar";
 import SupportFloatingButtons from "@/components/SupportFloatingButtons";
 
-const inter = Inter({ subsets: ["latin"] });
+const inter = Inter({
+  subsets: ["latin"],
+  variable: "--font-inter",
+});
+
+const fraunces = Fraunces({
+  subsets: ["latin"],
+  variable: "--font-fraunces",
+});
 
 const customFont = localFont({
   src: [
@@ -169,7 +177,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${inter.className} ${customFont.variable} ${font4.variable} antialiased`}
+        className={`${inter.className} ${inter.variable} ${fraunces.variable} ${customFont.variable} ${font4.variable} antialiased`}
       >
         <AuthProviderWrapper>
           <ConfirmProvider>

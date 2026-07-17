@@ -5,7 +5,7 @@ export default function Footer() {
   return (
     <footer
       className="w-full relative overflow-hidden"
-      style={{ backgroundColor: "#042B19" }}
+      style={{ backgroundColor: "#05627C" }}
     >
       {/* Footer SVG Background */}
       <div className="absolute inset-0 opacity-10">
@@ -20,12 +20,12 @@ export default function Footer() {
       <div className="container mx-auto px-4 lg:px-8 py-12 lg:py-16 relative z-10">
         {/* Main Footer Content */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8 lg:gap-12 mb-12">
-          {/* Crown Bankers Logo */}
+          {/* Big Bull Energies Logo */}
           <div className="md:col-span-2 lg:col-span-1">
             <Link href="/" className="flex items-start">
               <Image
                 src="/image.png"
-                alt="Crown Bankers Logo"
+                alt="Big Bull Energies Logo"
                 width={200}
                 height={100}
                 className="object-contain"
@@ -148,7 +148,6 @@ export default function Footer() {
                   Our Plan
                 </Link>
               </li>
-              
             </ul>
           </div>
 
@@ -210,7 +209,7 @@ export default function Footer() {
           </div>
         </div>
 
-        {/* Crown Bankers Section */}
+        {/* Big Bull Energies Section */}
         <div
           className="border-t pt-8 mb-8"
           style={{ borderColor: "#CDE5DA", opacity: 0.3 }}
@@ -221,7 +220,7 @@ export default function Footer() {
                 className="text-2xl font-bold mb-2 text-white"
                 style={{ opacity: 1 }}
               >
-                Crown Banker
+                Big Bull Energies
               </div>
               <p className="text-sm text-white" style={{ opacity: 1 }}>
                 Bridging renewable energy and financial solutions for a
@@ -238,7 +237,7 @@ export default function Footer() {
         >
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
             <div className="text-white text-sm" style={{ opacity: 1 }}>
-              © 2025 Crown Banker
+              © 2025 Big Bull Energies
             </div>
             <div className="flex flex-wrap items-center gap-6">
               <Link

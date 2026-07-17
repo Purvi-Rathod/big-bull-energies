@@ -28,8 +28,8 @@ async function testCarryForwardScenario() {
     await mongoose.connect(MONGODB_URI);
     console.log("✅ Connected to MongoDB\n");
 
-    // Find a test user or use CROWN-000018 as mentioned by user
-    const testUserId = "CROWN-000018";
+    // Find a test user or use BIGBULL-000018 as mentioned by user
+    const testUserId = "BIGBULL-000018";
     const user = await User.findOne({ userId: testUserId });
     
     if (!user) {

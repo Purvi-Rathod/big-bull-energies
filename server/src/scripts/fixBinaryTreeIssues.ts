@@ -35,29 +35,29 @@ interface FixAction {
 
 // All fixes from the diagnostic report
 const fixes: FixAction[] = [
-  // CROWN-000282
-  { userId: "CROWN-000282", field: "rightBusiness", value: 200.00, description: "Update rightBusiness to 200.00" },
-  { userId: "CROWN-000282", field: "leftDownlines", value: 26, description: "Update leftDownlines to 26" },
-  { userId: "CROWN-000282", field: "rightDownlines", value: 7, description: "Update rightDownlines to 7" },
+  // BIGBULL-000282
+  { userId: "BIGBULL-000282", field: "rightBusiness", value: 200.00, description: "Update rightBusiness to 200.00" },
+  { userId: "BIGBULL-000282", field: "leftDownlines", value: 26, description: "Update leftDownlines to 26" },
+  { userId: "BIGBULL-000282", field: "rightDownlines", value: 7, description: "Update rightDownlines to 7" },
   
-  // CROWN-000483
-  { userId: "CROWN-000483", field: "rightBusiness", value: 100.00, description: "Update rightBusiness to 100.00" },
+  // BIGBULL-000483
+  { userId: "BIGBULL-000483", field: "rightBusiness", value: 100.00, description: "Update rightBusiness to 100.00" },
   
-  // CROWN-000288
-  { userId: "CROWN-000288", field: "leftDownlines", value: 1, description: "Update leftDownlines to 1" },
-  { userId: "CROWN-000288", field: "rightDownlines", value: 6, description: "Update rightDownlines to 6" },
+  // BIGBULL-000288
+  { userId: "BIGBULL-000288", field: "leftDownlines", value: 1, description: "Update leftDownlines to 1" },
+  { userId: "BIGBULL-000288", field: "rightDownlines", value: 6, description: "Update rightDownlines to 6" },
   
-  // CROWN-000549
-  { userId: "CROWN-000549", field: "rightBusiness", value: 0.00, description: "Update rightBusiness to 0.00" },
+  // BIGBULL-000549
+  { userId: "BIGBULL-000549", field: "rightBusiness", value: 0.00, description: "Update rightBusiness to 0.00" },
   
-  // CROWN-000414
-  { userId: "CROWN-000414", field: "leftDownlines", value: 13, description: "Update leftDownlines to 13" },
-  { userId: "CROWN-000414", field: "rightDownlines", value: 0, description: "Update rightDownlines to 0" },
+  // BIGBULL-000414
+  { userId: "BIGBULL-000414", field: "leftDownlines", value: 13, description: "Update leftDownlines to 13" },
+  { userId: "BIGBULL-000414", field: "rightDownlines", value: 0, description: "Update rightDownlines to 0" },
   
-  // CROWN-000550
-  { userId: "CROWN-000550", field: "rightBusiness", value: 0.00, description: "Update rightBusiness to 0.00" },
-  { userId: "CROWN-000550", field: "leftDownlines", value: 0, description: "Update leftDownlines to 0" },
-  { userId: "CROWN-000550", field: "rightDownlines", value: 3, description: "Update rightDownlines to 3" },
+  // BIGBULL-000550
+  { userId: "BIGBULL-000550", field: "rightBusiness", value: 0.00, description: "Update rightBusiness to 0.00" },
+  { userId: "BIGBULL-000550", field: "leftDownlines", value: 0, description: "Update leftDownlines to 0" },
+  { userId: "BIGBULL-000550", field: "rightDownlines", value: 3, description: "Update rightDownlines to 3" },
 ];
 
 async function connectDB() {

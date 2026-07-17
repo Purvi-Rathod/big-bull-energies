@@ -21,7 +21,9 @@ export default function ContactPage() {
   };
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >,
   ) => {
     setFormData({
       ...formData,
@@ -30,16 +32,19 @@ export default function ContactPage() {
   };
 
   return (
-    <main className="min-h-screen w-full overflow-x-hidden" style={{ paddingTop: "156px" }}>
+    <main
+      className="min-h-screen w-full overflow-x-hidden"
+      style={{ paddingTop: "156px" }}
+    >
       {/* Hero Section */}
       <section className="relative w-full bg-[#E8F5F0] py-16 md:py-20 lg:py-24">
         <div className="container mx-auto px-4 lg:px-8">
           <div className="max-w-3xl mx-auto text-center">
             <div className="flex items-center justify-center gap-3 mb-8">
-              <div className="h-px w-12 bg-[#042B19]"></div>
+              <div className="h-px w-12 bg-[#05627C]"></div>
               <span
                 className="text-xs font-medium uppercase tracking-wide"
-                style={{ color: "#042B19" }}
+                style={{ color: "#05627C" }}
               >
                 CONTACT US
               </span>
@@ -47,7 +52,7 @@ export default function ContactPage() {
             <h1
               className="text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-normal leading-tight mb-6"
               style={{
-                color: "#042B19",
+                color: "#05627C",
                 fontFamily: "var(--font-font4), sans-serif",
               }}
             >
@@ -56,7 +61,7 @@ export default function ContactPage() {
             <p
               className="text-base md:text-lg lg:text-xl leading-relaxed"
               style={{
-                color: "#042B19",
+                color: "#05627C",
                 fontFamily: "var(--font-font4), sans-serif",
               }}
             >
@@ -77,18 +82,18 @@ export default function ContactPage() {
                 className="w-16 h-16 rounded-full flex items-center justify-center mb-6 shadow-md"
                 style={{ backgroundColor: "#E8F5F0" }}
               >
-                <Phone className="w-8 h-8" style={{ color: "#042B19" }} />
+                <Phone className="w-8 h-8" style={{ color: "#05627C" }} />
               </div>
               <h3
                 className="text-xl font-bold mb-3"
-                style={{ color: "#042B19" }}
+                style={{ color: "#05627C" }}
               >
                 Phone
               </h3>
               <a
                 href="tel:+447452321010"
                 className="text-base md:text-lg transition hover:opacity-70"
-                style={{ color: "#042B19" }}
+                style={{ color: "#05627C" }}
               >
                 +44 7452321010
               </a>
@@ -100,18 +105,18 @@ export default function ContactPage() {
                 className="w-16 h-16 rounded-full flex items-center justify-center mb-6 shadow-md"
                 style={{ backgroundColor: "#E8F5F0" }}
               >
-                <Mail className="w-8 h-8" style={{ color: "#042B19" }} />
+                <Mail className="w-8 h-8" style={{ color: "#05627C" }} />
               </div>
               <h3
                 className="text-xl font-bold mb-3"
-                style={{ color: "#042B19" }}
+                style={{ color: "#05627C" }}
               >
                 Email
               </h3>
               <a
                 href="mailto:crownbankers.com@gmail.com"
                 className="text-base md:text-lg transition hover:opacity-70"
-                style={{ color: "#042B19" }}
+                style={{ color: "#05627C" }}
               >
                 crownbankers.com@gmail.com
               </a>
@@ -123,19 +128,16 @@ export default function ContactPage() {
                 className="w-16 h-16 rounded-full flex items-center justify-center mb-6 shadow-md"
                 style={{ backgroundColor: "#E8F5F0" }}
               >
-                <MapPin className="w-8 h-8" style={{ color: "#042B19" }} />
+                <MapPin className="w-8 h-8" style={{ color: "#05627C" }} />
               </div>
               <h3
                 className="text-xl font-bold mb-3"
-                style={{ color: "#042B19" }}
+                style={{ color: "#05627C" }}
               >
                 Address
               </h3>
-              <p
-                className="text-base md:text-lg"
-                style={{ color: "#042B19" }}
-              >
-                Crown Bankers Headquarters
+              <p className="text-base md:text-lg" style={{ color: "#05627C" }}>
+                Big Bull Energies Headquarters
                 <br />
                 United Kingdom
               </p>
@@ -153,7 +155,7 @@ export default function ContactPage() {
               <div className="bg-[#E8F5F0] p-8 md:p-10 lg:p-12">
                 <h2
                   className="text-3xl md:text-4xl lg:text-5xl font-bold mb-8"
-                  style={{ color: "#042B19" }}
+                  style={{ color: "#05627C" }}
                 >
                   Send us a message
                 </h2>
@@ -162,7 +164,7 @@ export default function ContactPage() {
                     <label
                       htmlFor="name"
                       className="block text-sm font-bold uppercase tracking-wide mb-3"
-                      style={{ color: "#042B19" }}
+                      style={{ color: "#05627C" }}
                     >
                       Name *
                     </label>
@@ -173,10 +175,10 @@ export default function ContactPage() {
                       required
                       value={formData.name}
                       onChange={handleChange}
-                      className="w-full px-4 py-3 border-2 bg-white transition focus:outline-none focus:ring-2 focus:ring-[#042B19]"
+                      className="w-full px-4 py-3 border-2 bg-white transition focus:outline-none focus:ring-2 focus:ring-[#05627C]"
                       style={{
-                        borderColor: "#042B19",
-                        color: "#042B19",
+                        borderColor: "#05627C",
+                        color: "#05627C",
                       }}
                     />
                   </div>
@@ -185,7 +187,7 @@ export default function ContactPage() {
                     <label
                       htmlFor="email"
                       className="block text-sm font-bold uppercase tracking-wide mb-3"
-                      style={{ color: "#042B19" }}
+                      style={{ color: "#05627C" }}
                     >
                       Email *
                     </label>
@@ -196,10 +198,10 @@ export default function ContactPage() {
                       required
                       value={formData.email}
                       onChange={handleChange}
-                      className="w-full px-4 py-3 border-2 bg-white transition focus:outline-none focus:ring-2 focus:ring-[#042B19]"
+                      className="w-full px-4 py-3 border-2 bg-white transition focus:outline-none focus:ring-2 focus:ring-[#05627C]"
                       style={{
-                        borderColor: "#042B19",
-                        color: "#042B19",
+                        borderColor: "#05627C",
+                        color: "#05627C",
                       }}
                     />
                   </div>
@@ -208,7 +210,7 @@ export default function ContactPage() {
                     <label
                       htmlFor="phone"
                       className="block text-sm font-bold uppercase tracking-wide mb-3"
-                      style={{ color: "#042B19" }}
+                      style={{ color: "#05627C" }}
                     >
                       Phone
                     </label>
@@ -218,10 +220,10 @@ export default function ContactPage() {
                       name="phone"
                       value={formData.phone}
                       onChange={handleChange}
-                      className="w-full px-4 py-3 border-2 bg-white transition focus:outline-none focus:ring-2 focus:ring-[#042B19]"
+                      className="w-full px-4 py-3 border-2 bg-white transition focus:outline-none focus:ring-2 focus:ring-[#05627C]"
                       style={{
-                        borderColor: "#042B19",
-                        color: "#042B19",
+                        borderColor: "#05627C",
+                        color: "#05627C",
                       }}
                     />
                   </div>
@@ -230,7 +232,7 @@ export default function ContactPage() {
                     <label
                       htmlFor="subject"
                       className="block text-sm font-bold uppercase tracking-wide mb-3"
-                      style={{ color: "#042B19" }}
+                      style={{ color: "#05627C" }}
                     >
                       Subject *
                     </label>
@@ -240,10 +242,10 @@ export default function ContactPage() {
                       required
                       value={formData.subject}
                       onChange={handleChange}
-                      className="w-full px-4 py-3 border-2 bg-white transition focus:outline-none focus:ring-2 focus:ring-[#042B19]"
+                      className="w-full px-4 py-3 border-2 bg-white transition focus:outline-none focus:ring-2 focus:ring-[#05627C]"
                       style={{
-                        borderColor: "#042B19",
-                        color: "#042B19",
+                        borderColor: "#05627C",
+                        color: "#05627C",
                       }}
                     >
                       <option value="">Select a subject</option>
@@ -259,7 +261,7 @@ export default function ContactPage() {
                     <label
                       htmlFor="message"
                       className="block text-sm font-bold uppercase tracking-wide mb-3"
-                      style={{ color: "#042B19" }}
+                      style={{ color: "#05627C" }}
                     >
                       Message *
                     </label>
@@ -270,10 +272,10 @@ export default function ContactPage() {
                       rows={6}
                       value={formData.message}
                       onChange={handleChange}
-                      className="w-full px-4 py-3 border-2 bg-white resize-none transition focus:outline-none focus:ring-2 focus:ring-[#042B19]"
+                      className="w-full px-4 py-3 border-2 bg-white resize-none transition focus:outline-none focus:ring-2 focus:ring-[#05627C]"
                       style={{
-                        borderColor: "#042B19",
-                        color: "#042B19",
+                        borderColor: "#05627C",
+                        color: "#05627C",
                       }}
                     />
                   </div>
@@ -293,14 +295,14 @@ export default function ContactPage() {
               <div className="flex flex-col justify-center">
                 <h2
                   className="text-3xl md:text-4xl lg:text-5xl font-bold mb-6"
-                  style={{ color: "#042B19" }}
+                  style={{ color: "#05627C" }}
                 >
                   We&apos;d love to hear from you
                 </h2>
                 <p
                   className="text-base md:text-lg lg:text-xl leading-relaxed mb-10"
                   style={{
-                    color: "#042B19",
+                    color: "#05627C",
                     fontFamily: "var(--font-font4), sans-serif",
                   }}
                 >
@@ -315,18 +317,18 @@ export default function ContactPage() {
                       className="w-14 h-14 rounded-full flex items-center justify-center flex-shrink-0 shadow-md"
                       style={{ backgroundColor: "#E8F5F0" }}
                     >
-                      <Phone className="w-7 h-7" style={{ color: "#042B19" }} />
+                      <Phone className="w-7 h-7" style={{ color: "#05627C" }} />
                     </div>
                     <div>
                       <h3
                         className="text-xl font-bold mb-2"
-                        style={{ color: "#042B19" }}
+                        style={{ color: "#05627C" }}
                       >
                         Call us
                       </h3>
                       <p
                         className="text-base md:text-lg mb-1"
-                        style={{ color: "#042B19" }}
+                        style={{ color: "#05627C" }}
                       >
                         <a
                           href="tel:+447452321010"
@@ -337,7 +339,7 @@ export default function ContactPage() {
                       </p>
                       <p
                         className="text-sm"
-                        style={{ color: "#042B19", opacity: 0.8 }}
+                        style={{ color: "#05627C", opacity: 0.8 }}
                       >
                         Monday - Friday: 9:00 AM - 6:00 PM GMT
                       </p>
@@ -348,18 +350,18 @@ export default function ContactPage() {
                       className="w-14 h-14 rounded-full flex items-center justify-center flex-shrink-0 shadow-md"
                       style={{ backgroundColor: "#E8F5F0" }}
                     >
-                      <Mail className="w-7 h-7" style={{ color: "#042B19" }} />
+                      <Mail className="w-7 h-7" style={{ color: "#05627C" }} />
                     </div>
                     <div>
                       <h3
                         className="text-xl font-bold mb-2"
-                        style={{ color: "#042B19" }}
+                        style={{ color: "#05627C" }}
                       >
                         Email us
                       </h3>
                       <p
                         className="text-base md:text-lg mb-1"
-                        style={{ color: "#042B19" }}
+                        style={{ color: "#05627C" }}
                       >
                         <a
                           href="mailto:crownbankers.com@gmail.com"
@@ -370,7 +372,7 @@ export default function ContactPage() {
                       </p>
                       <p
                         className="text-sm"
-                        style={{ color: "#042B19", opacity: 0.8 }}
+                        style={{ color: "#05627C", opacity: 0.8 }}
                       >
                         We typically respond within 24 hours
                       </p>

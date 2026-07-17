@@ -1,11 +1,11 @@
 /**
  * Fix Script: Delete Duplicate Investment and Clean Up ROI
  * 
- * This script deletes Investment #2 (orphaned investment) for user CROWN-000282
+ * This script deletes Investment #2 (orphaned investment) for user BIGBULL-000282
  * and removes associated ROI transactions and updates ROI wallet balance.
  * 
  * Usage: npx ts-node -r dotenv/config src/scripts/fixDuplicateInvestment.ts [userId]
- * Example: npx ts-node -r dotenv/config src/scripts/fixDuplicateInvestment.ts CROWN-000282
+ * Example: npx ts-node -r dotenv/config src/scripts/fixDuplicateInvestment.ts BIGBULL-000282
  * 
  * The script will automatically find the orphaned investment (Investment #2) for the user.
  */
@@ -77,13 +77,13 @@ async function fixDuplicateInvestmentForUser(userId: string) {
   // Find user first
   let user = await User.findOne({ userId }).lean();
   if (!user && !userId.includes('-')) {
-    user = await User.findOne({ userId: `CROWN-${userId}` }).lean();
+    user = await User.findOne({ userId: `BIGBULL-${userId}` }).lean();
   }
   if (!user && !userId.includes('-')) {
     user = await User.findOne({ userId: `CNEOX-${userId}` }).lean();
   }
   if (!user) {
-    throw new Error(`User with userId "${userId}" not found. Tried: "${userId}", "CROWN-${userId}", "CNEOX-${userId}"`);
+    throw new Error(`User with userId "${userId}" not found. Tried: "${userId}", "BIGBULL-${userId}", "CNEOX-${userId}"`);
   }
 
   console.log(`✅ User Found: ${user.userId} (${user.name || 'N/A'})\n`);
@@ -243,13 +243,13 @@ async function fixDuplicateInvestmentForUser(userId: string) {
 }
 
 async function main() {
-  const userId = process.argv[2] || 'CROWN-000282'; // Default to CROWN-000282
+  const userId = process.argv[2] || 'BIGBULL-000282'; // Default to BIGBULL-000282
 
   if (!userId) {
     console.error('❌ Error: User ID is required');
     console.error('Usage: npx ts-node -r dotenv/config src/scripts/fixDuplicateInvestment.ts [userId]');
-    console.error('Example: npx ts-node -r dotenv/config src/scripts/fixDuplicateInvestment.ts CROWN-000282');
-    console.error('   (If userId not provided, defaults to CROWN-000282)');
+    console.error('Example: npx ts-node -r dotenv/config src/scripts/fixDuplicateInvestment.ts BIGBULL-000282');
+    console.error('   (If userId not provided, defaults to BIGBULL-000282)');
     process.exit(1);
   }
 

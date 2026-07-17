@@ -22,7 +22,7 @@ const PasswordResetEmail: React.FC<PasswordResetEmailProps> = ({
 }) => (
   <Html lang="en" dir="ltr">
     <Head>
-      <title>Reset Your Password - CROWN</title>
+      <title>Reset Your Password - BIG BULL</title>
       <Font
         fontFamily="Roboto"
         fallbackFontFamily="Verdana"
@@ -34,7 +34,7 @@ const PasswordResetEmail: React.FC<PasswordResetEmailProps> = ({
         fontStyle="normal"
       />
     </Head>
-    <Preview>Reset your CROWN account password</Preview>
+    <Preview>Reset your BIG BULL account password</Preview>
     <Container style={{ maxWidth: '600px', margin: '0 auto', padding: '20px', fontFamily: 'Roboto, Verdana, sans-serif' }}>
       <Section>
         <Row>
@@ -49,7 +49,7 @@ const PasswordResetEmail: React.FC<PasswordResetEmailProps> = ({
         </Row>
         <Row>
           <Text style={{ color: '#374151', fontSize: '16px', lineHeight: '24px', marginBottom: '16px' }}>
-            We received a request to reset your password for your CROWN account. If you didn't make this request, you can safely ignore this email.
+            We received a request to reset your password for your BIG BULL account. If you didn't make this request, you can safely ignore this email.
           </Text>
         </Row>
         <Row>

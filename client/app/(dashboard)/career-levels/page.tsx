@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { api } from '@/lib/api';
-import CrownLoader from '@/components/CrownLoader';
+import BigBullLoader from '@/components/BigBullLoader';
 
 interface CareerProgress {
   currentLevel: {
@@ -115,15 +115,15 @@ export default function CareerLevelsPage() {
   };
 
   if (loading) {
-    return <CrownLoader fullScreen />;
+    return <BigBullLoader fullScreen />;
   }
 
   return (
-    <div className="w-full bg-gradient-to-br from-black via-gray-900 to-black min-h-screen py-8 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+    <div className="w-full min-h-screen py-4 md:py-8 px-2 sm:px-4 md:px-6 lg:px-8 relative overflow-hidden">
       {/* Decorative background elements */}
       <div className="fixed inset-0 pointer-events-none opacity-20">
-        <div className="absolute top-0 left-1/4 w-96 h-96 bg-yellow-500/10 rounded-full blur-3xl"></div>
-        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-yellow-600/10 rounded-full blur-3xl"></div>
+        <div className="absolute top-0 left-1/4 w-96 h-96 bg-[#FBF676]/10 rounded-full blur-3xl"></div>
+        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-[#FBF676]/10 rounded-full blur-3xl"></div>
       </div>
 
       <div className="relative z-10">
@@ -131,11 +131,11 @@ export default function CareerLevelsPage() {
         <h1 className="text-3xl font-extrabold mb-2 text-white">
           <span className="bg-gradient-to-r from-yellow-300 via-yellow-400 to-yellow-600 bg-clip-text text-transparent drop-shadow-lg">Career Levels</span>
         </h1>
-        <p className="mt-1 text-sm text-gray-400">Track your career level progress and rewards</p>
+        <p className="mt-1 text-sm text-white/55">Track your career level progress and rewards</p>
       </div>
 
       {error && (
-        <div className="mb-6 bg-red-900/30 border border-red-500/50 text-red-400 px-4 py-3 rounded-lg backdrop-blur-sm">
+        <div className="mb-6 bg-red-900/30 border border-red-400/50 text-[#FBF676] px-4 py-3 rounded-lg backdrop-blur-sm">
           {error}
         </div>
       )}
@@ -143,21 +143,21 @@ export default function CareerLevelsPage() {
       {progress && (
         <>
           {/* Current Level Card */}
-          <div className="bg-gradient-to-br from-gray-900/95 via-gray-800/95 to-gray-900/95 backdrop-blur-sm rounded-2xl shadow-2xl border border-yellow-500/30 p-8 mb-8">
+          <div className="rounded-2xl shadow-2xl border border-[#FBF676]/25 backdrop-blur-md bg-[rgba(8,16,40,0.75)] p-8 mb-8">
             <h2 className="text-2xl font-extrabold text-white mb-6 flex items-center gap-2">
-              <span className="w-1 h-6 bg-gradient-to-b from-yellow-400 to-yellow-600 rounded"></span>
+              <span className="w-1 h-6 bg-gradient-to-b from-[#FBF676] to-[#e8e04a] rounded"></span>
               Current Level
             </h2>
             {progress.currentLevel ? (
               <div className="space-y-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <h3 className="text-3xl font-extrabold text-yellow-400">{progress.currentLevel.name}</h3>
-                    <p className="text-sm text-gray-400 font-semibold mt-1">Level {progress.currentLevel.level}</p>
+                    <h3 className="text-3xl font-extrabold text-[#FBF676]">{progress.currentLevel.name}</h3>
+                    <p className="text-sm text-white/55 font-semibold mt-1">Level {progress.currentLevel.level}</p>
                   </div>
                   <div className="text-right">
-                    <p className="text-sm text-gray-400 font-semibold">Reward</p>
-                    <p className="text-2xl font-extrabold text-yellow-400">
+                    <p className="text-sm text-white/55 font-semibold">Reward</p>
+                    <p className="text-2xl font-extrabold text-[#FBF676]">
                       ${progress.currentLevel.rewardAmount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                     </p>
                   </div>
@@ -165,35 +165,35 @@ export default function CareerLevelsPage() {
 
                 {/* Progress Bar */}
                 <div>
-                  <div className="flex justify-between text-sm text-gray-300 mb-3 font-semibold">
+                  <div className="flex justify-between text-sm text-white/75 mb-3 font-semibold">
                     <span>Progress: <span className="text-white font-bold">${progress.levelInvestment.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span></span>
-                    <span>Target: <span className="text-yellow-400 font-bold">${(progress.currentLevel.investmentThreshold * 2).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span></span>
+                    <span>Target: <span className="text-[#FBF676] font-bold">${(progress.currentLevel.investmentThreshold * 2).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span></span>
                   </div>
                   <div className="w-full bg-gray-700/50 rounded-full h-4">
                     <div
-                      className="bg-gradient-to-r from-yellow-500 to-yellow-600 h-4 rounded-full transition-all duration-300 shadow-lg shadow-yellow-500/30"
+                      className="bg-[#FBF676] h-4 rounded-full transition-all duration-300 shadow-lg shadow-[#FBF676]/25"
                       style={{
                         width: `${getProgressPercentage(progress.levelInvestment, progress.currentLevel.investmentThreshold * 2)}%`,
                       }}
                     ></div>
                   </div>
-                  <p className="text-xs text-gray-400 mt-2 font-semibold">
+                  <p className="text-xs text-white/55 mt-2 font-semibold">
                     {getProgressPercentage(progress.levelInvestment, progress.currentLevel.investmentThreshold * 2).toFixed(1)}% complete
                   </p>
                 </div>
 
                 {/* Left & Right Business Targets (Per Side) */}
                 {binaryTree && (
-                  <div className="mt-6 p-5 bg-gray-800/80 rounded-xl border border-gray-700/50">
-                    <h3 className="text-base font-extrabold text-yellow-400 mb-4">
+                  <div className="mt-6 p-5 bg-[rgba(5,12,32,0.9)] rounded-xl border border-[#FBF676]/50">
+                    <h3 className="text-base font-extrabold text-[#FBF676] mb-4">
                       Left & Right Business Targets (per side)
                     </h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       {/* Left Side */}
-                      <div className="p-5 bg-gradient-to-r from-yellow-500/10 to-yellow-600/5 rounded-xl border border-yellow-500/30">
-                        <div className="flex justify-between text-xs text-gray-300 mb-2 font-semibold">
+                      <div className="p-5 bg-[rgba(251,246,118,0.12)] rounded-xl border border-[#FBF676]/25">
+                        <div className="flex justify-between text-xs text-yellow-300 mb-2 font-semibold">
                           <span>Left Business</span>
-                          <span className="text-yellow-400">
+                          <span className="text-[#FBF676]">
                             $
                             {binaryTree.leftBusiness.toLocaleString('en-US', {
                               minimumFractionDigits: 2,
@@ -206,9 +206,9 @@ export default function CareerLevelsPage() {
                             })}
                           </span>
                         </div>
-                        <div className="w-full bg-gray-700/50 rounded-full h-3">
+                        <div className="w-full bg-[rgba(5,12,32,0.9)] rounded-full h-3">
                           <div
-                            className="bg-gradient-to-r from-yellow-500 to-yellow-600 h-3 rounded-full transition-all duration-300 shadow-lg shadow-yellow-500/30"
+                            className="bg-[#FBF676] h-3 rounded-full transition-all duration-300 shadow-lg shadow-[#FBF676]/25"
                             style={{
                               width: `${getSideProgressPercentage(
                                 binaryTree.leftBusiness,
@@ -217,7 +217,7 @@ export default function CareerLevelsPage() {
                             }}
                           ></div>
                         </div>
-                        <p className="mt-2 text-xs text-gray-400 font-semibold">
+                        <p className="mt-2 text-xs text-[#FBF676] font-semibold">
                           {getSideProgressPercentage(
                             binaryTree.leftBusiness,
                             progress.currentLevel.investmentThreshold
@@ -227,10 +227,10 @@ export default function CareerLevelsPage() {
                       </div>
 
                       {/* Right Side */}
-                      <div className="p-5 bg-gradient-to-r from-yellow-500/10 to-yellow-600/5 rounded-xl border border-yellow-500/30">
-                        <div className="flex justify-between text-xs text-gray-300 mb-2 font-semibold">
+                      <div className="p-5 bg-[rgba(251,246,118,0.12)] rounded-xl border border-[#FBF676]/25">
+                        <div className="flex justify-between text-xs text-yellow-300 mb-2 font-semibold">
                           <span>Right Business</span>
-                          <span className="text-yellow-400">
+                          <span className="text-[#FBF676]">
                             $
                             {binaryTree.rightBusiness.toLocaleString('en-US', {
                               minimumFractionDigits: 2,
@@ -243,9 +243,9 @@ export default function CareerLevelsPage() {
                             })}
                           </span>
                         </div>
-                        <div className="w-full bg-gray-700/50 rounded-full h-3">
+                        <div className="w-full bg-[rgba(5,12,32,0.9)] rounded-full h-3">
                           <div
-                            className="bg-gradient-to-r from-yellow-500 to-yellow-600 h-3 rounded-full transition-all duration-300 shadow-lg shadow-yellow-500/30"
+                            className="bg-[#FBF676] h-3 rounded-full transition-all duration-300 shadow-lg shadow-[#FBF676]/25"
                             style={{
                               width: `${getSideProgressPercentage(
                                 binaryTree.rightBusiness,
@@ -254,7 +254,7 @@ export default function CareerLevelsPage() {
                             }}
                           ></div>
                         </div>
-                        <p className="mt-2 text-xs text-gray-400 font-semibold">
+                        <p className="mt-2 text-xs text-[#FBF676] font-semibold">
                           {getSideProgressPercentage(
                             binaryTree.rightBusiness,
                             progress.currentLevel.investmentThreshold
@@ -263,9 +263,9 @@ export default function CareerLevelsPage() {
                         </p>
                       </div>
                     </div>
-                    <p className="mt-4 text-xs text-gray-400 font-semibold">
+                    <p className="mt-4 text-xs text-[#FBF676] font-semibold">
                       Career level reward unlocks when{' '}
-                      <span className="font-extrabold text-yellow-400">both</span> left and right business reach the
+                      <span className="font-extrabold text-[#FBF676]">both</span> left and right business reach the
                       full target amount.
                     </p>
                   </div>
@@ -273,28 +273,28 @@ export default function CareerLevelsPage() {
               </div>
             ) : (
               <div className="text-center py-12">
-                <p className="text-gray-300 text-lg font-bold">Congratulations! You've completed all career levels! 🎉</p>
+                <p className="text-white/75 text-lg font-bold">Congratulations! You've completed all career levels! 🎉</p>
               </div>
             )}
           </div>
 
           {/* Statistics Cards */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            <div className="group bg-gradient-to-br from-gray-900/95 via-gray-800/95 to-gray-900/95 backdrop-blur-sm rounded-2xl shadow-2xl border border-yellow-500/30 p-6 hover:border-yellow-500/60 hover:shadow-yellow-500/20 transition-all duration-300">
-              <h3 className="text-sm font-bold text-gray-400 mb-3">Total Business Volume</h3>
-              <p className="text-3xl font-extrabold bg-gradient-to-r from-white to-yellow-100 bg-clip-text text-transparent">
+            <div className="group rounded-2xl shadow-2xl border border-[#FBF676]/25 backdrop-blur-md bg-[rgba(8,16,40,0.75)] p-6 hover:border-[#FBF676]/60 hover:shadow-[#FBF676]/20 transition-all duration-300">
+              <h3 className="text-sm font-bold text-[#FBF676] mb-3">Total Business Volume</h3>
+              <p className="text-3xl font-extrabold text-[#FBF676]">
                 ${progress.totalBusinessVolume.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
               </p>
             </div>
-            <div className="group bg-gradient-to-br from-gray-900/95 via-gray-800/95 to-gray-900/95 backdrop-blur-sm rounded-2xl shadow-2xl border border-yellow-500/30 p-6 hover:border-yellow-500/60 hover:shadow-yellow-500/20 transition-all duration-300">
-              <h3 className="text-sm font-bold text-gray-400 mb-3">Total Rewards Earned</h3>
-              <p className="text-3xl font-extrabold text-yellow-400">
+            <div className="group rounded-2xl shadow-2xl border border-[#FBF676]/25 backdrop-blur-md bg-[rgba(8,16,40,0.75)] p-6 hover:border-[#FBF676]/60 hover:shadow-[#FBF676]/20 transition-all duration-300">
+              <h3 className="text-sm font-bold text-[#FBF676] mb-3">Total Rewards Earned</h3>
+              <p className="text-3xl font-extrabold text-[#FBF676]">
                 ${progress.totalRewardsEarned.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
               </p>
             </div>
-            <div className="group bg-gradient-to-br from-gray-900/95 via-gray-800/95 to-gray-900/95 backdrop-blur-sm rounded-2xl shadow-2xl border border-yellow-500/30 p-6 hover:border-yellow-500/60 hover:shadow-yellow-500/20 transition-all duration-300">
-              <h3 className="text-sm font-bold text-gray-400 mb-3">Levels Completed</h3>
-              <p className="text-3xl font-extrabold text-yellow-400">
+            <div className="group rounded-2xl shadow-2xl border border-[#FBF676]/25 backdrop-blur-md bg-[rgba(8,16,40,0.75)] p-6 hover:border-[#FBF676]/60 hover:shadow-[#FBF676]/20 transition-all duration-300">
+              <h3 className="text-sm font-bold text-[#FBF676] mb-3">Levels Completed</h3>
+              <p className="text-3xl font-extrabold text-[#FBF676]">
                 {progress.completedLevels.length}
               </p>
             </div>
@@ -302,9 +302,9 @@ export default function CareerLevelsPage() {
 
           {/* Completed Levels */}
           {progress.completedLevels.length > 0 && (
-            <div className="bg-gradient-to-br from-gray-900/95 via-gray-800/95 to-gray-900/95 backdrop-blur-sm rounded-2xl shadow-2xl border border-yellow-500/30 p-8 mb-8">
+            <div className="rounded-2xl shadow-2xl border border-[#FBF676]/25 backdrop-blur-md bg-[rgba(8,16,40,0.75)] p-8 mb-8">
               <h2 className="text-2xl font-extrabold text-white mb-6 flex items-center gap-2">
-                <span className="w-1 h-6 bg-gradient-to-b from-yellow-400 to-yellow-600 rounded"></span>
+                <span className="w-1 h-6 bg-gradient-to-b from-[#FBF676] to-[#e8e04a] rounded"></span>
                 Completed Levels
               </h2>
               <div className="space-y-4">
@@ -313,22 +313,22 @@ export default function CareerLevelsPage() {
                   .map((completed, index) => (
                     <div
                       key={completed.levelId}
-                      className="flex items-center justify-between p-5 bg-gradient-to-r from-yellow-500/20 via-yellow-600/15 to-yellow-500/20 border-2 border-yellow-500/40 rounded-xl hover:border-yellow-500/60 transition-all"
+                      className="flex items-center justify-between p-5 bg-[rgba(251,246,118,0.12)] border-2 border-[#FBF676]/35 rounded-xl hover:border-[#FBF676]/60 transition-all"
                     >
                       <div className="flex items-center space-x-4">
                         <div className="flex-shrink-0">
-                          <div className="w-12 h-12 bg-gradient-to-r from-yellow-500 to-yellow-600 rounded-full flex items-center justify-center text-black font-extrabold shadow-lg shadow-yellow-500/30">
+                          <div className="w-12 h-12 bg-gradient-to-r from-yellow-500 to-yellow-600 rounded-full flex items-center justify-center text-black font-extrabold shadow-lg shadow-[#FBF676]/25">
                             ✓
                           </div>
                         </div>
                         <div>
                           <h3 className="font-extrabold text-white text-lg">{completed.levelName}</h3>
-                          <p className="text-sm text-gray-400 font-semibold">Completed: {formatDate(completed.completedAt)}</p>
+                          <p className="text-sm text-white/55 font-semibold">Completed: {formatDate(completed.completedAt)}</p>
                         </div>
                       </div>
                       <div className="text-right">
-                        <p className="text-sm text-gray-400 font-semibold">Reward Received</p>
-                        <p className="text-xl font-extrabold text-yellow-400">
+                        <p className="text-sm text-white/55 font-semibold">Reward Received</p>
+                        <p className="text-xl font-extrabold text-[#FBF676]">
                           ${completed.rewardAmount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                         </p>
                       </div>
@@ -340,9 +340,9 @@ export default function CareerLevelsPage() {
 
           {/* All Available Levels */}
           {allLevels.length > 0 && (
-            <div className="bg-gradient-to-br from-gray-900/95 via-gray-800/95 to-gray-900/95 backdrop-blur-sm rounded-2xl shadow-2xl border border-yellow-500/30 p-8">
+            <div className="rounded-2xl shadow-2xl border border-[#FBF676]/25 backdrop-blur-md bg-[rgba(8,16,40,0.75)] p-8">
               <h2 className="text-2xl font-extrabold text-white mb-6 flex items-center gap-2">
-                <span className="w-1 h-6 bg-gradient-to-b from-yellow-400 to-yellow-600 rounded"></span>
+                <span className="w-1 h-6 bg-gradient-to-b from-[#FBF676] to-[#e8e04a] rounded"></span>
                 All Career Levels
               </h2>
               <div className="space-y-4">
@@ -360,9 +360,9 @@ export default function CareerLevelsPage() {
                         key={level.id}
                         className={`p-5 border-2 rounded-xl transition-all ${
                           isCompleted
-                            ? 'bg-gradient-to-r from-yellow-500/30 via-yellow-600/20 to-yellow-500/30 border-yellow-500/60'
+                            ? 'bg-gradient-to-r from-yellow-500/30 via-yellow-600/20 to-yellow-500/30 border-[#FBF676]/60'
                             : isCurrent
-                            ? 'bg-gradient-to-r from-yellow-500/20 via-yellow-600/15 to-yellow-500/20 border-yellow-500/50'
+                            ? 'bg-[rgba(251,246,118,0.12)] border-[#FBF676]/50'
                             : 'bg-gray-800/80 border-gray-700/50'
                         }`}
                       >
@@ -371,9 +371,9 @@ export default function CareerLevelsPage() {
                             <div
                               className={`w-12 h-12 rounded-full flex items-center justify-center font-extrabold text-white shadow-lg ${
                                 isCompleted
-                                  ? 'bg-gradient-to-r from-yellow-500 to-yellow-600 shadow-yellow-500/30'
+                                  ? 'bg-gradient-to-r from-yellow-500 to-yellow-600 shadow-[#FBF676]/25'
                                   : isCurrent
-                                  ? 'bg-gradient-to-r from-yellow-500 to-yellow-600 shadow-yellow-500/30'
+                                  ? 'bg-gradient-to-r from-yellow-500 to-yellow-600 shadow-[#FBF676]/25'
                                   : 'bg-gray-700'
                               }`}
                             >
@@ -381,21 +381,21 @@ export default function CareerLevelsPage() {
                             </div>
                             <div>
                               <h3 className="font-extrabold text-white text-lg">{level.name}</h3>
-                              <p className="text-sm text-gray-400 font-semibold">
-                                Investment Threshold: <span className="text-yellow-400">${level.investmentThreshold.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                              <p className="text-sm text-white/55 font-semibold">
+                                Investment Threshold: <span className="text-[#FBF676]">${level.investmentThreshold.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                               </p>
                             </div>
                           </div>
                           <div className="text-right">
-                            <p className="text-sm text-gray-400 font-semibold">Reward</p>
-                            <p className="text-xl font-extrabold text-yellow-400">
+                            <p className="text-sm text-white/55 font-semibold">Reward</p>
+                            <p className="text-xl font-extrabold text-[#FBF676]">
                               ${level.rewardAmount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                             </p>
                             {isCurrent && (
-                              <p className="text-xs text-yellow-400 mt-1 font-bold">Current Level</p>
+                              <p className="text-xs text-[#FBF676] mt-1 font-bold">Current Level</p>
                             )}
                             {isCompleted && (
-                              <p className="text-xs text-yellow-400 mt-1 font-bold">Completed</p>
+                              <p className="text-xs text-[#FBF676] mt-1 font-bold">Completed</p>
                             )}
                           </div>
                         </div>
@@ -409,8 +409,8 @@ export default function CareerLevelsPage() {
       )}
 
       {!progress && !loading && (
-        <div className="bg-gradient-to-br from-gray-900/95 via-gray-800/95 to-gray-900/95 backdrop-blur-sm rounded-2xl shadow-2xl border border-yellow-500/30 p-12 text-center">
-          <p className="text-gray-300 text-lg font-bold">No career progress found. Start investing to begin your career journey!</p>
+        <div className="rounded-2xl shadow-2xl border border-[#FBF676]/25 backdrop-blur-md bg-[rgba(8,16,40,0.75)] p-12 text-center">
+          <p className="text-white/75 text-lg font-bold">No career progress found. Start investing to begin your career journey!</p>
         </div>
       )}
           </div>

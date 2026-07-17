@@ -10,22 +10,26 @@ export default function CareersPage() {
     {
       icon: <TrendingUp className="w-8 h-8" />,
       title: "Growth Opportunities",
-      description: "Join a fast-growing company with opportunities for career advancement and professional development.",
+      description:
+        "Join a fast-growing company with opportunities for career advancement and professional development.",
     },
     {
       icon: <Users className="w-8 h-8" />,
       title: "Collaborative Culture",
-      description: "Work with a diverse team of professionals who are passionate about renewable energy and innovation.",
+      description:
+        "Work with a diverse team of professionals who are passionate about renewable energy and innovation.",
     },
     {
       icon: <Award className="w-8 h-8" />,
       title: "Competitive Benefits",
-      description: "Enjoy competitive salaries, health insurance, retirement plans, and other comprehensive benefits.",
+      description:
+        "Enjoy competitive salaries, health insurance, retirement plans, and other comprehensive benefits.",
     },
     {
       icon: <Briefcase className="w-8 h-8" />,
       title: "Meaningful Work",
-      description: "Make a positive impact on the environment while building a rewarding career in renewable energy.",
+      description:
+        "Make a positive impact on the environment while building a rewarding career in renewable energy.",
     },
   ];
 
@@ -62,7 +66,7 @@ export default function CareersPage() {
       <section className="relative w-full h-[50vh] md:h-[60vh] overflow-hidden">
         <Image
           src="/event.jpeg"
-          alt="Careers at Crown Bankers"
+          alt="Careers at Big Bull Energies"
           fill
           className="object-cover"
           priority
@@ -75,11 +79,11 @@ export default function CareersPage() {
               <div className="flex items-center gap-3 mb-6">
                 <div
                   className="h-px w-12"
-                  style={{ backgroundColor: "#042B19" }}
+                  style={{ backgroundColor: "#05627C" }}
                 ></div>
                 <span
                   className="text-xs font-medium uppercase tracking-wide"
-                  style={{ color: "#042B19" }}
+                  style={{ color: "#05627C" }}
                 >
                   CAREERS
                 </span>
@@ -87,14 +91,16 @@ export default function CareersPage() {
               <h1
                 className="text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-normal leading-tight mb-6"
                 style={{
-                  color: "#042B19",
+                  color: "#05627C",
                   fontFamily: "var(--font-font4), sans-serif",
                 }}
               >
                 Join us in building the energy future.
               </h1>
               <p className="text-lg text-gray-700 leading-relaxed">
-                At Crown Bankers, innovation is driven by a unique array of ideas and perspectives. Our growing team is dedicated to empowering the world with secure, reliable energy solutions.
+                At Big Bull Energies, innovation is driven by a unique array of
+                ideas and perspectives. Our growing team is dedicated to
+                empowering the world with secure, reliable energy solutions.
               </p>
             </div>
           </div>
@@ -108,14 +114,15 @@ export default function CareersPage() {
             <h2
               className="text-3xl md:text-4xl lg:text-5xl font-normal mb-4"
               style={{
-                color: "#042B19",
+                color: "#05627C",
                 fontFamily: "var(--font-font4), sans-serif",
               }}
             >
               Why Work With Us
             </h2>
             <p className="text-lg text-gray-600">
-              We offer a supportive work environment where your ideas matter and your career can flourish.
+              We offer a supportive work environment where your ideas matter and
+              your career can flourish.
             </p>
           </div>
 
@@ -126,15 +133,12 @@ export default function CareersPage() {
                 className="p-8 border border-gray-200 hover:shadow-lg transition-shadow"
                 style={{ borderColor: "#E5E7EB" }}
               >
-                <div
-                  className="mb-4"
-                  style={{ color: "#042B19" }}
-                >
+                <div className="mb-4" style={{ color: "#05627C" }}>
                   {benefit.icon}
                 </div>
                 <h3
                   className="text-xl font-semibold mb-3"
-                  style={{ color: "#042B19" }}
+                  style={{ color: "#05627C" }}
                 >
                   {benefit.title}
                 </h3>
@@ -155,7 +159,7 @@ export default function CareersPage() {
               <h2
                 className="text-3xl md:text-4xl lg:text-5xl font-normal mb-4"
                 style={{
-                  color: "#042B19",
+                  color: "#05627C",
                   fontFamily: "var(--font-font4), sans-serif",
                 }}
               >
@@ -177,7 +181,7 @@ export default function CareersPage() {
                     <div className="flex-1">
                       <h3
                         className="text-xl font-semibold mb-2"
-                        style={{ color: "#042B19" }}
+                        style={{ color: "#05627C" }}
                       >
                         {position.title}
                       </h3>
@@ -192,7 +196,7 @@ export default function CareersPage() {
                     <Link
                       href="/contact"
                       className="inline-flex items-center gap-2 px-6 py-3 font-semibold text-white transition hover:opacity-90 uppercase text-sm"
-                      style={{ backgroundColor: "#042B19" }}
+                      style={{ backgroundColor: "#05627C" }}
                     >
                       Apply Now
                       <ArrowRight className="w-4 h-4" />
@@ -204,12 +208,13 @@ export default function CareersPage() {
 
             <div className="mt-12 text-center">
               <p className="text-gray-600 mb-6">
-                Don't see a position that matches your skills? We're always looking for talented individuals.
+                Don't see a position that matches your skills? We're always
+                looking for talented individuals.
               </p>
               <Link
                 href="/contact"
                 className="inline-flex items-center gap-2 px-8 py-4 font-semibold text-white transition hover:opacity-90 uppercase text-sm"
-                style={{ backgroundColor: "#042B19" }}
+                style={{ backgroundColor: "#05627C" }}
               >
                 Get in Touch
                 <ArrowRight className="w-5 h-5" />
@@ -222,18 +227,22 @@ export default function CareersPage() {
       {/* CTA Section */}
       <section className="py-16 md:py-20 bg-white">
         <div className="container mx-auto px-4 lg:px-8">
-          <div className="max-w-4xl mx-auto text-center bg-gray-50 p-12 border border-gray-200" style={{ borderColor: "#E5E7EB" }}>
+          <div
+            className="max-w-4xl mx-auto text-center bg-gray-50 p-12 border border-gray-200"
+            style={{ borderColor: "#E5E7EB" }}
+          >
             <h2
               className="text-3xl md:text-4xl font-normal mb-4"
               style={{
-                color: "#042B19",
+                color: "#05627C",
                 fontFamily: "var(--font-font4), sans-serif",
               }}
             >
               Ready to Make an Impact?
             </h2>
             <p className="text-lg text-gray-600 mb-8 max-w-2xl mx-auto">
-              Join Crown Bankers and be part of a team that's transforming the future of renewable energy and financial solutions.
+              Join Big Bull Energies and be part of a team that's transforming
+              the future of renewable energy and financial solutions.
             </p>
             <Link
               href="/contact"

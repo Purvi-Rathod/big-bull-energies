@@ -82,7 +82,7 @@ async function calculateExpectedBusinessVolume(
   let rightCount = 0;
   
   const user = await User.findById(userId).select("userId").lean();
-  const isAdmin = (user as any)?.userId === "CROWN-000000" || (user as any)?.userId === "CNEOX-000000";
+  const isAdmin = (user as any)?.userId === "BIGBULL-000000" || (user as any)?.userId === "CROWN-000000" || (user as any)?.userId === "CNEOX-000000";
   
   if (isAdmin) {
     const adminChildren = await BinaryTree.find({ parent: userId })
@@ -178,7 +178,7 @@ async function getAllDownlines(
   if (!tree) return downlines;
   
   const user = await User.findById(rootUserId).select("userId").lean();
-  const isAdmin = (user as any)?.userId === "CROWN-000000" || (user as any)?.userId === "CNEOX-000000";
+  const isAdmin = (user as any)?.userId === "BIGBULL-000000" || (user as any)?.userId === "CROWN-000000" || (user as any)?.userId === "CNEOX-000000";
   
   if (isAdmin) {
     const adminChildren = await BinaryTree.find({ parent: rootUserId })

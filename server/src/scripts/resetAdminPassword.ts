@@ -1,7 +1,7 @@
 /**
  * Reset Admin Password Script
  * 
- * This script resets the admin user (CROWN-000000) password to "admin@123"
+ * This script resets the admin user (BIGBULL-000000) password to "admin@123"
  * 
  * Usage: npm run reset:admin-password
  */
@@ -23,10 +23,10 @@ async function resetAdminPassword() {
     console.log("✅ Connected to database");
     
     // Find admin user
-    const admin = await User.findOne({ userId: "CROWN-000000" });
+    const admin = await User.findOne({ userId: "BIGBULL-000000" });
     
     if (!admin) {
-      console.error("❌ Admin user (CROWN-000000) not found!");
+      console.error("❌ Admin user (BIGBULL-000000) not found!");
       process.exit(1);
     }
     

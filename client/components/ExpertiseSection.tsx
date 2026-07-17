@@ -34,17 +34,19 @@ export default function ExpertiseSection() {
       <div className="relative w-full bg-white overflow-hidden py-8 md:py-12 lg:py-16">
         {/* Description Text in White Section */}
         <div className="relative z-10 h-full flex items-center justify-center px-4 sm:px-6 md:px-8 lg:px-16">
-            <p
-              className="text-center text-sm sm:text-base md:text-lg lg:text-xl leading-relaxed max-w-4xl"
-              style={{
-                color: "#042B19",
-                fontFamily: "var(--font-font4), sans-serif",
-              }}
-            >
-              Crown Bankers combines innovative binary investment systems with sustainable energy projects. 
-              We provide secure, transparent investment opportunities backed by renewable energy infrastructure, 
-              empowering investors to build wealth while supporting the global transition to clean energy.
-            </p>
+          <p
+            className="text-center text-sm sm:text-base md:text-lg lg:text-xl leading-relaxed max-w-4xl"
+            style={{
+              color: "#05627C",
+              fontFamily: "var(--font-font4), sans-serif",
+            }}
+          >
+            Big Bull Energies combines innovative binary investment systems with
+            sustainable energy projects. We provide secure, transparent
+            investment opportunities backed by renewable energy infrastructure,
+            empowering investors to build wealth while supporting the global
+            transition to clean energy.
+          </p>
         </div>
       </div>
 
@@ -834,7 +836,7 @@ export default function ExpertiseSection() {
             </p>
             <h2
               className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl mb-2 sm:mb-4 leading-[1.05]"
-              style={{ color: "#042B19" }}
+              style={{ color: "#05627C" }}
             >
               <span
                 style={{
@@ -872,7 +874,7 @@ export default function ExpertiseSection() {
                   className="h-auto text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold leading-[1.05]"
                   style={{
                     fontFamily: "'Font3', sans-serif",
-                    color: "#042B19",
+                    color: "#05627C",
                     filter: "none",
                   }}
                 />
@@ -894,7 +896,8 @@ export default function ExpertiseSection() {
               </span>
             </h2>
             <p className="text-gray-600 text-base sm:text-lg md:text-xl lg:text-xl xl:text-2xl max-w-lg leading-relaxed mt-2 sm:mt-4">
-              Building wealth through innovative investment systems and sustainable energy solutions.
+              Building wealth through innovative investment systems and
+              sustainable energy solutions.
             </p>
           </div>
 

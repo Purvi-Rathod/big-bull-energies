@@ -22,7 +22,7 @@ export default function ProtectedRoute({
     if (loading) return;
 
     if (requireAdmin && !admin) {
-      router.push('/login');
+      router.push('/admin/login');
       return;
     }
 

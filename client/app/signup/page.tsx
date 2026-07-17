@@ -7,7 +7,7 @@ import { api } from '@/lib/api';
 import { countries } from '@/lib/countries';
 import Image from 'next/image';
 import Link from 'next/link';
-import CrownLoader from '@/components/CrownLoader';
+import BigBullLoader from '@/components/BigBullLoader';
 
 function SignupContent() {
   const searchParams = useSearchParams();
@@ -102,8 +102,8 @@ function SignupContent() {
         router.replace('/admin/dashboard');
       } else if (user) {
         // Regular user signup - redirect to dashboard
-        if (user.userId === 'CROWN-000000' || user.userId === 'CROWN-000000') {
-          // CROWN-000000 or CROWN-000000 user should be redirected to admin dashboard
+        if (user.userId === 'BIGBULL-000000' || user.userId === 'CROWN-000000' || user.userId === 'CNEOX-000000') {
+          // BIGBULL-000000 or BIGBULL-000000 user should be redirected to admin dashboard
           router.replace('/admin/dashboard');
         } else {
           router.replace('/dashboard');
@@ -173,351 +173,582 @@ function SignupContent() {
     }
   };
 
+  const inputCls =
+    'underline-input w-full py-2.5 text-[#F6F5EC] placeholder-[#9FB8C9]/50 text-sm font-medium';
+  const labelCls =
+    'block text-xs font-semibold tracking-[0.15em] uppercase mb-2 text-[#9FB8C9]';
+
   return (
-    <div className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 relative">
-      {/* Background Image */}
-      <div className="fixed inset-0 z-0">
-        <Image
-          src="/signinbg.png"
-          alt="Background"
-          fill
-          className="object-cover"
-          priority
-          quality={90}
-        />
-        {/* Overlay for better readability */}
-        <div className="absolute inset-0 bg-black/50"></div>
+    <div className="min-h-screen grid grid-cols-1 md:grid-cols-[1fr_1.5fr] font-[var(--font-body)]">
+      <style jsx global>{`
+        :root {
+          --font-display: var(--font-fraunces), serif;
+          --font-body: var(--font-inter), sans-serif;
+        }
+        @keyframes drawLine {
+          from {
+            stroke-dashoffset: 900;
+          }
+          to {
+            stroke-dashoffset: 0;
+          }
+        }
+        @keyframes fadeUp {
+          from {
+            opacity: 0;
+            transform: translateY(10px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        @keyframes dotPulse {
+          0%,
+          100% {
+            opacity: 0.4;
+            r: 4;
+          }
+          50% {
+            opacity: 1;
+            r: 6;
+          }
+        }
+        @keyframes shimmer {
+          from {
+            transform: translateX(-120%);
+          }
+          to {
+            transform: translateX(220%);
+          }
+        }
+        .bull-line {
+          stroke-dasharray: 900;
+          stroke-dashoffset: 900;
+          animation: drawLine 2.2s cubic-bezier(0.65, 0, 0.35, 1) 0.3s forwards;
+        }
+        .bull-dot {
+          animation: dotPulse 2.4s ease-in-out 2.3s infinite;
+        }
+        .fade-up {
+          opacity: 0;
+          animation: fadeUp 0.7s ease-out forwards;
+        }
+        .cta-shimmer::after {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 40%;
+          height: 100%;
+          background: linear-gradient(
+            110deg,
+            transparent 0%,
+            rgba(255, 255, 255, 0.55) 50%,
+            transparent 100%
+          );
+          transform: translateX(-120%);
+        }
+        .cta-shimmer:hover::after {
+          animation: shimmer 1s ease-in-out forwards;
+        }
+        .underline-input {
+          background: transparent;
+          border: none;
+          border-bottom: 1px solid rgba(159, 184, 201, 0.35);
+          transition: border-color 0.25s ease, box-shadow 0.25s ease;
+        }
+        .underline-input:focus {
+          outline: none;
+          border-bottom-color: #fbf676;
+          box-shadow: 0 1px 0 0 #fbf676;
+        }
+        .underline-input:disabled {
+          color: #9fb8c9;
+          border-bottom-style: dashed;
+          cursor: not-allowed;
+        }
+        .underline-select {
+          background: transparent;
+          border: none;
+          border-bottom: 1px solid rgba(159, 184, 201, 0.35);
+          transition: border-color 0.25s ease, box-shadow 0.25s ease;
+          appearance: none;
+          -webkit-appearance: none;
+        }
+        .underline-select:focus {
+          outline: none;
+          border-bottom-color: #fbf676;
+          box-shadow: 0 1px 0 0 #fbf676;
+        }
+        .underline-select:disabled {
+          color: #9fb8c9;
+          border-bottom-style: dashed;
+          cursor: not-allowed;
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .bull-line,
+          .bull-dot,
+          .fade-up,
+          .cta-shimmer::after {
+            animation: none !important;
+          }
+        }
+      `}</style>
+
+      {/* Left — brand / signature panel */}
+      <div
+        className="relative hidden md:flex flex-col justify-between overflow-hidden px-12 py-12"
+        style={{
+          background: 'linear-gradient(160deg, #081148 0%, #0C1A6B 50%, #05627C 130%)',
+        }}
+      >
+        <div
+          className="pointer-events-none absolute inset-0 opacity-[0.06]"
+          style={{
+            backgroundImage:
+              'linear-gradient(#FBF676 1px, transparent 1px), linear-gradient(90deg, #FBF676 1px, transparent 1px)',
+            backgroundSize: '48px 48px',
+          }}
+        ></div>
+
+        <Link href="/" className="relative z-10 w-fit">
+          <Image
+            src="/image.png"
+            alt="Big Bull Energies Logo"
+            width={168}
+            height={56}
+            className="h-11 w-auto"
+            priority
+          />
+        </Link>
+
+        <div className="relative z-10 max-w-md">
+          <p className="text-xs font-semibold tracking-[0.3em] uppercase mb-5" style={{ color: '#FBF676' }}>
+            New Member
+          </p>
+          <h1
+            className="text-4xl lg:text-[2.6rem] leading-[1.1] mb-5 text-[#F6F5EC]"
+            style={{ fontFamily: 'var(--font-display)', fontWeight: 500 }}
+          >
+            Take your position
+            <br />
+            before the market does.
+          </h1>
+          <p className="text-sm leading-relaxed text-[#9FB8C9] max-w-xs">
+            Set up your account in minutes — portfolio tracking, referral
+            network, and settlement all in one place.
+          </p>
+
+          <svg viewBox="0 0 420 160" className="mt-10 w-full max-w-md" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="lineGlowSignup" x1="0" y1="0" x2="1" y2="0">
+                <stop offset="0%" stopColor="#05627C" />
+                <stop offset="100%" stopColor="#FBF676" />
+              </linearGradient>
+            </defs>
+            {[30, 70, 110, 150].map((y) => (
+              <line key={y} x1="0" y1={y} x2="420" y2={y} stroke="#F6F5EC" strokeOpacity="0.06" />
+            ))}
+            <path
+              className="bull-line"
+              d="M0 130 L60 118 L100 132 L150 90 L190 100 L240 55 L290 68 L340 30 L420 12"
+              stroke="url(#lineGlowSignup)"
+              strokeWidth="2.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+            <circle className="bull-dot" cx="420" cy="12" r="4" fill="#FBF676" />
+          </svg>
+        </div>
+
+        <p className="relative z-10 text-xs text-[#9FB8C9]/70">© {new Date().getFullYear()} Big Bull Energies</p>
       </div>
-      
-      {/* Content - Made wider for better appearance */}
-      <div className="relative z-10 max-w-2xl w-full space-y-8 bg-gradient-to-br from-gray-900/95 via-gray-800/95 to-gray-900/95 backdrop-blur-sm rounded-2xl shadow-2xl p-8 border border-yellow-500/30">
-        <div>
-          <div className="flex justify-center mb-6">
+
+      {/* Right — form panel */}
+      <div
+        className="relative flex items-center justify-center px-6 py-14 sm:px-10"
+        style={{ backgroundColor: '#0C1A6B' }}
+      >
+        <div
+          className="pointer-events-none absolute inset-0 opacity-[0.05] md:hidden"
+          style={{
+            backgroundImage:
+              'linear-gradient(#FBF676 1px, transparent 1px), linear-gradient(90deg, #FBF676 1px, transparent 1px)',
+            backgroundSize: '48px 48px',
+          }}
+        ></div>
+
+        <div className="relative z-10 w-full max-w-2xl fade-up">
+          <div className="flex md:hidden justify-center mb-8">
             <Link href="/">
               <Image
                 src="/image.png"
-                alt="Crown Bankers Logo"
-                width={180}
-                height={60}
-                className="h-14 w-auto cursor-pointer hover:opacity-80 transition-opacity"
+                alt="Big Bull Energies Logo"
+                width={150}
+                height={50}
+                className="h-10 w-auto"
                 priority
               />
             </Link>
           </div>
-          <h2 className="text-center text-3xl font-extrabold mb-2">
-            <span className="bg-gradient-to-r from-yellow-300 via-yellow-400 to-yellow-600 bg-clip-text text-transparent">
-              Create your account
-            </span>
+
+          <p className="text-xs font-semibold tracking-[0.3em] uppercase mb-3" style={{ color: '#FBF676' }}>
+            Get Started
+          </p>
+          <h2
+            className="text-3xl mb-2 text-[#F6F5EC]"
+            style={{ fontFamily: 'var(--font-display)', fontWeight: 500 }}
+          >
+            Create your account
           </h2>
+
           {referrerFromUrl && (
-            <div className="mt-4 p-3 bg-gradient-to-r from-yellow-500/20 via-yellow-600/15 to-yellow-500/20 border-2 border-yellow-500/40 rounded-xl">
-              <p className="text-sm font-bold text-yellow-300 text-center">
-                ✓ You're signing up with a referral link! Referrer and position have been automatically set.
+            <div
+              className="mt-4 mb-2 border-l-2 px-4 py-3 rounded-r-md"
+              style={{ borderColor: '#FBF676', backgroundColor: 'rgba(251,246,118,0.08)' }}
+            >
+              <p className="text-sm font-medium" style={{ color: '#FBF676' }}>
+                You're signing up with a referral link — referrer and position have been set automatically.
               </p>
             </div>
           )}
-          <p className="mt-2 text-center text-sm text-gray-300">
+
+          <p className="text-sm text-[#9FB8C9] mb-9">
             Already have an account?{' '}
-            <a href="/login" className="font-semibold text-yellow-400 hover:text-yellow-300 transition-colors">
-              Sign in to existing account
+            <a href="/login" className="font-semibold transition-colors hover:opacity-80" style={{ color: '#FBF676' }}>
+              Sign in instead
             </a>
           </p>
-        </div>
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-          {error && (
-            <div className="bg-red-900/30 border-2 border-red-500/50 text-red-400 px-4 py-3 rounded-xl">
-              <p className="font-bold">{error}</p>
-            </div>
-          )}
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="md:col-span-2">
-              <label htmlFor="name" className="block text-sm font-bold text-yellow-400 mb-2">
-                Full Name
-              </label>
-              <input
-                id="name"
-                name="name"
-                type="text"
-                required
-                className="appearance-none relative block w-full px-4 py-3 border-2 border-yellow-500/40 placeholder-gray-500 text-white bg-gray-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-yellow-500/50 focus:border-yellow-500/70 transition-all sm:text-sm font-semibold"
-                placeholder="Enter your full name"
-                value={formData.name}
-                onChange={handleChange}
-              />
-            </div>
-
-            {isAdmin ? (
-              <>
-                <div>
-                  <label htmlFor="email" className="block text-sm font-bold text-yellow-400 mb-2">
-                    Email <span className="text-red-400">*</span>
-                  </label>
-                  <input
-                    id="email"
-                    name="email"
-                    type="email"
-                    required
-                    className="appearance-none relative block w-full px-4 py-3 border-2 border-yellow-500/40 placeholder-gray-500 text-white bg-gray-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-yellow-500/50 focus:border-yellow-500/70 transition-all sm:text-sm font-semibold"
-                    placeholder="Enter your email address"
-                    value={formData.email}
-                    onChange={handleChange}
-                  />
-                </div>
-                <div>
-                  <label htmlFor="phone" className="block text-sm font-bold text-yellow-400 mb-2">
-                    Phone (Optional)
-                  </label>
-                  <input
-                    id="phone"
-                    name="phone"
-                    type="tel"
-                    className="appearance-none relative block w-full px-4 py-3 border-2 border-yellow-500/40 placeholder-gray-500 text-white bg-gray-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-yellow-500/50 focus:border-yellow-500/70 transition-all sm:text-sm font-semibold"
-                    placeholder="Enter your phone number"
-                    value={formData.phone}
-                    onChange={handleChange}
-                  />
-                </div>
-              </>
-            ) : (
-              <>
-                <div>
-                  <label htmlFor="email" className="block text-sm font-bold text-yellow-400 mb-2">
-                    Email <span className="text-red-400">*</span>
-                  </label>
-                  <input
-                    id="email"
-                    name="email"
-                    type="email"
-                    className="appearance-none relative block w-full px-4 py-3 border-2 border-yellow-500/40 placeholder-gray-500 text-white bg-gray-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-yellow-500/50 focus:border-yellow-500/70 transition-all sm:text-sm font-semibold"
-                    placeholder="Enter your email address"
-                    value={formData.email}
-                    onChange={handleChange}
-                    required
-                  />
-                </div>
-                <div>
-                  <label htmlFor="phone" className="block text-sm font-bold text-yellow-400 mb-2">
-                    Phone <span className="text-red-400">*</span>
-                  </label>
-                  <input
-                    id="phone"
-                    name="phone"
-                    type="tel"
-                    className="appearance-none relative block w-full px-4 py-3 border-2 border-yellow-500/40 placeholder-gray-500 text-white bg-gray-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-yellow-500/50 focus:border-yellow-500/70 transition-all sm:text-sm font-semibold"
-                    placeholder="Enter your phone number"
-                    value={formData.phone}
-                    onChange={handleChange}
-                    required
-                  />
-                </div>
-                <div>
-                  <label htmlFor="country" className="block text-sm font-bold text-yellow-400 mb-2">
-                    Country <span className="text-red-400">*</span>
-                  </label>
-                  <select
-                    id="country"
-                    name="country"
-                    required
-                    className="appearance-none block w-full px-4 py-3 border-2 border-yellow-500/40 bg-gray-800 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-yellow-500/50 focus:border-yellow-500/70 sm:text-sm text-white font-semibold transition-all"
-                    value={formData.country}
-                    onChange={handleChange}
-                  >
-                    <option value="">Select your country</option>
-                    {countries.map((country) => (
-                      <option key={country.code} value={country.name} className="bg-gray-800">
-                        {country.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <div>
-                  <label htmlFor="referrerId" className="block text-sm font-bold text-yellow-400 mb-2">
-                    Referrer ID {referrerFromUrl && <span className="text-yellow-300">(From Link)</span>}
-                  </label>
-                  <input
-                    id="referrerId"
-                    name="referrerId"
-                    type="text"
-                    disabled={referrerFromUrl}
-                    className={`appearance-none relative block w-full px-4 py-3 border-2 placeholder-gray-500 bg-gray-800 rounded-xl focus:outline-none focus:ring-2 transition-all sm:text-sm font-semibold ${
-                      referrerFromUrl 
-                        ? 'bg-gray-700/50 cursor-not-allowed border-yellow-500/30 text-gray-400' 
-                        : referrerValidation.valid === true
-                        ? 'border-yellow-500/60 text-white focus:ring-yellow-500/50 focus:border-yellow-500/70'
-                        : referrerValidation.valid === false
-                        ? 'border-red-500/50 text-white focus:ring-red-500/50 focus:border-red-500/70'
-                        : 'border-yellow-500/40 text-white focus:ring-yellow-500/50 focus:border-yellow-500/70'
-                    }`}
-                    placeholder="CROWN-XXXXXX"
-                    value={formData.referrerId}
-                    onChange={handleChange}
-                  />
-                  {referrerFromUrl && (
-                    <p className="mt-1 text-xs font-bold text-yellow-300">
-                      Referrer ID was automatically filled from your referral link
-                    </p>
-                  )}
-                  {!referrerFromUrl && formData.referrerId && (
-                    <div className="mt-1">
-                      {referrerValidation.checking ? (
-                        <p className="text-xs text-gray-400 flex items-center font-semibold">
-                          <svg className="animate-spin h-3 w-3 mr-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                          </svg>
-                          Validating referrer ID...
-                        </p>
-                      ) : referrerValidation.valid === true ? (
-                        <p className="text-xs font-bold text-yellow-400 flex items-center">
-                          <svg className="h-3 w-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                          </svg>
-                          {referrerValidation.message}
-                        </p>
-                      ) : referrerValidation.valid === false ? (
-                        <p className="text-xs font-bold text-red-400 flex items-center">
-                          <svg className="h-3 w-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                          </svg>
-                          {referrerValidation.message}
-                        </p>
-                      ) : null}
-                    </div>
-                  )}
-                </div>
-                <div>
-                  <label htmlFor="position" className="block text-sm font-bold text-yellow-400 mb-2">
-                    Position {referrerFromUrl && <span className="text-yellow-300">(From Link)</span>}
-                  </label>
-                  <select
-                    id="position"
-                    name="position"
-                    disabled={referrerFromUrl}
-                    className={`appearance-none block w-full px-4 py-3 border-2 bg-gray-800 rounded-xl shadow-sm focus:outline-none focus:ring-2 sm:text-sm text-white font-semibold transition-all ${
-                      referrerFromUrl ? 'bg-gray-700/50 cursor-not-allowed border-yellow-500/30' : 'border-yellow-500/40 focus:ring-yellow-500/50 focus:border-yellow-500/70'
-                    }`}
-                    value={formData.position}
-                    onChange={handleChange}
-                  >
-                    <option value="left" className="bg-gray-800">Left</option>
-                    <option value="right" className="bg-gray-800">Right</option>
-                  </select>
-                  {referrerFromUrl && (
-                    <p className="mt-1 text-xs font-bold text-yellow-300">
-                      Position was automatically set from your referral link
-                    </p>
-                  )}
-                </div>
-              </>
+          <form className="space-y-7" onSubmit={handleSubmit}>
+            {error && (
+              <div className="border-l-2 border-red-400 bg-red-400/10 px-4 py-3 rounded-r-md">
+                <p className="text-sm font-medium text-red-300">{error}</p>
+              </div>
             )}
 
-            <div>
-              <label htmlFor="password" className="block text-sm font-bold text-yellow-400 mb-2">
-                Password <span className="text-red-400">*</span>
-              </label>
-              <div className="relative">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
+              <div className="md:col-span-2">
+                <label htmlFor="name" className={labelCls}>
+                  Full Name
+                </label>
                 <input
-                  id="password"
-                  name="password"
-                  type={showPassword ? "text" : "password"}
+                  id="name"
+                  name="name"
+                  type="text"
                   required
-                  minLength={8}
-                  className="appearance-none relative block w-full px-4 py-3 pr-12 border-2 border-yellow-500/40 placeholder-gray-500 text-white bg-gray-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-yellow-500/50 focus:border-yellow-500/70 transition-all sm:text-sm font-semibold"
-                  placeholder="Enter password (min 8 characters)"
-                  value={formData.password}
+                  className={inputCls}
+                  placeholder="Enter your full name"
+                  value={formData.name}
                   onChange={handleChange}
                 />
-                <button
-                  type="button"
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-yellow-400 focus:outline-none transition-colors"
-                  onClick={() => setShowPassword(!showPassword)}
-                  tabIndex={-1}
-                >
-                  {showPassword ? (
-                    <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
-                    </svg>
-                  ) : (
-                    <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                    </svg>
-                  )}
-                </button>
+              </div>
+
+              {isAdmin ? (
+                <>
+                  <div>
+                    <label htmlFor="email" className={labelCls}>
+                      Email <span style={{ color: '#f87171' }}>*</span>
+                    </label>
+                    <input
+                      id="email"
+                      name="email"
+                      type="email"
+                      required
+                      className={inputCls}
+                      placeholder="Enter your email address"
+                      value={formData.email}
+                      onChange={handleChange}
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="phone" className={labelCls}>
+                      Phone (Optional)
+                    </label>
+                    <input
+                      id="phone"
+                      name="phone"
+                      type="tel"
+                      className={inputCls}
+                      placeholder="Enter your phone number"
+                      value={formData.phone}
+                      onChange={handleChange}
+                    />
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div>
+                    <label htmlFor="email" className={labelCls}>
+                      Email <span style={{ color: '#f87171' }}>*</span>
+                    </label>
+                    <input
+                      id="email"
+                      name="email"
+                      type="email"
+                      className={inputCls}
+                      placeholder="Enter your email address"
+                      value={formData.email}
+                      onChange={handleChange}
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="phone" className={labelCls}>
+                      Phone <span style={{ color: '#f87171' }}>*</span>
+                    </label>
+                    <input
+                      id="phone"
+                      name="phone"
+                      type="tel"
+                      className={inputCls}
+                      placeholder="Enter your phone number"
+                      value={formData.phone}
+                      onChange={handleChange}
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="country" className={labelCls}>
+                      Country <span style={{ color: '#f87171' }}>*</span>
+                    </label>
+                    <select
+                      id="country"
+                      name="country"
+                      required
+                      className={`underline-select w-full py-2.5 text-sm font-medium text-[#F6F5EC] ${!formData.country ? 'text-[#9FB8C9]/50' : ''}`}
+                      value={formData.country}
+                      onChange={handleChange}
+                    >
+                      <option value="" className="bg-[#0C1A6B]">
+                        Select your country
+                      </option>
+                      {countries.map((country) => (
+                        <option key={country.code} value={country.name} className="bg-[#0C1A6B]">
+                          {country.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div>
+                    <label htmlFor="referrerId" className={labelCls}>
+                      Referrer ID {referrerFromUrl && <span style={{ color: '#FBF676' }}>(From Link)</span>}
+                    </label>
+                    <input
+                      id="referrerId"
+                      name="referrerId"
+                      type="text"
+                      disabled={referrerFromUrl}
+                      className={inputCls}
+                      style={
+                        !referrerFromUrl && referrerValidation.valid === false
+                          ? { borderBottomColor: '#f87171' }
+                          : !referrerFromUrl && referrerValidation.valid === true
+                          ? { borderBottomColor: '#FBF676' }
+                          : undefined
+                      }
+                      placeholder="BIGBULL-XXXXXX"
+                      value={formData.referrerId}
+                      onChange={handleChange}
+                    />
+                    {referrerFromUrl && (
+                      <p className="mt-1.5 text-xs font-medium" style={{ color: '#FBF676' }}>
+                        Referrer ID was automatically filled from your referral link
+                      </p>
+                    )}
+                    {!referrerFromUrl && formData.referrerId && (
+                      <div className="mt-1.5">
+                        {referrerValidation.checking ? (
+                          <p className="text-xs text-[#9FB8C9] flex items-center font-medium">
+                            <svg className="animate-spin h-3 w-3 mr-1.5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                            Validating referrer ID...
+                          </p>
+                        ) : referrerValidation.valid === true ? (
+                          <p className="text-xs font-medium flex items-center" style={{ color: '#FBF676' }}>
+                            <svg className="h-3 w-3 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                            </svg>
+                            {referrerValidation.message}
+                          </p>
+                        ) : referrerValidation.valid === false ? (
+                          <p className="text-xs font-medium text-red-300 flex items-center">
+                            <svg className="h-3 w-3 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                            {referrerValidation.message}
+                          </p>
+                        ) : null}
+                      </div>
+                    )}
+                  </div>
+                  <div>
+                    <label htmlFor="position" className={labelCls}>
+                      Position {referrerFromUrl && <span style={{ color: '#FBF676' }}>(From Link)</span>}
+                    </label>
+                    <select
+                      id="position"
+                      name="position"
+                      disabled={referrerFromUrl}
+                      className="underline-select w-full py-2.5 text-sm font-medium text-[#F6F5EC]"
+                      value={formData.position}
+                      onChange={handleChange}
+                    >
+                      <option value="left" className="bg-[#0C1A6B]">
+                        Left
+                      </option>
+                      <option value="right" className="bg-[#0C1A6B]">
+                        Right
+                      </option>
+                    </select>
+                    {referrerFromUrl && (
+                      <p className="mt-1.5 text-xs font-medium" style={{ color: '#FBF676' }}>
+                        Position was automatically set from your referral link
+                      </p>
+                    )}
+                  </div>
+                </>
+              )}
+
+              <div>
+                <label htmlFor="password" className={labelCls}>
+                  Password <span style={{ color: '#f87171' }}>*</span>
+                </label>
+                <div className="relative">
+                  <input
+                    id="password"
+                    name="password"
+                    type={showPassword ? 'text' : 'password'}
+                    required
+                    minLength={8}
+                    className={`${inputCls} pr-10`}
+                    placeholder="Min 8 characters"
+                    value={formData.password}
+                    onChange={handleChange}
+                  />
+                  <button
+                    type="button"
+                    className="absolute inset-y-0 right-0 flex items-center text-[#9FB8C9] hover:text-[#FBF676] focus:outline-none transition-colors"
+                    onClick={() => setShowPassword(!showPassword)}
+                    tabIndex={-1}
+                  >
+                    {showPassword ? (
+                      <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"
+                        />
+                      </svg>
+                    ) : (
+                      <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                        />
+                      </svg>
+                    )}
+                  </button>
+                </div>
+              </div>
+              <div>
+                <label htmlFor="confirmPassword" className={labelCls}>
+                  Confirm Password <span style={{ color: '#f87171' }}>*</span>
+                </label>
+                <div className="relative">
+                  <input
+                    id="confirmPassword"
+                    name="confirmPassword"
+                    type={showConfirmPassword ? 'text' : 'password'}
+                    required
+                    minLength={8}
+                    className={`${inputCls} pr-10`}
+                    placeholder="Re-enter your password"
+                    value={formData.confirmPassword}
+                    onChange={handleChange}
+                  />
+                  <button
+                    type="button"
+                    className="absolute inset-y-0 right-0 flex items-center text-[#9FB8C9] hover:text-[#FBF676] focus:outline-none transition-colors"
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    tabIndex={-1}
+                  >
+                    {showConfirmPassword ? (
+                      <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"
+                        />
+                      </svg>
+                    ) : (
+                      <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                        />
+                      </svg>
+                    )}
+                  </button>
+                </div>
               </div>
             </div>
-            <div>
-              <label htmlFor="confirmPassword" className="block text-sm font-bold text-yellow-400 mb-2">
-                Confirm Password <span className="text-red-400">*</span>
+
+            {/* <div className="flex items-center">
+              <input
+                id="is-admin"
+                name="is-admin"
+                type="checkbox"
+                className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded cursor-pointer"
+                checked={isAdmin}
+                onChange={(e) => setIsAdmin(e.target.checked)}
+              />
+              <label htmlFor="is-admin" className="ml-2 block text-sm font-medium text-black cursor-pointer">
+                Sign up as Admin
               </label>
-              <div className="relative">
-                <input
-                  id="confirmPassword"
-                  name="confirmPassword"
-                  type={showConfirmPassword ? "text" : "password"}
-                  required
-                  minLength={8}
-                  className="appearance-none relative block w-full px-4 py-3 pr-12 border-2 border-yellow-500/40 placeholder-gray-500 text-white bg-gray-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-yellow-500/50 focus:border-yellow-500/70 transition-all sm:text-sm font-semibold"
-                  placeholder="Confirm your password"
-                  value={formData.confirmPassword}
-                  onChange={handleChange}
-                />
-                <button
-                  type="button"
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-yellow-400 focus:outline-none transition-colors"
-                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  tabIndex={-1}
-                >
-                  {showConfirmPassword ? (
-                    <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
-                    </svg>
-                  ) : (
-                    <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                    </svg>
-                  )}
-                </button>
-              </div>
-            </div>
-          </div>
+            </div> */}
 
-          {/* <div className="flex items-center">
-            <input
-              id="is-admin"
-              name="is-admin"
-              type="checkbox"
-              className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded cursor-pointer"
-              checked={isAdmin}
-              onChange={(e) => setIsAdmin(e.target.checked)}
-            />
-            <label htmlFor="is-admin" className="ml-2 block text-sm font-medium text-black cursor-pointer">
-              Sign up as Admin
-            </label>
-          </div> */}
-
-          <div className="md:col-span-2">
             <button
               type="submit"
               disabled={loading}
-              className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-bold rounded-xl text-black bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-400 hover:to-yellow-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg shadow-yellow-500/30 hover:shadow-yellow-500/50 hover:scale-105 active:scale-95"
+              className="cta-shimmer relative overflow-hidden w-full flex justify-center items-center py-3.5 px-4 rounded-md text-sm font-semibold tracking-[0.08em] uppercase disabled:opacity-50 disabled:cursor-not-allowed transition-transform duration-200 hover:-translate-y-0.5"
+              style={{ backgroundColor: '#FBF676', color: '#0C1A6B' }}
             >
               {loading ? (
-                <span className="flex items-center">
-                  <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-black" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <span className="flex items-center normal-case tracking-normal">
+                  <svg
+                    className="animate-spin -ml-1 mr-3 h-4 w-4"
+                    style={{ color: '#0C1A6B' }}
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                    ></path>
                   </svg>
-                  Creating account...
+                  Creating account
                 </span>
               ) : (
                 'Create account'
               )}
             </button>
-          </div>
-        </form>
+          </form>
+        </div>
       </div>
     </div>
   );
@@ -525,9 +756,8 @@ function SignupContent() {
 
 export default function SignupPage() {
   return (
-    <Suspense fallback={<CrownLoader fullScreen />}>
+    <Suspense fallback={<BigBullLoader fullScreen />}>
       <SignupContent />
     </Suspense>
   );
 }
-

@@ -15,11 +15,11 @@ function getYouTubeEmbedParams(autoplay: boolean): string {
     params.set("mute", "1");
     params.set("playsinline", "1");
   }
-  params.set("modestbranding", "1");  // hide YouTube logo in controls
-  params.set("rel", "0");             // no related videos at end
-  params.set("showinfo", "0");        // hide title (legacy)
-  params.set("controls", "0");         // hide controls — raw video only
-  params.set("iv_load_policy", "3");   // hide annotations
+  params.set("modestbranding", "1"); // hide YouTube logo in controls
+  params.set("rel", "0"); // no related videos at end
+  params.set("showinfo", "0"); // hide title (legacy)
+  params.set("controls", "0"); // hide controls — raw video only
+  params.set("iv_load_policy", "3"); // hide annotations
   return params.toString();
 }
 
@@ -97,10 +97,14 @@ export default function GalleryPage() {
   const fetchGalleryItems = async () => {
     try {
       setLoading(true);
-      const params = selectedCategory ? `?category=${encodeURIComponent(selectedCategory)}` : "";
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://api.crownbankers.com/api/v1'}/gallery${params}`);
+      const params = selectedCategory
+        ? `?category=${encodeURIComponent(selectedCategory)}`
+        : "";
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL || "https://api.crownbankers.com/api/v1"}/gallery${params}`,
+      );
       const data = await response.json();
-      
+
       if (data.status === "success" && data.data) {
         console.table(data.data.items);
         setItems(data.data.items || []);
@@ -144,10 +148,10 @@ export default function GalleryPage() {
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-4xl mx-auto text-center">
             <div className="flex items-center justify-center gap-2 sm:gap-3 mb-4 sm:mb-6">
-              <div className="h-px w-8 sm:w-12" style={{ backgroundColor: "#042B19" }}></div>
+              <div className="h-px w-8 sm:w-12" style={{ backgroundColor: "#05627C" }}></div>
               <span
                 className="text-xs font-medium uppercase tracking-wide"
-                style={{ color: "#042B19" }}
+                style={{ color: "#05627C" }}
               >
                 GALLERY
               </span>
@@ -155,7 +159,7 @@ export default function GalleryPage() {
             <h1
               className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl 2xl:text-7xl font-normal leading-tight mb-4 sm:mb-6 px-2"
               style={{
-                color: "#042B19",
+                color: "#05627C",
                 fontFamily: "var(--font-font4), sans-serif",
               }}
             >
@@ -164,7 +168,7 @@ export default function GalleryPage() {
             <p
               className="text-sm sm:text-base md:text-lg lg:text-xl leading-relaxed max-w-2xl mx-auto px-2"
               style={{
-                color: "#042B19",
+                color: "#05627C",
                 fontFamily: "var(--font-font4), sans-serif",
               }}
             >
@@ -176,16 +180,19 @@ export default function GalleryPage() {
 
       {/* Category Filter */}
       {categories.length > 0 && (
-        <section className="relative w-full bg-white py-6 sm:py-8 border-b-2" style={{ borderColor: "#042B19", opacity: 0.9 }}>
+        <section
+          className="relative w-full bg-white py-6 sm:py-8 border-b-2"
+          style={{ borderColor: "#05627C", opacity: 0.9 }}
+        >
           <div className="container mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex items-center gap-2 sm:gap-4 flex-wrap justify-center">
-              <Filter className="w-5 h-5" style={{ color: "#042B19" }} />
+              <Filter className="w-5 h-5" style={{ color: "#05627C" }} />
               <button
                 onClick={() => setSelectedCategory("")}
                 className={`px-4 sm:px-6 py-2 rounded-lg text-sm sm:text-base font-medium transition ${
                   selectedCategory === ""
-                    ? "bg-[#042B19] text-white"
-                    : "bg-[#E8F5F0] text-[#042B19] hover:bg-[#042B19] hover:text-white"
+                    ? "bg-[#05627C] text-white"
+                    : "bg-[#E8F5F0] text-[#05627C] hover:bg-[#05627C] hover:text-white"
                 }`}
               >
                 All
@@ -196,8 +203,8 @@ export default function GalleryPage() {
                   onClick={() => setSelectedCategory(category)}
                   className={`px-4 sm:px-6 py-2 rounded-lg text-sm sm:text-base font-medium transition ${
                     selectedCategory === category
-                      ? "bg-[#042B19] text-white"
-                      : "bg-[#E8F5F0] text-[#042B19] hover:bg-[#042B19] hover:text-white"
+                      ? "bg-[#05627C] text-white"
+                      : "bg-[#E8F5F0] text-[#05627C] hover:bg-[#05627C] hover:text-white"
                   }`}
                 >
                   {category}
@@ -214,13 +221,20 @@ export default function GalleryPage() {
           {loading ? (
             <div className="flex items-center justify-center py-20">
               <div className="text-center">
-                <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2" style={{ borderColor: "#042B19" }}></div>
-                <p className="mt-4" style={{ color: "#042B19" }}>Loading gallery...</p>
+                <div
+                  className="inline-block animate-spin rounded-full h-12 w-12 border-b-2"
+                  style={{ borderColor: "#05627C" }}
+                ></div>
+                <p className="mt-4" style={{ color: "#05627C" }}>
+                  Loading gallery...
+                </p>
               </div>
             </div>
           ) : items.length === 0 ? (
             <div className="text-center py-20">
-              <p className="text-lg" style={{ color: "#042B19" }}>No gallery items found.</p>
+              <p className="text-lg" style={{ color: "#05627C" }}>
+                No gallery items found.
+              </p>
             </div>
           ) : (
             <>
@@ -230,7 +244,7 @@ export default function GalleryPage() {
                   <div key={category} className="mb-12 sm:mb-16">
                     <h2
                       className="text-2xl sm:text-3xl md:text-4xl font-bold mb-6 sm:mb-8"
-                      style={{ color: "#042B19" }}
+                      style={{ color: "#05627C" }}
                     >
                       {category}
                     </h2>
@@ -242,7 +256,13 @@ export default function GalleryPage() {
                         >
                           {item.mediaType === "video" ? (
                             <>
-                              <div className="absolute inset-0 w-full h-full" onClick={(e) => { e.stopPropagation(); handleItemClick(item); }}>
+                              <div
+                                className="absolute inset-0 w-full h-full"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleItemClick(item);
+                                }}
+                              >
                                 {isEmbeddableVideoUrl(item.mediaUrl) ? (
                                   <iframe
                                     src={getVideoEmbedUrl(item.mediaUrl, true)}
@@ -252,16 +272,34 @@ export default function GalleryPage() {
                                     title={item.title}
                                   />
                                 ) : (
-                                  <video src={item.mediaUrl} autoPlay muted loop playsInline controls className="w-full h-full object-contain bg-black" title={item.title} />
+                                  <video
+                                    src={item.mediaUrl}
+                                    autoPlay
+                                    muted
+                                    loop
+                                    playsInline
+                                    controls
+                                    className="w-full h-full object-contain bg-black"
+                                    title={item.title}
+                                  />
                                 )}
                               </div>
                               <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-3 pointer-events-none">
-                                <h3 className="text-white font-semibold text-sm">{item.title}</h3>
-                                {item.description && <p className="text-white/80 text-xs mt-0.5 line-clamp-2">{item.description}</p>}
+                                <h3 className="text-white font-semibold text-sm">
+                                  {item.title}
+                                </h3>
+                                {item.description && (
+                                  <p className="text-white/80 text-xs mt-0.5 line-clamp-2">
+                                    {item.description}
+                                  </p>
+                                )}
                               </div>
                             </>
                           ) : (
-                            <div onClick={() => handleItemClick(item)} className="cursor-pointer w-full h-full">
+                            <div
+                              onClick={() => handleItemClick(item)}
+                              className="cursor-pointer w-full h-full"
+                            >
                               <img
                                 src={item.mediaUrl}
                                 alt={item.title}
@@ -278,8 +316,14 @@ export default function GalleryPage() {
                                 }}
                               />
                               <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-4 opacity-0 group-hover:opacity-100 transition-opacity">
-                                <h3 className="text-white font-semibold text-sm sm:text-base">{item.title}</h3>
-                                {item.description && <p className="text-white/80 text-xs sm:text-sm mt-1 line-clamp-2">{item.description}</p>}
+                                <h3 className="text-white font-semibold text-sm sm:text-base">
+                                  {item.title}
+                                </h3>
+                                {item.description && (
+                                  <p className="text-white/80 text-xs sm:text-sm mt-1 line-clamp-2">
+                                    {item.description}
+                                  </p>
+                                )}
                               </div>
                             </div>
                           )}
@@ -297,7 +341,13 @@ export default function GalleryPage() {
                     >
                       {item.mediaType === "video" ? (
                         <>
-                          <div className="absolute inset-0 w-full h-full" onClick={(e) => { e.stopPropagation(); handleItemClick(item); }}>
+                          <div
+                            className="absolute inset-0 w-full h-full"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleItemClick(item);
+                            }}
+                          >
                             {isEmbeddableVideoUrl(item.mediaUrl) ? (
                               <iframe
                                 src={getVideoEmbedUrl(item.mediaUrl, true)}
@@ -307,16 +357,30 @@ export default function GalleryPage() {
                                 title={item.title}
                               />
                             ) : (
-                              <video src={item.mediaUrl} controls className="w-full h-full object-contain bg-black" title={item.title} />
+                              <video
+                                src={item.mediaUrl}
+                                controls
+                                className="w-full h-full object-contain bg-black"
+                                title={item.title}
+                              />
                             )}
                           </div>
                           <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-3 pointer-events-none">
-                            <h3 className="text-white font-semibold text-sm">{item.title}</h3>
-                            {item.description && <p className="text-white/80 text-xs mt-0.5 line-clamp-2">{item.description}</p>}
+                            <h3 className="text-white font-semibold text-sm">
+                              {item.title}
+                            </h3>
+                            {item.description && (
+                              <p className="text-white/80 text-xs mt-0.5 line-clamp-2">
+                                {item.description}
+                              </p>
+                            )}
                           </div>
                         </>
                       ) : (
-                        <div onClick={() => handleItemClick(item)} className="cursor-pointer w-full h-full">
+                        <div
+                          onClick={() => handleItemClick(item)}
+                          className="cursor-pointer w-full h-full"
+                        >
                           <img
                             src={item.mediaUrl}
                             alt={item.title}
@@ -333,8 +397,14 @@ export default function GalleryPage() {
                             }}
                           />
                           <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-4 opacity-0 group-hover:opacity-100 transition-opacity">
-                            <h3 className="text-white font-semibold text-sm sm:text-base">{item.title}</h3>
-                            {item.description && <p className="text-white/80 text-xs sm:text-sm mt-1 line-clamp-2">{item.description}</p>}
+                            <h3 className="text-white font-semibold text-sm sm:text-base">
+                              {item.title}
+                            </h3>
+                            {item.description && (
+                              <p className="text-white/80 text-xs sm:text-sm mt-1 line-clamp-2">
+                                {item.description}
+                              </p>
+                            )}
                           </div>
                         </div>
                       )}
@@ -353,18 +423,34 @@ export default function GalleryPage() {
           className="fixed inset-0 bg-black bg-opacity-90 z-50 flex items-center justify-center p-4"
           onClick={closeModal}
         >
-          <div className="max-w-6xl w-full max-h-[90vh] relative" onClick={(e) => e.stopPropagation()}>
+          <div
+            className="max-w-6xl w-full max-h-[90vh] relative"
+            onClick={(e) => e.stopPropagation()}
+          >
             <button
               onClick={closeModal}
               className="absolute top-4 right-4 z-10 w-10 h-10 bg-white/20 hover:bg-white/30 rounded-full flex items-center justify-center text-white transition"
             >
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              <svg
+                className="w-6 h-6"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
               </svg>
             </button>
             <div className="bg-white rounded-lg overflow-hidden">
               {selectedItem.mediaType === "video" ? (
-                <div className="relative w-full bg-black rounded-t-lg" style={{ paddingBottom: "56.25%" }}>
+                <div
+                  className="relative w-full bg-black rounded-t-lg"
+                  style={{ paddingBottom: "56.25%" }}
+                >
                   {isEmbeddableVideoUrl(selectedItem.mediaUrl) ? (
                     <iframe
                       key={`video-${selectedItem._id ?? selectedItem.id ?? selectedItem.mediaUrl}`}
@@ -393,13 +479,18 @@ export default function GalleryPage() {
                 />
               )}
               <div className="p-6">
-                <h3 className="text-2xl font-bold mb-2" style={{ color: "#042B19" }}>
+                <h3
+                  className="text-2xl font-bold mb-2"
+                  style={{ color: "#05627C" }}
+                >
                   {selectedItem.title}
                 </h3>
                 {selectedItem.description && (
-                  <p className="text-gray-700 mb-2">{selectedItem.description}</p>
+                  <p className="text-gray-700 mb-2">
+                    {selectedItem.description}
+                  </p>
                 )}
-                <span className="inline-block px-3 py-1 text-sm font-medium rounded-full bg-[#E8F5F0] text-[#042B19]">
+                <span className="inline-block px-3 py-1 text-sm font-medium rounded-full bg-[#E8F5F0] text-[#05627C]">
                   {selectedItem.category}
                 </span>
               </div>

@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { api } from '@/lib/api';
-import CrownLoader from '@/components/CrownLoader';
+import BigBullLoader from '@/components/BigBullLoader';
 
 interface Package {
   id: string;
@@ -239,15 +239,15 @@ export default function PlansPage() {
 
 
   if (loading) {
-    return <CrownLoader fullScreen />;
+    return <BigBullLoader fullScreen />;
   }
 
   return (
-    <div className="w-full bg-gradient-to-br from-black via-gray-900 to-black min-h-screen py-8 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+    <div className="w-full min-h-screen py-4 md:py-8 px-2 sm:px-4 md:px-6 lg:px-8 relative overflow-hidden">
       {/* Decorative background elements */}
       <div className="fixed inset-0 pointer-events-none opacity-20">
-        <div className="absolute top-0 right-1/4 w-96 h-96 bg-yellow-500/10 rounded-full blur-3xl"></div>
-        <div className="absolute bottom-0 left-1/4 w-96 h-96 bg-yellow-600/10 rounded-full blur-3xl"></div>
+        <div className="absolute top-0 right-1/4 w-96 h-96 bg-[#FBF676]/10 rounded-full blur-3xl"></div>
+        <div className="absolute bottom-0 left-1/4 w-96 h-96 bg-[#FBF676]/10 rounded-full blur-3xl"></div>
       </div>
 
       <div className="relative z-10">
@@ -259,8 +259,8 @@ export default function PlansPage() {
 
         {packages.length === 0 && !loading && (
           <div className="px-4 py-6 sm:px-0">
-            <div className="text-center py-12 bg-gradient-to-br from-gray-900/95 to-gray-800/95 backdrop-blur-sm rounded-2xl shadow-2xl border border-yellow-500/30">
-              <p className="text-gray-400 text-lg">No active packages available at the moment.</p>
+            <div className="text-center py-12 rounded-2xl shadow-2xl border border-[#FBF676]/25 backdrop-blur-md bg-[rgba(8,16,40,0.75)]">
+              <p className="text-white/55 text-lg">No active packages available at the moment.</p>
             </div>
           </div>
         )}
@@ -271,7 +271,7 @@ export default function PlansPage() {
               <h1 className="text-3xl font-extrabold text-white mb-2 flex items-center gap-3">
                 <span className="bg-gradient-to-r from-yellow-300 via-yellow-400 to-yellow-600 bg-clip-text text-transparent drop-shadow-lg">Investment Packages</span>
               </h1>
-              <p className="text-gray-400 text-sm">
+              <p className="text-white/55 text-sm">
                 Showing {packages.length} active package{packages.length !== 1 ? 's' : ''}
               </p>
             </div>
@@ -291,7 +291,7 @@ export default function PlansPage() {
                 const status = pkg.status || 'Active';
 
                 return (
-                  <div key={pkg.id} className="group relative bg-gradient-to-br from-gray-900/95 via-gray-800/95 to-gray-900/95 backdrop-blur-sm rounded-2xl shadow-2xl border border-yellow-500/30 hover:border-yellow-500/60 hover:shadow-yellow-500/20 transition-all duration-300 overflow-hidden p-6">
+                  <div key={pkg.id} className="group relative bg-gradient-to-br from-gray-900/95 via-gray-800/95 to-gray-900/95 backdrop-blur-sm rounded-2xl shadow-2xl border border-[#FBF676]/25 hover:border-[#FBF676]/60 hover:shadow-[#FBF676]/20 transition-all duration-300 overflow-hidden p-6">
                     {/* Animated gradient overlay on hover */}
                     <div className="absolute inset-0 bg-gradient-to-br from-yellow-500/0 via-yellow-500/0 to-yellow-500/0 group-hover:from-yellow-500/5 group-hover:via-yellow-500/10 group-hover:to-yellow-500/5 transition-all duration-500"></div>
 
@@ -299,7 +299,7 @@ export default function PlansPage() {
                       <div className="flex justify-between items-start mb-6">
                         <h3 className="text-2xl font-extrabold bg-gradient-to-r from-white via-yellow-100 to-white bg-clip-text text-transparent">{pkg.packageName}</h3>
                         <span className={`px-4 py-1.5 text-xs font-bold rounded-full shadow-lg ${status === 'Active'
-                          ? 'bg-gradient-to-r from-yellow-500/30 to-yellow-600/20 text-yellow-300 border border-yellow-500/50 shadow-yellow-500/20'
+                          ? 'bg-[rgba(251,246,118,0.15)] text-[#FBF676] border border-[#FBF676]/40'
                           : 'bg-red-900/40 text-red-400 border border-red-500/40'
                           }`}>
                           {status}
@@ -308,23 +308,23 @@ export default function PlansPage() {
 
                       <div className="space-y-4 mb-6">
                         {/* Investment Amount Range */}
-                        <div className="p-4 bg-gradient-to-r from-yellow-500/20 via-yellow-600/15 to-yellow-500/20 rounded-xl border-2 border-yellow-500/40 shadow-lg shadow-yellow-500/10">
-                          <p className="text-xs text-gray-400 mb-2 uppercase tracking-wider font-semibold">Investment Range</p>
+                        <div className="p-4 bg-[rgba(251,246,118,0.12)] rounded-xl border-2 border-[#FBF676]/40 shadow-lg shadow-[#FBF676]/15">
+                          <p className="text-xs text-white/55 mb-2 uppercase tracking-wider font-semibold">Investment Range</p>
                           <p className="text-2xl font-extrabold bg-gradient-to-r from-yellow-400 to-yellow-600 bg-clip-text text-transparent">
                             ${pkg.minAmount.toLocaleString()} - ${pkg.maxAmount.toLocaleString()}
                           </p>
                         </div>
 
                         {/* Duration */}
-                        <div className="flex justify-between items-center py-3 border-b border-yellow-500/20">
-                          <span className="text-sm font-semibold text-gray-300">Duration:</span>
+                        <div className="flex justify-between items-center py-3 border-b border-[#FBF676]/20">
+                          <span className="text-sm font-semibold text-white/75">Duration:</span>
                           <span className="text-sm font-bold text-white">{pkg.duration} days</span>
                         </div>
 
                         {/* Total Output Percentage */}
-                        <div className="flex justify-between items-center py-3 border-b border-yellow-500/20">
-                          <span className="text-sm font-semibold text-gray-300">Total Output:</span>
-                          <span className="text-lg font-extrabold text-yellow-400">
+                        <div className="flex justify-between items-center py-3 border-b border-[#FBF676]/20">
+                          <span className="text-sm font-semibold text-white/75">Total Output:</span>
+                          <span className="text-lg font-extrabold text-[#FBF676]">
                             {/* {pkg.roi !== undefined && pkg.roi !== null
                               ? `${((pkg.duration * pkg.roi) + renewablePrinciplePct).toFixed(2)}%`
                               : `${totalOutputPct}%`} */}
@@ -333,34 +333,34 @@ export default function PlansPage() {
                         </div>
 
                         {/* Daily ROI Rate */}
-                        <div className="flex justify-between items-center py-3 border-b border-yellow-500/20">
-                          <span className="text-sm font-semibold text-gray-300">Daily ROI Rate:</span>
+                        <div className="flex justify-between items-center py-3 border-b border-[#FBF676]/20">
+                          <span className="text-sm font-semibold text-white/75">Daily ROI Rate:</span>
                           <span className="text-sm font-bold text-yellow-300">
                             {pkg.roi ? `${pkg.roi}%` : `${(dailyRoiRate * 100).toFixed(4)}%`}
                           </span>
                         </div>
 
                         {/* Renewable Principle: Solar Starter 60%, others from package */}
-                        <div className="flex justify-between items-center py-3 border-b border-yellow-500/20">
-                          <span className="text-sm font-semibold text-gray-300">Renewable Principle:</span>
-                          <span className="text-sm font-bold text-yellow-400">{renewablePrinciplePct}%</span>
+                        <div className="flex justify-between items-center py-3 border-b border-[#FBF676]/20">
+                          <span className="text-sm font-semibold text-white/75">Renewable Principle:</span>
+                          <span className="text-sm font-bold text-[#FBF676]">{renewablePrinciplePct}%</span>
                         </div>
 
                         {/* Referral Bonus: rounded so 10.05% displays as 10% */}
-                        <div className="flex justify-between items-center py-3 border-b border-yellow-500/20">
-                          <span className="text-sm font-semibold text-gray-300">Referral Bonus:</span>
-                          <span className="text-sm font-bold text-yellow-400">{referralPct}%</span>
+                        <div className="flex justify-between items-center py-3 border-b border-[#FBF676]/20">
+                          <span className="text-sm font-semibold text-white/75">Referral Bonus:</span>
+                          <span className="text-sm font-bold text-[#FBF676]">{referralPct}%</span>
                         </div>
 
                         {/* Binary Bonus */}
-                        <div className="flex justify-between items-center py-3 border-b border-yellow-500/20">
-                          <span className="text-sm font-semibold text-gray-300">Binary Bonus:</span>
-                          <span className="text-sm font-bold text-yellow-400">{binaryPct}%</span>
+                        <div className="flex justify-between items-center py-3 border-b border-[#FBF676]/20">
+                          <span className="text-sm font-semibold text-white/75">Binary Bonus:</span>
+                          <span className="text-sm font-bold text-[#FBF676]">{binaryPct}%</span>
                         </div>
 
                         {/* Power Capacity / Capping Limit */}
                         <div className="flex justify-between items-center py-3">
-                          <span className="text-sm font-semibold text-gray-300">Power Capacity:</span>
+                          <span className="text-sm font-semibold text-white/75">Power Capacity:</span>
                           <span className="text-sm font-bold text-white">${powerCapacity.toLocaleString()}</span>
                         </div>
                       </div>
@@ -368,7 +368,7 @@ export default function PlansPage() {
                       <button
                         onClick={() => handleInvestNow(pkg)}
                         disabled={status !== 'Active'}
-                        className="w-full px-6 py-4 bg-gradient-to-r from-yellow-500 to-yellow-600 text-black rounded-xl hover:from-yellow-400 hover:to-yellow-500 disabled:opacity-50 disabled:cursor-not-allowed font-extrabold text-lg transition-all shadow-lg shadow-yellow-500/30 hover:shadow-yellow-500/50 hover:scale-105 active:scale-95 disabled:hover:scale-100"
+                        className="w-full px-6 py-4 bg-[#FBF676] text-[#0C1A6B] rounded-xl hover:bg-[#e8e04a] disabled:opacity-50 disabled:cursor-not-allowed font-extrabold text-lg transition-all shadow-lg shadow-[#FBF676]/25 hover:shadow-[#FBF676]/30 hover:scale-105 active:scale-95 disabled:hover:scale-100"
                       >
                         {status === 'Active' ? 'Invest Now' : 'Package Inactive'}
                       </button>
@@ -386,27 +386,27 @@ export default function PlansPage() {
         {/* Investment Modal */}
         {showInvestModal && selectedPackage && (
           <div className="fixed inset-0 bg-black/80 backdrop-blur-sm overflow-y-auto h-full w-full z-50">
-            <div className="relative top-20 mx-auto p-6 border border-yellow-500/30 w-full max-w-md shadow-2xl rounded-2xl bg-gradient-to-br from-gray-900/95 via-gray-800/95 to-gray-900/95 backdrop-blur-sm">
+            <div className="relative top-20 mx-auto p-6 border border-[#FBF676]/25 w-full max-w-md shadow-2xl rounded-2xl bg-gradient-to-br from-gray-900/95 via-gray-800/95 to-gray-900/95 backdrop-blur-sm">
               <div className="mt-3">
                 <h3 className="text-2xl font-extrabold text-white mb-6 flex items-center gap-2">
                   <span className="bg-gradient-to-r from-yellow-300 via-yellow-400 to-yellow-600 bg-clip-text text-transparent">Make Investment</span>
                 </h3>
 
-                <div className="mb-6 p-5 bg-gradient-to-r from-yellow-500/20 via-yellow-600/15 to-yellow-500/20 rounded-xl border-2 border-yellow-500/40 shadow-lg shadow-yellow-500/10">
+                <div className="mb-6 p-5 bg-[rgba(251,246,118,0.12)] rounded-xl border-2 border-[#FBF676]/40 shadow-lg shadow-[#FBF676]/15">
                   <h4 className="font-extrabold text-white mb-3 text-lg">{selectedPackage.packageName}</h4>
                   <div className="text-sm space-y-2">
                     <div className="flex justify-between">
-                      <span className="text-gray-300 font-semibold">Amount Range:</span>
-                      <span className="font-bold text-yellow-400">${selectedPackage.minAmount.toLocaleString()} - ${selectedPackage.maxAmount.toLocaleString()}</span>
+                      <span className="text-white/75 font-semibold">Amount Range:</span>
+                      <span className="font-bold text-[#FBF676]">${selectedPackage.minAmount.toLocaleString()} - ${selectedPackage.maxAmount.toLocaleString()}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-gray-300 font-semibold">Duration:</span>
+                      <span className="text-white/75 font-semibold">Duration:</span>
                       <span className="font-bold text-white">{selectedPackage.duration} days</span>
                     </div>
                     <div className="flex justify-between items-start">
-                      <span className="text-gray-300 font-semibold mt-1">Total Output:</span>
+                      <span className="text-white/75 font-semibold mt-1">Total Output:</span>
                       <div className="text-right">
-                        <span className="font-bold text-yellow-400 block">
+                        <span className="font-bold text-[#FBF676] block">
                           {(() => {
                             const renewablePct = selectedPackage.packageName === 'Solar Starter' ? 60 : (selectedPackage.renewablePrinciplePct ?? selectedPackage.principleReturn ?? 60);
                             return selectedPackage.roi !== undefined && selectedPackage.roi !== null
@@ -415,7 +415,7 @@ export default function PlansPage() {
                           })()}%
                         </span>
                         {selectedPackage.roi !== undefined && selectedPackage.roi !== null && (
-                          <span className="text-xs text-gray-400 block mt-0.5">
+                          <span className="text-xs text-white/55 block mt-0.5">
                             ({selectedPackage.roi}% × {selectedPackage.duration} days + {(selectedPackage.packageName === 'Solar Starter' ? 60 : (selectedPackage.renewablePrinciplePct ?? selectedPackage.principleReturn ?? 60))}% Capital Back)
                           </span>
                         )}
@@ -426,21 +426,21 @@ export default function PlansPage() {
 
                 {/* Voucher Selection */}
                 {loadingVouchers ? (
-                  <div className="mb-6 p-4 bg-gray-800/50 rounded-xl border border-gray-700">
-                    <p className="text-sm text-gray-400">Loading vouchers...</p>
+                  <div className="mb-6 p-4 bg-[#081028] rounded-xl border border-gray-700">
+                    <p className="text-sm text-white/55">Loading vouchers...</p>
                   </div>
                 ) : availableVouchers.length > 0 ? (
-                  <div className="mb-6 p-5 bg-gradient-to-br from-yellow-500/10 to-yellow-600/5 rounded-xl border border-yellow-500/30">
-                    <label className="block text-sm font-bold text-yellow-400 mb-3">
+                  <div className="mb-6 p-5 bg-[rgba(251,246,118,0.12)] rounded-xl border border-[#FBF676]/25">
+                    <label className="block text-sm font-bold text-[#FBF676] mb-3">
                       Use Voucher (Optional)
                     </label>
-                    <p className="text-xs text-gray-400 mb-3">
+                    <p className="text-xs text-white/55 mb-3">
                       💡 Tip: To use a voucher, you must invest at least 2x the voucher purchase amount. A $100 voucher requires a minimum investment of $200.
                     </p>
                     <select
                       value={selectedVoucherId || ''}
                       onChange={(e) => setSelectedVoucherId(e.target.value || null)}
-                      className="w-full px-4 py-3 border border-yellow-500/40 rounded-xl text-white bg-gray-800 focus:outline-none focus:ring-2 focus:ring-yellow-500/50 focus:border-yellow-500/70 mb-3 font-semibold"
+                      className="w-full px-4 py-3 border border-[#FBF676]/40 rounded-xl text-white bg-gray-800 focus:outline-none focus:ring-2 focus:ring-[#FBF676]/40 focus:border-[#FBF676]/70 mb-3 font-semibold"
                     >
                       <option value="">No voucher</option>
                       {availableVouchers.map((voucher: any) => {
@@ -465,16 +465,16 @@ export default function PlansPage() {
 
                         return (
                           <div className="text-sm space-y-3">
-                            <div className="flex justify-between p-2 bg-gray-800/50 rounded-lg">
-                              <span className="text-gray-300 font-semibold">Voucher Purchase Amount:</span>
+                            <div className="flex justify-between p-2 bg-[#081028] rounded-lg">
+                              <span className="text-white/75 font-semibold">Voucher Purchase Amount:</span>
                               <span className="font-bold text-white">${voucherPurchaseAmount.toLocaleString()}</span>
                             </div>
-                            <div className="flex justify-between p-2 bg-gray-800/50 rounded-lg">
-                              <span className="text-gray-300 font-semibold">Voucher Investment Value:</span>
-                              <span className="font-bold text-yellow-400">${voucherInvestmentValue.toLocaleString()}</span>
+                            <div className="flex justify-between p-2 bg-[#081028] rounded-lg">
+                              <span className="text-white/75 font-semibold">Voucher Investment Value:</span>
+                              <span className="font-bold text-[#FBF676]">${voucherInvestmentValue.toLocaleString()}</span>
                             </div>
-                            <div className="flex justify-between p-2 bg-gray-800/50 rounded-lg">
-                              <span className="text-gray-300 font-semibold">Your Investment Amount:</span>
+                            <div className="flex justify-between p-2 bg-[#081028] rounded-lg">
+                              <span className="text-white/75 font-semibold">Your Investment Amount:</span>
                               <span className="font-bold text-white">${investmentAmount.toLocaleString()}</span>
                             </div>
                             {!meetsMinimumRequirement && investmentAmount > 0 ? (
@@ -490,8 +490,8 @@ export default function PlansPage() {
                                 </div>
                               </div>
                             ) : meetsMinimumRequirement && investmentAmount > 0 && voucherInvestmentValue >= investmentAmount ? (
-                              <div className="p-4 bg-gradient-to-r from-yellow-500/20 to-yellow-600/15 border border-yellow-500/40 rounded-xl">
-                                <div className="text-yellow-400 font-bold flex items-center mb-2">
+                              <div className="p-4 bg-[rgba(251,246,118,0.12)] border border-[#FBF676]/40 rounded-xl">
+                                <div className="text-[#FBF676] font-bold flex items-center mb-2">
                                   <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
                                     <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                                   </svg>
@@ -502,9 +502,9 @@ export default function PlansPage() {
                                 </div>
                               </div>
                             ) : meetsMinimumRequirement && investmentAmount > voucherInvestmentValue ? (
-                              <div className="space-y-2 p-3 bg-gray-800/50 rounded-lg">
+                              <div className="space-y-2 p-3 bg-[#081028] rounded-lg">
                                 <div className="flex justify-between">
-                                  <span className="text-gray-300 font-semibold">After Voucher:</span>
+                                  <span className="text-white/75 font-semibold">After Voucher:</span>
                                   <span className="font-bold text-white">${remainingAmount.toLocaleString()}</span>
                                 </div>
                                 {useMainWallet && mainWalletBalance !== null && mainWalletBalance > 0 && (() => {
@@ -513,20 +513,20 @@ export default function PlansPage() {
                                   return (
                                     <>
                                       <div className="flex justify-between border-t border-gray-700 pt-2 mt-2">
-                                        <span className="text-gray-300 font-semibold">Main Wallet:</span>
+                                        <span className="text-white/75 font-semibold">Main Wallet:</span>
                                         <span className="font-bold text-blue-400">-${mainWalletToUse.toLocaleString()}</span>
                                       </div>
-                                      <div className="flex justify-between border-t-2 border-yellow-500/50 pt-2 mt-2">
-                                        <span className="text-yellow-400 font-bold">Amount to Pay:</span>
-                                        <span className="font-bold text-yellow-400 text-lg">${finalPayment.toLocaleString()}</span>
+                                      <div className="flex justify-between border-t-2 border-[#FBF676]/50 pt-2 mt-2">
+                                        <span className="text-[#FBF676] font-bold">Amount to Pay:</span>
+                                        <span className="font-bold text-[#FBF676] text-lg">${finalPayment.toLocaleString()}</span>
                                       </div>
                                     </>
                                   );
                                 })()}
                                 {(!useMainWallet || !mainWalletBalance || mainWalletBalance === 0) && (
-                                  <div className="flex justify-between border-t-2 border-yellow-500/50 pt-2 mt-2">
-                                    <span className="text-yellow-400 font-bold">Amount to Pay:</span>
-                                    <span className="font-bold text-yellow-400 text-lg">${remainingAmount.toLocaleString()}</span>
+                                  <div className="flex justify-between border-t-2 border-[#FBF676]/50 pt-2 mt-2">
+                                    <span className="text-[#FBF676] font-bold">Amount to Pay:</span>
+                                    <span className="font-bold text-[#FBF676] text-lg">${remainingAmount.toLocaleString()}</span>
                                   </div>
                                 )}
                                 {!useMainWallet && mainWalletBalance !== null && mainWalletBalance > 0 && (
@@ -543,8 +543,8 @@ export default function PlansPage() {
                     })()}
                   </div>
                 ) : (
-                  <div className="mb-6 p-4 bg-gray-800/50 rounded-xl border border-gray-700">
-                    <p className="text-sm text-gray-400">No active vouchers available. <a href="/vouchers" className="text-yellow-400 hover:text-yellow-300 hover:underline font-semibold">Create one?</a></p>
+                  <div className="mb-6 p-4 bg-[#081028] rounded-xl border border-gray-700">
+                    <p className="text-sm text-white/55">No active vouchers available. <a href="/vouchers" className="text-[#FBF676] hover:text-[#FBF676] hover:underline font-semibold">Create one?</a></p>
                   </div>
                 )}
 
@@ -562,7 +562,7 @@ export default function PlansPage() {
                         <span className="text-sm font-bold text-white">
                           Use Main Wallet Balance
                         </span>
-                        <p className="text-xs text-gray-300 mt-1">
+                        <p className="text-xs text-white/75 mt-1">
                           Available: <span className="font-semibold text-blue-400">${mainWalletBalance.toFixed(2)}</span> • This amount can only be used to activate investment packages
                         </p>
                         {useMainWallet && investAmount && !isNaN(parseFloat(investAmount)) && (() => {
@@ -575,8 +575,8 @@ export default function PlansPage() {
                           return (
                             <div className="mt-3 text-sm">
                               {voucherValue > 0 && (
-                                <div className="mb-2 p-2 bg-gray-800/50 rounded-lg">
-                                  <span className="text-gray-300">After voucher coverage:</span>
+                                <div className="mb-2 p-2 bg-[#081028] rounded-lg">
+                                  <span className="text-white/75">After voucher coverage:</span>
                                   <span className="font-semibold text-white ml-2">${amountAfterVoucher.toFixed(2)}</span>
                                 </div>
                               )}
@@ -613,7 +613,7 @@ export default function PlansPage() {
                     min={selectedPackage.minAmount}
                     max={selectedPackage.maxAmount}
                     step="0.01"
-                    className="w-full px-4 py-3 border border-yellow-500/40 rounded-xl text-white bg-gray-800 focus:outline-none focus:ring-2 focus:ring-yellow-500/50 focus:border-yellow-500/70 font-semibold"
+                    className="w-full px-4 py-3 border border-[#FBF676]/40 rounded-xl text-white bg-gray-800 focus:outline-none focus:ring-2 focus:ring-[#FBF676]/40 focus:border-[#FBF676]/70 font-semibold"
                     placeholder={`Enter amount (${selectedPackage.minAmount} - ${selectedPackage.maxAmount})`}
                   />
                   {investAmount && !isNaN(parseFloat(investAmount)) && !selectedVoucherId && (() => {
@@ -624,21 +624,21 @@ export default function PlansPage() {
                     const finalPayment = investmentAmount - mainWalletToUse;
                     
                     return (
-                      <div className="mt-4 p-4 bg-gray-800/50 rounded-xl border border-gray-700">
+                      <div className="mt-4 p-4 bg-[#081028] rounded-xl border border-gray-700">
                         <div className="text-sm space-y-2">
                           <div className="flex justify-between">
-                            <span className="text-gray-300 font-semibold">Investment Amount:</span>
+                            <span className="text-white/75 font-semibold">Investment Amount:</span>
                             <span className="font-bold text-white">${investmentAmount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                           </div>
                           {useMainWallet && mainWalletToUse > 0 && (
                             <div className="flex justify-between border-t border-gray-700 pt-2">
-                              <span className="text-gray-300 font-semibold">Main Wallet Applied:</span>
+                              <span className="text-white/75 font-semibold">Main Wallet Applied:</span>
                               <span className="font-bold text-blue-400">-${mainWalletToUse.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                             </div>
                           )}
-                          <div className="flex justify-between border-t-2 border-yellow-500/50 pt-2">
-                            <span className="text-yellow-400 font-bold">Amount to Pay:</span>
-                            <span className="font-bold text-yellow-400 text-lg">${finalPayment.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                          <div className="flex justify-between border-t-2 border-[#FBF676]/50 pt-2">
+                            <span className="text-[#FBF676] font-bold">Amount to Pay:</span>
+                            <span className="font-bold text-[#FBF676] text-lg">${finalPayment.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                           </div>
                         </div>
                       </div>
@@ -663,15 +663,15 @@ export default function PlansPage() {
 
                     if (!meetsMinimumRequirement && investmentAmount > 0) {
                       return (
-                        <div className="mb-6 p-4 bg-yellow-500/10 border border-yellow-500/40 rounded-xl">
-                          <div className="text-yellow-400 text-sm font-bold flex items-center mb-2">
+                        <div className="mb-6 p-4 bg-[#FBF676]/10 border border-[#FBF676]/40 rounded-xl">
+                          <div className="text-[#FBF676] text-sm font-bold flex items-center mb-2">
                             <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
                               <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
                             </svg>
                             Warning: Minimum Investment Required
                           </div>
                           <div className="text-xs text-yellow-300 mt-1">
-                            To use this ${voucherPurchaseAmount.toLocaleString()} voucher, you must invest at least <strong className="text-yellow-400">${minimumInvestmentRequired.toLocaleString()}</strong> (2x the voucher purchase amount).
+                            To use this ${voucherPurchaseAmount.toLocaleString()} voucher, you must invest at least <strong className="text-[#FBF676]">${minimumInvestmentRequired.toLocaleString()}</strong> (2x the voucher purchase amount).
                           </div>
                         </div>
                       );
@@ -690,7 +690,7 @@ export default function PlansPage() {
                       setUseMainWallet(false);
                       setError('');
                     }}
-                    className="px-6 py-3 text-sm font-semibold text-gray-300 bg-gray-700 rounded-xl hover:bg-gray-600 transition-colors"
+                    className="px-6 py-3 text-sm font-semibold text-white/75 bg-gray-700 rounded-xl hover:bg-gray-600 transition-colors"
                   >
                     Cancel
                   </button>
@@ -709,7 +709,7 @@ export default function PlansPage() {
                       }
                       return false;
                     })()}
-                    className="px-6 py-3 text-sm font-bold text-black bg-gradient-to-r from-yellow-500 to-yellow-600 rounded-xl hover:from-yellow-400 hover:to-yellow-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg shadow-yellow-500/30 hover:shadow-yellow-500/50 hover:scale-105 active:scale-95 disabled:hover:scale-100"
+                    className="px-6 py-3 text-sm font-bold text-black bg-[#FBF676] rounded-xl hover:bg-[#e8e04a] disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg shadow-[#FBF676]/25 hover:shadow-[#FBF676]/30 hover:scale-105 active:scale-95 disabled:hover:scale-100"
                   >
                     {creatingPayment ? 'Creating Payment...' : 'Proceed to Payment'}
                   </button>

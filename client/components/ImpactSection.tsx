@@ -40,7 +40,7 @@ export default function ImpactSection() {
           {/* Dark Green Text Box */}
           <div
             className="p-6 sm:p-8 md:p-10 lg:p-12 mb-4 sm:mb-6"
-            style={{ backgroundColor: "#042B19" }}
+            style={{ backgroundColor: "#05627C" }}
           >
             <p
               className="text-xs sm:text-sm font-medium mb-3 sm:mb-4 uppercase tracking-wide"
@@ -65,7 +65,7 @@ export default function ImpactSection() {
             className="inline-flex items-center justify-center w-full sm:w-auto px-6 sm:px-8 py-3 sm:py-4 text-xs sm:text-sm md:text-base font-bold uppercase tracking-wide transition-all duration-300 hover:scale-105 hover:shadow-lg group"
             style={{
               backgroundColor: "#ffcf0B",
-              color: "#042B19",
+              color: "#05627C",
             }}
           >
             <span className="transition-transform duration-300 group-hover:translate-x-1">

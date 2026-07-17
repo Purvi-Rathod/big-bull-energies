@@ -30,7 +30,7 @@ const VoucherExpiredEmail: React.FC<VoucherExpiredEmailProps> = ({
 }) => (
   <Html lang="en" dir="ltr">
     <Head>
-      <title>Voucher Expired - CROWN</title>
+      <title>Voucher Expired - BIG BULL</title>
       <Font
         fontFamily="Roboto"
         fallbackFontFamily="Verdana"
@@ -90,7 +90,7 @@ const VoucherExpiredEmail: React.FC<VoucherExpiredEmailProps> = ({
         </Row>
         <Row>
           <Text style={{ color: '#6b7280', fontSize: '14px', lineHeight: '20px', marginTop: '16px' }}>
-            Thank you for using CROWN!
+            Thank you for using BIG BULL!
           </Text>
         </Row>
       </Section>

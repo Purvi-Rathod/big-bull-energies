@@ -9,7 +9,7 @@
  * 5. Identifies miscalculations and generates action report
  * 
  * Usage: npx ts-node -r dotenv/config src/scripts/diagnoseBinaryTree.ts [userId]
- * Example: npx ts-node -r dotenv/config src/scripts/diagnoseBinaryTree.ts CROWN-000282
+ * Example: npx ts-node -r dotenv/config src/scripts/diagnoseBinaryTree.ts BIGBULL-000282
  */
 
 import mongoose from "mongoose";
@@ -130,7 +130,7 @@ async function getAllDownlines(
   }
   
   // Check if admin (can have unlimited children via parent relationship)
-  const isAdmin = (user as any)?.userId === "CROWN-000000" || (user as any)?.userId === "CNEOX-000000";
+  const isAdmin = (user as any)?.userId === "BIGBULL-000000" || (user as any)?.userId === "CROWN-000000" || (user as any)?.userId === "CNEOX-000000";
   
   if (isAdmin) {
     // For admin, get all children via parent relationship
@@ -274,7 +274,7 @@ async function calculateExpectedBusinessVolume(
   let rightCount = 0;
   
   // Check if admin
-  const isAdmin = (user as any)?.userId === "CROWN-000000" || (user as any)?.userId === "CNEOX-000000";
+  const isAdmin = (user as any)?.userId === "BIGBULL-000000" || (user as any)?.userId === "CROWN-000000" || (user as any)?.userId === "CNEOX-000000";
   
   if (isAdmin) {
     // For admin, get all children via parent relationship
@@ -611,7 +611,7 @@ async function generateDiagnosticReport(rootUserId: string): Promise<DiagnosticR
   // Find root user
   let rootUser = await User.findOne({ userId: rootUserId }).lean();
   if (!rootUser && !rootUserId.includes('-')) {
-    rootUser = await User.findOne({ userId: `CROWN-${rootUserId}` }).lean();
+    rootUser = await User.findOne({ userId: `BIGBULL-${rootUserId}` }).lean();
   }
   if (!rootUser) {
     throw new Error(`User ${rootUserId} not found`);
@@ -1076,7 +1076,7 @@ async function disconnectDB() {
 }
 
 async function main() {
-  const userId = process.argv[2] || 'CROWN-000282';
+  const userId = process.argv[2] || 'BIGBULL-000282';
 
   try {
     await connectDB();

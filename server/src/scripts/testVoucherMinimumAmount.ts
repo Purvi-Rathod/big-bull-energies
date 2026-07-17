@@ -18,7 +18,7 @@ const MONGODB_URI = process.env.MONGODB_URL_DEVELOPMENT || process.env.MONGODB_U
 const API_BASE = process.env.API_URL || process.env.NEXT_PUBLIC_API_URL || "https://api.crownbankers.com";
 const API_BASE_URL = `${API_BASE}/api/v1`;
 
-const TEST_USER_ID = "CROWN-000018";
+const TEST_USER_ID = "BIGBULL-000018";
 const TEST_USER_PASSWORD = "Test@123";
 
 // Helper to get auth token

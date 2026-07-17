@@ -608,7 +608,7 @@ export const getUserReports = asyncHandler(async (req, res) => {
     referralInvestmentMap.set(inv._id.toString(), inv);
   });
 
-  // Get source users from meta field (meta.fromUser can be ObjectId string or userId like CROWN-000097)
+  // Get source users from meta field (meta.fromUser can be ObjectId string or userId like BIGBULL-000097)
   const referralSourceUserIds = referralTransactions
     .map((tx) => tx.meta?.fromUser)
     .filter((id): id is string => !!id);
@@ -1459,8 +1459,8 @@ export const updateWalletAddress = asyncHandler(async (req, res) => {
   }
 
   // Check if user is trying to update an existing wallet address
-  // Only allow if it's an admin request (check if req.admin exists or user is CROWN-000000 or CNEOX-000000)
-  const isAdminRequest = (req as any).admin !== undefined || currentUser.userId === "CROWN-000000" || currentUser.userId === "CNEOX-000000";
+  // Only allow if it's an admin request (check if req.admin exists or user is BIGBULL-000000 or CNEOX-000000)
+  const isAdminRequest = (req as any).admin !== undefined || currentUser.userId === "BIGBULL-000000" || currentUser.userId === "CROWN-000000" || currentUser.userId === "CNEOX-000000";
   
   if (walletAddress && currentUser.walletAddress && currentUser.walletAddress.trim().length > 0) {
     if (!isAdminRequest) {
@@ -1543,7 +1543,7 @@ export const updateUserProfile = asyncHandler(async (req, res) => {
     
     if (emailChanged) {
       // Check if this is an admin request
-      const isAdminRequest = (req as any).admin !== undefined || currentUser.userId === "CROWN-000000" || currentUser.userId === "CNEOX-000000";
+      const isAdminRequest = (req as any).admin !== undefined || currentUser.userId === "BIGBULL-000000" || currentUser.userId === "CROWN-000000" || currentUser.userId === "CNEOX-000000";
       
       if (!isAdminRequest) {
         throw new AppError(
@@ -1566,7 +1566,7 @@ export const updateUserProfile = asyncHandler(async (req, res) => {
         updateData.email = undefined;
       } else {
         // Regular users cannot clear their email
-        const isAdminRequest = (req as any).admin !== undefined || currentUser.userId === "CROWN-000000" || currentUser.userId === "CNEOX-000000";
+        const isAdminRequest = (req as any).admin !== undefined || currentUser.userId === "BIGBULL-000000" || currentUser.userId === "CROWN-000000" || currentUser.userId === "CNEOX-000000";
         if (!isAdminRequest) {
           throw new AppError(
             "Email address cannot be removed. Please contact admin support.",
@@ -1602,7 +1602,7 @@ export const updateUserProfile = asyncHandler(async (req, res) => {
     }
 
     // Check if user is trying to update an existing wallet address
-    const isAdminRequest = (req as any).admin !== undefined || currentUser.userId === "CROWN-000000";
+    const isAdminRequest = (req as any).admin !== undefined || currentUser.userId === "BIGBULL-000000";
     
     if (currentUser.walletAddress && currentUser.walletAddress.trim().length > 0) {
       if (!isAdminRequest) {

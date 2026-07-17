@@ -34,7 +34,7 @@ export default function RemoveFundsPage() {
     description: '',
   });
   const [userSearch, setUserSearch] = useState('');
-  const [userSearchUseCrownPrefix, setUserSearchUseCrownPrefix] = useState(true);
+  const [userSearchUseBigBullPrefix, setUserSearchUseBigBullPrefix] = useState(true);
   const [searching, setSearching] = useState(false);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const hasFetchedRef = useRef(false);
@@ -69,7 +69,7 @@ export default function RemoveFundsPage() {
 
     setSearching(true);
     try {
-      const response = await api.getAdminUsers({ page: 1, limit: 100, search: getEffectiveUserSearch(userSearch, userSearchUseCrownPrefix) });
+      const response = await api.getAdminUsers({ page: 1, limit: 100, search: getEffectiveUserSearch(userSearch, userSearchUseBigBullPrefix) });
       if (response.data?.users && response.data.users.length > 0) {
         const users = response.data.users;
         setUsers(users);
@@ -171,8 +171,8 @@ export default function RemoveFundsPage() {
               <AdminUserSearchInput
                 value={userSearch}
                 onChange={setUserSearch}
-                useCrownPrefix={userSearchUseCrownPrefix}
-                onUseCrownPrefixChange={setUserSearchUseCrownPrefix}
+                useBigBullPrefix={userSearchUseBigBullPrefix}
+                onUseBigBullPrefixChange={setUserSearchUseBigBullPrefix}
                 className="flex-1"
                 onKeyDown={(e) => {
                   if (e.key === 'Enter') {

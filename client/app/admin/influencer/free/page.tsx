@@ -176,7 +176,7 @@ export default function FreeAccountPage() {
   const targetValid = !isNaN(targetNum) && targetNum >= 0;
 
   const handleUserIdChange = (value: string) => {
-    const v = value.toUpperCase().replace(/^CROWN-/, '').trim();
+    const v = value.toUpperCase().replace(/^BIGBULL-/, '').trim();
     setUserId(v);
   };
 
@@ -187,7 +187,7 @@ export default function FreeAccountPage() {
       toast.error('Please enter User ID number');
       return;
     }
-    const idToSend = `CROWN-${trimmedUserId}`;
+    const idToSend = `BIGBULL-${trimmedUserId}`;
     if (!selectedPackageId || !selectedPackage) {
       toast.error('Please select a package');
       return;
@@ -274,7 +274,7 @@ export default function FreeAccountPage() {
             Existing User ID <span className="text-red-500">*</span>
           </label>
           <div className="flex items-center w-full rounded-md border border-gray-300 bg-white focus-within:ring-2 focus-within:ring-indigo-500">
-            <span className="inline-flex items-center pl-4 text-gray-600 font-mono border-r border-gray-300 bg-gray-50 rounded-l-md py-2">CROWN-</span>
+            <span className="inline-flex items-center pl-4 text-gray-600 font-mono border-r border-gray-300 bg-gray-50 rounded-l-md py-2">BIGBULL-</span>
             <input
               type="text"
               value={userId}

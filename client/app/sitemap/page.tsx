@@ -31,16 +31,22 @@ export default function SitemapPage() {
     <div className="min-h-screen bg-gray-50" style={{ paddingTop: "156px" }}>
       <div className="container mx-auto px-4 py-16">
         <div className="max-w-4xl mx-auto">
-          <h1 className="text-4xl font-bold mb-4" style={{ color: "#042B19" }}>
+          <h1 className="text-4xl font-bold mb-4" style={{ color: "#05627C" }}>
             Sitemap
           </h1>
           <p className="text-lg text-gray-600 mb-8">
             Find all pages and sections of our website
           </p>
 
-          <div className="bg-white rounded-lg shadow-sm p-8 space-y-8" style={{ borderColor: "#E5E7EB" }}>
+          <div
+            className="bg-white rounded-lg shadow-sm p-8 space-y-8"
+            style={{ borderColor: "#E5E7EB" }}
+          >
             <section>
-              <h2 className="text-2xl font-semibold mb-4" style={{ color: "#042B19" }}>
+              <h2
+                className="text-2xl font-semibold mb-4"
+                style={{ color: "#05627C" }}
+              >
                 Main Pages
               </h2>
               <ul className="space-y-2">
@@ -58,7 +64,10 @@ export default function SitemapPage() {
             </section>
 
             <section>
-              <h2 className="text-2xl font-semibold mb-4" style={{ color: "#042B19" }}>
+              <h2
+                className="text-2xl font-semibold mb-4"
+                style={{ color: "#05627C" }}
+              >
                 Energy Technologies
               </h2>
               <ul className="space-y-2">
@@ -81,6 +90,3 @@ export default function SitemapPage() {
     </div>
   );
 }
-
-
-

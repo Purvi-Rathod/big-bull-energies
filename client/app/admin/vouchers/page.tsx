@@ -37,7 +37,7 @@ export default function AdminVouchersPage() {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [creating, setCreating] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
-  const [searchUseCrownPrefix, setSearchUseCrownPrefix] = useState(true);
+  const [searchUseBigBullPrefix, setSearchUseBigBullPrefix] = useState(true);
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
@@ -108,12 +108,12 @@ export default function AdminVouchersPage() {
   };
 
   const handleCreateVoucher = async () => {
-    const idPart = formUserId.trim().toUpperCase().replace(/^CROWN-/, '');
+    const idPart = formUserId.trim().toUpperCase().replace(/^BIGBULL-/, '');
     if (!idPart || !formAmount) {
       setError('User ID and amount are required');
       return;
     }
-    const fullUserId = `CROWN-${idPart}`;
+    const fullUserId = `BIGBULL-${idPart}`;
 
     const amount = parseFloat(formAmount);
     if (isNaN(amount) || amount <= 0) {
@@ -186,7 +186,7 @@ export default function AdminVouchersPage() {
     return new Date(expiry) < new Date();
   };
 
-  const effectiveSearch = getEffectiveUserSearch(searchTerm, searchUseCrownPrefix);
+  const effectiveSearch = getEffectiveUserSearch(searchTerm, searchUseBigBullPrefix);
 
   // Filter vouchers
   const filteredVouchers = vouchers.filter((voucher) => {
@@ -246,8 +246,8 @@ export default function AdminVouchersPage() {
             <AdminUserSearchInput
               value={searchTerm}
               onChange={setSearchTerm}
-              useCrownPrefix={searchUseCrownPrefix}
-              onUseCrownPrefixChange={setSearchUseCrownPrefix}
+              useBigBullPrefix={searchUseBigBullPrefix}
+              onUseBigBullPrefixChange={setSearchUseBigBullPrefix}
               placeholderWithoutPrefix="Voucher ID, name, email..."
             />
           </div>
@@ -426,11 +426,11 @@ export default function AdminVouchersPage() {
                   User ID *
                 </label>
                 <div className="flex items-center w-full rounded-md border border-gray-300 bg-white focus-within:ring-2 focus-within:ring-indigo-500">
-                  <span className="inline-flex items-center pl-3 py-2 text-gray-600 font-mono border-r border-gray-300 bg-gray-50 rounded-l-md text-sm">CROWN-</span>
+                  <span className="inline-flex items-center pl-3 py-2 text-gray-600 font-mono border-r border-gray-300 bg-gray-50 rounded-l-md text-sm">BIGBULL-</span>
                   <input
                     type="text"
                     value={formUserId}
-                    onChange={(e) => setFormUserId(e.target.value.toUpperCase().replace(/^CROWN-/, ''))}
+                    onChange={(e) => setFormUserId(e.target.value.toUpperCase().replace(/^BIGBULL-/, ''))}
                     placeholder="e.g. 000001"
                     className="flex-1 min-w-0 px-3 py-2 border-0 rounded-r-md focus:outline-none focus:ring-0 text-black placeholder:text-gray-500 font-mono"
                   />

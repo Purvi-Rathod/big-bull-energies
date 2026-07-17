@@ -39,7 +39,7 @@ export default function DashboardHeader({
       <div className="px-6 py-3">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold" style={{ color: "#042B19" }}>
+            <h1 className="text-2xl font-bold" style={{ color: "#05627C" }}>
               {title}
             </h1>
             {subtitle && (
@@ -53,7 +53,7 @@ export default function DashboardHeader({
               onClick={() => setIsProfileOpen(!isProfileOpen)}
               className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-50 transition"
             >
-              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#042B19] to-[#16a34a] flex items-center justify-center shadow-md">
+              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#05627C] to-[#16a34a] flex items-center justify-center shadow-md">
                 <span className="text-sm font-bold text-white">A</span>
               </div>
               <ChevronDown
@@ -74,13 +74,13 @@ export default function DashboardHeader({
                   style={{ borderColor: "#E5E7EB" }}
                 >
                   <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#042B19] to-[#16a34a] flex items-center justify-center shadow-md">
+                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#05627C] to-[#16a34a] flex items-center justify-center shadow-md">
                       <span className="text-lg font-bold text-white">A</span>
                     </div>
                     <div>
                       <p
                         className="text-sm font-semibold"
-                        style={{ color: "#042B19" }}
+                        style={{ color: "#05627C" }}
                       >
                         Andrew
                       </p>
@@ -97,7 +97,7 @@ export default function DashboardHeader({
                     className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-50 transition text-left"
                   >
                     <Edit className="w-4 h-4 text-gray-600" />
-                    <span className="text-sm" style={{ color: "#042B19" }}>
+                    <span className="text-sm" style={{ color: "#05627C" }}>
                       Edit Profile
                     </span>
                   </button>

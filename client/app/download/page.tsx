@@ -10,7 +10,7 @@ export default function DownloadPage() {
         <div className="max-w-4xl mx-auto text-center">
           <div className="mb-8">
             <svg
-              className="w-24 h-24 mx-auto mb-6 text-[#042B19]"
+              className="w-24 h-24 mx-auto mb-6 text-[#05627C]"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -23,18 +23,26 @@ export default function DownloadPage() {
               />
             </svg>
           </div>
-          <h1 className="text-4xl md:text-5xl font-bold mb-6" style={{ color: "#042B19" }}>
+          <h1
+            className="text-4xl md:text-5xl font-bold mb-6"
+            style={{ color: "#05627C" }}
+          >
             Download Brochure
           </h1>
-          <div className="bg-white rounded-lg shadow-sm p-8 md:p-12 mb-8" style={{ borderColor: "#E5E7EB" }}>
+          <div
+            className="bg-white rounded-lg shadow-sm p-8 md:p-12 mb-8"
+            style={{ borderColor: "#E5E7EB" }}
+          >
             <p className="text-lg text-gray-600 mb-6 leading-relaxed">
-              Download our comprehensive brochure to learn more about Crown Bankers, our renewable energy projects, and investment opportunities.
+              Download our comprehensive brochure to learn more about Big Bull
+              Energies, our renewable energy projects, and investment
+              opportunities.
             </p>
             <a
               href="/crown-bankers-brochure.pdf"
-              download="Crown-Bankers-Brochure.pdf"
+              download="Big Bull-Bankers-Brochure.pdf"
               className="inline-flex items-center gap-3 px-8 py-4 rounded-lg font-semibold text-white transition hover:opacity-90 shadow-lg hover:shadow-xl"
-              style={{ backgroundColor: "#042B19" }}
+              style={{ backgroundColor: "#05627C" }}
             >
               <Download className="w-5 h-5" />
               Download PDF Brochure
@@ -47,14 +55,14 @@ export default function DownloadPage() {
             <a
               href="/contact"
               className="inline-block px-8 py-3 rounded-lg font-semibold text-white transition hover:opacity-90"
-              style={{ backgroundColor: "#042B19" }}
+              style={{ backgroundColor: "#05627C" }}
             >
               Contact Us
             </a>
             <a
               href="/"
               className="inline-block px-8 py-3 rounded-lg font-semibold border transition hover:bg-gray-100"
-              style={{ borderColor: "#042B19", color: "#042B19" }}
+              style={{ borderColor: "#05627C", color: "#05627C" }}
             >
               Back to Home
             </a>
@@ -65,6 +73,3 @@ export default function DownloadPage() {
     </div>
   );
 }
-
-
-

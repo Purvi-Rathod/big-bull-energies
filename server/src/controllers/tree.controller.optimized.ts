@@ -34,7 +34,7 @@ export const getMyTree = asyncHandler(async (req, res) => {
     throw new AppError("User not found", 404);
   }
 
-  const isAdmin = (currentUser as any).userId === "CROWN-000000" || (currentUser as any).userId === "CNEOX-000000";
+  const isAdmin = (currentUser as any).userId === "BIGBULL-000000" || (currentUser as any).userId === "CROWN-000000" || (currentUser as any).userId === "CNEOX-000000";
 
   // OPTIMIZATION 1: Batch load all binary trees in user's downline upfront
   // Use aggregation to find all descendants efficiently
@@ -173,7 +173,7 @@ export const getMyTree = asyncHandler(async (req, res) => {
     const treeInfo = treeMap.get(nodeIdStr);
     const totalInvestment = investmentMap.get(nodeIdStr) || 0;
 
-    const nodeIsAdmin = userInfo.userId === "CROWN-000000" || userInfo.userId === "CNEOX-000000";
+    const nodeIsAdmin = userInfo.userId === "BIGBULL-000000" || userInfo.userId === "CROWN-000000" || userInfo.userId === "CNEOX-000000";
     let children: string[] = [];
 
     if (nodeIsAdmin) {

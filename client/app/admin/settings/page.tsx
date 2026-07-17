@@ -66,7 +66,7 @@ export default function SettingsPage() {
   const [roiCronMessage, setRoiCronMessage] = useState('');
 
   useEffect(() => {
-    const isAdminUser = user?.userId === 'CROWN-000000' || user?.userId === 'CNEOX-000000';
+    const isAdminUser = user?.userId === 'BIGBULL-000000' || user?.userId === 'CROWN-000000' || user?.userId === 'CNEOX-000000';
     const isAdminAccount = !!admin;
 
     if (isAdminUser || isAdminAccount) {
@@ -235,7 +235,7 @@ export default function SettingsPage() {
 
   // Check status on mount and when user/admin changes
   useEffect(() => {
-    const isAdminUser = user?.userId === 'CROWN-000000' || user?.userId === 'CNEOX-000000';
+    const isAdminUser = user?.userId === 'BIGBULL-000000' || user?.userId === 'CROWN-000000' || user?.userId === 'CNEOX-000000';
     const isAdminAccount = !!admin;
 
     if (isAdminUser || isAdminAccount) {
@@ -965,7 +965,7 @@ export default function SettingsPage() {
               ⚠️ WARNING: This will mark ALL users (except admin accounts) as inactive!
             </p>
             <div className="text-xs text-orange-600 mt-2 space-y-1">
-              <p><strong>Will Deactivate:</strong> All user accounts except CROWN-000000 and CNEOX-000000</p>
+              <p><strong>Will Deactivate:</strong> All user accounts except BIGBULL-000000 and CNEOX-000000</p>
               <p><strong>Note:</strong> Users will become active again automatically when they invest in a plan</p>
               <p><strong>Use Case:</strong> Useful for resetting all user statuses or enforcing investment requirement</p>
             </div>
@@ -977,7 +977,7 @@ export default function SettingsPage() {
                 message: 'This will mark ALL users (except admin accounts) as inactive!\n\n' +
                   'This action will:\n' +
                   '• Mark all users as "inactive" status\n' +
-                  '• Admin accounts (CROWN-000000, CNEOX-000000) will NOT be affected\n' +
+                  '• Admin accounts (BIGBULL-000000, CNEOX-000000) will NOT be affected\n' +
                   '• Users will become active again automatically when they invest\n\n' +
                   'This is useful for:\n' +
                   '• Enforcing investment requirement for all users\n' +

@@ -43,9 +43,9 @@ function SolarMarquee() {
             <span
               className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl 2xl:text-8xl font-bold uppercase tracking-tight"
               style={{
-                color: "#042B19",
+                color: "#05627C",
                 fontFamily: "var(--font-custom), 'CustomFont', sans-serif",
-                WebkitTextStroke: "2px #042B19",
+                WebkitTextStroke: "2px #05627C",
                 WebkitTextFillColor: "transparent",
               }}
             >
@@ -53,7 +53,7 @@ function SolarMarquee() {
             </span>
             <span
               className="mx-4 sm:mx-6 md:mx-8 lg:mx-10 xl:mx-12 text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl 2xl:text-8xl"
-              style={{ color: "#042B19" }}
+              style={{ color: "#05627C" }}
             >
               ·
             </span>
@@ -77,7 +77,7 @@ export default function SolarPage() {
           priority
         />
         <div className="absolute inset-0 bg-gradient-to-b from-gray-900/20 to-transparent"></div>
-        
+
         {/* White Overlay on Left with Curved Lines */}
         <div className="absolute left-0 top-0 w-full sm:w-1/2 lg:w-1/3 h-full bg-white">
           {/* Curved Green Lines */}
@@ -89,21 +89,21 @@ export default function SolarPage() {
             >
               <path
                 d="M0,50 Q50,30 100,50 T200,50"
-                stroke="#042B19"
+                stroke="#05627C"
                 strokeWidth="2"
                 fill="none"
                 opacity="0.3"
               />
               <path
                 d="M0,80 Q50,60 100,80 T200,80"
-                stroke="#042B19"
+                stroke="#05627C"
                 strokeWidth="2"
                 fill="none"
                 opacity="0.3"
               />
               <path
                 d="M0,110 Q50,90 100,110 T200,110"
-                stroke="#042B19"
+                stroke="#05627C"
                 strokeWidth="2"
                 fill="none"
                 opacity="0.3"
@@ -115,19 +115,22 @@ export default function SolarPage() {
           <div className="relative z-10 p-4 sm:p-6 md:p-8 lg:p-12 xl:p-16 h-full flex flex-col justify-center">
             {/* Breadcrumbs/Navigation */}
             <div className="flex items-center gap-2 sm:gap-3 mb-6 sm:mb-8 flex-wrap">
-              <div className="h-px w-8 sm:w-12 bg-[#042B19]"></div>
+              <div className="h-px w-8 sm:w-12 bg-[#05627C]"></div>
               <Link
                 href="/energy-technologies"
                 className="text-xs font-medium uppercase tracking-wide hover:opacity-70 transition"
-                style={{ color: "#042B19" }}
+                style={{ color: "#05627C" }}
               >
                 ENERGY TECHNOLOGIES
               </Link>
               <div className="h-4 w-px bg-gray-300"></div>
-              <SolarPanel className="w-3 h-3 sm:w-4 sm:h-4" style={{ color: "#ffcf0B" }} />
+              <SolarPanel
+                className="w-3 h-3 sm:w-4 sm:h-4"
+                style={{ color: "#ffcf0B" }}
+              />
               <span
                 className="text-xs font-medium uppercase tracking-wide"
-                style={{ color: "#042B19" }}
+                style={{ color: "#05627C" }}
               >
                 SOLAR
               </span>
@@ -137,7 +140,7 @@ export default function SolarPage() {
             <h1
               className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl 2xl:text-7xl font-normal leading-tight"
               style={{
-                color: "#042B19",
+                color: "#05627C",
                 fontFamily: "var(--font-font4), sans-serif",
               }}
             >
@@ -164,19 +167,22 @@ export default function SolarPage() {
             <div className="flex flex-col order-2 lg:order-1">
               {/* Breadcrumbs/Navigation */}
               <div className="flex items-center gap-2 sm:gap-3 mb-6 sm:mb-8 flex-wrap">
-                <div className="h-px w-8 sm:w-12 bg-[#042B19]"></div>
+                <div className="h-px w-8 sm:w-12 bg-[#05627C]"></div>
                 <Link
                   href="/energy-technologies"
                   className="text-xs font-medium uppercase tracking-wide hover:opacity-70 transition"
-                  style={{ color: "#042B19" }}
+                  style={{ color: "#05627C" }}
                 >
                   ENERGY TECHNOLOGIES
                 </Link>
                 <div className="h-4 w-px bg-gray-300"></div>
-                <SolarPanel className="w-3 h-3 sm:w-4 sm:h-4" style={{ color: "#ffcf0B" }} />
+                <SolarPanel
+                  className="w-3 h-3 sm:w-4 sm:h-4"
+                  style={{ color: "#ffcf0B" }}
+                />
                 <span
                   className="text-xs font-medium uppercase tracking-wide"
-                  style={{ color: "#042B19" }}
+                  style={{ color: "#05627C" }}
                 >
                   SOLAR
                 </span>
@@ -186,11 +192,12 @@ export default function SolarPage() {
               <h1
                 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl 2xl:text-7xl font-normal leading-tight mb-6 sm:mb-8"
                 style={{
-                  color: "#042B19",
+                  color: "#05627C",
                   fontFamily: "var(--font-font4), sans-serif",
                 }}
               >
-                A core component of Crown Bankers&apos; investment portfolio.
+                A core component of Big Bull Energies&apos; investment
+                portfolio.
               </h1>
             </div>
 
@@ -210,15 +217,15 @@ export default function SolarPage() {
               <p
                 className="text-sm sm:text-base md:text-lg lg:text-xl leading-relaxed"
                 style={{
-                  color: "#042B19",
+                  color: "#05627C",
                   fontFamily: "var(--font-font4), sans-serif",
                 }}
               >
                 Solar energy harnesses the power of the sun to generate clean,
-                renewable electricity. Crown Bankers invests in solar projects that
-                provide sustainable energy solutions, reduce carbon emissions, and
-                generate returns for our investors while supporting the transition
-                to a cleaner energy future.
+                renewable electricity. Big Bull Energies invests in solar
+                projects that provide sustainable energy solutions, reduce
+                carbon emissions, and generate returns for our investors while
+                supporting the transition to a cleaner energy future.
               </p>
             </div>
           </div>
@@ -233,7 +240,7 @@ export default function SolarPage() {
             <div className="flex flex-col order-2 lg:order-1">
               <h2
                 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-6 sm:mb-8"
-                style={{ color: "#042B19" }}
+                style={{ color: "#05627C" }}
               >
                 Our solar investment portfolio
               </h2>
@@ -242,17 +249,17 @@ export default function SolarPage() {
               <div className="space-y-4 sm:space-y-6">
                 {/* Stat 1 */}
                 <div>
-                  <div className="h-px bg-[#042B19] mb-3 sm:mb-4"></div>
+                  <div className="h-px bg-[#05627C] mb-3 sm:mb-4"></div>
                   <div className="flex flex-col sm:flex-row sm:items-baseline gap-2 sm:gap-3">
                     <span
                       className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold"
-                      style={{ color: "#042B19" }}
+                      style={{ color: "#05627C" }}
                     >
                       2
                     </span>
                     <span
                       className="text-sm sm:text-base md:text-lg lg:text-xl"
-                      style={{ color: "#042B19" }}
+                      style={{ color: "#05627C" }}
                     >
                       solar plants operational
                     </span>
@@ -261,17 +268,17 @@ export default function SolarPage() {
 
                 {/* Stat 2 */}
                 <div>
-                  <div className="h-px bg-[#042B19] mb-3 sm:mb-4"></div>
+                  <div className="h-px bg-[#05627C] mb-3 sm:mb-4"></div>
                   <div className="flex flex-col sm:flex-row sm:items-baseline gap-2 sm:gap-3">
                     <span
                       className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold"
-                      style={{ color: "#042B19" }}
+                      style={{ color: "#05627C" }}
                     >
                       500+
                     </span>
                     <span
                       className="text-sm sm:text-base md:text-lg lg:text-xl"
-                      style={{ color: "#042B19" }}
+                      style={{ color: "#05627C" }}
                     >
                       megawatts of solar capacity
                     </span>
@@ -280,17 +287,17 @@ export default function SolarPage() {
 
                 {/* Stat 3 */}
                 <div>
-                  <div className="h-px bg-[#042B19] mb-3 sm:mb-4"></div>
+                  <div className="h-px bg-[#05627C] mb-3 sm:mb-4"></div>
                   <div className="flex flex-col sm:flex-row sm:items-baseline gap-2 sm:gap-3">
                     <span
                       className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold"
-                      style={{ color: "#042B19" }}
+                      style={{ color: "#05627C" }}
                     >
                       50+
                     </span>
                     <span
                       className="text-sm sm:text-base md:text-lg lg:text-xl"
-                      style={{ color: "#042B19" }}
+                      style={{ color: "#05627C" }}
                     >
                       solar projects in our investment portfolio
                     </span>
@@ -298,7 +305,7 @@ export default function SolarPage() {
                 </div>
 
                 {/* Final line */}
-                <div className="h-px bg-[#042B19] mt-3 sm:mt-4"></div>
+                <div className="h-px bg-[#05627C] mt-3 sm:mt-4"></div>
               </div>
             </div>
 
@@ -309,12 +316,12 @@ export default function SolarPage() {
                 href="/projects"
                 className="text-xs sm:text-sm md:text-base font-bold uppercase tracking-wide mb-6 sm:mb-8 hover:opacity-70 transition"
                 style={{
-                  color: "#042B19",
+                  color: "#05627C",
                   textDecoration: "underline",
                   textUnderlineOffset: "4px",
                 }}
               >
-                VIEW CROWN BANKERS PROJECTS
+                VIEW Big Bull Energies PROJECTS
               </Link>
 
               {/* Line Art Illustration */}
@@ -342,7 +349,7 @@ export default function SolarPage() {
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <h2
             className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-8 sm:mb-10 md:mb-12 text-center"
-            style={{ color: "#042B19" }}
+            style={{ color: "#05627C" }}
           >
             How solar energy works
           </h2>
@@ -351,7 +358,7 @@ export default function SolarPage() {
             <div className="flex flex-col gap-4 sm:gap-5 md:gap-6 order-2 lg:order-1">
               <p
                 className="text-sm sm:text-base md:text-lg lg:text-xl leading-relaxed mb-4 sm:mb-6"
-                style={{ color: "#042B19" }}
+                style={{ color: "#05627C" }}
               >
                 Solar technology is simple, scalable and reliable, and provides
                 great flexibility for the future of the grid.
@@ -386,13 +393,16 @@ export default function SolarPage() {
                   text: "Electricity is delivered to customers.",
                 },
               ].map((step) => (
-                <div key={step.number} className="flex items-start gap-3 sm:gap-4">
+                <div
+                  key={step.number}
+                  className="flex items-start gap-3 sm:gap-4"
+                >
                   <div
                     className="flex-shrink-0 w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center font-bold text-base sm:text-lg shadow-md"
                     style={{
                       backgroundColor: "#E8F5F0",
-                      color: "#042B19",
-                      border: "2px solid #042B19",
+                      color: "#05627C",
+                      border: "2px solid #05627C",
                       boxShadow: "0 4px 6px rgba(4, 43, 25, 0.1)",
                     }}
                   >
@@ -400,7 +410,7 @@ export default function SolarPage() {
                   </div>
                   <p
                     className="text-sm sm:text-base md:text-lg lg:text-xl leading-relaxed flex-1"
-                    style={{ color: "#042B19" }}
+                    style={{ color: "#05627C" }}
                   >
                     {step.text}
                   </p>
@@ -429,28 +439,28 @@ export default function SolarPage() {
             <div className="flex flex-col order-2 lg:order-1">
               <h2
                 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-4 sm:mb-6"
-                style={{ color: "#042B19" }}
+                style={{ color: "#05627C" }}
               >
                 Why solar
               </h2>
               <p
                 className="text-sm sm:text-base md:text-lg lg:text-xl leading-relaxed mb-4 sm:mb-6"
-                style={{ color: "#042B19" }}
+                style={{ color: "#05627C" }}
               >
-                Solar provides many advantages because of its accessibility around
-                the world. Solar&apos;s benefits include:
+                Solar provides many advantages because of its accessibility
+                around the world. Solar&apos;s benefits include:
               </p>
               <div className="space-y-3 sm:space-y-4">
                 <div className="flex items-start gap-2 sm:gap-3">
                   <span
                     className="text-lg sm:text-xl flex-shrink-0 mt-0.5"
-                    style={{ color: "#042B19" }}
+                    style={{ color: "#05627C" }}
                   >
                     →
                   </span>
                   <p
                     className="text-sm sm:text-base md:text-lg lg:text-xl leading-relaxed"
-                    style={{ color: "#042B19" }}
+                    style={{ color: "#05627C" }}
                   >
                     A stable fuel price throughout a project&apos;s lifespan
                   </p>
@@ -458,13 +468,13 @@ export default function SolarPage() {
                 <div className="flex items-start gap-2 sm:gap-3">
                   <span
                     className="text-lg sm:text-xl flex-shrink-0 mt-0.5"
-                    style={{ color: "#042B19" }}
+                    style={{ color: "#05627C" }}
                   >
                     →
                   </span>
                   <p
                     className="text-sm sm:text-base md:text-lg lg:text-xl leading-relaxed"
-                    style={{ color: "#042B19" }}
+                    style={{ color: "#05627C" }}
                   >
                     Strengthened energy independence
                   </p>
@@ -472,13 +482,13 @@ export default function SolarPage() {
                 <div className="flex items-start gap-2 sm:gap-3">
                   <span
                     className="text-lg sm:text-xl flex-shrink-0 mt-0.5"
-                    style={{ color: "#042B19" }}
+                    style={{ color: "#05627C" }}
                   >
                     →
                   </span>
                   <p
                     className="text-sm sm:text-base md:text-lg lg:text-xl leading-relaxed"
-                    style={{ color: "#042B19" }}
+                    style={{ color: "#05627C" }}
                   >
                     Carbon-free energy
                   </p>
@@ -512,7 +522,7 @@ export default function SolarPage() {
             <h2
               className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-normal mb-6 sm:mb-8 px-2"
               style={{
-                color: "#042B19",
+                color: "#05627C",
                 fontFamily: "var(--font-font4), sans-serif",
               }}
             >

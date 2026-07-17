@@ -5,7 +5,7 @@
  * but wallet amounts weren't updated accordingly.
  * 
  * Usage: npx ts-node -r dotenv/config src/scripts/fixWalletBalances.ts [userId1] [userId2] ...
- * Example: npx ts-node -r dotenv/config src/scripts/fixWalletBalances.ts CROWN-000282 CROWN-000281
+ * Example: npx ts-node -r dotenv/config src/scripts/fixWalletBalances.ts BIGBULL-000282 BIGBULL-000281
  */
 
 import mongoose from "mongoose";
@@ -297,7 +297,7 @@ async function main() {
   if (userIds.length === 0) {
     console.error("❌ Error: At least one user ID required");
     console.error("Usage: npx ts-node -r dotenv/config src/scripts/fixWalletBalances.ts [userId1] [userId2] ...");
-    console.error("Example: npx ts-node -r dotenv/config src/scripts/fixWalletBalances.ts CROWN-000282 CROWN-000281");
+    console.error("Example: npx ts-node -r dotenv/config src/scripts/fixWalletBalances.ts BIGBULL-000282 BIGBULL-000281");
     process.exit(1);
   }
   

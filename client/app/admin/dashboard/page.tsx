@@ -107,7 +107,7 @@ export default function AdminDashboard() {
   // Route protection is handled in layout
 
   useEffect(() => {
-    const isAdminUser = user?.userId === 'CROWN-000000' || user?.userId === 'CROWN-000000';
+    const isAdminUser = user?.userId === 'BIGBULL-000000' || user?.userId === 'CROWN-000000' || user?.userId === 'CNEOX-000000';
     const isAdminAccount = !!admin;
 
     if (isAdminUser || isAdminAccount) {
@@ -233,7 +233,7 @@ export default function AdminDashboard() {
       >
         <div className="flex items-center gap-4">
           <div className="flex items-center justify-center w-12 h-12 rounded-xl overflow-hidden" style={{ backgroundColor: 'rgba(25,235,243,0.15)', border: '1px solid rgba(25,235,243,0.3)' }}>
-            <Image src="/image.png" alt="Crown" width={36} height={36} className="object-contain" />
+            <Image src="/image.png" alt="Big Bull" width={36} height={36} className="object-contain" />
           </div>
           <div>
             <h1 className="text-[22px] flex items-center gap-2" style={{ color: tokens.h1, fontWeight: 700 }}>

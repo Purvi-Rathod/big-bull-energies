@@ -14,7 +14,7 @@ export default function CTASection() {
             <h2
               className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-normal leading-tight mb-4 sm:mb-6"
               style={{
-                color: "#042B19",
+                color: "#05627C",
                 fontFamily: "var(--font-font4), sans-serif",
               }}
             >
@@ -24,8 +24,10 @@ export default function CTASection() {
               the energy future.
             </h2>
             <p className="text-sm sm:text-base md:text-lg text-gray-700 leading-relaxed mb-6 sm:mb-8 max-w-lg">
-              At Crown Bankers, we combine innovative binary investment systems with sustainable energy projects. 
-              Join thousands of investors building wealth while supporting renewable energy initiatives worldwide.
+              At Big Bull Energies, we combine innovative binary investment
+              systems with sustainable energy projects. Join thousands of
+              investors building wealth while supporting renewable energy
+              initiatives worldwide.
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
               <Link
@@ -37,7 +39,7 @@ export default function CTASection() {
               </Link>
               <Link
                 href="/career-rewards"
-                className="inline-block bg-transparent border-2 border-[#042B19] text-[#042B19] font-bold px-4 sm:px-6 py-2 sm:py-3 transition hover:bg-[#042B19] hover:text-white text-xs sm:text-sm uppercase w-full sm:w-auto text-center"
+                className="inline-block bg-transparent border-2 border-[#05627C] text-[#05627C] font-bold px-4 sm:px-6 py-2 sm:py-3 transition hover:bg-[#05627C] hover:text-white text-xs sm:text-sm uppercase w-full sm:w-auto text-center"
                 style={{ borderRadius: "0", maxWidth: "fit-content" }}
               >
                 CAREER REWARDS
@@ -60,4 +62,3 @@ export default function CTASection() {
     </section>
   );
 }
-

@@ -27,7 +27,7 @@ const technologies: Technology[] = [
         fill="none"
         stroke="currentColor"
         viewBox="0 0 24 24"
-        style={{ color: "#042B19" }}
+        style={{ color: "#05627C" }}
       >
         <path
           strokeLinecap="round"
@@ -49,7 +49,7 @@ const technologies: Technology[] = [
         fill="none"
         stroke="currentColor"
         viewBox="0 0 24 24"
-        style={{ color: "#042B19" }}
+        style={{ color: "#05627C" }}
       >
         <path
           strokeLinecap="round"
@@ -77,7 +77,7 @@ const technologies: Technology[] = [
         fill="none"
         stroke="currentColor"
         viewBox="0 0 24 24"
-        style={{ color: "#042B19" }}
+        style={{ color: "#05627C" }}
       >
         <path
           strokeLinecap="round"
@@ -99,7 +99,7 @@ const technologies: Technology[] = [
         fill="none"
         stroke="currentColor"
         viewBox="0 0 24 24"
-        style={{ color: "#042B19" }}
+        style={{ color: "#05627C" }}
       >
         <path
           strokeLinecap="round"
@@ -121,7 +121,7 @@ const technologies: Technology[] = [
         fill="none"
         stroke="currentColor"
         viewBox="0 0 24 24"
-        style={{ color: "#042B19" }}
+        style={{ color: "#05627C" }}
       >
         <path
           strokeLinecap="round"
@@ -156,7 +156,7 @@ export default function EnergyTechnologiesSection() {
       {
         threshold: 0.3, // Trigger when 30% of the section is visible
         rootMargin: "0px",
-      }
+      },
     );
 
     observer.observe(section);
@@ -195,7 +195,7 @@ export default function EnergyTechnologiesSection() {
               y: 0,
               duration: 0.4,
               ease: "power2.out",
-            }
+            },
           );
         },
       });
@@ -218,7 +218,7 @@ export default function EnergyTechnologiesSection() {
               onComplete: () => {
                 isScrolling = false;
               },
-            }
+            },
           );
         },
       });
@@ -281,14 +281,14 @@ export default function EnergyTechnologiesSection() {
           <div className="relative z-10 flex flex-col order-2 lg:order-1">
             <p
               className="text-xs sm:text-sm font-medium mb-3 sm:mb-4 uppercase tracking-wide"
-              style={{ color: "#042B19" }}
+              style={{ color: "#05627C" }}
             >
               ENERGY TECHNOLOGIES
             </p>
             <h2
               className="text-lg sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl font-normal leading-tight mb-6 md:mb-8"
               style={{
-                color: "#042B19",
+                color: "#05627C",
                 fontFamily: "var(--font-custom), 'CustomFont', sans-serif",
               }}
             >
@@ -318,13 +318,13 @@ export default function EnergyTechnologiesSection() {
             {/* Introduction Text */}
             <p
               className="text-base sm:text-lg md:text-xl leading-relaxed mb-4 md:mb-5"
-              style={{ color: "#042B19" }}
+              style={{ color: "#05627C" }}
             >
               Invenergy is flexible in meeting your energy needs with a
               portfolio of proven and emerging technologies that capture, make,
-              store and move energy at scale. We&apos;ll work with you to pinpoint
-              the best solution, whether it&apos;s a single source or combination of
-              technologies.
+              store and move energy at scale. We&apos;ll work with you to
+              pinpoint the best solution, whether it&apos;s a single source or
+              combination of technologies.
             </p>
 
             <div className="h-px bg-gray-300 mb-4 md:mb-5"></div>
@@ -332,11 +332,13 @@ export default function EnergyTechnologiesSection() {
             {/* Technology Details */}
             <div ref={textRef} key={currentIndex}>
               <div className="flex items-center gap-2 sm:gap-3 mb-3 sm:mb-4">
-                <div className="shrink-0 w-6 h-6 sm:w-8 sm:h-8">{currentTech.icon}</div>
+                <div className="shrink-0 w-6 h-6 sm:w-8 sm:h-8">
+                  {currentTech.icon}
+                </div>
                 <h3
                   className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold"
                   style={{
-                    color: "#042B19",
+                    color: "#05627C",
                     fontFamily: "'Font3', sans-serif",
                     fontWeight: "400",
                   }}
@@ -347,7 +349,7 @@ export default function EnergyTechnologiesSection() {
               <p
                 className="text-base sm:text-lg md:text-xl leading-relaxed mb-4 md:mb-5 max-w-[500px]"
                 style={{
-                  color: "#042B19",
+                  color: "#05627C",
                   lineHeight: "1.7",
                 }}
               >
@@ -368,7 +370,7 @@ export default function EnergyTechnologiesSection() {
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
-                    style={{ color: "#042B19" }}
+                    style={{ color: "#05627C" }}
                   >
                     <path
                       strokeLinecap="round"
@@ -380,7 +382,7 @@ export default function EnergyTechnologiesSection() {
                 </div>
                 <span
                   className="text-base sm:text-lg md:text-xl font-bold uppercase tracking-wide"
-                  style={{ color: "#042B19" }}
+                  style={{ color: "#05627C" }}
                 >
                   LEARN MORE
                 </span>
@@ -396,7 +398,7 @@ export default function EnergyTechnologiesSection() {
                   key={index}
                   className={`h-1 transition-all duration-300 ${
                     index === currentIndex
-                      ? "w-8 sm:w-12 bg-[#042B19]"
+                      ? "w-8 sm:w-12 bg-[#05627C]"
                       : "w-2 sm:w-3 bg-gray-300"
                   }`}
                 />

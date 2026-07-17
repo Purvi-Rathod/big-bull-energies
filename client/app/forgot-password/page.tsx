@@ -1,28 +1,30 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import Link from 'next/link';
-import Image from 'next/image';
-import { api } from '@/lib/api';
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+import Image from "next/image";
+import { api } from "@/lib/api";
 
 export default function ForgotPasswordPage() {
-  const [userId, setUserId] = useState('');
+  const [userId, setUserId] = useState("");
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
   const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
+    setError("");
     setLoading(true);
 
     try {
       await api.forgotPassword(userId);
       setSuccess(true);
     } catch (err: any) {
-      setError(err.message || 'Failed to send password reset email. Please try again.');
+      setError(
+        err.message || "Failed to send password reset email. Please try again.",
+      );
     } finally {
       setLoading(false);
     }
@@ -43,14 +45,14 @@ export default function ForgotPasswordPage() {
         {/* Overlay for better readability */}
         <div className="absolute inset-0 bg-black/50"></div>
       </div>
-      
+
       {/* Content */}
       <div className="relative z-10 max-w-md w-full space-y-8 bg-gradient-to-br from-gray-900/95 via-gray-800/95 to-gray-900/95 backdrop-blur-sm rounded-2xl shadow-2xl p-8 border border-yellow-500/30">
         <div>
           <div className="flex justify-center mb-6">
             <Image
               src="/image.png"
-              alt="Crown Bankers Logo"
+              alt="Big Bull Energies Logo"
               width={180}
               height={60}
               className="h-14 w-auto"
@@ -71,7 +73,8 @@ export default function ForgotPasswordPage() {
           <div className="space-y-4">
             <div className="bg-gradient-to-r from-yellow-500/20 via-yellow-600/15 to-yellow-500/20 border-2 border-yellow-500/40 text-white px-4 py-3 rounded-xl">
               <p className="font-bold text-yellow-300">
-                Password reset link has been sent to your email. Please check your inbox and follow the instructions.
+                Password reset link has been sent to your email. Please check
+                your inbox and follow the instructions.
               </p>
             </div>
             <div className="text-center">
@@ -92,7 +95,10 @@ export default function ForgotPasswordPage() {
             )}
 
             <div>
-              <label htmlFor="user-id" className="block text-sm font-bold text-yellow-400 mb-2">
+              <label
+                htmlFor="user-id"
+                className="block text-sm font-bold text-yellow-400 mb-2"
+              >
                 User ID
               </label>
               <input
@@ -101,7 +107,7 @@ export default function ForgotPasswordPage() {
                 type="text"
                 required
                 className="appearance-none relative block w-full px-4 py-3 border-2 border-yellow-500/40 placeholder-gray-500 text-white bg-gray-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-yellow-500/50 focus:border-yellow-500/70 transition-all sm:text-sm font-semibold"
-                placeholder="User ID (CROWN-XXXXXX)"
+                placeholder="User ID (BIGBULL-XXXXXX)"
                 value={userId}
                 onChange={(e) => setUserId(e.target.value)}
               />
@@ -115,14 +121,30 @@ export default function ForgotPasswordPage() {
               >
                 {loading ? (
                   <span className="flex items-center">
-                    <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-black" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    <svg
+                      className="animate-spin -ml-1 mr-3 h-5 w-5 text-black"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                      ></circle>
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                      ></path>
                     </svg>
                     Sending...
                   </span>
                 ) : (
-                  'Send Reset Link'
+                  "Send Reset Link"
                 )}
               </button>
             </div>

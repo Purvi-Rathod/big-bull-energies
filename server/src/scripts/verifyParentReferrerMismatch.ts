@@ -2,8 +2,8 @@
  * Verification Script: Parent vs Referrer Mismatch
  * 
  * This script verifies the bug where:
- * - User CROWN-000014 was created with referrer CROWN-000001
- * - But the BinaryTree parent shows CROWN-000012
+ * - User BIGBULL-000014 was created with referrer BIGBULL-000001
+ * - But the BinaryTree parent shows BIGBULL-000012
  * 
  * Usage: npx ts-node -r dotenv/config src/scripts/verifyParentReferrerMismatch.ts
  */
@@ -23,13 +23,13 @@ async function verifyParentReferrerMismatch() {
     await mongoose.connect(MONGODB_URI);
     console.log("✅ Connected to MongoDB\n");
 
-    // Find user CROWN-000014
-    const user = await User.findOne({ userId: "CROWN-000014" })
+    // Find user BIGBULL-000014
+    const user = await User.findOne({ userId: "BIGBULL-000014" })
       .populate("referrer", "userId name")
       .lean();
 
     if (!user) {
-      console.log("❌ User CROWN-000014 not found");
+      console.log("❌ User BIGBULL-000014 not found");
       await mongoose.disconnect();
       return;
     }
@@ -46,7 +46,7 @@ async function verifyParentReferrerMismatch() {
       .lean();
 
     if (!binaryTree) {
-      console.log("❌ Binary tree entry not found for CROWN-000014");
+      console.log("❌ Binary tree entry not found for BIGBULL-000014");
       await mongoose.disconnect();
       return;
     }
@@ -78,15 +78,15 @@ async function verifyParentReferrerMismatch() {
       console.log("⚠️  Partial data: One is missing");
     }
 
-    // Also check the path from CROWN-000001 to CROWN-000014
+    // Also check the path from BIGBULL-000001 to BIGBULL-000014
     console.log();
-    console.log("🔗 Tracing path from CROWN-000001 to CROWN-000014:");
-    const rootUser = await User.findOne({ userId: "CROWN-000001" }).lean();
+    console.log("🔗 Tracing path from BIGBULL-000001 to BIGBULL-000014:");
+    const rootUser = await User.findOne({ userId: "BIGBULL-000001" }).lean();
     if (rootUser) {
       let currentUserId = rootUser._id;
-      const path: string[] = ["CROWN-000001"];
+      const path: string[] = ["BIGBULL-000001"];
       
-      // Traverse down to find CROWN-000014
+      // Traverse down to find BIGBULL-000014
       let found = false;
       let depth = 0;
       const maxDepth = 10;
@@ -104,8 +104,8 @@ async function verifyParentReferrerMismatch() {
           const leftChildUser = await User.findById((currentTree.leftChild as any)._id || currentTree.leftChild)
             .select("userId")
             .lean();
-          if (leftChildUser?.userId === "CROWN-000014") {
-            path.push("CROWN-000014 (via left)");
+          if (leftChildUser?.userId === "BIGBULL-000014") {
+            path.push("BIGBULL-000014 (via left)");
             found = true;
             break;
           }
@@ -116,8 +116,8 @@ async function verifyParentReferrerMismatch() {
           const rightChildUser = await User.findById((currentTree.rightChild as any)._id || currentTree.rightChild)
             .select("userId")
             .lean();
-          if (rightChildUser?.userId === "CROWN-000014") {
-            path.push("CROWN-000014 (via right)");
+          if (rightChildUser?.userId === "BIGBULL-000014") {
+            path.push("BIGBULL-000014 (via right)");
             found = true;
             break;
           }

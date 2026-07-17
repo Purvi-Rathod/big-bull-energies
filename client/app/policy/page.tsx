@@ -56,7 +56,7 @@ export default function PolicyPage() {
       </section>
 
       {/* Content */}
-      <section className="relative py-12 px-6 bg-gray-900">
+      <section className="relative py-12 px-6 bg-#05627C">
         <div className="max-w-4xl mx-auto">
           {activeTab === 'terms' && (
             <div className="space-y-8">
@@ -70,7 +70,7 @@ export default function PolicyPage() {
                   <div>
                     <h3 className="text-xl font-bold text-white mb-3">1. Acceptance of Terms</h3>
                     <p>
-                      By accessing and using CROWN, you accept and agree to be bound by these Terms of Service. 
+                      By accessing and using BIG BULL, you accept and agree to be bound by these Terms of Service. 
                       If you do not agree to these terms, please do not use our platform.
                     </p>
                   </div>
@@ -78,7 +78,7 @@ export default function PolicyPage() {
                   <div>
                     <h3 className="text-xl font-bold text-white mb-3">2. Platform Description</h3>
                     <p>
-                      CROWN is a binary MLM (Multi-Level Marketing) investment platform that enables users to 
+                      BIG BULL is a binary MLM (Multi-Level Marketing) investment platform that enables users to 
                       invest in packages and earn returns through multiple income streams including ROI, referral 
                       bonuses, binary matching bonuses, and career level rewards.
                     </p>
@@ -86,7 +86,7 @@ export default function PolicyPage() {
 
                   <div>
                     <h3 className="text-xl font-bold text-white mb-3">3. User Accounts</h3>
-                    <p className="mb-3">To use CROWN, you must:</p>
+                    <p className="mb-3">To use BIG BULL, you must:</p>
                     <ul className="list-disc ml-6 space-y-2">
                       <li>Be at least 18 years old</li>
                       <li>Provide accurate and complete registration information</li>
@@ -110,7 +110,7 @@ export default function PolicyPage() {
                   <div>
                     <h3 className="text-xl font-bold text-white mb-3">5. Payment Methods</h3>
                     <p className="mb-3">
-                      CROWN accepts payments and processes withdrawals exclusively through USDT TRC20. 
+                      BIG BULL accepts payments and processes withdrawals exclusively through USDT TRC20. 
                       Users must provide a valid USDT TRC20 wallet address for all transactions.
                     </p>
                     <ul className="list-disc ml-6 space-y-2">
@@ -147,7 +147,7 @@ export default function PolicyPage() {
                   <div>
                     <h3 className="text-xl font-bold text-white mb-3">8. Account Termination</h3>
                     <p>
-                      CROWN reserves the right to suspend or terminate accounts that violate these terms, 
+                      BIG BULL reserves the right to suspend or terminate accounts that violate these terms, 
                       engage in fraudulent activities, or pose a risk to the platform or other users. 
                       Terminated accounts may forfeit pending earnings.
                     </p>
@@ -156,7 +156,7 @@ export default function PolicyPage() {
                   <div>
                     <h3 className="text-xl font-bold text-white mb-3">9. Limitation of Liability</h3>
                     <p>
-                      CROWN provides the platform "as is" without warranties. We are not liable for any 
+                      BIG BULL provides the platform "as is" without warranties. We are not liable for any 
                       losses resulting from platform use, investment decisions, or technical issues. 
                       Investments carry inherent risks, and past performance does not guarantee future results.
                     </p>
@@ -280,7 +280,7 @@ export default function PolicyPage() {
                   <div>
                     <h3 className="text-xl font-bold text-white mb-3">8. Children's Privacy</h3>
                     <p>
-                      CROWN is not intended for users under 18 years of age. We do not knowingly collect 
+                      BIG BULL is not intended for users under 18 years of age. We do not knowingly collect 
                       information from children. If you believe we have collected information from a minor, 
                       please contact us immediately.
                     </p>
@@ -290,7 +290,7 @@ export default function PolicyPage() {
                     <h3 className="text-xl font-bold text-white mb-3">9. International Data Transfers</h3>
                     <p>
                       Your information may be transferred to and processed in countries other than your own. 
-                      By using CROWN, you consent to such transfers.
+                      By using BIG BULL, you consent to such transfers.
                     </p>
                   </div>
 
@@ -317,9 +317,9 @@ export default function PolicyPage() {
       </section>
 
       {/* Footer */}
-      <footer className="relative z-10 border-t border-yellow-500/20 mt-20 bg-gray-900">
+      <footer className="relative z-10 border-t border-yellow-500/20 mt-20 bg-#05627C">
         <div className="max-w-7xl mx-auto px-6 py-8 text-center text-white/70">
-          <p>&copy; {new Date().getFullYear()} CROWN. All rights reserved.</p>
+          <p>&copy; {new Date().getFullYear()} BIG BULL. All rights reserved.</p>
           <div className="mt-4 flex justify-center gap-6">
             <Link href="/about-us" className="hover:text-white transition-colors">About Us</Link>
             <Link href="/policy" className="hover:text-white transition-colors">Privacy & Terms</Link>

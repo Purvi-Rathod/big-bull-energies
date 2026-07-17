@@ -15,7 +15,7 @@ export default function WithdrawalsReportPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
-  const [searchUseCrownPrefix, setSearchUseCrownPrefix] = useState(true);
+  const [searchUseBigBullPrefix, setSearchUseBigBullPrefix] = useState(true);
   const [statusFilter, setStatusFilter] = useState<'all' | 'approved' | 'pending' | 'rejected' | 'completed' | 'failed'>('all');
   const [walletTypeFilter, setWalletTypeFilter] = useState<string>('all');
   const [startDate, setStartDate] = useState(urlStart);
@@ -58,7 +58,7 @@ export default function WithdrawalsReportPage() {
     
     if (searchTerm) {
       const term = searchTerm.toLowerCase();
-      const effectiveTerm = getEffectiveUserSearch(searchTerm, searchUseCrownPrefix).toLowerCase();
+      const effectiveTerm = getEffectiveUserSearch(searchTerm, searchUseBigBullPrefix).toLowerCase();
       filtered = filtered.filter((wd: any) =>
         wd.userId.toLowerCase().includes(effectiveTerm) ||
         wd.userName.toLowerCase().includes(term) ||
@@ -232,8 +232,8 @@ export default function WithdrawalsReportPage() {
                 <AdminUserSearchInput
                   value={searchTerm}
                   onChange={setSearchTerm}
-                  useCrownPrefix={searchUseCrownPrefix}
-                  onUseCrownPrefixChange={setSearchUseCrownPrefix}
+                  useBigBullPrefix={searchUseBigBullPrefix}
+                  onUseBigBullPrefixChange={setSearchUseBigBullPrefix}
                   placeholderWithoutPrefix="Name, email, withdrawal ID..."
                 />
 

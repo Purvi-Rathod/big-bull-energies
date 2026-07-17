@@ -1,8 +1,8 @@
-# Crown Bankers Platform - Complete Rule Book
+# Big Bull Energies Platform - Complete Rule Book
 
 **Version:** 1.0  
 **Last Updated:** 2024  
-**Platform:** Crown Bankers is a solar investment system that provides massive returns based on investors' network. It combines Binary MLM with ROI, Referral, and Binary Bonuses.
+**Platform:** Big Bull Energies is a solar investment system that provides massive returns based on investors' network. It combines Binary MLM with ROI, Referral, and Binary Bonuses.
 
 ---
 
@@ -94,7 +94,7 @@
 
 - **Structure**: Each user can have maximum 2 direct children (left and right)
 - **Exception**: Admin (CROWN-000000) can have unlimited children
-- **Position Assignment**: 
+- **Position Assignment**:
   - If position specified and available → use it
   - If position specified but unavailable → find next available in that leg
   - If no position specified → auto-assign first available (left preferred)
@@ -220,6 +220,7 @@ Status = "active" (initially)
 ```
 
 **Example:**
+
 - User purchases $100 voucher
 - Investment Value = $100 × 2 = $200
 - Expiration = 120 days from purchase
@@ -262,16 +263,19 @@ Remaining Amount = Investment Amount - Voucher Investment Value
 #### Voucher Usage Examples
 
 **Example 1: Full Coverage**
+
 - Voucher: $100 (Investment Value: $200)
 - Investment: $100
 - Result: Voucher covers full amount → Investment activates immediately
 
 **Example 2: Partial Coverage**
+
 - Voucher: $100 (Investment Value: $200)
 - Investment: $300
 - Result: Voucher covers $200 → User pays remaining $100 via gateway
 
 **Example 3: Multiple Investments**
+
 - Voucher: $100 (Investment Value: $200)
 - Investment 1: $150 → Voucher covers $150, $50 remaining → User pays $50
 - Investment 2: $50 → Voucher covers remaining $50 → Investment activates
@@ -325,6 +329,7 @@ Remaining Amount = Investment Amount - Voucher Investment Value
 #### Request/Response Examples
 
 **Create Voucher (from wallet):**
+
 ```json
 POST /api/v1/user/vouchers/create
 {
@@ -349,6 +354,7 @@ Response:
 ```
 
 **Create Investment with Voucher:**
+
 ```json
 POST /api/v1/payment/create
 {
@@ -377,6 +383,7 @@ Response:
 #### Payment Gateway Disabled
 
 When NOWPayments gateway is disabled:
+
 - Vouchers can still be created (directly, without payment)
 - Investments can be created with vouchers (directly, without payment)
 - System processes investments immediately when voucher covers full amount
@@ -400,20 +407,20 @@ When NOWPayments gateway is disabled:
 
 ```typescript
 interface Voucher {
-  voucherId: string;           // Unique voucher identifier (format: VCH-{timestamp}-{random})
-  user: ObjectId;              // Owner of the voucher
-  fromWallet?: ObjectId;       // Wallet used to purchase (if from wallet)
-  amount: Decimal128;          // Purchase amount
+  voucherId: string; // Unique voucher identifier (format: VCH-{timestamp}-{random})
+  user: ObjectId; // Owner of the voucher
+  fromWallet?: ObjectId; // Wallet used to purchase (if from wallet)
+  amount: Decimal128; // Purchase amount
   investmentValue: Decimal128; // Investment value (amount × multiplier)
-  multiplier: number;          // Multiplier (default: 2)
+  multiplier: number; // Multiplier (default: 2)
   originalAmount?: Decimal128; // Original amount (for tracking)
-  createdBy: ObjectId;         // User who created the voucher
-  createdOn: Date;             // Creation timestamp
-  usedAt?: Date;               // Usage timestamp (when voucher was used)
-  expiry: Date;                // Expiration date (120 days from creation)
+  createdBy: ObjectId; // User who created the voucher
+  createdOn: Date; // Creation timestamp
+  usedAt?: Date; // Usage timestamp (when voucher was used)
+  expiry: Date; // Expiration date (120 days from creation)
   status: "active" | "used" | "expired" | "revoked";
-  paymentId?: string;          // Payment ID (if purchased via gateway)
-  orderId?: string;            // Order ID (if purchased via gateway)
+  paymentId?: string; // Payment ID (if purchased via gateway)
+  orderId?: string; // Order ID (if purchased via gateway)
 }
 ```
 
@@ -440,16 +447,19 @@ interface Voucher {
 ### Referral Bonus Flow
 
 **Scenario 1: First Investment**
+
 - User B (sponsored by User A) invests $100
 - User A receives: $100 × 7% = **$7** referral bonus
 - Referral bonus credited to User A's Referral wallet immediately
 
 **Scenario 2: Subsequent Investment**
+
 - User B invests again $500
 - User A receives: **$0** (referral bonus already paid on first investment)
 - System checks: User B has existing investments → skip referral bonus
 
 **Scenario 3: Deep Downline**
+
 - User A invites User D
 - User D is placed under User B or User C in binary tree (due to position availability)
 - User D invests $200
@@ -484,6 +494,7 @@ interface Voucher {
 ### Business Volume (BV) Addition
 
 **When Investment is Activated:**
+
 - Investment amount is added to parent's business volume
 - Traverses up the tree, adding BV to each ancestor's appropriate leg
 - BV is added based on user's position (left or right) in parent's tree
@@ -492,36 +503,43 @@ interface Voucher {
 ### Binary Bonus Calculation (Daily Cron)
 
 **Step 1: Calculate Available Volume**
+
 ```
 left_available = leftCarry + (leftBusiness - leftMatched)
 right_available = rightCarry + (rightBusiness - rightMatched)
 ```
 
 **Step 2: Find Matched Volume**
+
 ```
 matched = min(left_available, right_available)
 ```
 
 **Step 3: Apply Power Capacity Cap**
+
 ```
 capped_matched = min(matched, powerCapacity)
 ```
 
 **Step 4: Calculate Binary Bonus**
+
 ```
 binaryBonus = capped_matched * (binaryPct / 100)
 ```
 
 **Step 5: Consumption Model**
+
 - Consume `capped_matched` from both legs
 - Priority: Consume from `leftCarry`/`rightCarry` first, then from unmatched business
 - Update `leftMatched` and `rightMatched` to track consumed business from cumulative business volume
 
 **Step 6: Update Carry Forward**
+
 ```
 newLeftCarry = left_available - capped_matched
 newRightCarry = right_available - capped_matched
 ```
+
 **Important**: The leftover available volume (after subtracting matched amount) becomes the new carry forward. This ensures carry forward is properly flushed after matching.
 
 ### Binary Bonus Example
@@ -529,6 +547,7 @@ newRightCarry = right_available - capped_matched
 **Scenario: User A has User B (left) and User C (right)**
 
 **Day 1:**
+
 - User B invests $100 → User A's `leftBusiness = $100`
 - User C invests $500 → User A's `rightBusiness = $500`
 - Daily cron calculates:
@@ -542,6 +561,7 @@ newRightCarry = right_available - capped_matched
 - Result: User A receives **$10** binary bonus, right carry forward = **$400**
 
 **Day 2:**
+
 - User B invests again $400 → User A's `leftBusiness = $100 + $400 = $500`
 - Daily cron calculates:
   - `left_available = $0 + ($500 - $100) = $400` (carry + unmatched business)
@@ -577,26 +597,31 @@ newRightCarry = right_available - capped_matched
 ### ROI Calculation Formula
 
 **Step 1: Calculate Daily ROI Rate**
+
 ```
 dailyRoiRate = (totalOutputPct / 100) / durationDays
 ```
 
 **Step 2: Calculate Daily ROI Amount**
+
 ```
 dailyRoiAmount = principal * dailyRoiRate
 ```
 
 **Step 3: Split into Cashable and Renewable**
+
 ```
 renewablePart = dailyRoiAmount * (renewablePrinciplePct / 100)
 cashablePart = dailyRoiAmount - renewablePart
 ```
 
 **Step 4: Credit to Wallets**
+
 - `cashablePart` → Credited to ROI wallet `balance` (withdrawable)
 - `renewablePart` → Credited to ROI wallet `renewablePrincipal` (non-withdrawable)
 
 **Step 5: Update Investment Record**
+
 - `totalRoiEarned` += `cashablePart` (only cashable counts)
 - `totalReinvested` += `renewablePart` (track renewable separately)
 - `daysElapsed` += 1
@@ -607,6 +632,7 @@ cashablePart = dailyRoiAmount - renewablePart
 ### ROI Example
 
 **Package**: Solar Starter
+
 - `investedAmount`: $1000
 - `principal`: $1000 (remains constant)
 - `totalOutputPct`: 225%
@@ -614,12 +640,14 @@ cashablePart = dailyRoiAmount - renewablePart
 - `renewablePrinciplePct`: 50%
 
 **Daily Calculation:**
+
 - `dailyRoiRate = (225 / 100) / 150 = 0.015` (1.5% per day)
 - `dailyRoiAmount = $1000 × 0.015 = $15`
 - `renewablePart = $15 × 50% = $7.50` (non-withdrawable)
 - `cashablePart = $15 - $7.50 = $7.50` (withdrawable)
 
 **After 150 Days:**
+
 - `totalRoiEarned` = $7.50 × 150 = **$1,125** (cashable)
 - `totalReinvested` = $7.50 × 150 = **$1,125** (renewable, non-withdrawable)
 - Total ROI = **$2,250** (225% of $1000)
@@ -679,6 +707,7 @@ cashablePart = dailyRoiAmount - renewablePart
 ### Wallet Initialization
 
 When a user is created, all wallet types are initialized with:
+
 - `balance`: 0
 - `renewablePrincipal`: 0 (ROI wallet only)
 - `reserved`: 0
@@ -725,6 +754,7 @@ When a user is created, all wallet types are initialized with:
 ### Free Account (Funded) Rules (Official)
 
 **Activation**
+
 - On free activation: **no referral income** is credited to uplines.
 - The funded amount **does not count** as binary tree business.
 - User earns **ROI on the funded package**.
@@ -732,10 +762,12 @@ When a user is created, all wallet types are initialized with:
 - Existing referrer and downline structure **remain unchanged**; no new account or downline is created.
 
 **Withdrawal — Before completing the binary target**
+
 - **ROI withdrawal: locked.**
 - **Referral + Binary: unlocked** (can withdraw). Withdrawal amount limited to binary/referral income earned (wallet balance).
 
 **Withdrawal — After completing the binary target**
+
 - User can withdraw from **ROI wallet**.
 - All eligible incomes become withdrawable as per system rules.
 
@@ -752,11 +784,13 @@ When a user is created, all wallet types are initialized with:
 ### Order of Operations
 
 **Step 1: Deactivate Expired Investments**
+
 - Find all investments where `endDate < today` OR `daysRemaining <= 0`
 - Set `isActive = false`
 - These investments stop earning ROI and contributing to binary bonuses
 
 **Step 2: Calculate Binary Bonuses**
+
 - For each user with binary tree entry:
   - Calculate available volume from carry forward and unmatched business
   - Find matched volume (min of left and right available)
@@ -767,6 +801,7 @@ When a user is created, all wallet types are initialized with:
   - Create binary transaction record
 
 **Step 3: Calculate ROI**
+
 - For each active investment:
   - Check if ROI already calculated today (via `lastRoiDate`)
   - Calculate daily ROI amount
@@ -798,7 +833,7 @@ When a user is created, all wallet types are initialized with:
 
 1. **Unmatched Volume**: Carry forward represents unmatched business volume
 2. **Daily Recalculation**: Carry forward is recalculated daily during binary bonus calculation
-3. **Consumption Priority**: 
+3. **Consumption Priority**:
    - First: Consume from carry forward
    - Then: Consume from unmatched business
 4. **Leftover Calculation**: After matching, leftover available volume becomes new carry forward
@@ -825,6 +860,7 @@ rightConsumedFromBusiness = capped_matched - rightConsumedFromCarry
 ```
 
 **Key Points:**
+
 - Carry forward is **flushed** (consumed) during matching
 - **CRITICAL**: When carry is fully consumed, it becomes $0 (not leftover unmatched business)
 - Leftover unmatched business remains as unmatched (tracked via business - matched)
@@ -849,6 +885,7 @@ The Career Levels Reward System rewards users based on their total business volu
 ### Career Level Structure
 
 Each career level has:
+
 - **Name**: e.g., "Bronze", "Silver", "Gold", "Platinum"
 - **Level Number**: Sequential ordering (1, 2, 3, 4...)
 - **Investment Threshold**: Total business volume required (left + right)
@@ -876,16 +913,19 @@ Each career level has:
 ### Career Level Calculation
 
 **Total Business Volume:**
+
 ```
 totalBusinessVolume = leftBusiness + rightBusiness
 ```
 
 **Level Investment Progress:**
+
 ```
 levelInvestment = totalBusinessVolume - sum(completedLevelThresholds)
 ```
 
 **Level Completion:**
+
 - When `levelInvestment >= currentLevelThreshold`, the user:
   1. Receives the reward amount (credited to ROI wallet)
   2. Level investment counter resets to 0
@@ -895,10 +935,12 @@ levelInvestment = totalBusinessVolume - sum(completedLevelThresholds)
 ### Career Level Checking
 
 Career levels are checked automatically when:
+
 - Business volume is added to a user's binary tree (via `addBusinessVolume`)
 - This happens when a downline activates a package
 
 **Process:**
+
 1. Calculate total business volume (left + right)
 2. Find the next level to achieve (after highest completed level)
 3. Calculate level investment progress
@@ -912,6 +954,7 @@ Career levels are checked automatically when:
 ### Career Progress Tracking
 
 Each user has a `UserCareerProgress` record that tracks:
+
 - `currentLevel`: Reference to current career level
 - `currentLevelName`: Name of current level
 - `levelInvestment`: Investment progress for current level (resets after each level)
@@ -964,6 +1007,7 @@ Each user has a `UserCareerProgress` record that tracks:
 ### Admin Management
 
 Admins can:
+
 - Create new career levels
 - Update existing career levels (threshold, reward, status)
 - Delete career levels
@@ -1096,10 +1140,12 @@ Admins can:
 ### Sample 1: Complete Investment Flow
 
 **Setup:**
+
 - User A invites User B (left) and User C (right)
 - Package: Solar Starter (7% referral, 10% binary, 225% ROI, 150 days, $1000 cap)
 
 **Day 1 - Investment Activation:**
+
 - User B invests $100
   - User A receives: $100 × 7% = **$7** referral bonus
   - User A's `leftBusiness` = $100
@@ -1108,6 +1154,7 @@ Admins can:
   - User A's `rightBusiness` = $500
 
 **Day 1 - Daily Cron (Binary):**
+
 - User A's binary calculation:
   - `left_available` = $0 + ($100 - $0) = $100
   - `right_available` = $0 + ($500 - $0) = $500
@@ -1118,17 +1165,20 @@ Admins can:
   - `newRightCarry` = $400
 
 **Day 1 - Daily Cron (ROI):**
+
 - User B's ROI: $100 × (225%/100) / 150 = $1.50/day
   - Cashable: $0.75, Renewable: $0.75
 - User C's ROI: $500 × (225%/100) / 150 = $7.50/day
   - Cashable: $3.75, Renewable: $3.75
 
 **Day 2 - User B Invests Again:**
+
 - User B invests $400
   - User A receives: **$0** referral bonus (already paid)
   - User A's `leftBusiness` = $100 + $400 = $500
 
 **Day 2 - Daily Cron (Binary):**
+
 - User A's binary calculation:
   - `left_available` = $0 + ($500 - $100) = $400 (carry + unmatched business)
   - `right_available` = $400 + ($500 - $100) = $800 (carry + unmatched business)
@@ -1141,7 +1191,7 @@ Admins can:
   - `newRightCarry` = **$0** (carry fully consumed, leftover unmatched business stays as unmatched)
   - `newRightMatched` = $100 (unchanged, no business consumed)
 - Result: User A receives **$40** binary bonus
-- **Important**: 
+- **Important**:
   - The original $400 right carry is **consumed** (flushed) during matching
   - **CRITICAL FIX**: When carry is fully consumed, new carry = $0 (not leftover unmatched business)
   - Leftover unmatched business ($400) stays as unmatched (available for future matching)
@@ -1152,14 +1202,17 @@ Admins can:
 **Scenario**: User A has $400 right carry, User B invests $400 to balance it.
 
 **Day 1 State (After Cron):**
+
 - User A: `leftBusiness = $100`, `leftMatched = $100`, `leftCarry = $0`
 - User A: `rightBusiness = $500`, `rightMatched = $100`, `rightCarry = $400`
 
 **Day 2: User B Invests $400**
+
 - User A: `leftBusiness = $500` (increased from $100)
 - User A: `rightBusiness = $500`, `rightMatched = $100`, `rightCarry = $400` (unchanged)
 
 **Day 2 Cron Calculation:**
+
 - `left_available` = $0 + ($500 - $100) = $400
 - `right_available` = $400 + ($500 - $100) = $800
 - `matched` = min($400, $800) = $400
@@ -1168,6 +1221,7 @@ Admins can:
 - `newRightMatched` = $100 (unchanged, no business consumed)
 
 **After Day 2 Cron:**
+
 - The original $400 right carry is **consumed** (flushed) during matching
 - New right carry = $400 (leftover unmatched business: $500 - $100 = $400)
 - **Verification**: Original $400 carry is gone, replaced by leftover unmatched volume
@@ -1176,11 +1230,13 @@ Admins can:
 ### Sample 2: Deep Downline Referral
 
 **Setup:**
+
 - User A invites User B
 - User B invites User D (placed under User B in binary tree)
 - Package: 7% referral
 
 **Investment:**
+
 - User D invests $200
 - **User A receives**: $200 × 7% = **$14** referral bonus
 - **User B receives**: $0 (not the direct sponsor)
@@ -1189,10 +1245,12 @@ Admins can:
 ### Sample 3: Power Capacity Limit
 
 **Setup:**
+
 - User A has $2000 left business and $3000 right business
 - Power capacity: $1000
 
 **Binary Calculation:**
+
 - `matched` = min($2000, $3000) = $2000
 - `capped_matched` = min($2000, $1000) = $1000
 - `binaryBonus` = $1000 × 10% = **$100** (capped)
@@ -1235,9 +1293,10 @@ Admins can:
 
 ## Conclusion
 
-This rule book defines all business rules, calculations, and workflows for the Crown Bankers platform—a solar investment system that delivers massive returns based on investors' network. All calculations and operations must follow these rules exactly to ensure system consistency and accuracy.
+This rule book defines all business rules, calculations, and workflows for the Big Bull Energies platform—a solar investment system that delivers massive returns based on investors' network. All calculations and operations must follow these rules exactly to ensure system consistency and accuracy.
 
 **Key Principles:**
+
 1. Referral bonuses: One-time, immediate, first investment only
 2. Binary bonuses: Daily, consumption model, power capacity capped
 3. ROI: Daily, split into cashable and renewable, principal constant
@@ -1252,4 +1311,3 @@ For technical implementation details, refer to the source code and API documenta
 **Document Version**: 1.0  
 **Last Updated**: 2024  
 **Maintained By**: Development Team
-

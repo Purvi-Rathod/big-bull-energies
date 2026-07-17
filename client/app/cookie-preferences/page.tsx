@@ -27,31 +27,47 @@ export default function CookiePreferencesPage() {
     <div className="min-h-screen bg-gray-50" style={{ paddingTop: "156px" }}>
       <div className="container mx-auto px-4 py-16">
         <div className="max-w-4xl mx-auto">
-          <h1 className="text-4xl font-bold mb-4" style={{ color: "#042B19" }}>
+          <h1 className="text-4xl font-bold mb-4" style={{ color: "#05627C" }}>
             Cookie Preferences
           </h1>
           <p className="text-lg text-gray-600 mb-8">
-            Manage your cookie preferences for Crown Bankers
+            Manage your cookie preferences for Big Bull Energies
           </p>
 
-          <div className="bg-white rounded-lg shadow-sm p-8 space-y-6" style={{ borderColor: "#E5E7EB" }}>
+          <div
+            className="bg-white rounded-lg shadow-sm p-8 space-y-6"
+            style={{ borderColor: "#E5E7EB" }}
+          >
             <section>
-              <h2 className="text-2xl font-semibold mb-4" style={{ color: "#042B19" }}>
+              <h2
+                className="text-2xl font-semibold mb-4"
+                style={{ color: "#05627C" }}
+              >
                 What are cookies?
               </h2>
               <p className="text-gray-700 leading-relaxed">
-                Cookies are small text files that are placed on your device when you visit our website. They help us provide you with a better experience by remembering your preferences and understanding how you use our site.
+                Cookies are small text files that are placed on your device when
+                you visit our website. They help us provide you with a better
+                experience by remembering your preferences and understanding how
+                you use our site.
               </p>
             </section>
 
             <section className="space-y-4">
-              <div className="flex items-center justify-between p-4 border rounded-lg" style={{ borderColor: "#E5E7EB" }}>
+              <div
+                className="flex items-center justify-between p-4 border rounded-lg"
+                style={{ borderColor: "#E5E7EB" }}
+              >
                 <div className="flex-1">
-                  <h3 className="font-semibold mb-2" style={{ color: "#042B19" }}>
+                  <h3
+                    className="font-semibold mb-2"
+                    style={{ color: "#05627C" }}
+                  >
                     Essential Cookies
                   </h3>
                   <p className="text-sm text-gray-600">
-                    These cookies are necessary for the website to function properly. They cannot be disabled.
+                    These cookies are necessary for the website to function
+                    properly. They cannot be disabled.
                   </p>
                 </div>
                 <label className="relative inline-flex items-center cursor-pointer">
@@ -61,17 +77,25 @@ export default function CookiePreferencesPage() {
                     disabled
                     className="sr-only peer"
                   />
-                  <div className="w-11 h-6 bg-gray-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#042B19]"></div>
+                  <div className="w-11 h-6 bg-gray-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#05627C]"></div>
                 </label>
               </div>
 
-              <div className="flex items-center justify-between p-4 border rounded-lg" style={{ borderColor: "#E5E7EB" }}>
+              <div
+                className="flex items-center justify-between p-4 border rounded-lg"
+                style={{ borderColor: "#E5E7EB" }}
+              >
                 <div className="flex-1">
-                  <h3 className="font-semibold mb-2" style={{ color: "#042B19" }}>
+                  <h3
+                    className="font-semibold mb-2"
+                    style={{ color: "#05627C" }}
+                  >
                     Analytics Cookies
                   </h3>
                   <p className="text-sm text-gray-600">
-                    These cookies help us understand how visitors interact with our website by collecting and reporting information anonymously.
+                    These cookies help us understand how visitors interact with
+                    our website by collecting and reporting information
+                    anonymously.
                   </p>
                 </div>
                 <label className="relative inline-flex items-center cursor-pointer">
@@ -81,17 +105,24 @@ export default function CookiePreferencesPage() {
                     onChange={() => handleToggle("analytics")}
                     className="sr-only peer"
                   />
-                  <div className="w-11 h-6 bg-gray-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#042B19]"></div>
+                  <div className="w-11 h-6 bg-gray-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#05627C]"></div>
                 </label>
               </div>
 
-              <div className="flex items-center justify-between p-4 border rounded-lg" style={{ borderColor: "#E5E7EB" }}>
+              <div
+                className="flex items-center justify-between p-4 border rounded-lg"
+                style={{ borderColor: "#E5E7EB" }}
+              >
                 <div className="flex-1">
-                  <h3 className="font-semibold mb-2" style={{ color: "#042B19" }}>
+                  <h3
+                    className="font-semibold mb-2"
+                    style={{ color: "#05627C" }}
+                  >
                     Marketing Cookies
                   </h3>
                   <p className="text-sm text-gray-600">
-                    These cookies are used to deliver relevant advertisements and track campaign effectiveness.
+                    These cookies are used to deliver relevant advertisements
+                    and track campaign effectiveness.
                   </p>
                 </div>
                 <label className="relative inline-flex items-center cursor-pointer">
@@ -101,7 +132,7 @@ export default function CookiePreferencesPage() {
                     onChange={() => handleToggle("marketing")}
                     className="sr-only peer"
                   />
-                  <div className="w-11 h-6 bg-gray-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#042B19]"></div>
+                  <div className="w-11 h-6 bg-gray-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#05627C]"></div>
                 </label>
               </div>
             </section>
@@ -110,16 +141,20 @@ export default function CookiePreferencesPage() {
               <button
                 onClick={handleSave}
                 className="px-6 py-3 rounded-lg font-semibold text-white transition hover:opacity-90"
-                style={{ backgroundColor: "#042B19" }}
+                style={{ backgroundColor: "#05627C" }}
               >
                 Save Preferences
               </button>
               <button
                 onClick={() => {
-                  setPreferences({ essential: true, analytics: false, marketing: false });
+                  setPreferences({
+                    essential: true,
+                    analytics: false,
+                    marketing: false,
+                  });
                 }}
                 className="px-6 py-3 rounded-lg font-semibold border transition hover:bg-gray-50"
-                style={{ borderColor: "#042B19", color: "#042B19" }}
+                style={{ borderColor: "#05627C", color: "#05627C" }}
               >
                 Reset to Default
               </button>

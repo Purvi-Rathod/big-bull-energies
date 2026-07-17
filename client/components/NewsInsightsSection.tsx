@@ -14,24 +14,25 @@ export default function NewsInsightsSection() {
       date: "JAN 10, 2025",
       category: "NEWS",
       headline:
-        "Crown Bankers Expands Solar Energy Investment Portfolio Across Multiple Regions",
+        "Big Bull Energies Expands Solar Energy Investment Portfolio Across Multiple Regions",
       description:
-        "Crown Bankers announces significant expansion of its solar energy investment portfolio, with new projects launching in key markets. This expansion strengthens the company's commitment to renewable energy and provides investors with diversified opportunities.",
+        "Big Bull Energies announces significant expansion of its solar energy investment portfolio, with new projects launching in key markets. This expansion strengthens the company's commitment to renewable energy and provides investors with diversified opportunities.",
     },
     {
       date: "JAN 5, 2025",
       category: "ANNOUNCEMENT",
-      headline: "Crown Bankers Reaches Milestone: 10,000 Active Investors Worldwide",
+      headline:
+        "Big Bull Energies Reaches Milestone: 10,000 Active Investors Worldwide",
       description:
-        "Crown Bankers celebrates a major milestone as the platform reaches 10,000 active investors globally. This achievement reflects the growing trust in Crown Bankers' innovative approach to binary investment and sustainable energy.",
+        "Big Bull Energies celebrates a major milestone as the platform reaches 10,000 active investors globally. This achievement reflects the growing trust in Big Bull Energies' innovative approach to binary investment and sustainable energy.",
     },
     {
       date: "DEC 28, 2024",
       category: "NEWS",
       headline:
-        "New Investment Packages Released: Enhanced Returns for Crown Bankers Members",
+        "New Investment Packages Released: Enhanced Returns for Big Bull Energies Members",
       description:
-        "Crown Bankers introduces new investment packages with enhanced returns and flexible terms. These packages are designed to meet the diverse needs of investors while maintaining the company's commitment to sustainable energy projects.",
+        "Big Bull Energies introduces new investment packages with enhanced returns and flexible terms. These packages are designed to meet the diverse needs of investors while maintaining the company's commitment to sustainable energy projects.",
     },
   ];
 
@@ -43,7 +44,7 @@ export default function NewsInsightsSection() {
           <h2
             className="text-3xl sm:text-4xl md:text-5xl lg:text-5xl font-normal mb-3 sm:mb-4"
             style={{
-              color: "#042B19",
+              color: "#05627C",
               fontFamily: "var(--font-font4), sans-serif",
             }}
           >
@@ -58,7 +59,7 @@ export default function NewsInsightsSection() {
           <div className="space-y-3 sm:space-y-4">
             <p
               className="text-xs sm:text-sm font-medium uppercase tracking-wide"
-              style={{ color: "#042B19" }}
+              style={{ color: "#05627C" }}
             >
               FEATURED
             </p>
@@ -73,7 +74,7 @@ export default function NewsInsightsSection() {
             </div>
             <div
               className="flex items-center gap-2 sm:gap-3 text-xs sm:text-sm"
-              style={{ color: "#042B19" }}
+              style={{ color: "#05627C" }}
             >
               <span>{featuredArticle.date}</span>
               <svg
@@ -93,12 +94,16 @@ export default function NewsInsightsSection() {
             </div>
             <h3
               className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold leading-tight"
-              style={{ color: "#042B19" }}
+              style={{ color: "#05627C" }}
             >
               {featuredArticle.headline}
             </h3>
             <p className="text-sm sm:text-base text-gray-600 mt-3 sm:mt-4 leading-relaxed">
-              Crown Bankers announces the launch of its innovative binary investment platform, combining network marketing excellence with sustainable energy investments. The platform offers investors unique opportunities to build wealth while contributing to the global transition to renewable energy.
+              Big Bull Energies announces the launch of its innovative binary
+              investment platform, combining network marketing excellence with
+              sustainable energy investments. The platform offers investors
+              unique opportunities to build wealth while contributing to the
+              global transition to renewable energy.
             </p>
           </div>
 
@@ -108,7 +113,7 @@ export default function NewsInsightsSection() {
               <div key={index} className="py-4 sm:py-5 md:py-6">
                 <div
                   className="flex items-center gap-2 sm:gap-3 text-xs sm:text-sm mb-2 sm:mb-3"
-                  style={{ color: "#042B19" }}
+                  style={{ color: "#05627C" }}
                 >
                   <span>{article.date}</span>
                   <svg
@@ -128,7 +133,7 @@ export default function NewsInsightsSection() {
                 </div>
                 <h4
                   className="text-lg sm:text-xl md:text-2xl font-bold leading-tight mb-2 sm:mb-3"
-                  style={{ color: "#042B19" }}
+                  style={{ color: "#05627C" }}
                 >
                   {article.headline}
                 </h4>

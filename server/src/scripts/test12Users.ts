@@ -3,7 +3,7 @@
  * 
  * This script:
  * 1. Flushes the entire database
- * 2. Creates admin user with userId CROWN-000000
+ * 2. Creates admin user with userId BIGBULL-000000
  * 3. Seeds packages with all new fields
  * 4. Creates 12 test users in a tree structure
  * 5. Activates packages for users to test ROI, binary, and referral bonuses
@@ -57,22 +57,22 @@ async function flushDatabase() {
 }
 
 /**
- * Create admin user with userId CROWN-000000
+ * Create admin user with userId BIGBULL-000000
  */
 async function createAdminUser() {
   try {
-    console.log("👤 Creating admin user (CROWN-000000)...");
+    console.log("👤 Creating admin user (BIGBULL-000000)...");
     
     // Check if admin already exists
-    const existingAdmin = await findUserByUserId("CROWN-000000");
+    const existingAdmin = await findUserByUserId("BIGBULL-000000");
     if (existingAdmin) {
-      console.log("✅ Admin user already exists: CROWN-000000\n");
+      console.log("✅ Admin user already exists: BIGBULL-000000\n");
       return existingAdmin;
     }
     
     // Create admin user
     const adminUser = await User.create({
-      userId: "CROWN-000000",
+      userId: "BIGBULL-000000",
       name: "Admin User",
       email: "admin@crown.com",
       phone: "0000000000",
@@ -85,7 +85,7 @@ async function createAdminUser() {
     // Initialize admin's binary tree and wallets (no parent)
     await initializeUser(adminUser._id as Types.ObjectId, null, null);
     
-    console.log(`✅ Admin user created: CROWN-000000 (${adminUser.name})\n`);
+    console.log(`✅ Admin user created: BIGBULL-000000 (${adminUser.name})\n`);
     return adminUser;
   } catch (error: any) {
     console.error("❌ Error creating admin user:", error.message);
@@ -503,7 +503,7 @@ async function runTest12Users() {
     console.log("");
     
     console.log("🌳 Tree Structure:");
-    console.log(`   - Admin (CROWN-000000)`);
+    console.log(`   - Admin (BIGBULL-000000)`);
     console.log(`     ├─ Level 1 User 1 (${level1Users[0].userId})`);
     console.log(`     │  ├─ Level 2 User 1 (${user1Children[0].userId}) - left`);
     console.log(`     │  └─ Level 2 User 2 (${user1Children[1].userId}) - right`);

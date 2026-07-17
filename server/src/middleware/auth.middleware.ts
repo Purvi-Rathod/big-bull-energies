@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import { verifyAuthToken } from "../utils/jwt";
+import { verifyAuthToken, verifyAdminToken } from "../utils/jwt";
 import { AppError } from "../utils/AppError";
 
 declare global {
@@ -11,6 +11,17 @@ declare global {
   }
 }
 
+function getBearerOrCookieToken(req: Request): string | null {
+  return (
+    (req.headers.authorization?.startsWith("Bearer ")
+      ? req.headers.authorization.split(" ")[1]
+      : null) ||
+    req.cookies?.adminToken ||
+    req.cookies?.token ||
+    null
+  );
+}
+
 /**
  * Middleware to authenticate user using user JWT token
  * Sets req.user with user information
@@ -19,10 +30,7 @@ export function requireAuth(req: Request, res: Response, next: NextFunction) {
   try {
     // Prefer Authorization header over cookie so impersonation (Bearer token) wins over
     // any existing token cookie (e.g. admin's user session in another tab).
-    const token =
-      (req.headers.authorization?.startsWith("Bearer ")
-        ? req.headers.authorization.split(" ")[1]
-        : null) || req.cookies?.token;
+    const token = getBearerOrCookieToken(req);
 
     if (!token) {
       throw new AppError("User token required", 401);
@@ -44,6 +52,53 @@ export function requireAuth(req: Request, res: Response, next: NextFunction) {
     return res.status(401).json({ 
       status: "error",
       message: "Invalid or expired token" 
+    });
+  }
+}
+
+/**
+ * Accept either a user JWT or an admin JWT (for admin panel pages that call user tree APIs).
+ */
+export function requireAuthOrAdmin(req: Request, res: Response, next: NextFunction) {
+  try {
+    const token = getBearerOrCookieToken(req);
+
+    if (!token) {
+      throw new AppError("Authentication required", 401);
+    }
+
+    try {
+      const decoded = verifyAuthToken(token);
+      req.user = {
+        id: decoded.sub,
+        role: decoded.role,
+      };
+      return next();
+    } catch {
+      // fall through to admin token
+    }
+
+    try {
+      const decoded = verifyAdminToken(token);
+      req.admin = {
+        id: decoded.sub,
+        role: decoded.role,
+        email: decoded.email,
+      };
+      return next();
+    } catch {
+      throw new AppError("Invalid or expired token", 401);
+    }
+  } catch (error) {
+    if (error instanceof AppError) {
+      return res.status(error.statusCode).json({
+        status: "error",
+        message: error.message,
+      });
+    }
+    return res.status(401).json({
+      status: "error",
+      message: "Invalid or expired token",
     });
   }
 }

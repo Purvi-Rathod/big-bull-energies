@@ -5,13 +5,13 @@
  * receiving binary income in the next daily calculation.
  *
  * Affected accounts:
- *   CROWN-000220 - Right business $7000
- *   CROWN-000637 - Right business $6000
- *   CROWN-000638 - Right business $5000
- *   CROWN-000639 - Right business $4000
- *   CROWN-000640 - Right business $3000
- *   CROWN-000641 - Right business $2000
- *   CROWN-000642 - Right business $1000
+ *   BIGBULL-000220 - Right business $7000
+ *   BIGBULL-000637 - Right business $6000
+ *   BIGBULL-000638 - Right business $5000
+ *   BIGBULL-000639 - Right business $4000
+ *   BIGBULL-000640 - Right business $3000
+ *   BIGBULL-000641 - Right business $2000
+ *   BIGBULL-000642 - Right business $1000
  *
  * Usage: npx ts-node -r dotenv/config src/scripts/removeRightBusiness.ts
  */
@@ -40,13 +40,13 @@ const MONGODB_URI =
   "mongodb://localhost:27017/crown-bankers";
 
 const USER_IDS_TO_UPDATE = [
-  "CROWN-000220",
-  "CROWN-000637",
-  "CROWN-000638",
-  "CROWN-000639",
-  "CROWN-000640",
-  "CROWN-000641",
-  "CROWN-000642",
+  "BIGBULL-000220",
+  "BIGBULL-000637",
+  "BIGBULL-000638",
+  "BIGBULL-000639",
+  "BIGBULL-000640",
+  "BIGBULL-000641",
+  "BIGBULL-000642",
 ];
 
 async function connectDB() {

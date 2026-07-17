@@ -15,7 +15,7 @@ import ReactFlow, {
 } from 'reactflow';
 import 'reactflow/dist/style.css';
 import { api } from '@/lib/api';
-import CrownLoader from '@/components/CrownLoader';
+import BigBullLoader from '@/components/BigBullLoader';
 
 interface TreeUser {
   id: string;
@@ -79,7 +79,7 @@ const CustomNode = memo(({ data }: { data: CustomNodeData }) => {
     }
   }, [onExpand, isExpanded, isLoading, hasMoreDownlines, user.userId]);
 
-  const isAdmin = user.userId === "CROWN-000000" || user.userId === "CROWN-000000";
+  const isAdmin = user.userId === "BIGBULL-000000" || user.userId === "CROWN-000000" || user.userId === "CNEOX-000000";
   const totalChildren = isAdmin ? (user.allChildren?.length || user.leftDownlines || 0) : null;
 
   return (
@@ -383,7 +383,7 @@ export default function MyTreePage() {
       levels[level].push(user);
       processed.add(user.id);
 
-      const isAdmin = user.userId === "CROWN-000000" || user.userId === "CROWN-000000";
+      const isAdmin = user.userId === "BIGBULL-000000" || user.userId === "CROWN-000000" || user.userId === "CNEOX-000000";
       const childrenSet = new Set<TreeUser>();
       
       if (isAdmin) {
@@ -586,7 +586,7 @@ export default function MyTreePage() {
   }, []);
 
   if (loading) {
-    return <CrownLoader fullScreen />;
+    return <BigBullLoader fullScreen />;
   }
 
   if (error) {
@@ -598,8 +598,8 @@ export default function MyTreePage() {
   }
 
   return (
-      <div className="w-full h-[calc(100vh-8rem)] flex flex-col bg-black rounded-lg overflow-hidden border border-yellow-500/20">
-        <div className="bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 border-b border-yellow-500/30 shadow-lg p-4 z-10">
+      <div className="w-full h-[calc(100vh-8rem)] flex flex-col bg-[rgba(8,16,40,0.9)] rounded-lg overflow-hidden border border-[#FBF676]/20">
+        <div className="bg-[rgba(5,12,32,0.95)] border-b border-[#FBF676]/25 shadow-lg p-4 z-10">
           <div className="flex flex-col gap-4">
             <div className="flex justify-between items-center">
               <div>
@@ -612,7 +612,7 @@ export default function MyTreePage() {
               </div>
               <button
                 onClick={() => window.history.back()}
-                className="px-4 py-2 bg-gradient-to-r from-yellow-500 to-yellow-600 text-black rounded-lg hover:from-yellow-400 hover:to-yellow-500 transition-all font-semibold shadow-lg hover:shadow-yellow-500/50"
+                className="px-4 py-2 bg-[#FBF676] text-[#0C1A6B] rounded-lg hover:bg-[#e8e04a] transition-all font-semibold shadow-lg hover:shadow-[#FBF676]/30"
               >
                 ← Back
               </button>
@@ -633,10 +633,10 @@ export default function MyTreePage() {
                     }
                   }}
                   placeholder="Search by User ID, Name, or Email..."
-                  className="w-full px-4 py-2 pl-10 bg-gray-800/50 border border-yellow-500/30 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 text-white placeholder:text-gray-400"
+                  className="w-full px-4 py-2 pl-10 bg-[#081028] border border-[#FBF676]/25 rounded-lg focus:ring-2 focus:ring-[#FBF676]/40 focus:border-[#FBF676]/70 text-white placeholder:text-white/55"
                 />
                 <svg
-                  className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-yellow-400"
+                  className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-[#FBF676]"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -646,7 +646,7 @@ export default function MyTreePage() {
               </div>
               <button
                 onClick={() => handleSearch(searchTerm)}
-                className="px-6 py-2 bg-gradient-to-r from-yellow-500 to-yellow-600 text-black rounded-lg hover:from-yellow-400 hover:to-yellow-500 transition-all font-semibold shadow-lg hover:shadow-yellow-500/50"
+                className="px-6 py-2 bg-[#FBF676] text-[#0C1A6B] rounded-lg hover:bg-[#e8e04a] transition-all font-semibold shadow-lg hover:shadow-[#FBF676]/30"
               >
                 Search
               </button>

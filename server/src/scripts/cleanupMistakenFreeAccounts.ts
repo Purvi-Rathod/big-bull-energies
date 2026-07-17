@@ -9,7 +9,7 @@
  * 5. Deactivate users (set status = "inactive")
  * 6. Remove free account type (set accountType = null or "normal")
  * 
- * Usage: npx ts-node -r dotenv/config src/scripts/cleanupMistakenFreeAccounts.ts CROWN-000577 CROWN-000576 CROWN-000575
+ * Usage: npx ts-node -r dotenv/config src/scripts/cleanupMistakenFreeAccounts.ts BIGBULL-000577 BIGBULL-000576 BIGBULL-000575
  */
 
 import mongoose from "mongoose";
@@ -141,7 +141,7 @@ async function main() {
 
   if (userIds.length === 0) {
     console.error("❌ Please provide user IDs as arguments");
-    console.error("Usage: npx ts-node -r dotenv/config src/scripts/cleanupMistakenFreeAccounts.ts CROWN-000577 CROWN-000576 CROWN-000575");
+    console.error("Usage: npx ts-node -r dotenv/config src/scripts/cleanupMistakenFreeAccounts.ts BIGBULL-000577 BIGBULL-000576 BIGBULL-000575");
     process.exit(1);
   }
 

@@ -2,9 +2,9 @@
  * Script to create left and right children for a given referrer ID
  * 
  * Usage: 
- *   npm run create:children CROWN-000000
+ *   npm run create:children BIGBULL-000000
  *   OR
- *   npx ts-node -r dotenv/config src/scripts/createLeftRightChildren.ts CROWN-000000
+ *   npx ts-node -r dotenv/config src/scripts/createLeftRightChildren.ts BIGBULL-000000
  * 
  * This script creates two users:
  * - One as left child of the referrer
@@ -44,7 +44,7 @@ async function createChildUser(
   // Check if position is already occupied
   const referrerTree = await BinaryTree.findOne({ user: referrerUser._id });
   if (referrerTree) {
-    const referrerIsAdmin = referrerUser.userId === "CROWN-000000";
+    const referrerIsAdmin = referrerUser.userId === "BIGBULL-000000";
     
     if (!referrerIsAdmin) {
       // For non-admin, check if position is already occupied
@@ -196,7 +196,7 @@ const referrerId = process.argv[2];
 
 if (!referrerId) {
   console.log("Usage: npx ts-node src/scripts/createLeftRightChildren.ts <REFERRER_ID>");
-  console.log("Example: npx ts-node src/scripts/createLeftRightChildren.ts CROWN-000000");
+  console.log("Example: npx ts-node src/scripts/createLeftRightChildren.ts BIGBULL-000000");
   process.exit(1);
 }
 

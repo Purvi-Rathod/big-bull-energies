@@ -121,11 +121,11 @@ async function diagnoseUser(userId: string): Promise<DiagnosticReport> {
   console.log(`🔍 DIAGNOSING USER: ${userId}`);
   console.log(`${'='.repeat(80)}\n`);
 
-  // Find user by userId - try exact match first, then try with CROWN- prefix, then try with CNEOX- prefix
+  // Find user by userId - try exact match first, then try with BIGBULL- prefix, then try with CNEOX- prefix
   let user = await User.findOne({ userId }).lean();
   if (!user && !userId.includes('-')) {
-    // Try with CROWN- prefix
-    user = await User.findOne({ userId: `CROWN-${userId}` }).lean();
+    // Try with BIGBULL- prefix
+    user = await User.findOne({ userId: `BIGBULL-${userId}` }).lean();
   }
   if (!user && !userId.includes('-')) {
     // Try with CNEOX- prefix
@@ -138,7 +138,7 @@ async function diagnoseUser(userId: string): Promise<DiagnosticReport> {
     }
   }
   if (!user) {
-    throw new Error(`User with userId "${userId}" not found. Tried: "${userId}", "CROWN-${userId}", "CNEOX-${userId}"`);
+    throw new Error(`User with userId "${userId}" not found. Tried: "${userId}", "BIGBULL-${userId}", "CNEOX-${userId}"`);
   }
 
   console.log(`✅ User Found:`);
@@ -500,7 +500,7 @@ function generateReport(report: DiagnosticReport): string {
 }
 
 async function main() {
-  const userId = process.argv[2] || 'CROWN-000282';
+  const userId = process.argv[2] || 'BIGBULL-000282';
 
   try {
     await connectDB();

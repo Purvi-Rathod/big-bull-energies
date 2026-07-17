@@ -5,7 +5,7 @@
  * and recalculates carry forward according to the rulebook.
  * 
  * Usage: npx ts-node -r dotenv/config src/scripts/fixMatchedAndCarry.ts [userId1] [userId2] ...
- * Example: npx ts-node -r dotenv/config src/scripts/fixMatchedAndCarry.ts CROWN-000532 CROWN-000281
+ * Example: npx ts-node -r dotenv/config src/scripts/fixMatchedAndCarry.ts BIGBULL-000532 BIGBULL-000281
  */
 
 import mongoose from "mongoose";
@@ -308,7 +308,7 @@ async function main() {
   if (userIds.length === 0) {
     console.error("❌ Error: At least one user ID required");
     console.error("Usage: npx ts-node -r dotenv/config src/scripts/fixMatchedAndCarry.ts [userId1] [userId2] ...");
-    console.error("Example: npx ts-node -r dotenv/config src/scripts/fixMatchedAndCarry.ts CROWN-000532 CROWN-000281");
+    console.error("Example: npx ts-node -r dotenv/config src/scripts/fixMatchedAndCarry.ts BIGBULL-000532 BIGBULL-000281");
     process.exit(1);
   }
   

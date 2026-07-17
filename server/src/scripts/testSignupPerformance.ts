@@ -38,9 +38,9 @@ async function testSignupPerformance() {
     }
 
     // Find a test referrer
-    const referrer = await findUserByUserId("CROWN-000071");
+    const referrer = await findUserByUserId("BIGBULL-000071");
     if (!referrer) {
-      console.error("❌ Referrer CROWN-000071 not found. Please ensure test data exists.");
+      console.error("❌ Referrer BIGBULL-000071 not found. Please ensure test data exists.");
       process.exit(1);
     }
 
@@ -53,7 +53,7 @@ async function testSignupPerformance() {
       phone: `123456789${Date.now().toString().slice(-4)}`,
       password: "Test@123456",
       country: "US",
-      referrerUserId: "CROWN-000071",
+      referrerUserId: "BIGBULL-000071",
       position: "left" as const,
     };
 

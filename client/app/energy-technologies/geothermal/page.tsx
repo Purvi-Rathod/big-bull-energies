@@ -43,9 +43,9 @@ function GeothermalMarquee() {
             <span
               className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl 2xl:text-8xl font-bold uppercase tracking-tight"
               style={{
-                color: "#042B19",
+                color: "#05627C",
                 fontFamily: "var(--font-custom), 'CustomFont', sans-serif",
-                WebkitTextStroke: "2px #042B19",
+                WebkitTextStroke: "2px #05627C",
                 WebkitTextFillColor: "transparent",
               }}
             >
@@ -53,7 +53,7 @@ function GeothermalMarquee() {
             </span>
             <span
               className="mx-4 sm:mx-6 md:mx-8 lg:mx-10 xl:mx-12 text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl 2xl:text-8xl"
-              style={{ color: "#042B19" }}
+              style={{ color: "#05627C" }}
             >
               ·
             </span>
@@ -90,19 +90,22 @@ export default function GeothermalPage() {
             <div className="flex flex-col order-2 lg:order-1">
               {/* Breadcrumbs/Navigation */}
               <div className="flex items-center gap-2 sm:gap-3 mb-6 sm:mb-8 flex-wrap">
-                <div className="h-px w-8 sm:w-12 bg-[#042B19]"></div>
+                <div className="h-px w-8 sm:w-12 bg-[#05627C]"></div>
                 <Link
                   href="/energy-technologies"
                   className="text-xs font-medium uppercase tracking-wide hover:opacity-70 transition"
-                  style={{ color: "#042B19" }}
+                  style={{ color: "#05627C" }}
                 >
                   ENERGY TECHNOLOGIES
                 </Link>
                 <div className="h-4 w-px bg-gray-300"></div>
-                <Mountain className="w-3 h-3 sm:w-4 sm:h-4" style={{ color: "#ffcf0B" }} />
+                <Mountain
+                  className="w-3 h-3 sm:w-4 sm:h-4"
+                  style={{ color: "#ffcf0B" }}
+                />
                 <span
                   className="text-xs font-medium uppercase tracking-wide"
-                  style={{ color: "#042B19" }}
+                  style={{ color: "#05627C" }}
                 >
                   GEOTHERMAL
                 </span>
@@ -112,7 +115,7 @@ export default function GeothermalPage() {
               <h1
                 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl 2xl:text-7xl font-normal leading-tight mb-6 sm:mb-8"
                 style={{
-                  color: "#042B19",
+                  color: "#05627C",
                   fontFamily: "var(--font-font4), sans-serif",
                 }}
               >
@@ -134,13 +137,14 @@ export default function GeothermalPage() {
               <p
                 className="text-sm sm:text-base md:text-lg lg:text-xl leading-relaxed"
                 style={{
-                  color: "#042B19",
+                  color: "#05627C",
                   fontFamily: "var(--font-font4), sans-serif",
                 }}
               >
-                Geothermal energy harnesses the Earth&apos;s natural heat to generate
-                clean, renewable electricity. This sustainable energy source provides
-                reliable power generation with minimal environmental impact.
+                Geothermal energy harnesses the Earth&apos;s natural heat to
+                generate clean, renewable electricity. This sustainable energy
+                source provides reliable power generation with minimal
+                environmental impact.
               </p>
             </div>
           </div>
@@ -155,7 +159,7 @@ export default function GeothermalPage() {
             <div className="flex flex-col order-2 lg:order-1">
               <h2
                 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-6 sm:mb-8"
-                style={{ color: "#042B19" }}
+                style={{ color: "#05627C" }}
               >
                 Our proven track record in geothermal
               </h2>
@@ -164,17 +168,17 @@ export default function GeothermalPage() {
               <div className="space-y-4 sm:space-y-6">
                 {/* Stat 1 */}
                 <div>
-                  <div className="h-px bg-[#042B19] mb-3 sm:mb-4"></div>
+                  <div className="h-px bg-[#05627C] mb-3 sm:mb-4"></div>
                   <div className="flex flex-col sm:flex-row sm:items-baseline gap-2 sm:gap-3">
                     <span
                       className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold"
-                      style={{ color: "#042B19" }}
+                      style={{ color: "#05627C" }}
                     >
                       5+
                     </span>
                     <span
                       className="text-sm sm:text-base md:text-lg lg:text-xl"
-                      style={{ color: "#042B19" }}
+                      style={{ color: "#05627C" }}
                     >
                       geothermal projects in development
                     </span>
@@ -183,17 +187,17 @@ export default function GeothermalPage() {
 
                 {/* Stat 2 */}
                 <div>
-                  <div className="h-px bg-[#042B19] mb-3 sm:mb-4"></div>
+                  <div className="h-px bg-[#05627C] mb-3 sm:mb-4"></div>
                   <div className="flex flex-col sm:flex-row sm:items-baseline gap-2 sm:gap-3">
                     <span
                       className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold"
-                      style={{ color: "#042B19" }}
+                      style={{ color: "#05627C" }}
                     >
                       500+
                     </span>
                     <span
                       className="text-sm sm:text-base md:text-lg lg:text-xl"
-                      style={{ color: "#042B19" }}
+                      style={{ color: "#05627C" }}
                     >
                       megawatts of geothermal capacity planned
                     </span>
@@ -202,17 +206,17 @@ export default function GeothermalPage() {
 
                 {/* Stat 3 */}
                 <div>
-                  <div className="h-px bg-[#042B19] mb-3 sm:mb-4"></div>
+                  <div className="h-px bg-[#05627C] mb-3 sm:mb-4"></div>
                   <div className="flex flex-col sm:flex-row sm:items-baseline gap-2 sm:gap-3">
                     <span
                       className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold"
-                      style={{ color: "#042B19" }}
+                      style={{ color: "#05627C" }}
                     >
                       100+
                     </span>
                     <span
                       className="text-sm sm:text-base md:text-lg lg:text-xl"
-                      style={{ color: "#042B19" }}
+                      style={{ color: "#05627C" }}
                     >
                       years of sustainable energy potential
                     </span>
@@ -220,7 +224,7 @@ export default function GeothermalPage() {
                 </div>
 
                 {/* Final line */}
-                <div className="h-px bg-[#042B19] mt-3 sm:mt-4"></div>
+                <div className="h-px bg-[#05627C] mt-3 sm:mt-4"></div>
               </div>
             </div>
 
@@ -231,7 +235,7 @@ export default function GeothermalPage() {
                 href="/projects"
                 className="text-xs sm:text-sm md:text-base font-bold uppercase tracking-wide mb-6 sm:mb-8 hover:opacity-70 transition"
                 style={{
-                  color: "#042B19",
+                  color: "#05627C",
                   textDecoration: "underline",
                   textUnderlineOffset: "4px",
                 }}
@@ -257,7 +261,7 @@ export default function GeothermalPage() {
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <h2
             className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-8 sm:mb-10 md:mb-12 text-center"
-            style={{ color: "#042B19" }}
+            style={{ color: "#05627C" }}
           >
             How geothermal energy works
           </h2>
@@ -290,13 +294,16 @@ export default function GeothermalPage() {
                   text: "Electricity is transmitted via transmission lines to the power grid.",
                 },
               ].map((step) => (
-                <div key={step.number} className="flex items-start gap-3 sm:gap-4">
+                <div
+                  key={step.number}
+                  className="flex items-start gap-3 sm:gap-4"
+                >
                   <div
                     className="flex-shrink-0 w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center font-bold text-base sm:text-lg shadow-md"
                     style={{
                       backgroundColor: "#E8F5F0",
-                      color: "#042B19",
-                      border: "2px solid #042B19",
+                      color: "#05627C",
+                      border: "2px solid #05627C",
                       boxShadow: "0 4px 6px rgba(4, 43, 25, 0.1)",
                     }}
                   >
@@ -304,7 +311,7 @@ export default function GeothermalPage() {
                   </div>
                   <p
                     className="text-sm sm:text-base md:text-lg lg:text-xl leading-relaxed flex-1"
-                    style={{ color: "#042B19" }}
+                    style={{ color: "#05627C" }}
                   >
                     {step.text}
                   </p>
@@ -332,58 +339,61 @@ export default function GeothermalPage() {
             <div className="flex flex-col order-2 lg:order-1">
               <h2
                 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-4 sm:mb-6"
-                style={{ color: "#042B19" }}
+                style={{ color: "#05627C" }}
               >
                 Why geothermal energy
               </h2>
               <p
                 className="text-sm sm:text-base md:text-lg lg:text-xl leading-relaxed mb-4 sm:mb-6"
-                style={{ color: "#042B19" }}
+                style={{ color: "#05627C" }}
               >
-                Geothermal energy offers unique advantages as a renewable energy source.
-                Geothermal&apos;s benefits include:
+                Geothermal energy offers unique advantages as a renewable energy
+                source. Geothermal&apos;s benefits include:
               </p>
               <div className="space-y-3 sm:space-y-4">
                 <div className="flex items-start gap-2 sm:gap-3">
                   <span
                     className="text-lg sm:text-xl flex-shrink-0 mt-0.5"
-                    style={{ color: "#042B19" }}
+                    style={{ color: "#05627C" }}
                   >
                     →
                   </span>
                   <p
                     className="text-sm sm:text-base md:text-lg lg:text-xl leading-relaxed"
-                    style={{ color: "#042B19" }}
+                    style={{ color: "#05627C" }}
                   >
-                    Renewable and sustainable energy source with minimal carbon footprint
+                    Renewable and sustainable energy source with minimal carbon
+                    footprint
                   </p>
                 </div>
                 <div className="flex items-start gap-2 sm:gap-3">
                   <span
                     className="text-lg sm:text-xl flex-shrink-0 mt-0.5"
-                    style={{ color: "#042B19" }}
+                    style={{ color: "#05627C" }}
                   >
                     →
                   </span>
                   <p
                     className="text-sm sm:text-base md:text-lg lg:text-xl leading-relaxed"
-                    style={{ color: "#042B19" }}
+                    style={{ color: "#05627C" }}
                   >
-                    Reliable base-load power available 24/7 regardless of weather conditions
+                    Reliable base-load power available 24/7 regardless of
+                    weather conditions
                   </p>
                 </div>
                 <div className="flex items-start gap-2 sm:gap-3">
                   <span
                     className="text-lg sm:text-xl flex-shrink-0 mt-0.5"
-                    style={{ color: "#042B19" }}
+                    style={{ color: "#05627C" }}
                   >
                     →
                   </span>
                   <p
                     className="text-sm sm:text-base md:text-lg lg:text-xl leading-relaxed"
-                    style={{ color: "#042B19" }}
+                    style={{ color: "#05627C" }}
                   >
-                    Long operational lifespan with low operating and maintenance costs
+                    Long operational lifespan with low operating and maintenance
+                    costs
                   </p>
                 </div>
               </div>
@@ -408,7 +418,7 @@ export default function GeothermalPage() {
             <h2
               className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-normal mb-6 sm:mb-8 px-2"
               style={{
-                color: "#042B19",
+                color: "#05627C",
                 fontFamily: "var(--font-font4), sans-serif",
               }}
             >

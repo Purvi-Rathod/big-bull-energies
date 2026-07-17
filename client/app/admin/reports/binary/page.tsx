@@ -10,7 +10,7 @@ export default function BinaryReportPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
-  const [searchUseCrownPrefix, setSearchUseCrownPrefix] = useState(true);
+  const [searchUseBigBullPrefix, setSearchUseBigBullPrefix] = useState(true);
   const [typeFilter, setTypeFilter] = useState<'all' | 'credit' | 'debit'>('all');
   const [statusFilter, setStatusFilter] = useState<'all' | 'completed' | 'pending' | 'failed'>('all');
   const [startDate, setStartDate] = useState('');
@@ -48,7 +48,7 @@ export default function BinaryReportPage() {
     
     if (searchTerm) {
       const term = searchTerm.toLowerCase();
-      const effectiveTerm = getEffectiveUserSearch(searchTerm, searchUseCrownPrefix).toLowerCase();
+      const effectiveTerm = getEffectiveUserSearch(searchTerm, searchUseBigBullPrefix).toLowerCase();
       filtered = filtered.filter((tx: any) =>
         tx.userId.toLowerCase().includes(effectiveTerm) ||
         tx.userName.toLowerCase().includes(term) ||
@@ -216,8 +216,8 @@ export default function BinaryReportPage() {
                 <AdminUserSearchInput
                   value={searchTerm}
                   onChange={setSearchTerm}
-                  useCrownPrefix={searchUseCrownPrefix}
-                  onUseCrownPrefixChange={setSearchUseCrownPrefix}
+                  useBigBullPrefix={searchUseBigBullPrefix}
+                  onUseBigBullPrefixChange={setSearchUseBigBullPrefix}
                 />
 
                 <div className="flex gap-4 flex-wrap items-center">

@@ -159,8 +159,8 @@ body {
 /* Removed forced black text to allow dark theme pages to use white text */
 /* Individual components should set text color based on their theme */
 
-/* CROWN Loader Animations */
-@keyframes crownArcRotate1 {
+/* BIG BULL Loader Animations */
+@keyframes bigbullArcRotate1 {
   0% {
     transform: rotate(0deg);
     opacity: 1;
@@ -174,7 +174,7 @@ body {
   }
 }
 
-@keyframes crownArcRotate2 {
+@keyframes bigbullArcRotate2 {
   0% {
     transform: rotate(180deg);
     opacity: 1;
@@ -188,16 +188,16 @@ body {
   }
 }
 
-.crown-arc-1 {
-  animation: crownArcRotate1 2s linear infinite;
+.bigbull-arc-1 {
+  animation: bigbullArcRotate1 2s linear infinite;
 }
 
-.crown-arc-2 {
-  animation: crownArcRotate2 2s linear infinite;
+.bigbull-arc-2 {
+  animation: bigbullArcRotate2 2s linear infinite;
 }
 
 /* Fade-in animation for loader */
-@keyframes crownLoaderFadeIn {
+@keyframes bigbullLoaderFadeIn {
   from {
     opacity: 0;
   }
@@ -206,8 +206,8 @@ body {
   }
 }
 
-.crown-loader-container {
-  animation: crownLoaderFadeIn 0.3s ease-in;
+.bigbull-loader-container {
+  animation: bigbullLoaderFadeIn 0.3s ease-in;
 }
 
 /* Dashboard Page Animations */
@@ -396,4 +396,30 @@ body {
 
 .reports-tabs-container::-webkit-scrollbar-thumb:hover {
   background: #a0aec0;
+}
+
+/* Dark form controls for user dashboard (avoid white native selects/inputs) */
+select,
+select option,
+input[type="number"],
+input[type="text"],
+input[type="email"],
+input[type="password"],
+textarea {
+  color-scheme: dark;
+}
+
+select option {
+  background-color: #081028;
+  color: #ffffff;
+}
+
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+textarea:-webkit-autofill,
+select:-webkit-autofill {
+  -webkit-text-fill-color: #ffffff;
+  -webkit-box-shadow: 0 0 0px 1000px #081028 inset;
+  transition: background-color 5000s ease-in-out 0s;
 }

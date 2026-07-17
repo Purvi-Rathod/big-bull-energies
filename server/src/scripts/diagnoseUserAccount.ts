@@ -6,7 +6,7 @@
  * Free Account / funded activation rules) and reports OK vs issues.
  *
  * Usage: npx ts-node -r dotenv/config src/scripts/diagnoseUserAccount.ts [userId]
- * Example: npx ts-node -r dotenv/config src/scripts/diagnoseUserAccount.ts CROWN-000220
+ * Example: npx ts-node -r dotenv/config src/scripts/diagnoseUserAccount.ts BIGBULL-000220
  */
 
 import mongoose from "mongoose";
@@ -81,7 +81,7 @@ export async function diagnoseUserAccount(userId: string): Promise<{
 
   let user = await User.findOne({ userId }).lean();
   if (!user && !userId.includes("-")) {
-    user = await User.findOne({ userId: `CROWN-${userId}` }).lean();
+    user = await User.findOne({ userId: `BIGBULL-${userId}` }).lean();
   }
   if (!user && !userId.includes("-")) {
     user = await User.findOne({ userId: `CNEOX-${userId}` }).lean();
@@ -90,7 +90,7 @@ export async function diagnoseUserAccount(userId: string): Promise<{
     user = await User.findById(userId).lean();
   }
   if (!user) {
-    throw new Error(`User not found: "${userId}" (tried ${userId}, CROWN-${userId}, CNEOX-${userId})`);
+    throw new Error(`User not found: "${userId}" (tried ${userId}, BIGBULL-${userId}, CNEOX-${userId})`);
   }
 
   const userObjId = (user as any)._id;
@@ -236,7 +236,7 @@ function printReport(result: Awaited<ReturnType<typeof diagnoseUserAccount>>) {
 }
 
 async function main() {
-  const userId = process.argv[2] || "CROWN-000220";
+  const userId = process.argv[2] || "BIGBULL-000220";
   try {
     await connectDB();
     const result = await diagnoseUserAccount(userId);

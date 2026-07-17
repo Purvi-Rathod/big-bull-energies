@@ -189,9 +189,9 @@ class PerformanceTestSuite {
     console.log("   Root user will have 10 left and 10 right children\n");
 
     // Find or create root user (User A)
-    let rootUser = await findUserByUserId("CROWN-000071");
+    let rootUser = await findUserByUserId("BIGBULL-000071");
     if (!rootUser) {
-      console.log("⚠️  Root user CROWN-000071 not found. Creating test root user...");
+      console.log("⚠️  Root user BIGBULL-000071 not found. Creating test root user...");
       
       // Create root user
       const rootData = {

@@ -131,7 +131,7 @@ export default function LeadershipPage() {
                 }}
               >
                 Our leadership team brings decades of combined experience in
-                renewable energy, finance, and technology to drive Crown
+                renewable energy, finance, and technology to drive Big Bull
                 Bankers&apos; mission forward.
               </p>
             </div>

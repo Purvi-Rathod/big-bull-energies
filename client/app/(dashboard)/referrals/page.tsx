@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { api } from '@/lib/api';
-import CrownLoader from '@/components/CrownLoader';
+import BigBullLoader from '@/components/BigBullLoader';
 
 interface Referral {
   id: string;
@@ -118,7 +118,7 @@ export default function ReferralsPage() {
   };
 
   if (loading) {
-    return <CrownLoader fullScreen />;
+    return <BigBullLoader fullScreen />;
   }
 
   return (

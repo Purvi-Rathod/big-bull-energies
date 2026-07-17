@@ -24,7 +24,7 @@ export default function HowPlatformWorksPage() {
       icon: <Users className="w-8 h-8" />,
       details: [
         "Sign up with your email and personal details",
-        "Receive your unique user ID (CROWN-XXXXXX)",
+        "Receive your unique user ID (BIGBULL-XXXXXX)",
         "Access your dashboard immediately",
         "Get your personal referral link",
       ],

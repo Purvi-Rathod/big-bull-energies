@@ -4,8 +4,8 @@ import Link from "next/link";
 import PublicHeader from "@/components/PublicHeader";
 
 // PDFs in public/ – encode spaces for URLs
-const UK_PDF = "/Crown%20Bankers%20UK%20Legal.pdf";
-const NZ_PDF = "/Crown%20Bankers%20NZ%20Legal.pdf";
+const UK_PDF = "/Big Bull%20Bankers%20UK%20Legal.pdf";
+const NZ_PDF = "/Big Bull%20Bankers%20NZ%20Legal.pdf";
 
 export default function LegalPage() {
   return (

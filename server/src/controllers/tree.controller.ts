@@ -91,7 +91,7 @@ export const viewBinaryTree = asyncHandler(async (req, res) => {
   // First, find all admin children (if admin exists)
   const adminUser = users.find((u: any) => {
     const userInfo = userMap.get(u._id.toString());
-    return userInfo?.userId === "CROWN-000000" || userInfo?.userId === "CNEOX-000000";
+    return userInfo?.userId === "BIGBULL-000000" || userInfo?.userId === "CROWN-000000" || userInfo?.userId === "CNEOX-000000";
   });
   
   let adminChildrenMap = new Map<string, string[]>();
@@ -111,8 +111,8 @@ export const viewBinaryTree = asyncHandler(async (req, res) => {
     const userInfo = userMap.get(userId);
 
     if (userInfo) {
-      // Check if this is admin (CROWN-000000 or CNEOX-000000)
-      const isAdmin = userInfo.userId === "CROWN-000000" || userInfo.userId === "CNEOX-000000";
+      // Check if this is admin (BIGBULL-000000 or CNEOX-000000)
+      const isAdmin = userInfo.userId === "BIGBULL-000000" || userInfo.userId === "CROWN-000000" || userInfo.userId === "CNEOX-000000";
       
       // For admin, get all children (not just left/right)
       let allChildren: string[] = [];
@@ -216,7 +216,7 @@ export const getMyTree = asyncHandler(async (req, res) => {
     throw new AppError("User not found", 404);
   }
 
-  const isAdmin = (currentUser as any).userId === "CROWN-000000" || (currentUser as any).userId === "CNEOX-000000";
+  const isAdmin = (currentUser as any).userId === "BIGBULL-000000" || (currentUser as any).userId === "CROWN-000000" || (currentUser as any).userId === "CNEOX-000000";
 
   // OPTIMIZATION 1: Collect all descendant user IDs efficiently using level-by-level batch loading
   // This batches queries by level instead of per-node
@@ -431,7 +431,7 @@ export const getMyTree = asyncHandler(async (req, res) => {
     const treeInfo = treeMap.get(nodeIdStr);
     const totalInvestment = investmentMap.get(nodeIdStr) || 0;
 
-    const nodeIsAdmin = userInfo.userId === "CROWN-000000" || userInfo.userId === "CNEOX-000000";
+    const nodeIsAdmin = userInfo.userId === "BIGBULL-000000" || userInfo.userId === "CROWN-000000" || userInfo.userId === "CNEOX-000000";
     let children: string[] = [];
 
     if (nodeIsAdmin) {
@@ -549,7 +549,7 @@ async function isUserInDownline(
 
   // Check if requesting user is admin - admins can view any tree
   const requestingUser = await User.findById(requestingUserObjId).select("userId").lean();
-  const requestingIsAdmin = (requestingUser as any)?.userId === "CROWN-000000" || (requestingUser as any)?.userId === "CNEOX-000000";
+  const requestingIsAdmin = (requestingUser as any)?.userId === "BIGBULL-000000" || (requestingUser as any)?.userId === "CROWN-000000" || (requestingUser as any)?.userId === "CNEOX-000000";
   if (requestingIsAdmin) {
     return true; // Admins can view any tree
   }
@@ -580,7 +580,7 @@ async function isUserInDownline(
     
     // Check if this node is admin (can have unlimited children via parent relationship)
     const user = await User.findById(current.userId).select("userId").lean();
-    const isAdmin = (user as any)?.userId === "CROWN-000000" || (user as any)?.userId === "CNEOX-000000";
+    const isAdmin = (user as any)?.userId === "BIGBULL-000000" || (user as any)?.userId === "CROWN-000000" || (user as any)?.userId === "CNEOX-000000";
     
     if (isAdmin) {
       // For admin, check all children via parent relationship
@@ -620,7 +620,9 @@ async function isUserInDownline(
 
 export const getNodeDownlines = asyncHandler(async (req, res) => {
   const requestingUserId = (req as any).user?.id;
-  if (!requestingUserId) {
+  const isPanelAdmin = !!(req as any).admin;
+
+  if (!requestingUserId && !isPanelAdmin) {
     throw new AppError("User not authenticated", 401);
   }
 
@@ -634,18 +636,24 @@ export const getNodeDownlines = asyncHandler(async (req, res) => {
   // This prevents loading too many users for users with 400+ downlines
   const maxDepth = Math.min(parseInt(req.query.maxDepth as string) || 3, 5);
 
-  // Find requesting user
-  const requestingUser = await User.findById(requestingUserId)
-    .select("_id userId")
-    .lean();
-  
-  if (!requestingUser) {
-    throw new AppError("Requesting user not found", 404);
-  }
+  let requestingIsAdmin = isPanelAdmin;
 
-  // Check if requesting user is admin - admins can view any tree
-  const requestingUserIdStr = (requestingUser as any).userId;
-  const requestingIsAdmin = requestingUserIdStr === "CROWN-000000" || requestingUserIdStr === "CNEOX-000000";
+  if (requestingUserId) {
+    const requestingUser = await User.findById(requestingUserId)
+      .select("_id userId")
+      .lean();
+
+    if (!requestingUser) {
+      throw new AppError("Requesting user not found", 404);
+    }
+
+    const requestingUserIdStr = (requestingUser as any).userId;
+    requestingIsAdmin =
+      requestingIsAdmin ||
+      requestingUserIdStr === "BIGBULL-000000" ||
+      requestingUserIdStr === "CROWN-000000" ||
+      requestingUserIdStr === "CNEOX-000000";
+  }
 
   // Find target user by userId (not _id)
   const targetUser = await User.findOne({ userId: targetUserId })
@@ -657,11 +665,15 @@ export const getNodeDownlines = asyncHandler(async (req, res) => {
   }
 
   // Convert _id to ObjectId (lean() returns plain object)
-  const requestingUserObjId = new Types.ObjectId((requestingUser._id as any).toString());
   const targetUserObjId = new Types.ObjectId((targetUser._id as any).toString());
-  
+
   // FIXED: Access control - check if target user is in requesting user's downline (unless requesting user is admin)
-  if (!requestingIsAdmin) {
+  if (!requestingIsAdmin && requestingUserId) {
+    const requestingUser = await User.findById(requestingUserId).select("_id").lean();
+    if (!requestingUser) {
+      throw new AppError("Requesting user not found", 404);
+    }
+    const requestingUserObjId = new Types.ObjectId((requestingUser._id as any).toString());
     const hasAccess = await isUserInDownline(requestingUserObjId, targetUserObjId);
     
     if (!hasAccess) {
@@ -672,7 +684,7 @@ export const getNodeDownlines = asyncHandler(async (req, res) => {
     }
   }
 
-  const isAdmin = (targetUser as any).userId === "CROWN-000000" || (targetUser as any).userId === "CNEOX-000000";
+  const isAdmin = (targetUser as any).userId === "BIGBULL-000000" || (targetUser as any).userId === "CROWN-000000" || (targetUser as any).userId === "CNEOX-000000";
 
   // Collect all descendant user IDs efficiently using level-by-level batch loading
   const allTreeUserIds = new Set<string>([targetUserObjId.toString()]);
@@ -847,7 +859,7 @@ export const getNodeDownlines = asyncHandler(async (req, res) => {
     const treeInfo = treeMap.get(nodeIdStr);
     const totalInvestment = investmentMap.get(nodeIdStr) || 0;
 
-    const nodeIsAdmin = userInfo.userId === "CROWN-000000" || userInfo.userId === "CNEOX-000000";
+    const nodeIsAdmin = userInfo.userId === "BIGBULL-000000" || userInfo.userId === "CROWN-000000" || userInfo.userId === "CNEOX-000000";
     let children: string[] = [];
 
     if (nodeIsAdmin) {

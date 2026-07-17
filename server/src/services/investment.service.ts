@@ -830,7 +830,7 @@ export async function addBusinessVolumeUpTree(
       } else {
         // Check if parent is admin (has unlimited children via parent relationship)
         const parentUser = await User.findById(parentId).select("userId").lean();
-        if (parentUser && ((parentUser as any).userId === "CROWN-000000" || (parentUser as any).userId === "CNEOX-000000")) {
+        if (parentUser && ((parentUser as any).userId === "BIGBULL-000000" || (parentUser as any).userId === "CROWN-000000" || (parentUser as any).userId === "CNEOX-000000")) {
           // User is admin's child, add BV but don't calculate binary bonus
           ancestorsToUpdate.push({ userId: parentId, position: position });
           break;

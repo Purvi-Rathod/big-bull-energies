@@ -80,7 +80,7 @@ const CustomNode = memo(({ data }: { data: CustomNodeData }) => {
   }, [onExpand, isExpanded, isLoading, hasMoreDownlines, user.userId]);
 
   // Check if this is admin node (not a binary node)
-  const isAdmin = user.userId === "CROWN-000000" || user.userId === "CROWN-000000";
+  const isAdmin = user.userId === "BIGBULL-000000" || user.userId === "CROWN-000000" || user.userId === "CNEOX-000000";
   const totalChildren = isAdmin ? (user.allChildren?.length || user.leftDownlines || 0) : null;
 
   return (
@@ -412,7 +412,7 @@ export default function TreePage() {
       processed.add(user.id);
 
       // Get all children of this user
-      const isAdmin = user.userId === "CROWN-000000" || user.userId === "CROWN-000000";
+      const isAdmin = user.userId === "BIGBULL-000000" || user.userId === "CROWN-000000" || user.userId === "CNEOX-000000";
       
       const childrenSet = new Set<TreeUser>();
       
@@ -506,7 +506,7 @@ export default function TreePage() {
         const position = nodePositions.get(user.id) || { x: 0, y: 0 };
         
         // For admin, calculate total children count
-        const isAdmin = user.userId === "CROWN-000000" || user.userId === "CROWN-000000";
+        const isAdmin = user.userId === "BIGBULL-000000" || user.userId === "CROWN-000000" || user.userId === "CNEOX-000000";
         let userWithChildren = { ...user };
         if (isAdmin) {
           const adminChildren = childrenMap.get(user.id) || [];

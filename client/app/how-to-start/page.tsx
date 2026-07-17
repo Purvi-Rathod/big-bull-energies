@@ -13,7 +13,7 @@ export default function HowToStartPage() {
     {
       step: "1",
       title: "Sign Up",
-      description: "Click 'Sign Up' and fill in your details. You'll receive a unique user ID like CROWN-XXXXXX.",
+      description: "Click 'Sign Up' and fill in your details. You'll receive a unique user ID like BIGBULL-XXXXXX.",
       action: "Takes less than 2 minutes"
     },
     {
@@ -92,7 +92,7 @@ export default function HowToStartPage() {
             How to <span className="bg-gradient-to-r from-yellow-400 to-yellow-600 bg-clip-text text-transparent">Start</span>
           </h1>
           <p className="text-xl text-white/80 leading-relaxed">
-            Your complete guide to getting started with CROWN and maximizing your earning potential
+            Your complete guide to getting started with BIG BULL and maximizing your earning potential
           </p>
         </div>
       </section>
@@ -103,7 +103,7 @@ export default function HowToStartPage() {
           <div className="text-center mb-12">
             <h2 className="text-4xl font-extrabold text-white mb-4">Quick Start Guide</h2>
             <p className="text-xl text-white/70">
-              Follow these 6 simple steps to begin your CROWN journey
+              Follow these 6 simple steps to begin your BIG BULL journey
             </p>
           </div>
 
@@ -146,7 +146,7 @@ export default function HowToStartPage() {
               <li>• Referrer's User ID (optional but recommended)</li>
             </ul>
             <p className="text-white/80 mt-4 leading-relaxed">
-              Once registered, you'll receive your unique User ID in the format CROWN-XXXXXX. 
+              Once registered, you'll receive your unique User ID in the format BIGBULL-XXXXXX. 
               This ID is your identity on the platform.
             </p>
           </div>
@@ -235,7 +235,7 @@ export default function HowToStartPage() {
               Tips for <span className="bg-gradient-to-r from-yellow-400 to-yellow-600 bg-clip-text text-transparent">Success</span>
             </h2>
             <p className="text-xl text-white/70">
-              Expert advice to maximize your earnings on CROWN
+              Expert advice to maximize your earnings on BIG BULL
             </p>
           </div>
 
@@ -257,7 +257,7 @@ export default function HowToStartPage() {
           <div className="p-12 bg-gradient-to-br from-yellow-500/20 via-yellow-600/20 to-amber-500/20 backdrop-blur-md rounded-3xl border border-white/20">
             <h2 className="text-4xl font-extrabold text-white mb-6">Ready to Begin Your Journey?</h2>
             <p className="text-xl text-white/80 mb-8">
-              Join CROWN today and start building your financial future
+              Join BIG BULL today and start building your financial future
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link
@@ -280,7 +280,7 @@ export default function HowToStartPage() {
       {/* Footer */}
       <footer className="relative z-10 border-t border-yellow-500/20 mt-20 bg-#05627C">
         <div className="max-w-7xl mx-auto px-6 py-8 text-center text-white/70">
-          <p>&copy; {new Date().getFullYear()} CROWN. All rights reserved.</p>
+          <p>&copy; {new Date().getFullYear()} BIG BULL. All rights reserved.</p>
           <div className="mt-4 flex justify-center gap-6">
             <Link href="/about-us" className="hover:text-white transition-colors">About Us</Link>
             <Link href="/policy" className="hover:text-white transition-colors">Privacy & Terms</Link>

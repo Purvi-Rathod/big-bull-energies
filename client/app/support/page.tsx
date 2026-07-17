@@ -9,7 +9,7 @@ export default function SupportPage() {
       icon: "📚",
       title: "Getting Started",
       description:
-        "New to CROWN? Learn how to create an account, make your first investment, and start earning.",
+        "New to BIG BULL? Learn how to create an account, make your first investment, and start earning.",
       link: "/how-to-start",
     },
     {
@@ -51,7 +51,7 @@ export default function SupportPage() {
 
   const faqs = [
     {
-      question: "How do I get started with CROWN?",
+      question: "How do I get started with BIG BULL?",
       answer:
         "Simply sign up for a free account, set up your USDT TRC20 wallet address, fund your Investment Wallet, choose a package, and start earning. Visit our 'How to Start' page for detailed steps.",
     },
@@ -162,7 +162,7 @@ export default function SupportPage() {
                 Our Support System
               </h2>
               <p className="text-base sm:text-lg text-gray-700 leading-relaxed mb-6">
-                CROWN provides comprehensive 24/7 support through our integrated
+                BIG BULL provides comprehensive 24/7 support through our integrated
                 ticket system. Once you're logged in, you can create support
                 tickets for any questions, issues, or assistance you need. Our
                 support team responds promptly to ensure you have the best
@@ -243,7 +243,7 @@ export default function SupportPage() {
                     Step 1: Log In to Your Account
                   </h3>
                   <p className="text-gray-600 leading-relaxed">
-                    Access your CROWN dashboard by logging in with your
+                    Access your BIG BULL dashboard by logging in with your
                     credentials. Support tickets are available to all registered
                     users.
                   </p>
@@ -411,7 +411,7 @@ export default function SupportPage() {
                     How It Works
                   </div>
                   <div className="text-gray-600 text-sm">
-                    Complete guide to CROWN features
+                    Complete guide to BIG BULL features
                   </div>
                 </Link>
                 <Link

@@ -1,7 +1,7 @@
 /**
  * Test Script - Create 12 Users with Investments
  * Creates a tree structure:
- * - Admin (CROWN-000000) has 3 children
+ * - Admin (BIGBULL-000000) has 3 children
  * - Each of those 3 children has their own subtree
  * - Each user makes an investment to simulate referral and binary income
  * 
@@ -113,14 +113,14 @@ async function createTestUsersWithInvestments() {
     console.log("✅ Database connected\n");
 
     // Get or create admin user
-    let adminUser = await findUserByUserId("CROWN-000000");
+    let adminUser = await findUserByUserId("BIGBULL-000000");
     if (!adminUser) {
-      console.log("📝 Creating admin user (CROWN-000000)...");
+      console.log("📝 Creating admin user (BIGBULL-000000)...");
       const adminResult = await createTestUser(0, null, null, "Admin User");
       adminUser = adminResult.user;
       console.log(`✅ Admin user created: ${adminResult.userId}\n`);
     } else {
-      console.log(`✅ Admin user already exists: CROWN-000000\n`);
+      console.log(`✅ Admin user already exists: BIGBULL-000000\n`);
     }
 
     // Get a package for investments (use first available package)
@@ -240,7 +240,7 @@ async function createTestUsersWithInvestments() {
     console.log(`Total Users Created: ${createdUsers.length} (excluding admin)`);
     console.log(`Total Investments: ${investmentCount}`);
     console.log(`\nTree Structure:`);
-    console.log(`  Admin (CROWN-000000)`);
+    console.log(`  Admin (BIGBULL-000000)`);
     console.log(`  ├── Level 1 User 1 (${level1Users[0].userId})`);
     console.log(`  │   ├── Level 2 User 1 (${user1Children[0].userId})`);
     console.log(`  │   │   └── Level 3 User 1 (${user10.userId})`);

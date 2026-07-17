@@ -15,7 +15,7 @@ export default function InvestmentsReportPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
-  const [searchUseCrownPrefix, setSearchUseCrownPrefix] = useState(true);
+  const [searchUseBigBullPrefix, setSearchUseBigBullPrefix] = useState(true);
   const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'inactive' | 'removed'>('all');
   const [typeFilter, setTypeFilter] = useState<string>('all');
   const [startDate, setStartDate] = useState(urlStart);
@@ -58,7 +58,7 @@ export default function InvestmentsReportPage() {
     
     if (searchTerm) {
       const term = searchTerm.toLowerCase();
-      const effectiveTerm = getEffectiveUserSearch(searchTerm, searchUseCrownPrefix).toLowerCase();
+      const effectiveTerm = getEffectiveUserSearch(searchTerm, searchUseBigBullPrefix).toLowerCase();
       filtered = filtered.filter((inv: any) =>
         inv.userId.toLowerCase().includes(effectiveTerm) ||
         inv.userName.toLowerCase().includes(term) ||
@@ -268,8 +268,8 @@ export default function InvestmentsReportPage() {
                 <AdminUserSearchInput
                   value={searchTerm}
                   onChange={setSearchTerm}
-                  useCrownPrefix={searchUseCrownPrefix}
-                  onUseCrownPrefixChange={setSearchUseCrownPrefix}
+                  useBigBullPrefix={searchUseBigBullPrefix}
+                  onUseBigBullPrefixChange={setSearchUseBigBullPrefix}
                   placeholderWithoutPrefix="Name, email, package..."
                 />
 

@@ -6,7 +6,7 @@
  * 
  * Usage:
  *   - Check all users: npx ts-node -r dotenv/config src/scripts/runReconciliation.ts
- *   - Check specific user: npx ts-node -r dotenv/config src/scripts/runReconciliation.ts CROWN-000282
+ *   - Check specific user: npx ts-node -r dotenv/config src/scripts/runReconciliation.ts BIGBULL-000282
  *   - Limit users: npx ts-node -r dotenv/config src/scripts/runReconciliation.ts --max-users 1000
  */
 

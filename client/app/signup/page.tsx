@@ -7,7 +7,7 @@ import { api } from '@/lib/api';
 import { countries } from '@/lib/countries';
 import Image from 'next/image';
 import Link from 'next/link';
-import CrownLoader from '@/components/CrownLoader';
+import BigBullLoader from '@/components/BigBullLoader';
 
 function SignupContent() {
   const searchParams = useSearchParams();
@@ -102,8 +102,8 @@ function SignupContent() {
         router.replace('/admin/dashboard');
       } else if (user) {
         // Regular user signup - redirect to dashboard
-        if (user.userId === 'CROWN-000000' || user.userId === 'CROWN-000000') {
-          // CROWN-000000 or CROWN-000000 user should be redirected to admin dashboard
+        if (user.userId === 'BIGBULL-000000' || user.userId === 'CROWN-000000' || user.userId === 'CNEOX-000000') {
+          // BIGBULL-000000 or BIGBULL-000000 user should be redirected to admin dashboard
           router.replace('/admin/dashboard');
         } else {
           router.replace('/dashboard');
@@ -315,7 +315,7 @@ function SignupContent() {
         <Link href="/" className="relative z-10 w-fit">
           <Image
             src="/image.png"
-            alt="Crown Bankers Logo"
+            alt="Big Bull Energies Logo"
             width={168}
             height={56}
             className="h-11 w-auto"
@@ -362,7 +362,7 @@ function SignupContent() {
           </svg>
         </div>
 
-        <p className="relative z-10 text-xs text-[#9FB8C9]/70">© {new Date().getFullYear()} Crown Bankers</p>
+        <p className="relative z-10 text-xs text-[#9FB8C9]/70">© {new Date().getFullYear()} Big Bull Energies</p>
       </div>
 
       {/* Right — form panel */}
@@ -384,7 +384,7 @@ function SignupContent() {
             <Link href="/">
               <Image
                 src="/image.png"
-                alt="Crown Bankers Logo"
+                alt="Big Bull Energies Logo"
                 width={150}
                 height={50}
                 className="h-10 w-auto"
@@ -548,7 +548,7 @@ function SignupContent() {
                           ? { borderBottomColor: '#FBF676' }
                           : undefined
                       }
-                      placeholder="CROWN-XXXXXX"
+                      placeholder="BIGBULL-XXXXXX"
                       value={formData.referrerId}
                       onChange={handleChange}
                     />
@@ -756,7 +756,7 @@ function SignupContent() {
 
 export default function SignupPage() {
   return (
-    <Suspense fallback={<CrownLoader fullScreen />}>
+    <Suspense fallback={<BigBullLoader fullScreen />}>
       <SignupContent />
     </Suspense>
   );

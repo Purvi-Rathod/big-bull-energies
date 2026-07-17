@@ -2,19 +2,19 @@
 
 import React, { useMemo } from 'react';
 
-interface CrownLoaderProps {
+interface BigBullLoaderProps {
   size?: 'sm' | 'md' | 'lg';
   text?: string;
   fullScreen?: boolean;
   className?: string;
 }
 
-export default function CrownLoader({ 
+export default function BigBullLoader({ 
   size = 'md', 
-  text = 'CROWN',
+  text = 'BIG BULL',
   fullScreen = false,
   className = ''
-}: CrownLoaderProps) {
+}: BigBullLoaderProps) {
   const sizeClasses = {
     sm: {
       container: 'w-32 h-32',
@@ -49,11 +49,11 @@ export default function CrownLoader({
     ? 'fixed inset-0 flex items-center justify-center bg-black z-50'
     : 'flex items-center justify-center';
 
-  const uniqueId = useMemo(() => `crown-loader-${Math.random().toString(36).substr(2, 9)}`, []);
+  const uniqueId = useMemo(() => `bigbull-loader-${Math.random().toString(36).substr(2, 9)}`, []);
 
   return (
     <>
-      <div className={`${containerClass} ${className} crown-loader-container`}>
+      <div className={`${containerClass} ${className} bigbull-loader-container`}>
         <div className={`relative ${currentSize.container} flex items-center justify-center`}>
           {/* SVG container for animated arcs */}
           <svg
@@ -94,7 +94,7 @@ export default function CrownLoader({
               strokeDasharray={`${arcLength} ${circumference}`}
               strokeDashoffset={0}
               filter={`url(#glow-${uniqueId})`}
-              className="crown-arc-1"
+              className="bigbull-arc-1"
               style={{
                 transformOrigin: `${center}px ${center}px`,
               }}
@@ -112,14 +112,14 @@ export default function CrownLoader({
               strokeDasharray={`${arcLength} ${circumference}`}
               strokeDashoffset={arcLength}
               filter={`url(#glow-${uniqueId})`}
-              className="crown-arc-2"
+              className="bigbull-arc-2"
               style={{
                 transformOrigin: `${center}px ${center}px`,
               }}
             />
           </svg>
 
-          {/* CROWN text */}
+          {/* BIG BULL text */}
           <div
             className={`relative z-10 font-bold ${currentSize.text} text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 via-yellow-400 to-yellow-600`}
             style={{

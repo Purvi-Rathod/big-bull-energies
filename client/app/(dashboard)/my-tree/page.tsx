@@ -15,7 +15,7 @@ import ReactFlow, {
 } from 'reactflow';
 import 'reactflow/dist/style.css';
 import { api } from '@/lib/api';
-import CrownLoader from '@/components/CrownLoader';
+import BigBullLoader from '@/components/BigBullLoader';
 
 interface TreeUser {
   id: string;
@@ -79,7 +79,7 @@ const CustomNode = memo(({ data }: { data: CustomNodeData }) => {
     }
   }, [onExpand, isExpanded, isLoading, hasMoreDownlines, user.userId]);
 
-  const isAdmin = user.userId === "CROWN-000000" || user.userId === "CROWN-000000";
+  const isAdmin = user.userId === "BIGBULL-000000" || user.userId === "CROWN-000000" || user.userId === "CNEOX-000000";
   const totalChildren = isAdmin ? (user.allChildren?.length || user.leftDownlines || 0) : null;
 
   return (
@@ -383,7 +383,7 @@ export default function MyTreePage() {
       levels[level].push(user);
       processed.add(user.id);
 
-      const isAdmin = user.userId === "CROWN-000000" || user.userId === "CROWN-000000";
+      const isAdmin = user.userId === "BIGBULL-000000" || user.userId === "CROWN-000000" || user.userId === "CNEOX-000000";
       const childrenSet = new Set<TreeUser>();
       
       if (isAdmin) {
@@ -586,7 +586,7 @@ export default function MyTreePage() {
   }, []);
 
   if (loading) {
-    return <CrownLoader fullScreen />;
+    return <BigBullLoader fullScreen />;
   }
 
   if (error) {

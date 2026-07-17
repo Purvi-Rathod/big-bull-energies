@@ -69,7 +69,7 @@ interface SendInvestmentPurchaseEmailParams {
   startDate: string;
   endDate: string;
   dashboardLink: string;
-  /** User ID (e.g. CROWN-000123) for template {userId} */
+  /** User ID (e.g. BIGBULL-000123) for template {userId} */
   userId?: string;
 }
 // migrated
@@ -279,7 +279,7 @@ export const sendPasswordResetEmail = async ({
     await sendWithTemplate({
       from: defaultFrom(),
       to,
-      subject: "Reset Your Password - CROWN",
+      subject: "Reset Your Password - BIG BULL",
       template: TEMPLATES.PasswordReset,
       merge: { name, resetLink },
     });

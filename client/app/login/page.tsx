@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import Image from "next/image";
 import Link from "next/link";
-import CrownLoader from "@/components/CrownLoader";
+import BigBullLoader from "@/components/BigBullLoader";
 
 function LoginContent() {
   const [userId, setUserId] = useState("");
@@ -37,8 +37,8 @@ function LoginContent() {
         router.replace("/admin/dashboard");
       } else if (user) {
         // Regular user login
-        if (user.userId === "CROWN-000000" || user.userId === "CROWN-000000") {
-          // CROWN-000000 or CROWN-000000 user should be redirected to admin dashboard
+        if (user.userId === "BIGBULL-000000" || user.userId === "CROWN-000000" || user.userId === "CNEOX-000000") {
+          // BIGBULL-000000 or BIGBULL-000000 user should be redirected to admin dashboard
           router.replace("/admin/dashboard");
         } else {
           router.replace("/dashboard");
@@ -358,7 +358,7 @@ function LoginContent() {
                   type="text"
                   required
                   className="underline-input w-full py-2.5 text-[#F6F5EC] placeholder-[#9FB8C9]/50 text-sm font-medium"
-                  placeholder="CROWN-XXXXXX"
+                  placeholder="BIGBULL-XXXXXX"
                   value={userId}
                   onChange={(e) => setUserId(e.target.value)}
                 />
@@ -496,7 +496,7 @@ function LoginContent() {
 
 export default function LoginPage() {
   return (
-    <Suspense fallback={<CrownLoader fullScreen />}>
+    <Suspense fallback={<BigBullLoader fullScreen />}>
       <LoginContent />
     </Suspense>
   );

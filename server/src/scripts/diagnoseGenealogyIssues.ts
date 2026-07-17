@@ -6,7 +6,7 @@
  * 2. Access control issues (users viewing trees outside their downline)
  * 
  * Usage: npx ts-node -r dotenv/config src/scripts/diagnoseGenealogyIssues.ts [userId1] [userId2]
- * Example: npx ts-node -r dotenv/config src/scripts/diagnoseGenealogyIssues.ts CROWN-000106 CROWN-000280
+ * Example: npx ts-node -r dotenv/config src/scripts/diagnoseGenealogyIssues.ts BIGBULL-000106 BIGBULL-000280
  */
 
 import mongoose from "mongoose";
@@ -57,7 +57,7 @@ async function isUserInDownline(userAId: Types.ObjectId, userBId: Types.ObjectId
     
     // Check if this is admin (can have unlimited children via parent relationship)
     const user = await User.findById(current.userId).select("userId").lean();
-    const isAdmin = (user as any)?.userId === "CROWN-000000" || (user as any)?.userId === "CNEOX-000000";
+    const isAdmin = (user as any)?.userId === "BIGBULL-000000" || (user as any)?.userId === "CROWN-000000" || (user as any)?.userId === "CNEOX-000000";
     
     if (isAdmin) {
       // For admin, check all children via parent relationship
@@ -129,7 +129,7 @@ async function countSubtreeUsers(
 
     // Check if admin
     const user = await User.findById(current.userId).select("userId").lean();
-    const isAdmin = (user as any)?.userId === "CROWN-000000" || (user as any)?.userId === "CNEOX-000000";
+    const isAdmin = (user as any)?.userId === "BIGBULL-000000" || (user as any)?.userId === "CROWN-000000" || (user as any)?.userId === "CNEOX-000000";
 
     if (isAdmin) {
       const adminChildren = await BinaryTree.find({ parent: current.userId })
@@ -190,7 +190,7 @@ async function diagnoseGenealogy(userId1: string, userId2?: string) {
   // Find user 1
   let user1 = await User.findOne({ userId: userId1 }).lean();
   if (!user1 && !userId1.includes('-')) {
-    user1 = await User.findOne({ userId: `CROWN-${userId1}` }).lean();
+    user1 = await User.findOne({ userId: `BIGBULL-${userId1}` }).lean();
   }
   if (!user1) {
     throw new Error(`User ${userId1} not found`);
@@ -225,7 +225,7 @@ async function diagnoseGenealogy(userId1: string, userId2?: string) {
     // Find user 2
     let user2 = await User.findOne({ userId: userId2 }).lean();
     if (!user2 && !userId2.includes('-')) {
-      user2 = await User.findOne({ userId: `CROWN-${userId2}` }).lean();
+      user2 = await User.findOne({ userId: `BIGBULL-${userId2}` }).lean();
     }
     if (!user2) {
       throw new Error(`User ${userId2} not found`);
@@ -293,8 +293,8 @@ async function diagnoseGenealogy(userId1: string, userId2?: string) {
 }
 
 async function main() {
-  const userId1 = process.argv[2] || 'CROWN-000106';
-  const userId2 = process.argv[3] || 'CROWN-000280';
+  const userId1 = process.argv[2] || 'BIGBULL-000106';
+  const userId2 = process.argv[3] || 'BIGBULL-000280';
 
   try {
     await connectDB();

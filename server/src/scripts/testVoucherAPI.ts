@@ -91,10 +91,10 @@ async function getAdminToken(): Promise<string> {
     // Admin login requires email, not userId
     // First, try to find admin by userId and get email from database
     const { Admin } = await import("../models/Admin");
-    const admin = await Admin.findOne({ userId: "CROWN-000000" });
+    const admin = await Admin.findOne({ userId: "BIGBULL-000000" });
     
     if (!admin) {
-      throw new Error("Admin user CROWN-000000 not found in database");
+      throw new Error("Admin user BIGBULL-000000 not found in database");
     }
     
     const response = await axios.post(`${API_BASE_URL}/admin/login`, {

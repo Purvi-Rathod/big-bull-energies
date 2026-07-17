@@ -32,7 +32,7 @@ const VoucherCreatedEmail: React.FC<VoucherCreatedEmailProps> = ({
 }) => (
   <Html lang="en" dir="ltr">
     <Head>
-      <title>Voucher Created - CROWN</title>
+      <title>Voucher Created - BIG BULL</title>
       <Font
         fontFamily="Roboto"
         fallbackFontFamily="Verdana"
@@ -97,7 +97,7 @@ const VoucherCreatedEmail: React.FC<VoucherCreatedEmailProps> = ({
         </Row>
         <Row>
           <Text style={{ color: '#6b7280', fontSize: '14px', lineHeight: '20px', marginTop: '24px' }}>
-            Thank you for using CROWN!
+            Thank you for using BIG BULL!
           </Text>
         </Row>
       </Section>

@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { api } from '@/lib/api';
 import toast from 'react-hot-toast';
-import CrownLoader from '@/components/CrownLoader';
+import BigBullLoader from '@/components/BigBullLoader';
 
 interface Voucher {
   id: string;
@@ -180,7 +180,7 @@ export default function VouchersPage() {
   };
 
   if (loading) {
-    return <CrownLoader fullScreen />;
+    return <BigBullLoader fullScreen />;
   }
 
   return (

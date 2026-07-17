@@ -5,7 +5,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { api } from '@/lib/api';
 import { countries } from '@/lib/countries';
 import toast from 'react-hot-toast';
-import CrownLoader from '@/components/CrownLoader';
+import BigBullLoader from '@/components/BigBullLoader';
 
 export default function ProfilePage() {
   const { user, refreshAuth } = useAuth();
@@ -91,7 +91,7 @@ export default function ProfilePage() {
   };
 
   if (loading) {
-    return <CrownLoader fullScreen />;
+    return <BigBullLoader fullScreen />;
   }
 
   return (

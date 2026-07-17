@@ -26,7 +26,7 @@ interface User {
 export default function PowerlegAccountPage() {
   const { admin } = useAuth();
   const [userSearch, setUserSearch] = useState('');
-  const [userSearchUseCrownPrefix, setUserSearchUseCrownPrefix] = useState(true);
+  const [userSearchUseBigBullPrefix, setUserSearchUseBigBullPrefix] = useState(true);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [users, setUsers] = useState<User[]>([]);
   const [packages, setPackages] = useState<Package[]>([]);
@@ -111,7 +111,7 @@ export default function PowerlegAccountPage() {
 
     setSearching(true);
     try {
-      const response = await api.getAdminUsers({ page: 1, limit: 100, search: getEffectiveUserSearch(userSearch, userSearchUseCrownPrefix) });
+      const response = await api.getAdminUsers({ page: 1, limit: 100, search: getEffectiveUserSearch(userSearch, userSearchUseBigBullPrefix) });
       if (response.data?.users && response.data.users.length > 0) {
         const foundUsers = response.data.users;
         setUsers(foundUsers);
@@ -239,8 +239,8 @@ export default function PowerlegAccountPage() {
                 setUserSearch(v);
                 if (selectedUser && v !== selectedUser.userId) setSelectedUser(null);
               }}
-              useCrownPrefix={userSearchUseCrownPrefix}
-              onUseCrownPrefixChange={setUserSearchUseCrownPrefix}
+              useBigBullPrefix={userSearchUseBigBullPrefix}
+              onUseBigBullPrefixChange={setUserSearchUseBigBullPrefix}
               className="flex-1"
               onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), handleSearch())}
             />

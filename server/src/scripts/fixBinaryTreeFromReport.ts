@@ -4,7 +4,7 @@
  * Reads a diagnostic report file and automatically applies all fixes
  * 
  * Usage: npx ts-node -r dotenv/config src/scripts/fixBinaryTreeFromReport.ts <report-file-path>
- * Example: npx ts-node -r dotenv/config src/scripts/fixBinaryTreeFromReport.ts diagnostic-reports/binary-tree-diagnostic-CROWN-000106-2026-02-06T12-34-47-575Z.txt
+ * Example: npx ts-node -r dotenv/config src/scripts/fixBinaryTreeFromReport.ts diagnostic-reports/binary-tree-diagnostic-BIGBULL-000106-2026-02-06T12-34-47-575Z.txt
  */
 
 import mongoose from "mongoose";
@@ -71,8 +71,8 @@ function parseReportFile(reportPath: string): FixAction[] {
     // Skip if line doesn't start with a number followed by a dot
     if (!/^\d+\./.test(line)) continue;
     
-    // Parse: "1. Update leftBusiness to 95050.00 for user CROWN-000106"
-    // or: "119. Update leftBusiness to 95050.00 for user CROWN-000106"
+    // Parse: "1. Update leftBusiness to 95050.00 for user BIGBULL-000106"
+    // or: "119. Update leftBusiness to 95050.00 for user BIGBULL-000106"
     const match = line.match(/^\d+\.\s+Update\s+(\w+)\s+to\s+([\d.]+)\s+for\s+user\s+(\S+)/);
     if (match) {
       const [, field, valueStr, userId] = match;
@@ -296,7 +296,7 @@ async function main() {
   if (!reportPath) {
     console.error("❌ Error: Report file path required");
     console.error("Usage: npx ts-node -r dotenv/config src/scripts/fixBinaryTreeFromReport.ts <report-file-path>");
-    console.error("Example: npx ts-node -r dotenv/config src/scripts/fixBinaryTreeFromReport.ts diagnostic-reports/binary-tree-diagnostic-CROWN-000106-2026-02-06T12-34-47-575Z.txt");
+    console.error("Example: npx ts-node -r dotenv/config src/scripts/fixBinaryTreeFromReport.ts diagnostic-reports/binary-tree-diagnostic-BIGBULL-000106-2026-02-06T12-34-47-575Z.txt");
     process.exit(1);
   }
   

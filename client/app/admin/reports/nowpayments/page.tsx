@@ -24,7 +24,7 @@ export default function NOWPaymentsReportPage() {
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(25);
   const [search, setSearch] = useState('');
-  const [searchUseCrownPrefix, setSearchUseCrownPrefix] = useState(true);
+  const [searchUseBigBullPrefix, setSearchUseBigBullPrefix] = useState(true);
   const [statusFilter, setStatusFilter] = useState('');
   const [sortBy, setSortBy] = useState('date-desc');
 
@@ -57,7 +57,7 @@ export default function NOWPaymentsReportPage() {
       return { filteredPayments: [], paginatedPayments: [], totalPages: 0, totalFiltered: 0 };
     }
     const searchLower = search.trim().toLowerCase();
-    const effectiveSearchLower = getEffectiveUserSearch(search, searchUseCrownPrefix).toLowerCase();
+    const effectiveSearchLower = getEffectiveUserSearch(search, searchUseBigBullPrefix).toLowerCase();
     const statusLower = statusFilter.trim().toLowerCase();
     let list = report.payments.filter((p: any) => {
       if (searchLower || effectiveSearchLower) {
@@ -91,7 +91,7 @@ export default function NOWPaymentsReportPage() {
     const start = (page - 1) * pageSize;
     const paginatedPayments = list.slice(start, start + pageSize);
     return { filteredPayments: list, paginatedPayments, totalPages, totalFiltered };
-  }, [report?.payments, search, searchUseCrownPrefix, statusFilter, sortBy, page, pageSize]);
+  }, [report?.payments, search, searchUseBigBullPrefix, statusFilter, sortBy, page, pageSize]);
 
   const exportToCSV = () => {
     if (!report) return;
@@ -193,8 +193,8 @@ export default function NOWPaymentsReportPage() {
                 <AdminUserSearchInput
                   value={search}
                   onChange={(v) => { setSearch(v); setPage(1); }}
-                  useCrownPrefix={searchUseCrownPrefix}
-                  onUseCrownPrefixChange={setSearchUseCrownPrefix}
+                  useBigBullPrefix={searchUseBigBullPrefix}
+                  onUseBigBullPrefixChange={setSearchUseBigBullPrefix}
                   placeholderWithoutPrefix="Name, email, payment ID, package, country..."
                   className="flex-1 min-w-[200px] text-sm"
                 />

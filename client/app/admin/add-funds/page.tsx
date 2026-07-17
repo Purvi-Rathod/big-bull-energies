@@ -36,7 +36,7 @@ export default function AddFundsPage() {
     description: '',
   });
   const [userSearch, setUserSearch] = useState('');
-  const [userSearchUseCrownPrefix, setUserSearchUseCrownPrefix] = useState(true);
+  const [userSearchUseBigBullPrefix, setUserSearchUseBigBullPrefix] = useState(true);
   const [searching, setSearching] = useState(false);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [signupBonusId, setSignupBonusId] = useState('');
@@ -66,12 +66,12 @@ export default function AddFundsPage() {
   };
 
   const handleRestoreSignupBonus = async () => {
-    const idPart = signupBonusId.trim().toUpperCase().replace(/^CROWN-/, '');
+    const idPart = signupBonusId.trim().toUpperCase().replace(/^BIGBULL-/, '');
     if (!idPart) {
       toast.error('Enter User ID number');
       return;
     }
-    const fullId = `CROWN-${idPart}`;
+    const fullId = `BIGBULL-${idPart}`;
     setRestoringBonus(true);
     try {
       const response = await api.restoreSignupBonus(fullId);
@@ -94,7 +94,7 @@ export default function AddFundsPage() {
 
     setSearching(true);
     try {
-      const response = await api.getAdminUsers({ page: 1, limit: 100, search: getEffectiveUserSearch(userSearch, userSearchUseCrownPrefix) });
+      const response = await api.getAdminUsers({ page: 1, limit: 100, search: getEffectiveUserSearch(userSearch, userSearchUseBigBullPrefix) });
       if (response.data?.users && response.data.users.length > 0) {
         const users = response.data.users;
         setUsers(users);
@@ -182,11 +182,11 @@ export default function AddFundsPage() {
         <p className="text-sm text-gray-700 mb-3">Use when a user lost their main-wallet signup bonus. Enter User ID number below. Credits $5 to their Main wallet.</p>
         <div className="flex gap-2 flex-wrap items-center">
           <div className="flex items-center flex-1 min-w-[200px] rounded-md border border-amber-300 bg-white focus-within:ring-2 focus-within:ring-amber-500">
-            <span className="inline-flex items-center pl-4 text-gray-600 font-mono border-r border-amber-300 bg-amber-50/50 rounded-l-md py-2">CROWN-</span>
+            <span className="inline-flex items-center pl-4 text-gray-600 font-mono border-r border-amber-300 bg-amber-50/50 rounded-l-md py-2">BIGBULL-</span>
             <input
               type="text"
               value={signupBonusId}
-              onChange={(e) => setSignupBonusId(e.target.value.toUpperCase().replace(/^CROWN-/, ''))}
+              onChange={(e) => setSignupBonusId(e.target.value.toUpperCase().replace(/^BIGBULL-/, ''))}
               placeholder="e.g. 000670"
               className="flex-1 min-w-0 text-black px-4 py-2 border-0 rounded-r-md focus:outline-none focus:ring-0"
             />
@@ -213,8 +213,8 @@ export default function AddFundsPage() {
               <AdminUserSearchInput
                 value={userSearch}
                 onChange={setUserSearch}
-                useCrownPrefix={userSearchUseCrownPrefix}
-                onUseCrownPrefixChange={setUserSearchUseCrownPrefix}
+                useBigBullPrefix={userSearchUseBigBullPrefix}
+                onUseBigBullPrefixChange={setUserSearchUseBigBullPrefix}
                 className="flex-1"
                 onKeyDown={(e) => {
                   if (e.key === 'Enter') {

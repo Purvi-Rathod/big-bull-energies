@@ -45,7 +45,7 @@ export default function AdminInvestmentsPage() {
     amount: '',
   });
   const [userSearch, setUserSearch] = useState('');
-  const [userSearchUseCrownPrefix, setUserSearchUseCrownPrefix] = useState(true);
+  const [userSearchUseBigBullPrefix, setUserSearchUseBigBullPrefix] = useState(true);
   const [searching, setSearching] = useState(false);
   const [adminCreatedList, setAdminCreatedList] = useState<AdminCreatedInvestment[]>([]);
   const [loadingReport, setLoadingReport] = useState(false);
@@ -235,7 +235,7 @@ export default function AdminInvestmentsPage() {
   const getEffectiveUserSearch = () => {
     const q = userSearch.trim();
     if (!q) return '';
-    if (userSearchUseCrownPrefix) return 'CROWN-' + q.replace(/^CROWN-?/i, '').trim();
+    if (userSearchUseBigBullPrefix) return 'BIGBULL-' + q.replace(/^BIGBULL-?/i, '').trim();
     return q;
   };
 
@@ -289,15 +289,15 @@ export default function AdminInvestmentsPage() {
             </label>
             <div className="relative">
               <div className="flex w-full items-center rounded-md border border-gray-600 bg-white focus-within:ring-2 focus-within:ring-indigo-500 focus-within:border-indigo-500 pr-10">
-                {userSearchUseCrownPrefix ? (
+                {userSearchUseBigBullPrefix ? (
                   <span className="flex items-center gap-1 shrink-0 pl-3 pr-1 py-2 text-gray-600 font-medium">
-                    CROWN-
+                    BIGBULL-
                     <button
                       type="button"
-                      onClick={() => setUserSearchUseCrownPrefix(false)}
+                      onClick={() => setUserSearchUseBigBullPrefix(false)}
                       className="rounded p-0.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100"
                       title="Remove prefix to search by name or email"
-                      aria-label="Remove CROWN- prefix"
+                      aria-label="Remove BIGBULL- prefix"
                     >
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
                     </button>
@@ -305,11 +305,11 @@ export default function AdminInvestmentsPage() {
                 ) : (
                   <button
                     type="button"
-                    onClick={() => setUserSearchUseCrownPrefix(true)}
+                    onClick={() => setUserSearchUseBigBullPrefix(true)}
                     className="shrink-0 pl-2 pr-1 py-2 text-xs text-indigo-600 hover:text-indigo-800 font-medium"
-                    title="Use CROWN- prefix for user ID search"
+                    title="Use BIGBULL- prefix for user ID search"
                   >
-                    + CROWN-
+                    + BIGBULL-
                   </button>
                 )}
                 <input
@@ -322,7 +322,7 @@ export default function AdminInvestmentsPage() {
                       setFormData({ ...formData, userId: '' });
                     }
                   }}
-                  placeholder={userSearchUseCrownPrefix ? "e.g. 000123" : "Name or email..."}
+                  placeholder={userSearchUseBigBullPrefix ? "e.g. 000123" : "Name or email..."}
                   className="w-full min-w-0 px-2 py-2 text-black bg-transparent border-0 focus:outline-none focus:ring-0"
                 />
               </div>

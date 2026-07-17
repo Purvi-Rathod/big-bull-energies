@@ -40,7 +40,7 @@ export default function DownloadPage() {
             </p>
             <a
               href="/crown-bankers-brochure.pdf"
-              download="Crown-Bankers-Brochure.pdf"
+              download="Big Bull-Bankers-Brochure.pdf"
               className="inline-flex items-center gap-3 px-8 py-4 rounded-lg font-semibold text-white transition hover:opacity-90 shadow-lg hover:shadow-xl"
               style={{ backgroundColor: "#05627C" }}
             >

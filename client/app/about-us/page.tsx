@@ -17,7 +17,7 @@ export default function AboutUsPage() {
       <section className="relative py-20 px-6">
         <div className="max-w-4xl mx-auto text-center">
           <h1 className="text-5xl sm:text-6xl font-extrabold text-white mb-6">
-            About <span className="bg-gradient-to-r from-yellow-400 to-yellow-600 bg-clip-text text-transparent">CROWN</span>
+            About <span className="bg-gradient-to-r from-yellow-400 to-yellow-600 bg-clip-text text-transparent">BIG BULL</span>
           </h1>
           <p className="text-xl text-white/80 leading-relaxed">
             Revolutionizing binary investment with transparency, innovation, and technology
@@ -32,7 +32,7 @@ export default function AboutUsPage() {
           <div className="p-8 bg-yellow-500/5 backdrop-blur-md rounded-2xl border border-yellow-500/20">
             <h2 className="text-3xl font-bold text-white mb-4">Our Mission</h2>
             <p className="text-white/80 leading-relaxed text-lg">
-              CROWN was founded with a simple yet powerful mission: to democratize wealth creation through 
+              BIG BULL was founded with a simple yet powerful mission: to democratize wealth creation through 
               an advanced binary investment platform that combines cutting-edge technology with transparent, 
               fair compensation systems. We believe everyone deserves the opportunity to build sustainable 
               income through network marketing, backed by a robust technological infrastructure.
@@ -43,7 +43,7 @@ export default function AboutUsPage() {
           <div className="p-8 bg-yellow-500/5 backdrop-blur-md rounded-2xl border border-yellow-500/20">
             <h2 className="text-3xl font-bold text-white mb-4">What We Do</h2>
             <p className="text-white/80 leading-relaxed text-lg mb-6">
-              CROWN is a comprehensive binary MLM (Multi-Level Marketing) investment platform that enables 
+              BIG BULL is a comprehensive binary MLM (Multi-Level Marketing) investment platform that enables 
               users to earn through multiple income streams:
             </p>
             <ul className="space-y-4 text-white/80 text-lg">
@@ -118,7 +118,7 @@ export default function AboutUsPage() {
           <div className="p-8 bg-yellow-500/5 backdrop-blur-md rounded-2xl border border-yellow-500/20">
             <h2 className="text-3xl font-bold text-white mb-4">Built on Modern Technology</h2>
             <p className="text-white/80 leading-relaxed text-lg mb-6">
-              CROWN leverages state-of-the-art technology to ensure accuracy, security, and performance:
+              BIG BULL leverages state-of-the-art technology to ensure accuracy, security, and performance:
             </p>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="text-center p-4 bg-yellow-500/5 rounded-lg">
@@ -138,7 +138,7 @@ export default function AboutUsPage() {
 
           {/* CTA */}
           <div className="text-center p-8 bg-gradient-to-br from-yellow-500/20 via-yellow-600/20 to-amber-500/20 backdrop-blur-md rounded-2xl border border-white/20">
-            <h2 className="text-3xl font-bold text-white mb-4">Join the CROWN Revolution</h2>
+            <h2 className="text-3xl font-bold text-white mb-4">Join the BIG BULL Revolution</h2>
             <p className="text-white/80 mb-6 text-lg">
               Start your journey towards financial freedom today
             </p>
@@ -163,7 +163,7 @@ export default function AboutUsPage() {
       {/* Footer */}
       <footer className="relative z-10 border-t border-yellow-500/20 mt-20 bg-#05627C">
         <div className="max-w-7xl mx-auto px-6 py-8 text-center text-white/70">
-          <p>&copy; {new Date().getFullYear()} CROWN. All rights reserved.</p>
+          <p>&copy; {new Date().getFullYear()} BIG BULL. All rights reserved.</p>
           <div className="mt-4 flex justify-center gap-6">
             <Link href="/about-us" className="hover:text-white transition-colors">About Us</Link>
             <Link href="/policy" className="hover:text-white transition-colors">Privacy & Terms</Link>

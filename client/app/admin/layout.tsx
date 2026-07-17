@@ -366,7 +366,7 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
     if (authLoading) return;
 
     const isAdminUser =
-      user?.userId === "CROWN-000000" || user?.userId === "CNEOX-000000";
+      user?.userId === "BIGBULL-000000" || user?.userId === "CROWN-000000" || user?.userId === "CNEOX-000000";
     const isAdminAccount = !!admin;
 
     if (!isAdminUser && !isAdminAccount) {
@@ -613,7 +613,7 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
   }
 
   const isAdminUser =
-    user?.userId === "CROWN-000000" || user?.userId === "CNEOX-000000";
+    user?.userId === "BIGBULL-000000" || user?.userId === "CROWN-000000" || user?.userId === "CNEOX-000000";
   const isAdminAccount = !!admin;
 
   if (!isAdminUser && !isAdminAccount) {
@@ -707,7 +707,7 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
                 height={40}
                 className="h-8 w-auto"
               />
-              <p>CROWN ADMIN</p>
+              <p>BIG BULL ADMIN</p>
             </Link>
           ) : (
             <Link

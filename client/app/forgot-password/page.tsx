@@ -107,7 +107,7 @@ export default function ForgotPasswordPage() {
                 type="text"
                 required
                 className="appearance-none relative block w-full px-4 py-3 border-2 border-yellow-500/40 placeholder-gray-500 text-white bg-gray-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-yellow-500/50 focus:border-yellow-500/70 transition-all sm:text-sm font-semibold"
-                placeholder="User ID (CROWN-XXXXXX)"
+                placeholder="User ID (BIGBULL-XXXXXX)"
                 value={userId}
                 onChange={(e) => setUserId(e.target.value)}
               />

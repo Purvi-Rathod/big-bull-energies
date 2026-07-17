@@ -5,7 +5,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { api } from '@/lib/api';
 import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
-import CrownLoader from '@/components/CrownLoader';
+import BigBullLoader from '@/components/BigBullLoader';
 import { formatDateTimeLongUK } from '@/lib/utils';
 interface Wallet {
   type: string;
@@ -290,7 +290,7 @@ export default function WithdrawPage() {
     : 0;
 
   if (loading) {
-    return <CrownLoader fullScreen />;
+    return <BigBullLoader fullScreen />;
   }
 
   return (

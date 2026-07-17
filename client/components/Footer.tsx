@@ -220,7 +220,7 @@ export default function Footer() {
                 className="text-2xl font-bold mb-2 text-white"
                 style={{ opacity: 1 }}
               >
-                Crown Banker
+                Big Bull Energies
               </div>
               <p className="text-sm text-white" style={{ opacity: 1 }}>
                 Bridging renewable energy and financial solutions for a
@@ -237,7 +237,7 @@ export default function Footer() {
         >
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
             <div className="text-white text-sm" style={{ opacity: 1 }}>
-              © 2025 Crown Banker
+              © 2025 Big Bull Energies
             </div>
             <div className="flex flex-wrap items-center gap-6">
               <Link

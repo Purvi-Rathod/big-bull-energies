@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { viewBinaryTree, getMyTree, getNodeDownlines } from "../controllers/tree.controller";
-import { requireAuth } from "../middleware/auth.middleware";
+import { requireAuth, requireAuthOrAdmin } from "../middleware/auth.middleware";
 
 const router = Router();
 
@@ -10,8 +10,8 @@ router.get("/view", viewBinaryTree);
 // Protected route - user's own tree (downline)
 router.get("/my-tree", requireAuth, getMyTree);
 
-// Protected route - get downlines for a specific node (for lazy loading)
-router.get("/node/:userId/downlines", requireAuth, getNodeDownlines);
+// Protected route - get downlines for a specific node (user or admin panel)
+router.get("/node/:userId/downlines", requireAuthOrAdmin, getNodeDownlines);
 
 export default router;
 

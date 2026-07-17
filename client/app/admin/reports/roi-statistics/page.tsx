@@ -10,7 +10,7 @@ export default function ROIStatisticsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
-  const [searchUseCrownPrefix, setSearchUseCrownPrefix] = useState(true);
+  const [searchUseBigBullPrefix, setSearchUseBigBullPrefix] = useState(true);
   const [sortBy, setSortBy] = useState<'totalROI' | 'roiCount'>('totalROI');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
   const hasFetchedRef = useRef(false);
@@ -98,7 +98,7 @@ export default function ROIStatisticsPage() {
     // Apply search filter
     if (searchTerm) {
       const term = searchTerm.toLowerCase();
-      const effectiveTerm = getEffectiveUserSearch(searchTerm, searchUseCrownPrefix).toLowerCase();
+      const effectiveTerm = getEffectiveUserSearch(searchTerm, searchUseBigBullPrefix).toLowerCase();
       filtered = filtered.filter((u: any) =>
         u.userId.toLowerCase().includes(effectiveTerm) ||
         u.userName.toLowerCase().includes(term) ||
@@ -205,8 +205,8 @@ export default function ROIStatisticsPage() {
                 <AdminUserSearchInput
                   value={searchTerm}
                   onChange={setSearchTerm}
-                  useCrownPrefix={searchUseCrownPrefix}
-                  onUseCrownPrefixChange={setSearchUseCrownPrefix}
+                  useBigBullPrefix={searchUseBigBullPrefix}
+                  onUseBigBullPrefixChange={setSearchUseBigBullPrefix}
                   className="flex-1 min-w-[200px]"
                 />
                 <div className="flex gap-2">

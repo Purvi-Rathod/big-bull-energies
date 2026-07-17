@@ -32,8 +32,8 @@ export default function ReferralIncomePage() {
           <div className="p-8 bg-yellow-500/5 backdrop-blur-md rounded-2xl border border-yellow-500/20">
             <h2 className="text-3xl font-bold text-white mb-6">What is Referral Income?</h2>
             <p className="text-white/80 text-lg leading-relaxed mb-6">
-              Referral income is a one-time bonus you receive when someone you directly referred to CROWN makes 
-              their first investment. This instant reward recognizes your role in expanding the CROWN community 
+              Referral income is a one-time bonus you receive when someone you directly referred to BIG BULL makes 
+              their first investment. This instant reward recognizes your role in expanding the BIG BULL community 
               and compensates you immediately for bringing new members to the platform.
             </p>
             <div className="p-6 bg-gradient-to-r from-yellow-500/20 to-yellow-600/20 rounded-xl mt-6">
@@ -57,11 +57,11 @@ export default function ReferralIncomePage() {
                 <h3 className="text-xl font-bold text-white mb-4">Step 1: Share Your Referral Link</h3>
                 <p className="text-white/70 mb-4">
                   After signing up, you receive a unique referral link in your dashboard. Share this link with 
-                  friends, family, or anyone interested in joining CROWN.
+                  friends, family, or anyone interested in joining BIG BULL.
                 </p>
                 <div className="bg-black/30 p-4 rounded-lg">
                   <p className="text-yellow-400 font-mono text-sm">
-                    Your Referral Link: https://cneox.com/signup?ref=CROWN-XXXXXX
+                    Your Referral Link: https://cneox.com/signup?ref=BIGBULL-XXXXXX
                   </p>
                 </div>
               </div>
@@ -194,7 +194,7 @@ export default function ReferralIncomePage() {
               </li>
               <li className="flex items-start">
                 <span className="text-yellow-400 mr-3 text-xl">•</span>
-                <span><strong className="text-white">Educate Your Referrals:</strong> Help your referrals understand the platform so they're more likely to invest. The better they understand CROWN, the more confident they'll be.</span>
+                <span><strong className="text-white">Educate Your Referrals:</strong> Help your referrals understand the platform so they're more likely to invest. The better they understand BIG BULL, the more confident they'll be.</span>
               </li>
               <li className="flex items-start">
                 <span className="text-yellow-400 mr-3 text-xl">•</span>
@@ -211,7 +211,7 @@ export default function ReferralIncomePage() {
           <div className="text-center p-8 bg-gradient-to-br from-purple-500/20 via-pink-500/20 to-cyan-500/20 backdrop-blur-md rounded-2xl border border-white/20">
             <h2 className="text-3xl font-bold text-white mb-4">Start Earning Referral Income Today</h2>
             <p className="text-white/80 mb-6 text-lg">
-              Join CROWN and get your unique referral link to start building your network
+              Join BIG BULL and get your unique referral link to start building your network
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link
@@ -234,7 +234,7 @@ export default function ReferralIncomePage() {
       {/* Footer */}
       <footer className="relative z-10 border-t border-yellow-500/20 mt-20 bg-#05627C">
         <div className="max-w-7xl mx-auto px-6 py-8 text-center text-white/70">
-          <p>&copy; {new Date().getFullYear()} CROWN. All rights reserved.</p>
+          <p>&copy; {new Date().getFullYear()} BIG BULL. All rights reserved.</p>
           <div className="mt-4 flex justify-center gap-6">
             <Link href="/about-us" className="hover:text-white transition-colors">About Us</Link>
             <Link href="/policy" className="hover:text-white transition-colors">Privacy & Terms</Link>

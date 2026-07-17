@@ -1,6 +1,5 @@
 // API utility functions for making requests to the backend
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://api.crownbankers.com/api/v1';
-// const API_BASE_URL = 'http://localhost:8000/api/v1';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api/v1';
 export interface ApiResponse<T = any> {
   status: 'success' | 'error';
   message?: string;
@@ -42,7 +41,7 @@ class ApiClient {
       let token: string | null = null;
       
       if (isAdminRoute) {
-        // For admin routes: use adminToken, or token if CROWN-000000 or CROWN-000000
+        // For admin routes: use adminToken, or token if BIGBULL-000000 or BIGBULL-000000
         // Don't use impersonated token for admin routes
         if (!isImpersonating) {
           token = localStorage.getItem('adminToken') || localStorage.getItem('token');
@@ -97,12 +96,11 @@ class ApiClient {
             localStorage.getItem('adminToken') || 
             sessionStorage.getItem('token')
           );
+          const isAdminPage = typeof window !== 'undefined' && window.location.pathname.startsWith('/admin');
+          const hasAdminToken = typeof window !== 'undefined' && !!localStorage.getItem('adminToken');
           
-          // If it's an admin endpoint and user has a token, they might just not have admin access
-          // Don't redirect in this case - let the error propagate so component can handle it
-          if (isAdminEndpoint && hasToken) {
-            // This is likely a permission issue, not a session expiration
-            // Let the component handle it gracefully
+          // Admin panel pages may call user/tree APIs with adminToken — don't redirect to user login
+          if ((isAdminEndpoint || isAdminPage) && hasToken) {
             throw new Error(data.message || 'Access denied. Admin privileges required.');
           }
           
@@ -116,9 +114,8 @@ class ApiClient {
             
             // Only redirect if not already on login page
             if (!window.location.pathname.includes('/login')) {
-              // Store the current path to redirect back after login
               sessionStorage.setItem('redirectAfterLogin', window.location.pathname);
-              window.location.href = '/login';
+              window.location.href = isAdminPage || hasAdminToken ? '/admin/login' : '/login';
             }
           }
           throw new Error('Your session has expired. Please log in again.');

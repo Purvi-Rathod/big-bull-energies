@@ -64,7 +64,7 @@ export default function BinaryInvestmentSystemPage() {
                 What is the Binary System?
               </h2>
               <p className="text-base sm:text-lg text-gray-700 leading-relaxed mb-6">
-                The Binary Investment System is the core structure of CROWN,
+                The Binary Investment System is the core structure of BIG BULL,
                 designed to reward users for building balanced networks. Unlike
                 traditional MLM structures, the binary system focuses on two
                 legs (left and right), creating a fair and sustainable
@@ -566,7 +566,7 @@ export default function BinaryInvestmentSystemPage() {
                 Ready to Start Earning Binary Bonuses?
               </h2>
               <p className="text-base sm:text-lg text-gray-600 mb-6">
-                Join CROWN and start building your balanced binary network today
+                Join BIG BULL and start building your balanced binary network today
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Link
@@ -585,7 +585,7 @@ export default function BinaryInvestmentSystemPage() {
                     borderRadius: "0",
                   }}
                 >
-                  Learn More About CROWN
+                  Learn More About BIG BULL
                 </Link>
               </div>
             </div>

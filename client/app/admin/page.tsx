@@ -43,7 +43,7 @@ export default function AdminPanel() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [search, setSearch] = useState('');
-  const [searchUseCrownPrefix, setSearchUseCrownPrefix] = useState(true);
+  const [searchUseBigBullPrefix, setSearchUseBigBullPrefix] = useState(true);
   const [countryFilter, setCountryFilter] = useState('');
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
@@ -77,18 +77,18 @@ export default function AdminPanel() {
 
   useEffect(() => {
     // Only fetch users if authorized
-    const isAdminUser = user?.userId === 'CROWN-000000' || user?.userId === 'CROWN-000000';
+    const isAdminUser = user?.userId === 'BIGBULL-000000' || user?.userId === 'CROWN-000000' || user?.userId === 'CNEOX-000000';
     const isAdminAccount = !!admin;
 
     if (isAdminUser || isAdminAccount) {
       fetchUsers();
     }
-  }, [page, search, searchUseCrownPrefix, countryFilter, startDate, endDate, user, admin]);
+  }, [page, search, searchUseBigBullPrefix, countryFilter, startDate, endDate, user, admin]);
 
   const getEffectiveSearch = () => {
     const q = search.trim();
     if (!q) return '';
-    if (searchUseCrownPrefix) return 'CROWN-' + q.replace(/^CROWN-?/i, '').trim();
+    if (searchUseBigBullPrefix) return 'BIGBULL-' + q.replace(/^BIGBULL-?/i, '').trim();
     return q;
   };
 
@@ -347,15 +347,15 @@ export default function AdminPanel() {
               {/* Search and Country Filter Row */}
               <div className="flex gap-4 flex-wrap">
                 <div className="flex flex-1 w-[250px] min-w-0 items-center rounded-md border border-gray-300 bg-white focus-within:ring-2 focus-within:ring-indigo-500 focus-within:border-transparent">
-                  {searchUseCrownPrefix ? (
+                  {searchUseBigBullPrefix ? (
                     <span className="flex items-center gap-1 shrink-0 pl-3 pr-1 py-2 text-gray-600 font-medium">
-                      CROWN-
+                      BIGBULL-
                       <button
                         type="button"
-                        onClick={() => setSearchUseCrownPrefix(false)}
+                        onClick={() => setSearchUseBigBullPrefix(false)}
                         className="rounded p-0.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100"
                         title="Remove prefix to search by name, email, phone"
-                        aria-label="Remove CROWN- prefix"
+                        aria-label="Remove BIGBULL- prefix"
                       >
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
                       </button>
@@ -363,18 +363,18 @@ export default function AdminPanel() {
                   ) : (
                     <button
                       type="button"
-                      onClick={() => setSearchUseCrownPrefix(true)}
+                      onClick={() => setSearchUseBigBullPrefix(true)}
                       className="shrink-0 pl-2 pr-1 py-2 text-xs text-indigo-600 hover:text-indigo-800 font-medium"
-                      title="Use CROWN- prefix for user ID search"
+                      title="Use BIGBULL- prefix for user ID search"
                     >
-                      + CROWN-
+                      + BIGBULL-
                     </button>
                   )}
                   <input
                     type="text"
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
-                    placeholder={searchUseCrownPrefix ? "e.g. 000123" : "Name, email, phone..."}
+                    placeholder={searchUseBigBullPrefix ? "e.g. 000123" : "Name, email, phone..."}
                     className="w-full min-w-0 px-2 py-2 text-black bg-transparent border-0 focus:outline-none focus:ring-0"
                   />
                 </div>
@@ -404,7 +404,7 @@ export default function AdminPanel() {
                     type="button"
                     onClick={() => {
                       setSearch('');
-                      setSearchUseCrownPrefix(true);
+                      setSearchUseBigBullPrefix(true);
                       setCountryFilter('');
                       setStartDate('');
                       setEndDate('');
@@ -636,7 +636,7 @@ export default function AdminPanel() {
                                   setOpenDropdown(user.userId);
                                 }
                               }}
-                              disabled={deletingUserId === user.userId || updatingStatus === user.userId || user.userId === 'CROWN-000000' || user.userId === 'CROWN-000000'}
+                              disabled={deletingUserId === user.userId || updatingStatus === user.userId || user.userId === 'BIGBULL-000000' || user.userId === 'CROWN-000000' || user.userId === 'CNEOX-000000'}
                               className="p-1.5 text-black hover:text-black hover:bg-gray-100 rounded-md disabled:opacity-50 disabled:cursor-not-allowed"
                               title="Actions"
                             >
@@ -720,7 +720,7 @@ export default function AdminPanel() {
                     setDropdownPosition(null);
                     handleEditProfile(userForMenu);
                   }}
-                  disabled={userForMenu.userId === 'CROWN-000000'}
+                  disabled={userForMenu.userId === 'BIGBULL-000000' || userForMenu.userId === 'CROWN-000000' || userForMenu.userId === 'CNEOX-000000'}
                   className="w-full text-left px-4 py-2 text-sm text-blue-600 hover:bg-blue-50 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -735,7 +735,7 @@ export default function AdminPanel() {
                     setDropdownPosition(null);
                     handleDeactivate(userForMenu.userId, userForMenu.status);
                   }}
-                  disabled={updatingStatus === userForMenu.userId || userForMenu.userId === 'CROWN-000000'}
+                  disabled={updatingStatus === userForMenu.userId || userForMenu.userId === 'BIGBULL-000000' || userForMenu.userId === 'CROWN-000000' || userForMenu.userId === 'CNEOX-000000'}
                   className="w-full text-left px-4 py-2 text-sm text-yellow-600 hover:bg-yellow-50 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {userForMenu.status === 'active' ? (
@@ -758,7 +758,7 @@ export default function AdminPanel() {
                     setDropdownPosition(null);
                     handleDeleteClick(userForMenu.userId, userForMenu.name);
                   }}
-                  disabled={deletingUserId === userForMenu.userId || userForMenu.userId === 'CROWN-000000'}
+                  disabled={deletingUserId === userForMenu.userId || userForMenu.userId === 'BIGBULL-000000' || userForMenu.userId === 'CROWN-000000' || userForMenu.userId === 'CNEOX-000000'}
                   className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

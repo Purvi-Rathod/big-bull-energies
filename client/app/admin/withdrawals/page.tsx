@@ -82,7 +82,7 @@ function AdminWithdrawalsContent() {
   }, [searchParams]);
 
   useEffect(() => {
-    const isAdminUser = user?.userId === 'CROWN-000000' || user?.userId === 'CROWN-000000';
+    const isAdminUser = user?.userId === 'BIGBULL-000000' || user?.userId === 'CROWN-000000' || user?.userId === 'CNEOX-000000';
     const isAdminAccount = !!admin;
 
     if (isAdminUser || isAdminAccount) {

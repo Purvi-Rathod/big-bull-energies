@@ -5,7 +5,7 @@ import { useRouter, usePathname } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import Link from "next/link";
 import Image from "next/image";
-import CrownLoader from "./CrownLoader";
+import BigBullLoader from "./BigBullLoader";
 
 export default function UserLayout({
   children,
@@ -278,7 +278,7 @@ export default function UserLayout({
   };
 
   if (authLoading) {
-    return <CrownLoader fullScreen />;
+    return <BigBullLoader fullScreen />;
   }
 
   return (

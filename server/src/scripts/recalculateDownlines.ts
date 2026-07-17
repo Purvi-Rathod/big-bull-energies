@@ -59,7 +59,7 @@ async function countSubtreeUsers(
 
       // Check if this node is admin (can have unlimited children via parent relationship)
       const user = await User.findById(current.userId).select("userId").lean();
-      const isAdmin = (user as any)?.userId === "CROWN-000000" || (user as any)?.userId === "CNEOX-000000";
+      const isAdmin = (user as any)?.userId === "BIGBULL-000000" || (user as any)?.userId === "CROWN-000000" || (user as any)?.userId === "CNEOX-000000";
 
       if (isAdmin) {
         // For admin, check all children via parent relationship

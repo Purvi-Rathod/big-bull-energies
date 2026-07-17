@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import { api } from '@/lib/api';
 import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
-import CrownLoader from '@/components/CrownLoader';
+import BigBullLoader from '@/components/BigBullLoader';
 
 interface Investment {
   id: string;
@@ -105,7 +105,7 @@ export default function InvestmentsPage() {
   };
 
   if (loading) {
-    return <CrownLoader fullScreen />;
+    return <BigBullLoader fullScreen />;
   }
 
   return (

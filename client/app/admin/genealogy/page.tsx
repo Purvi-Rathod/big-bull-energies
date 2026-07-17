@@ -89,9 +89,9 @@ export default function GenealogyPage() {
   // Load admin tree by default on mount
   useEffect(() => {
     if (user || admin) {
-      // Load admin tree (CROWN-000000) by default
-      fetchTreeData('CROWN-000001', true);
-      setSelectedUserId('CROWN-000001');
+      // Load admin tree (BIGBULL-000000) by default
+      fetchTreeData('BIGBULL-000000', true);
+      setSelectedUserId('BIGBULL-000000');
     }
   }, [user, admin, fetchTreeData]);
 
@@ -364,7 +364,7 @@ export default function GenealogyPage() {
                   handleUserSelect();
                 }
               }}
-              placeholder="Enter User ID (e.g., CROWN-000123)"
+              placeholder="Enter User ID (e.g., BIGBULL-000123)"
               className="w-full px-4 py-2.5 border-2 text-black border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all bg-white shadow-sm"
             />
           </div>

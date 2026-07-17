@@ -10,7 +10,7 @@ export default function ROIReportPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
-  const [searchUseCrownPrefix, setSearchUseCrownPrefix] = useState(true);
+  const [searchUseBigBullPrefix, setSearchUseBigBullPrefix] = useState(true);
   const [typeFilter, setTypeFilter] = useState<'all' | 'credit' | 'debit'>('all');
   const [statusFilter, setStatusFilter] = useState<'all' | 'completed' | 'pending' | 'failed'>('all');
   const [startDate, setStartDate] = useState('');
@@ -49,7 +49,7 @@ export default function ROIReportPage() {
     // Apply search filter
     if (searchTerm) {
       const term = searchTerm.toLowerCase();
-      const effectiveTerm = getEffectiveUserSearch(searchTerm, searchUseCrownPrefix).toLowerCase();
+      const effectiveTerm = getEffectiveUserSearch(searchTerm, searchUseBigBullPrefix).toLowerCase();
       filtered = filtered.filter((tx: any) =>
         tx.userId.toLowerCase().includes(effectiveTerm) ||
         tx.userName.toLowerCase().includes(term) ||
@@ -223,8 +223,8 @@ export default function ROIReportPage() {
                   <AdminUserSearchInput
                     value={searchTerm}
                     onChange={setSearchTerm}
-                    useCrownPrefix={searchUseCrownPrefix}
-                    onUseCrownPrefixChange={setSearchUseCrownPrefix}
+                    useBigBullPrefix={searchUseBigBullPrefix}
+                    onUseBigBullPrefixChange={setSearchUseBigBullPrefix}
                   />
                 </div>
 

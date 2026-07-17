@@ -1,5 +1,5 @@
 /**
- * Fix User CROWN-000282 Issues
+ * Fix User BIGBULL-000282 Issues
  * 
  * Updates:
  * 1. Binary Bonus wallet: $520.00 → $20.00
@@ -56,10 +56,10 @@ async function disconnectDB() {
 
 async function fixUserCROWN000282() {
   console.log(`\n${'='.repeat(100)}`);
-  console.log(`🔧 FIXING USER CROWN-000282`);
+  console.log(`🔧 FIXING USER BIGBULL-000282`);
   console.log(`${'='.repeat(100)}\n`);
   
-  const userId = "CROWN-000282";
+  const userId = "BIGBULL-000282";
   
   // Find user
   const user = await User.findOne({ userId }).select("_id userId name").lean();

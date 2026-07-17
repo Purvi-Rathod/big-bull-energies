@@ -4,7 +4,7 @@
  * This script deletes a user (by userId) and ALL of its children recursively
  * from the binary tree, along with all related data.
  * 
- * Usage: npx ts-node -r dotenv/config src/scripts/deleteUserAndChildren.ts CROWN-000120
+ * Usage: npx ts-node -r dotenv/config src/scripts/deleteUserAndChildren.ts BIGBULL-000120
  */
 
 import mongoose from "mongoose";
@@ -220,7 +220,7 @@ class UserDeletionService {
     console.log(`   Phone: ${user.phone || "N/A"}\n`);
 
     // Prevent deletion of admin user
-    if (user.userId === "CROWN-000000" || user.userId === "CNEOX-000000") {
+    if (user.userId === "BIGBULL-000000" || user.userId === "CROWN-000000" || user.userId === "CNEOX-000000") {
       throw new Error("Cannot delete admin user");
     }
 
@@ -294,7 +294,7 @@ async function main() {
     console.log("\nUsage:");
     console.log("  npx ts-node -r dotenv/config src/scripts/deleteUserAndChildren.ts <USER_ID>");
     console.log("\nExample:");
-    console.log("  npx ts-node -r dotenv/config src/scripts/deleteUserAndChildren.ts CROWN-000120");
+    console.log("  npx ts-node -r dotenv/config src/scripts/deleteUserAndChildren.ts BIGBULL-000120");
     process.exit(1);
   }
 

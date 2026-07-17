@@ -20,7 +20,7 @@ export default function HowItWorksPage() {
       number: 1,
       title: "Create Your Account",
       description:
-        "Sign up for free and get your unique user ID (e.g., CROWN-XXXXXX). No upfront costs or hidden fees.",
+        "Sign up for free and get your unique user ID (e.g., BIGBULL-XXXXXX). No upfront costs or hidden fees.",
       icon: <Users className="w-8 h-8" />,
       details: [
         "Provide your name, email, and password",

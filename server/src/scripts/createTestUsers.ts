@@ -1,7 +1,7 @@
 /**
  * Testing Script - Multiple Branches from Admin
  * Creates 50 users with max depth of 5 levels
- * Creates multiple independent branches from admin (CROWN-000000)
+ * Creates multiple independent branches from admin (BIGBULL-000000)
  * 
  * Usage: npx ts-node src/scripts/createTestUsers.ts
  * Or: npm run test:users (if script is added to package.json)
@@ -37,10 +37,10 @@ function getNodeLevel(nodeIndex: number): number {
 }
 
 /**
- * Format number to CROWN-XXXXXX format
+ * Format number to BIGBULL-XXXXXX format
  */
 function formatUserId(number: number): string {
-  return `CROWN-${number.toString().padStart(6, "0")}`;
+  return `BIGBULL-${number.toString().padStart(6, "0")}`;
 }
 
 /**
@@ -100,7 +100,7 @@ async function createTestUser(
     
     // Update user's referrer and position if admin was assigned
     if (!parentUser && initResult.position) {
-      const adminUser = await findUserByUserId("CROWN-000000");
+      const adminUser = await findUserByUserId("BIGBULL-000000");
       if (adminUser) {
         user.referrer = adminUser._id as any;
         user.position = initResult.position;
@@ -158,7 +158,7 @@ async function createTestUsers() {
     console.log("✅ Connected to MongoDB");
 
     // Check if root user exists, create if not
-    const rootUserId = "CROWN-000000";
+    const rootUserId = "BIGBULL-000000";
     let rootUser = await findUserByUserId(rootUserId);
 
     if (!rootUser) {
@@ -173,7 +173,7 @@ async function createTestUsers() {
     const totalUsers = 50;
     const maxDepth = 5;
     console.log(`\n🚀 Creating ${totalUsers} users with max depth ${maxDepth}...`);
-    console.log(`📋 Strategy: Multiple independent branches from admin (CROWN-000000)\n`);
+    console.log(`📋 Strategy: Multiple independent branches from admin (BIGBULL-000000)\n`);
 
     let createdCount = 0;
     let errorCount = 0;
@@ -268,11 +268,11 @@ async function createTestUsers() {
     console.log(`   - Total users in database: ${totalUsersInDb}`);
 
     // Verify admin tree structure
-    const adminUser = await findUserByUserId("CROWN-000000");
+    const adminUser = await findUserByUserId("BIGBULL-000000");
     if (adminUser) {
       const adminTree = await BinaryTree.findOne({ user: adminUser._id });
       if (adminTree) {
-        console.log(`\n👑 Admin (CROWN-000000) Tree Stats:`);
+        console.log(`\n👑 Admin (BIGBULL-000000) Tree Stats:`);
         console.log(`   - Left child: ${adminTree.leftChild ? "Yes" : "No"}`);
         console.log(`   - Right child: ${adminTree.rightChild ? "Yes" : "No"}`);
         console.log(`   - Left downlines: ${adminTree.leftDownlines}`);

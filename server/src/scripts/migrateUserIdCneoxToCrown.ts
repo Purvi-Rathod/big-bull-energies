@@ -1,8 +1,8 @@
 /**
- * Migration Script: Update User IDs from CNEOX-XXXXXX to CROWN-XXXXXX
+ * Migration Script: Update User IDs from CNEOX-XXXXXX to BIGBULL-XXXXXX
  * 
  * This script migrates all existing user IDs in the database from CNEOX format
- * (CNEOX-XXXXXX) to the CROWN format (CROWN-XXXXXX).
+ * (CNEOX-XXXXXX) to the BIG BULL format (BIGBULL-XXXXXX).
  * 
  * Usage:
  *   npx ts-node -r dotenv/config src/scripts/migrateUserIdCneoxToCrown.ts
@@ -67,7 +67,7 @@ async function migrateUserIds() {
     for (const user of usersToMigrate) {
       try {
         const oldUserId = user.userId;
-        const newUserId = oldUserId.replace(/^CNEOX-/, "CROWN-");
+        const newUserId = oldUserId.replace(/^CNEOX-/, "BIGBULL-");
 
         // Check if new userId already exists
         const existingUser = await User.findOne({ userId: newUserId });
@@ -115,13 +115,13 @@ async function migrateUserIds() {
     // Verify migration
     console.log("\n🔍 Verifying migration...");
     const remainingCneoxUsers = await User.find({ userId: { $regex: /^CNEOX-/ } });
-    const crownUsers = await User.find({ userId: { $regex: /^CROWN-/ } });
+    const crownUsers = await User.find({ userId: { $regex: /^BIGBULL-/ } });
 
     console.log(`   Remaining CNEOX- users: ${remainingCneoxUsers.length}`);
-    console.log(`   Total CROWN- users: ${crownUsers.length}`);
+    console.log(`   Total BIGBULL- users: ${crownUsers.length}`);
 
     if (remainingCneoxUsers.length === 0) {
-      console.log("\n✅ Migration completed successfully! All users have been migrated to CROWN format.");
+      console.log("\n✅ Migration completed successfully! All users have been migrated to BIG BULL format.");
     } else {
       console.log(`\n⚠️  Warning: ${remainingCneoxUsers.length} users still have CNEOX- prefix.`);
       console.log("   Please review the errors above and run the migration again if needed.");

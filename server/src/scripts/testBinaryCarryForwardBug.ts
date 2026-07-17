@@ -33,7 +33,7 @@ import { generateNextUserId, findUserByUserId } from "../services/userId.service
 dotenv.config();
 
 const MONGODB_URI = process.env.MONGODB_URL_DEVELOPMENT || process.env.MONGODB_URI;
-const PARENT_USER_ID = "CROWN-000020";
+const PARENT_USER_ID = "BIGBULL-000020";
 const PARENT_PASSWORD = "Test@123";
 
 interface TestResult {

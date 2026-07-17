@@ -1071,7 +1071,7 @@ export const updateUserStatus = asyncHandler(async (req, res) => {
     }
 
     // Prevent status change of admin user
-    if (user.userId === "CROWN-000000" || user.userId === "CNEOX-000000") {
+    if (user.userId === "BIGBULL-000000" || user.userId === "CROWN-000000" || user.userId === "CNEOX-000000") {
       throw new AppError("Cannot change status of admin user", 403);
     }
 
@@ -1123,7 +1123,7 @@ export const updateUserProfile = asyncHandler(async (req, res) => {
     }
 
     // Prevent updating admin user profile
-    if (user.userId === "CROWN-000000" || user.userId === "CNEOX-000000") {
+    if (user.userId === "BIGBULL-000000" || user.userId === "CROWN-000000" || user.userId === "CNEOX-000000") {
       throw new AppError("Cannot update admin user profile", 403);
     }
 
@@ -1536,7 +1536,7 @@ export const deleteUser = asyncHandler(async (req, res) => {
     }
 
     // Prevent deletion of admin user
-    if (user.userId === "CROWN-000000" || user.userId === "CNEOX-000000") {
+    if (user.userId === "BIGBULL-000000" || user.userId === "CROWN-000000" || user.userId === "CNEOX-000000") {
       throw new AppError("Cannot delete admin user", 403);
     }
 
@@ -1929,7 +1929,7 @@ export const deactivateAllUsers = asyncHandler(async (req, res) => {
     // Prevent deactivating admin users
     const result = await User.updateMany(
       { 
-        userId: { $nin: ["CROWN-000000", "CNEOX-000000"] },
+        userId: { $nin: ["BIGBULL-000000", "CROWN-000000", "CNEOX-000000"] },
         status: { $ne: "inactive" } // Only update users who are not already inactive
       },
       { 
@@ -3338,7 +3338,7 @@ const SIGNUP_BONUS_AMOUNT = 5;
 /**
  * Admin: Restore $5 signup bonus to a user's main wallet
  * POST /api/v1/admin/wallet/restore-signup-bonus
- * Body: { userIdentifier: string } — e.g. "000670" or "CROWN-000670"
+ * Body: { userIdentifier: string } — e.g. "000670" or "BIGBULL-000670"
  *
  * Use when a user lost their signup bonus (e.g. created before main wallet was in init,
  * or main wallet was created with 0, or balance was debited by mistake).
@@ -3348,11 +3348,14 @@ export const restoreSignupBonus = asyncHandler(async (req, res) => {
   const { userIdentifier } = body as { userIdentifier?: string };
 
   if (!userIdentifier || typeof userIdentifier !== "string" || !userIdentifier.trim()) {
-    throw new AppError("userIdentifier is required (e.g. 000670 or CROWN-000670)", 400);
+    throw new AppError("userIdentifier is required (e.g. 000670 or BIGBULL-000670)", 400);
   }
 
   const trimmed = userIdentifier.trim();
   let user = await User.findOne({ userId: trimmed }).select("_id userId name email").lean();
+  if (!user && /^\d+$/.test(trimmed)) {
+    user = await User.findOne({ userId: `BIGBULL-${trimmed}` }).select("_id userId name email").lean();
+  }
   if (!user && /^\d+$/.test(trimmed)) {
     user = await User.findOne({ userId: `CROWN-${trimmed}` }).select("_id userId name email").lean();
   }
@@ -4143,9 +4146,10 @@ export const createFreeAccounts = asyncHandler(async (req, res) => {
   let userPromise: Promise<any>;
   if (/^\d+$/.test(trimmedUserId)) {
     // Try both formats in parallel, use first successful result
-    userPromise = findUserByUserId(trimmedUserId).catch(() => 
-      findUserByUserId("CROWN-" + trimmedUserId)
-    );
+    userPromise = findUserByUserId(trimmedUserId)
+      .then((u) => u || findUserByUserId("BIGBULL-" + trimmedUserId))
+      .then((u) => u || findUserByUserId("CROWN-" + trimmedUserId))
+      .then((u) => u || findUserByUserId("CNEOX-" + trimmedUserId));
   } else {
     userPromise = findUserByUserId(trimmedUserId);
   }
@@ -4294,9 +4298,14 @@ export const removeFreeInvestment = asyncHandler(async (req, res) => {
     throw new AppError("User ID is required", 400);
   }
   const userId = rawUserId.trim();
-  const normalizedId = /^\d+$/.test(userId) ? `CROWN-${userId}` : userId;
+  let user = await findUserByUserId(userId);
+  if (!user && /^\d+$/.test(userId)) {
+    user =
+      (await findUserByUserId(`BIGBULL-${userId}`)) ||
+      (await findUserByUserId(`CROWN-${userId}`)) ||
+      (await findUserByUserId(`CNEOX-${userId}`));
+  }
 
-  const user = await findUserByUserId(normalizedId);
   if (!user) {
     throw new AppError("User not found", 404);
   }
@@ -4719,7 +4728,7 @@ export const testEmailTemplate = asyncHandler(async (req, res) => {
       await sendSignupWelcomeEmail({
         to,
         name: get("name") || "Test User",
-        userId: get("userId") || "CROWN-000000",
+        userId: get("userId") || "BIGBULL-000000",
         loginLink: get("loginLink") || "https://crownbankers.com/login",
       });
       break;
@@ -4821,7 +4830,7 @@ export const testEmailTemplate = asyncHandler(async (req, res) => {
         voucherId: get("voucherId") || "VCH-001",
         amount: getNum("amount") ?? 100,
         investmentValue: getNum("investmentValue") ?? 100,
-        usedBy: get("usedBy") || "CROWN-000001",
+        usedBy: get("usedBy") || "BIGBULL-000001",
         dashboardLink: get("dashboardLink") || "https://crownbankers.com/plans",
       });
       break;

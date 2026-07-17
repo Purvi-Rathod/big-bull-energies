@@ -122,7 +122,7 @@ export default function ReferralsPage() {
   }
 
   return (
-    <div className="w-full bg-gradient-to-br from-black via-gray-900 to-black min-h-screen py-8 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+    <div className="w-full min-h-screen py-4 md:py-8 px-2 sm:px-4 md:px-6 lg:px-8 relative overflow-hidden">
       {/* Decorative background elements */}
       <div className="fixed inset-0 pointer-events-none opacity-20">
         <div className="absolute top-0 left-1/4 w-96 h-96 bg-yellow-500/10 rounded-full blur-3xl"></div>
@@ -131,11 +131,11 @@ export default function ReferralsPage() {
 
       <div className="relative z-10 space-y-6">
       {/* Header */}
-      <div className="bg-gradient-to-br from-gray-900/95 via-gray-800/95 to-gray-900/95 backdrop-blur-sm rounded-2xl shadow-2xl border border-yellow-500/30 p-6">
+      <div className="bg-gradient-to-br from-[#08152F]/95 via-[#0C1A6B]/90 to-[#05627C]/85 backdrop-blur-xl rounded-2xl shadow-2xl border border-yellow-500/30 p-6">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
             <h1 className="text-3xl font-extrabold mb-2 text-white flex items-center gap-3">
-              <span className="bg-gradient-to-r from-yellow-300 via-yellow-400 to-yellow-600 bg-clip-text text-transparent drop-shadow-lg">My Direct Referrals</span>
+              <span className="bg-gradient-to-r from-yellow-300 via-yellow-400 to-yellow-500 bg-clip-text text-transparent drop-shadow-lg">My Direct Referrals</span>
             </h1>
             <p className="text-sm text-gray-400 mt-1">
               View and manage all users who registered using your referral link
@@ -151,11 +151,11 @@ export default function ReferralsPage() {
       </div>
 
       {/* Filters */}
-      <div className="bg-gradient-to-br from-gray-900/95 via-gray-800/95 to-gray-900/95 backdrop-blur-sm rounded-2xl shadow-2xl border border-yellow-500/30 p-6">
+      <div className="bg-gradient-to-br from-[#08152F]/95 via-[#0C1A6B]/90 to-[#05627C]/85 backdrop-blur-xl rounded-2xl shadow-2xl border border-yellow-500/30 p-6">
         <form onSubmit={handleSearch} className="space-y-5">
           {/* Search */}
           <div>
-            <label htmlFor="search" className="block text-sm font-bold text-yellow-400 mb-3">
+            <label htmlFor="search" className="block text-sm font-bold text-yellow-300 mb-3">
               Search
             </label>
             <div className="flex gap-3">
@@ -169,7 +169,7 @@ export default function ReferralsPage() {
               />
               <button
                 type="submit"
-                className="px-8 py-3 bg-gradient-to-r from-yellow-500 to-yellow-600 text-black rounded-xl hover:from-yellow-400 hover:to-yellow-500 font-bold transition-all shadow-lg shadow-yellow-500/30 hover:shadow-yellow-500/50 hover:scale-105 active:scale-95"
+                className="px-8 py-3 bg-gradient-to-r from-yellow-300 to-yellow-400 text-black rounded-xl hover:from-yellow-400 hover:to-yellow-500 font-bold transition-all shadow-lg shadow-yellow-500/30 hover:shadow-yellow-500/50 hover:scale-105 active:scale-95"
               >
                 Search
               </button>
@@ -180,7 +180,7 @@ export default function ReferralsPage() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {/* Status Filter */}
             <div>
-              <label htmlFor="status" className="block text-sm font-bold text-yellow-400 mb-3">
+              <label htmlFor="status" className="block text-sm font-bold text-yellow-300 mb-3">
                 Status
               </label>
               <select
@@ -199,7 +199,7 @@ export default function ReferralsPage() {
 
             {/* Position Filter */}
             <div>
-              <label htmlFor="position" className="block text-sm font-bold text-yellow-400 mb-3">
+              <label htmlFor="position" className="block text-sm font-bold text-yellow-300 mb-3">
                 Position
               </label>
               <select
@@ -229,7 +229,7 @@ export default function ReferralsPage() {
       </div>
 
       {/* Referrals Table */}
-      <div className="bg-gradient-to-br from-gray-900/95 via-gray-800/95 to-gray-900/95 backdrop-blur-sm rounded-2xl shadow-2xl border border-yellow-500/30 overflow-hidden">
+      <div className="bg-gradient-to-br from-[#08152F]/95 via-[#0C1A6B]/90 to-[#05627C]/85 backdrop-blur-xl rounded-2xl shadow-2xl border border-yellow-500/30 overflow-hidden">
         {error ? (
           <div className="p-12 text-center">
             <p className="text-red-400">{error}</p>
@@ -266,7 +266,7 @@ export default function ReferralsPage() {
           <>
             <div className="overflow-x-auto">
               <table className="min-w-full divide-y divide-yellow-500/10">
-                <thead className="bg-gradient-to-r from-gray-800 via-gray-800/90 to-gray-800">
+                <thead className="bg-gradient-to-r from-[#08152F]/90 via-[#0C1A6B]/85 to-[#05627C]/80">
                   <tr>
                     <th className="px-6 py-5 text-left text-xs font-bold text-yellow-400 uppercase tracking-wider">User ID</th>
                     <th className="px-6 py-5 text-left text-xs font-bold text-yellow-400 uppercase tracking-wider">Name</th>
@@ -277,7 +277,7 @@ export default function ReferralsPage() {
                     <th className="px-6 py-5 text-left text-xs font-bold text-yellow-400 uppercase tracking-wider">Status</th>
                   </tr>
                 </thead>
-                <tbody className="bg-gray-900/50 divide-y divide-yellow-500/10">
+                <tbody className="bg-[#08152F]/50 divide-y divide-yellow-500/10">
                   {referrals.map((ref) => (
                     <tr key={ref.id} className="hover:bg-gradient-to-r hover:from-yellow-500/5 hover:via-yellow-500/10 hover:to-transparent transition-all duration-300 group">
                       <td className="px-6 py-5 whitespace-nowrap">
@@ -355,14 +355,14 @@ export default function ReferralsPage() {
 
             {/* Pagination */}
             {pagination.pages > 1 && (
-              <div className="bg-gradient-to-r from-gray-800 to-gray-800/80 px-6 py-5 border-t border-yellow-500/20">
+              <div className="bg-gradient-to-r from-[#08152F]/80 to-[#0C1A6B]/75 px-6 py-5 border-t border-yellow-500/20">
                 <div className="flex items-center justify-between flex-wrap gap-4">
                   <div className="text-sm text-gray-300 font-semibold">
                     Showing <span className="font-bold text-white">{(currentPage - 1) * pagination.limit + 1}</span> to{' '}
                     <span className="font-bold text-white">
                       {Math.min(currentPage * pagination.limit, pagination.total)}
                     </span>{' '}
-                    of <span className="font-bold text-yellow-400">{pagination.total}</span> referrals
+                    of <span className="font-bold text-yellow-300">{pagination.total}</span> referrals
                   </div>
                   <div className="flex gap-2">
                     <button

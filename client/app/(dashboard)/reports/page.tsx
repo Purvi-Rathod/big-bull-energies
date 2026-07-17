@@ -167,8 +167,8 @@ export default function ReportsPage() {
   const formatDateTimeForExport = (dateString: string) => formatDateTimeForExportUK(dateString);
 
   const renderTransactionTable = (transactions: Transaction[], title: string, showExport: boolean = true, isReferral: boolean = false) => (
-    <div className="bg-gradient-to-br from-gray-900/95 via-gray-800/95 to-gray-900/95 backdrop-blur-sm rounded-2xl shadow-2xl border border-yellow-500/30 overflow-hidden">
-      <div className="px-4 md:px-6 py-4 md:py-5 border-b border-yellow-500/20 bg-gradient-to-r from-gray-800 via-gray-800/90 to-gray-800 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+    <div className="bg-gradient-to-br from-[#08152F]/95 via-[#0C1A6B]/90 to-[#05627C]/85 backdrop-blur-xl rounded-2xl shadow-2xl border border-yellow-500/30 overflow-hidden">
+      <div className="px-4 md:px-6 py-4 md:py-5 border-b border-yellow-500/20 bg-gradient-to-r from-[#08152F]/80 via-[#0C1A6B]/75 to-[#05627C]/70 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
         <h3 className="text-lg md:text-xl font-extrabold text-white">{title}</h3>
         {showExport && transactions.length > 0 && (
           <button
@@ -183,7 +183,7 @@ export default function ReportsPage() {
         <div className="inline-block min-w-full align-middle">
           <div className="overflow-hidden">
             <table className="min-w-full divide-y divide-yellow-500/10">
-              <thead className="bg-gradient-to-r from-gray-800 via-gray-800/90 to-gray-800">
+              <thead className="bg-gradient-to-r from-[#08152F]/80 via-[#0C1A6B]/75 to-[#05627C]/70">
                 <tr>
                   <th className="px-3 md:px-6 py-3 md:py-5 text-left text-xs font-bold text-yellow-400 uppercase tracking-wider">Date & Time</th>
                   <th className="px-3 md:px-6 py-3 md:py-5 text-left text-xs font-bold text-yellow-400 uppercase tracking-wider">Type</th>
@@ -195,7 +195,7 @@ export default function ReportsPage() {
                   <th className="px-3 md:px-6 py-3 md:py-5 text-left text-xs font-bold text-yellow-400 uppercase tracking-wider">Transaction ID</th>
                 </tr>
               </thead>
-              <tbody className="bg-gray-900/50 divide-y divide-yellow-500/10">
+              <tbody className="bg-[#08152F]/50 divide-y divide-yellow-500/10">
                 {transactions.length === 0 ? (
                   <tr>
                     <td colSpan={isReferral ? 6 : 5} className="px-3 md:px-6 py-8 md:py-12 text-center text-gray-400 text-base md:text-lg">
@@ -269,8 +269,8 @@ export default function ReportsPage() {
   );
 
   const renderInvestmentTable = () => (
-    <div className="bg-gradient-to-br from-gray-900/95 via-gray-800/95 to-gray-900/95 backdrop-blur-sm rounded-2xl shadow-2xl border border-yellow-500/30 overflow-hidden">
-      <div className="px-4 md:px-6 py-4 md:py-5 border-b border-yellow-500/20 bg-gradient-to-r from-gray-800 via-gray-800/90 to-gray-800 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+    <div className="bg-gradient-to-br from-[#08152F]/95 via-[#0C1A6B]/90 to-[#05627C]/85 backdrop-blur-xl rounded-2xl shadow-2xl border border-yellow-500/30 overflow-hidden">
+      <div className="px-4 md:px-6 py-4 md:py-5 border-b border-yellow-500/20 bg-gradient-to-r from-[#08152F]/80 via-[#0C1A6B]/75 to-[#05627C]/70 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
         <h3 className="text-lg md:text-xl font-extrabold text-white">Investment Transactions</h3>
         {investmentTransactions.length > 0 && (
           <button
@@ -285,7 +285,7 @@ export default function ReportsPage() {
         <div className="inline-block min-w-full align-middle">
           <div className="overflow-hidden">
             <table className="min-w-full divide-y divide-yellow-500/10">
-              <thead className="bg-gradient-to-r from-gray-800 via-gray-800/90 to-gray-800">
+              <thead className="bg-gradient-to-r from-[#08152F]/80 via-[#0C1A6B]/75 to-[#05627C]/70">
                 <tr>
                   <th className="px-3 md:px-6 py-3 md:py-5 text-left text-xs font-bold text-yellow-400 uppercase tracking-wider">Date & Time</th>
                   <th className="px-3 md:px-6 py-3 md:py-5 text-left text-xs font-bold text-yellow-400 uppercase tracking-wider">Type</th>
@@ -298,7 +298,7 @@ export default function ReportsPage() {
                   <th className="px-3 md:px-6 py-3 md:py-5 text-left text-xs font-bold text-yellow-400 uppercase tracking-wider">Transaction ID</th>
                 </tr>
               </thead>
-              <tbody className="bg-gray-900/50 divide-y divide-yellow-500/10">
+              <tbody className="bg-[#08152F]/50 divide-y divide-yellow-500/10">
                 {investmentTransactions.length === 0 ? (
                   <tr>
                     <td colSpan={9} className="px-3 md:px-6 py-8 md:py-12 text-center text-gray-400 text-base md:text-lg">
@@ -365,8 +365,8 @@ export default function ReportsPage() {
   );
 
   const renderWithdrawalTable = () => (
-    <div className="bg-gradient-to-br from-gray-900/95 via-gray-800/95 to-gray-900/95 backdrop-blur-sm rounded-2xl shadow-2xl border border-yellow-500/30 overflow-hidden">
-      <div className="px-4 md:px-6 py-4 md:py-5 border-b border-yellow-500/20 bg-gradient-to-r from-gray-800 via-gray-800/90 to-gray-800 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+    <div className="bg-gradient-to-br from-[#08152F]/95 via-[#0C1A6B]/90 to-[#05627C]/85 backdrop-blur-xl rounded-2xl shadow-2xl border border-yellow-500/30 overflow-hidden">
+      <div className="px-4 md:px-6 py-4 md:py-5 border-b border-yellow-500/20 bg-gradient-to-r from-[#08152F]/80 via-[#0C1A6B]/75 to-[#05627C]/70 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
         <h3 className="text-lg md:text-xl font-extrabold text-white">Withdrawal History</h3>
         {withdrawals.length > 0 && (
           <button
@@ -381,7 +381,7 @@ export default function ReportsPage() {
         <div className="inline-block min-w-full align-middle">
           <div className="overflow-hidden">
             <table className="min-w-full divide-y divide-yellow-500/10">
-              <thead className="bg-gradient-to-r from-gray-800 via-gray-800/90 to-gray-800">
+              <thead className="bg-gradient-to-r from-[#08152F]/80 via-[#0C1A6B]/75 to-[#05627C]/70">
                 <tr>
                   <th className="px-3 md:px-6 py-3 md:py-5 text-left text-xs font-bold text-yellow-400 uppercase tracking-wider">Date & Time</th>
                   <th className="px-3 md:px-6 py-3 md:py-5 text-left text-xs font-bold text-yellow-400 uppercase tracking-wider">Withdrawal ID</th>
@@ -455,7 +455,7 @@ export default function ReportsPage() {
   }
 
   return (
-    <div className="w-full bg-gradient-to-br from-black via-gray-900 to-black min-h-screen py-8 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+    <div className="w-full  min-h-screen py-8 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
       {/* Decorative background elements */}
       <div className="fixed inset-0 pointer-events-none opacity-20">
         <div className="absolute top-0 right-1/4 w-96 h-96 bg-yellow-500/10 rounded-full blur-3xl"></div>
@@ -465,7 +465,7 @@ export default function ReportsPage() {
       <div className="relative z-10">
       <div className="mb-8">
         <h1 className="text-3xl font-extrabold mb-2 text-white flex items-center gap-3">
-          <span className="bg-gradient-to-r from-yellow-300 via-yellow-400 to-yellow-600 bg-clip-text text-transparent drop-shadow-lg">Reports</span>
+          <span className="bg-gradient-to-r from-yellow-300 via-yellow-400 to-yellow-500 bg-clip-text text-transparent drop-shadow-lg">Reports</span>
         </h1>
           </div>
           {error && (

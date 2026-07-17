@@ -86,7 +86,7 @@ export default function BinaryPage() {
   const totalDownlines = binaryTree.leftDownlines + binaryTree.rightDownlines;
 
   return (
-        <div className="w-full bg-gradient-to-br from-black via-gray-900 to-black min-h-screen py-8 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+        <div className="w-full min-h-screen py-4 md:py-8 px-2 sm:px-4 md:px-6 lg:px-8 relative overflow-hidden">
           {/* Decorative background elements */}
           <div className="fixed inset-0 pointer-events-none opacity-20">
             <div className="absolute top-0 left-1/4 w-96 h-96 bg-yellow-500/10 rounded-full blur-3xl"></div>
@@ -104,30 +104,26 @@ export default function BinaryPage() {
             {/* Business Overview Cards */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
               <div className="group relative bg-gradient-to-br from-yellow-500/20 via-yellow-600/15 to-yellow-500/20 rounded-2xl shadow-2xl border-2 border-yellow-500/40 p-6 hover:border-yellow-500/60 hover:shadow-yellow-500/30 transition-all duration-300 overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-br from-yellow-500/0 to-yellow-500/0 group-hover:from-yellow-500/10 group-hover:to-transparent transition-all duration-300"></div>
-                <div className="relative z-10">
+                <div className="absolute inset-0 bg-gradient-to-br from-[#0C1A6B]/0 via-[#05627C]/0 to-[#05627C]/0 group-hover:from-[#0C1A6B]/10 group-hover:via-[#05627C]/15 group-hover:to-[#FBF676]/5 transition-all duration-500"></div>                <div className="relative z-10">
                   <p className="text-sm text-gray-300 font-semibold mb-3">Left Business</p>
                   <p className="text-4xl font-extrabold bg-gradient-to-r from-white to-yellow-100 bg-clip-text text-transparent">${binaryTree.leftBusiness.toFixed(2)}</p>
                 </div>
               </div>
               <div className="group relative bg-gradient-to-br from-yellow-500/20 via-yellow-600/15 to-yellow-500/20 rounded-2xl shadow-2xl border-2 border-yellow-500/40 p-6 hover:border-yellow-500/60 hover:shadow-yellow-500/30 transition-all duration-300 overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-br from-yellow-500/0 to-yellow-500/0 group-hover:from-yellow-500/10 group-hover:to-transparent transition-all duration-300"></div>
-                <div className="relative z-10">
+                <div className="absolute inset-0 bg-gradient-to-br from-[#0C1A6B]/0 via-[#05627C]/0 to-[#05627C]/0 group-hover:from-[#0C1A6B]/10 group-hover:via-[#05627C]/15 group-hover:to-[#FBF676]/5 transition-all duration-500"></div>                <div className="relative z-10">
                   <p className="text-sm text-gray-300 font-semibold mb-3">Right Business</p>
                   <p className="text-4xl font-extrabold bg-gradient-to-r from-white to-yellow-100 bg-clip-text text-transparent">${binaryTree.rightBusiness.toFixed(2)}</p>
                 </div>
               </div>
               <div className="group relative bg-gradient-to-br from-yellow-500/30 via-yellow-600/20 to-yellow-500/30 rounded-2xl shadow-2xl border-2 border-yellow-500/60 p-6 hover:border-yellow-500/80 hover:shadow-yellow-500/40 transition-all duration-300 overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-br from-yellow-500/0 to-yellow-500/0 group-hover:from-yellow-500/10 group-hover:to-transparent transition-all duration-300"></div>
-                <div className="relative z-10">
+                <div className="absolute inset-0 bg-gradient-to-br from-[#0C1A6B]/0 via-[#05627C]/0 to-[#05627C]/0 group-hover:from-[#0C1A6B]/10 group-hover:via-[#05627C]/15 group-hover:to-[#FBF676]/5 transition-all duration-500"></div>                <div className="relative z-10">
                   <p className="text-sm text-white font-semibold mb-3">Binary Bonus</p>
                   <p className="text-4xl font-extrabold text-yellow-400">${binaryBonus.toFixed(2)}</p>
                   <p className="text-xs text-yellow-300 mt-2 font-semibold">10% of minimum</p>
                 </div>
               </div>
               <div className="group relative bg-gradient-to-br from-yellow-500/20 via-yellow-600/15 to-yellow-500/20 rounded-2xl shadow-2xl border-2 border-yellow-500/40 p-6 hover:border-yellow-500/60 hover:shadow-yellow-500/30 transition-all duration-300 overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-br from-yellow-500/0 to-yellow-500/0 group-hover:from-yellow-500/10 group-hover:to-transparent transition-all duration-300"></div>
-                <div className="relative z-10">
+                <div className="absolute inset-0 bg-gradient-to-br from-[#0C1A6B]/0 via-[#05627C]/0 to-[#05627C]/0 group-hover:from-[#0C1A6B]/10 group-hover:via-[#05627C]/15 group-hover:to-[#FBF676]/5 transition-all duration-500"></div>                <div className="relative z-10">
                   <p className="text-sm text-gray-300 font-semibold mb-3">Total Downlines</p>
                   <p className="text-4xl font-extrabold bg-gradient-to-r from-white to-yellow-100 bg-clip-text text-transparent">{totalDownlines}</p>
                 </div>
@@ -137,7 +133,7 @@ export default function BinaryPage() {
             {/* Detailed Information */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-10">
               {/* Business Details */}
-              <div className="bg-gradient-to-br from-gray-900/95 via-gray-800/95 to-gray-900/95 backdrop-blur-sm rounded-2xl shadow-2xl border border-yellow-500/30 p-8">
+              <div className="bg-gradient-to-br from-[#08152F]/95 via-[#0C1A6B]/90 to-[#05627C]/85 backdrop-blur-xl rounded-2xl shadow-2xl border border-yellow-500/30 p-8">
                 <h2 className="text-2xl font-extrabold text-white mb-6 flex items-center gap-2">
                   <span className="w-1 h-6 bg-gradient-to-b from-yellow-400 to-yellow-600 rounded"></span>
                   Business Details
@@ -175,7 +171,7 @@ export default function BinaryPage() {
               </div>
 
               {/* Carry Forward & Downlines */}
-              <div className="bg-gradient-to-br from-gray-900/95 via-gray-800/95 to-gray-900/95 backdrop-blur-sm rounded-2xl shadow-2xl border border-yellow-500/30 p-8">
+              <div className="bg-gradient-to-br from-[#08152F]/95 via-[#0C1A6B]/90 to-[#05627C]/85 backdrop-blur-xl rounded-2xl shadow-2xl border border-yellow-500/30 p-8">
                 <h2 className="text-2xl font-extrabold text-white mb-6 flex items-center gap-2">
                   <span className="w-1 h-6 bg-gradient-to-b from-yellow-400 to-yellow-600 rounded"></span>
                   Carry Forward & Downlines
@@ -215,7 +211,7 @@ export default function BinaryPage() {
 
             {/* Tree Connections */}
             {(binaryTree.parent || binaryTree.leftChild || binaryTree.rightChild) && (
-              <div className="bg-gradient-to-br from-gray-900/95 via-gray-800/95 to-gray-900/95 backdrop-blur-sm rounded-2xl shadow-2xl border border-yellow-500/30 p-8">
+              <div className="bg-gradient-to-br from-[#08152F]/95 via-[#0C1A6B]/90 to-[#05627C]/85 backdrop-blur-xl rounded-2xl shadow-2xl border border-yellow-500/30 p-8">
                 <h2 className="text-2xl font-extrabold text-white mb-6 flex items-center gap-2">
                   <span className="w-1 h-6 bg-gradient-to-b from-yellow-400 to-yellow-600 rounded"></span>
                   Tree Connections

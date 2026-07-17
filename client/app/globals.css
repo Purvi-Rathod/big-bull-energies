@@ -397,3 +397,29 @@ body {
 .reports-tabs-container::-webkit-scrollbar-thumb:hover {
   background: #a0aec0;
 }
+
+/* Dark form controls for user dashboard (avoid white native selects/inputs) */
+select,
+select option,
+input[type="number"],
+input[type="text"],
+input[type="email"],
+input[type="password"],
+textarea {
+  color-scheme: dark;
+}
+
+select option {
+  background-color: #081028;
+  color: #ffffff;
+}
+
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+textarea:-webkit-autofill,
+select:-webkit-autofill {
+  -webkit-text-fill-color: #ffffff;
+  -webkit-box-shadow: 0 0 0px 1000px #081028 inset;
+  transition: background-color 5000s ease-in-out 0s;
+}

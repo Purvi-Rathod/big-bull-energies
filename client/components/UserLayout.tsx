@@ -282,7 +282,20 @@ export default function UserLayout({
   }
 
   return (
-    <div className="min-h-screen bg-black flex">
+    <div className="min-h-screen flex relative">
+      {/* Shared background for all user pages */}
+      <div className="fixed inset-0 z-0">
+        <Image
+          src="/dash.png"
+          alt=""
+          fill
+          priority
+          className="object-cover object-center"
+          quality={90}
+          sizes="100vw"
+        />
+      </div>
+
       {/* Mobile Overlay */}
       {sidebarOpen && (
         <div
@@ -297,10 +310,17 @@ export default function UserLayout({
           sidebarOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
         } ${
           sidebarOpen ? "w-64" : "md:w-20"
-        } bg-gradient-to-b from-gray-900 via-gray-900 to-black border-r border-yellow-500/30 shadow-2xl transition-all duration-300 ease-in-out flex flex-col fixed h-screen z-30`}
+        } border-r shadow-2xl transition-all duration-300 ease-in-out flex flex-col fixed h-screen z-30`}
+        style={{
+          background: "linear-gradient(180deg, #0C1A6B 0%, #06103a 55%,rgb(5, 18, 44) 100%)",
+          borderColor: "rgba(251,246,118,0.2)",
+        }}
       >
         {/* Logo/Header */}
-        <div className="h-16 flex items-center justify-between px-4 border-b border-yellow-500/20 bg-gray-900/50 backdrop-blur-sm flex-shrink-0">
+        <div
+          className="h-16 flex items-center justify-between px-4 border-b backdrop-blur-sm flex-shrink-0"
+          style={{ borderColor: "rgba(251,246,118,0.15)", background: "rgba(5,98,124,0.2)" }}
+        >
           {sidebarOpen ? (
             <Link href="/" className="flex items-center gap-2">
               <Image
@@ -324,7 +344,7 @@ export default function UserLayout({
           )}
           <button
             onClick={() => setSidebarOpen(!sidebarOpen)}
-            className="p-2 rounded-lg hover:bg-yellow-500/20 text-gray-400 hover:text-yellow-400 transition-all duration-200 border border-transparent hover:border-yellow-500/30"
+            className="p-2 rounded-lg transition-all duration-200 border border-transparent hover:border-[#FBF676]/30 text-white/50 hover:text-[#FBF676] hover:bg-[#FBF676]/10"
             aria-label="Toggle sidebar"
           >
             <svg
@@ -432,7 +452,7 @@ export default function UserLayout({
 
       {/* Main Content */}
       <div
-        className={`flex-1 transition-all duration-300 ${sidebarOpen ? "md:ml-64" : "md:ml-20"} pb-20 md:pb-0`}
+        className={`relative z-10 flex-1 transition-all duration-300 ${sidebarOpen ? "md:ml-64" : "md:ml-20"} pb-20 md:pb-0`}
       >
         {/* Mobile menu button */}
         <div className="md:hidden fixed top-4 left-4 z-10">

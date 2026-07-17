@@ -243,7 +243,7 @@ export default function PlansPage() {
   }
 
   return (
-    <div className="w-full bg-gradient-to-br from-black via-gray-900 to-black min-h-screen py-8 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+    <div className="w-full min-h-screen py-4 md:py-8 px-2 sm:px-4 md:px-6 lg:px-8 relative overflow-hidden">
       {/* Decorative background elements */}
       <div className="fixed inset-0 pointer-events-none opacity-20">
         <div className="absolute top-0 right-1/4 w-96 h-96 bg-yellow-500/10 rounded-full blur-3xl"></div>
@@ -259,7 +259,7 @@ export default function PlansPage() {
 
         {packages.length === 0 && !loading && (
           <div className="px-4 py-6 sm:px-0">
-            <div className="text-center py-12 bg-gradient-to-br from-gray-900/95 to-gray-800/95 backdrop-blur-sm rounded-2xl shadow-2xl border border-yellow-500/30">
+            <div className="text-center py-12 bg-gradient-to-br from-[#08152F]/95 via-[#0C1A6B]/90 to-[#05627C]/85 backdrop-blur-xl rounded-2xl shadow-2xl border border-yellow-500/30">
               <p className="text-gray-400 text-lg">No active packages available at the moment.</p>
             </div>
           </div>

@@ -294,11 +294,11 @@ export default function WithdrawPage() {
   }
 
   return (
-    <div className="w-full bg-gradient-to-br from-black via-gray-900 to-black min-h-screen py-8 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+    <div className="w-full min-h-screen py-4 md:py-8 px-2 sm:px-4 md:px-6 lg:px-8 relative overflow-hidden">
       {/* Decorative background elements */}
       <div className="fixed inset-0 pointer-events-none opacity-20">
-        <div className="absolute top-0 left-1/4 w-96 h-96 bg-yellow-500/10 rounded-full blur-3xl"></div>
-        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-yellow-600/10 rounded-full blur-3xl"></div>
+        <div className="absolute top-0 left-1/4 w-96 h-96 bg-yellow-400/10 rounded-full blur-3xl"></div>
+        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-yellow-400/10 rounded-full blur-3xl"></div>
       </div>
 
       <div className="relative z-10">
@@ -315,7 +315,7 @@ export default function WithdrawPage() {
 
           {/* Target Completion Lock Message (non-free: full lock; free: ROI locked, Binary/Referral allowed) */}
           {targetStatus && (targetStatus.binaryTargetAmount ?? 0) > 0 && !targetStatus.isCompleted && (
-            <div className="mb-6 bg-amber-900/30 border-2 border-amber-500/50 text-amber-300 px-6 py-4 rounded-xl backdrop-blur-sm">
+            <div className="mb-6 bg-amber-900/30 border-2 border-amber-400/50 text-amber-300 px-6 py-4 rounded-xl backdrop-blur-sm">
               <div className="flex items-start gap-3">
                 <svg className="w-6 h-6 text-amber-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -358,7 +358,7 @@ export default function WithdrawPage() {
 
           {/* Free Account Info: official rules (before/after target) */}
           {userProfile?.accountType === 'free' && targetStatus && (
-            <div className="mb-6 bg-blue-900/30 border-2 border-blue-500/50 text-blue-300 px-6 py-4 rounded-xl backdrop-blur-sm">
+            <div className="mb-6 bg-blue-900/30 border-2 border-blue-400/50 text-blue-300 px-6 py-4 rounded-xl backdrop-blur-sm">
               <div className="flex items-start gap-3">
                 <svg className="w-6 h-6 text-blue-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -380,26 +380,29 @@ export default function WithdrawPage() {
           )}
 
           <div className="px-4 py-6 sm:px-0">
-            <div className="bg-gradient-to-br from-gray-900/95 via-gray-800/95 to-gray-900/95 backdrop-blur-sm rounded-2xl shadow-2xl border border-yellow-500/30 p-8">
+            <div className="rounded-2xl shadow-2xl border border-[#FBF676]/25 p-8 backdrop-blur-md bg-[rgba(8,16,40,0.75)]">
               {binaryTree && binaryTree.cappingLimit > 0 && (
-                <div className="mb-6 p-4 bg-gradient-to-r from-yellow-500/20 via-yellow-600/15 to-yellow-500/20 border-2 border-yellow-500/40 rounded-xl">
-                  <p className="text-sm text-yellow-300 font-bold">
-                    <strong className="text-yellow-400">Capping Limit:</strong> <span className="text-white">${binaryTree.cappingLimit.toFixed(2)}</span> per withdrawal
+                <div className="mb-6 p-4 bg-[rgba(251,246,118,0.12)] border-2 border-[#FBF676]/35 rounded-xl">
+                  <p className="text-sm text-[#FBF676] font-bold">
+                    <strong>Capping Limit:</strong> <span className="text-white">${binaryTree.cappingLimit.toFixed(2)}</span> per withdrawal
                   </p>
                 </div>
               )}
 
               <div className="space-y-6">
                 <div>
-                  <label className="block text-sm font-bold text-yellow-400 mb-3">
+                  <label className="block text-sm font-bold text-yellow-300 mb-3">
                     Select Wallet
                   </label>
                   <select
                     value={selectedWalletType}
                     onChange={(e) => setSelectedWalletType(e.target.value)}
-                    className="w-full px-4 py-3 border border-yellow-500/40 rounded-xl bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-yellow-500/50 focus:border-yellow-500/70 font-semibold"
+                    className="w-full px-4 py-3 border border-[#FBF676]/40 rounded-xl bg-[#081028] text-white focus:outline-none focus:ring-2 focus:ring-[#FBF676]/40 focus:border-[#FBF676]/70 font-semibold appearance-none"
+                    style={{ colorScheme: 'dark' }}
                   >
-                    <option value="">Select a wallet</option>
+                    <option value="" className="bg-[#081028] text-white">
+                      Select a wallet
+                    </option>
                     {sortWallets(wallets
                       .filter((w) => {
                         // Free: before target = binary + referral only; after target = all
@@ -425,7 +428,11 @@ export default function WithdrawPage() {
                             ? 'Interest Wallet'
                             : wallet.type;
                         return (
-                          <option key={wallet.type} value={wallet.type}>
+                          <option
+                            key={wallet.type}
+                            value={wallet.type}
+                            className="bg-[#081028] text-white"
+                          >
                             {label} - Available: ${(wallet.balance - wallet.reserved).toFixed(2)}
                           </option>
                         );
@@ -440,25 +447,25 @@ export default function WithdrawPage() {
 
                 {selectedWallet && (
                   <>
-                    <div className="p-5 bg-gray-800/80 border border-yellow-500/30 rounded-xl">
+                    <div className="p-5 bg-[rgba(5,12,32,0.9)] border border-[#FBF676]/30 rounded-xl">
                       <div className="flex justify-between items-center mb-3">
-                        <span className="text-sm text-gray-300 font-semibold">Total Balance:</span>
+                        <span className="text-sm text-[#FBF676]/80 font-semibold">Total Balance:</span>
                         <span className="font-extrabold text-white">${selectedWallet.balance.toFixed(2)}</span>
                       </div>
                       <div className="flex justify-between items-center mb-3">
-                        <span className="text-sm text-gray-300 font-semibold">Reserved:</span>
-                        <span className="font-extrabold text-gray-400">${selectedWallet.reserved.toFixed(2)}</span>
+                        <span className="text-sm text-[#FBF676]/80 font-semibold">Reserved:</span>
+                        <span className="font-extrabold text-[#FBF676]">${selectedWallet.reserved.toFixed(2)}</span>
                       </div>
-                      <div className="flex justify-between items-center pt-3 border-t border-yellow-500/20">
-                        <span className="text-sm font-bold text-yellow-400">Available:</span>
-                        <span className="text-xl font-extrabold text-yellow-400">
+                      <div className="flex justify-between items-center pt-3 border-t border-[#FBF676]/20">
+                        <span className="text-sm font-bold text-[#FBF676]">Available:</span>
+                        <span className="text-xl font-extrabold text-[#FBF676]">
                           ${availableBalance.toFixed(2)}
                         </span>
                       </div>
                     </div>
 
                     <div>
-                      <label className="block text-sm font-bold text-yellow-400 mb-3">
+                      <label className="block text-sm font-bold text-[#FBF676] mb-3">
                         Withdrawal Amount (USD)
                       </label>
                       <input
@@ -468,36 +475,37 @@ export default function WithdrawPage() {
                         min={MIN_WITHDRAWAL_AMOUNT}
                         max={availableBalance}
                         step="0.01"
-                        className="w-full px-4 py-3 border border-yellow-500/40 rounded-xl bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-yellow-500/50 focus:border-yellow-500/70 font-semibold"
+                        className="w-full px-4 py-3 border border-[#FBF676]/40 rounded-xl bg-[#081028] text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-[#FBF676]/40 focus:border-[#FBF676]/70 font-semibold"
+                        style={{ colorScheme: 'dark' }}
                         placeholder={`Min $${MIN_WITHDRAWAL_AMOUNT}`}
                       />
-                      <p className="mt-2 text-xs text-gray-400 font-semibold">
-                        Minimum: <span className="text-yellow-400">${MIN_WITHDRAWAL_AMOUNT}</span>
+                      <p className="mt-2 text-xs text-[#FBF676]/80 font-semibold">
+                        Minimum: <span className="text-[#FBF676]">${MIN_WITHDRAWAL_AMOUNT}</span>
                         {' | '}
-                        Maximum: <span className="text-yellow-400">${availableBalance.toFixed(2)}</span>
+                        Maximum: <span className="text-[#FBF676]">${availableBalance.toFixed(2)}</span>
                         {binaryTree && binaryTree.cappingLimit > 0 && (
-                          <> | Capping Limit: <span className="text-yellow-400">${binaryTree.cappingLimit.toFixed(2)}</span></>
+                          <> | Capping Limit: <span className="text-[#FBF676]">${binaryTree.cappingLimit.toFixed(2)}</span></>
                         )}
                       </p>
                     </div>
 
                     {withdrawAmount && parseFloat(withdrawAmount) > 0 && (
-                      <div className="p-5 bg-gradient-to-r from-yellow-500/20 via-yellow-600/15 to-yellow-500/20 border-2 border-yellow-500/40 rounded-xl">
+                      <div className="p-5 bg-[rgba(5,12,32,0.9)] border-2 border-[#FBF676]/35 rounded-xl">
                         <h4 className="font-extrabold text-white mb-4">Withdrawal Summary</h4>
                         <div className="space-y-2 text-sm">
                           <div className="flex justify-between">
-                            <span className="text-gray-300 font-semibold">Amount:</span>
+                            <span className="text-[#FBF676]/80 font-semibold">Amount:</span>
                             <span className="font-extrabold text-white">${parseFloat(withdrawAmount).toFixed(2)}</span>
                           </div>
                           <div className="flex justify-between">
-                            <span className="text-gray-300 font-semibold">Charges (5%):</span>
-                            <span className="font-extrabold text-red-400">
+                            <span className="text-[#FBF676]/80 font-semibold">Charges (5%):</span>
+                            <span className="font-extrabold text-[#FBF676]">
                               -${(parseFloat(withdrawAmount) * 0.05).toFixed(2)}
                             </span>
                           </div>
-                          <div className="flex justify-between pt-3 border-t border-yellow-500/30">
-                            <span className="font-bold text-yellow-400">Final Amount:</span>
-                            <span className="text-xl font-extrabold text-yellow-400">
+                          <div className="flex justify-between pt-3 border-t border-[#FBF676]/30">
+                            <span className="font-bold text-[#FBF676]">Final Amount:</span>
+                            <span className="text-xl font-extrabold text-[#FBF676]">
                               ${(parseFloat(withdrawAmount) * 0.95).toFixed(2)}
                             </span>
                           </div>
@@ -515,17 +523,17 @@ export default function WithdrawPage() {
                         // Non-free accounts: require target completed to withdraw
                         (userProfile?.accountType !== 'free' && targetStatus && (targetStatus.binaryTargetAmount ?? 0) > 0 && !targetStatus.isCompleted)
                       )}
-                      className="w-full px-6 py-4 bg-gradient-to-r from-yellow-500 to-yellow-600 text-black rounded-xl hover:from-yellow-400 hover:to-yellow-500 font-bold transition-all shadow-lg shadow-yellow-500/30 hover:shadow-yellow-500/50 hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="w-full px-6 py-4 bg-[#FBF676] text-[#0C1A6B] rounded-xl hover:bg-[#e8e04a] font-bold transition-all shadow-lg shadow-[#FBF676]/25 hover:scale-[1.01] active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       {withdrawing ? 'Processing...' : 'Submit Withdrawal Request'}
                     </button>
                     {!walletAddress && (
-                      <p className="mt-3 text-sm text-red-400 text-center font-semibold">
+                      <p className="mt-3 text-sm text-yellow-400 text-center font-semibold">
                         Please set your USDT TRC20 wallet address to proceed
                       </p>
                     )}
                     {userProfile?.accountType !== 'free' && targetStatus && (targetStatus.binaryTargetAmount ?? 0) > 0 && !targetStatus.isCompleted && (
-                      <p className="mt-3 text-sm text-red-400 text-center font-semibold">
+                      <p className="mt-3 text-sm text-yellow-400 text-center font-semibold">
                         Complete your binary target to unlock withdrawal
                       </p>
                     )}
@@ -537,10 +545,10 @@ export default function WithdrawPage() {
 
           {/* Wallet Address Section */}
           <div className="mb-8">
-            <div className="bg-gradient-to-br from-gray-900/95 via-gray-800/95 to-gray-900/95 backdrop-blur-sm rounded-2xl shadow-2xl border border-yellow-500/30 p-8">
+            <div className="rounded-2xl shadow-2xl border border-[#FBF676]/25 p-8 backdrop-blur-md bg-[rgba(8,16,40,0.75)]">
               <div className="flex justify-between items-center mb-6">
                 <h2 className="text-2xl font-extrabold text-white flex items-center gap-2">
-                  <span className="w-1 h-6 bg-gradient-to-b from-yellow-400 to-yellow-600 rounded"></span>
+                  <span className="w-1 h-6 rounded" style={{ background: 'linear-gradient(180deg, #FBF676, #05627C)' }}></span>
                   Payment Information
                 </h2>
                 {!userWalletAddress && (
@@ -549,27 +557,27 @@ export default function WithdrawPage() {
                       setModalWalletAddress(''); // Reset modal input when opening modal
                       setShowWalletModal(true);
                     }}
-                    className="px-6 py-3 bg-gradient-to-r from-yellow-500 to-yellow-600 text-black rounded-xl hover:from-yellow-400 hover:to-yellow-500 font-bold transition-all shadow-lg shadow-yellow-500/30 hover:shadow-yellow-500/50 hover:scale-105 active:scale-95"
+                    className="px-6 py-3 bg-gradient-to-r from-yellow-300 to-yellow-400 text-black rounded-xl hover:from-yellow-400 hover:to-yellow-500 font-bold transition-all shadow-lg shadow-yellow-500/30 hover:shadow-yellow-500/50 hover:scale-105 active:scale-95"
                   >
                     Setup Payment Info
                   </button>
                 )}
               </div>
               <div>
-                <h3 className="text-sm font-bold text-yellow-400 mb-3">USDT TRC20 Wallet Address</h3>
+                <h3 className="text-sm font-bold text-[#FBF676] mb-3">USDT TRC20 Wallet Address</h3>
                 {walletAddress ? (
-                  <div className="p-4 bg-gradient-to-r from-yellow-500/20 via-yellow-600/15 to-yellow-500/20 border-2 border-yellow-500/40 rounded-xl">
+                  <div className="p-4 bg-[rgba(5,12,32,0.9)] border-2 border-[#FBF676]/35 rounded-xl">
                     <p className="text-sm font-mono text-white break-all font-semibold">{walletAddress}</p>
-                    <p className="text-xs text-yellow-300 mt-2 font-bold">✓ Wallet address configured</p>
-                    <p className="text-xs text-gray-400 mt-2 font-semibold">
+                    <p className="text-xs text-[#FBF676] mt-2 font-bold">✓ Wallet address configured</p>
+                    <p className="text-xs text-white/50 mt-2 font-semibold">
                       Wallet address cannot be changed. Contact admin support if you need to update it.
                     </p>
                   </div>
                 ) : (
-                  <div className="p-4 bg-gray-800/80 border border-yellow-500/30 rounded-xl">
-                    <p className="text-sm text-gray-300 font-semibold">No wallet address set</p>
-                    <p className="text-xs text-yellow-400 mt-2 font-bold">Required for withdrawals</p>
-                    <p className="text-xs text-gray-400 mt-2 font-semibold">
+                  <div className="p-4 bg-[rgba(5,12,32,0.9)] border border-[#FBF676]/30 rounded-xl">
+                    <p className="text-sm text-white/80 font-semibold">No wallet address set</p>
+                    <p className="text-xs text-[#FBF676] mt-2 font-bold">Required for withdrawals</p>
+                    <p className="text-xs text-white/50 mt-2 font-semibold">
                       Supported: USDT TRC20 only
                     </p>
                   </div>
@@ -591,56 +599,56 @@ export default function WithdrawPage() {
 
           {/* Withdrawal History Section */}
           <div className="mb-10">
-            <div className="bg-gradient-to-br from-gray-900/95 via-gray-800/95 to-gray-900/95 backdrop-blur-sm rounded-2xl shadow-2xl border border-yellow-500/30 p-8">
-              <h2 className="text-2xl font-extrabold mb-6 text-white flex items-center gap-2">
-                <span className="bg-gradient-to-r from-yellow-300 via-yellow-400 to-yellow-600 bg-clip-text text-transparent">Withdrawal History</span>
+            <div className="rounded-2xl shadow-2xl border border-[#FBF676]/25 p-8 backdrop-blur-md bg-[rgba(8,16,40,0.75)]">
+              <h2 className="text-2xl font-extrabold mb-6 text-[#FBF676]">
+                Withdrawal History
               </h2>
               {withdrawals.length === 0 ? (
-                <div className="text-center py-12 text-gray-400 text-lg">
+                <div className="text-center py-12 text-white/50 text-lg">
                   <p>No withdrawal history found</p>
                 </div>
               ) : (
                 <div className="overflow-x-auto">
-                  <table className="min-w-full divide-y divide-yellow-500/10">
-                    <thead className="bg-gradient-to-r from-gray-800 via-gray-800/90 to-gray-800">
+                  <table className="min-w-full divide-y divide-[#FBF676]/15">
+                    <thead className="bg-[rgba(5,12,32,0.9)]">
                       <tr>
-                        <th className="px-6 py-5 text-left text-xs font-bold text-yellow-400 uppercase tracking-wider">Date</th>
-                        <th className="px-6 py-5 text-left text-xs font-bold text-yellow-400 uppercase tracking-wider">Withdrawal ID</th>
-                        <th className="px-6 py-5 text-left text-xs font-bold text-yellow-400 uppercase tracking-wider">Amount</th>
-                        <th className="px-6 py-5 text-left text-xs font-bold text-yellow-400 uppercase tracking-wider">Charges</th>
-                        <th className="px-6 py-5 text-left text-xs font-bold text-yellow-400 uppercase tracking-wider">Final Amount</th>
-                        <th className="px-6 py-5 text-left text-xs font-bold text-yellow-400 uppercase tracking-wider">Wallet Type</th>
-                        <th className="px-6 py-5 text-left text-xs font-bold text-yellow-400 uppercase tracking-wider">Status</th>
+                        <th className="px-6 py-5 text-left text-xs font-bold text-[#FBF676] uppercase tracking-wider">Date</th>
+                        <th className="px-6 py-5 text-left text-xs font-bold text-[#FBF676] uppercase tracking-wider">Withdrawal ID</th>
+                        <th className="px-6 py-5 text-left text-xs font-bold text-[#FBF676] uppercase tracking-wider">Amount</th>
+                        <th className="px-6 py-5 text-left text-xs font-bold text-[#FBF676] uppercase tracking-wider">Charges</th>
+                        <th className="px-6 py-5 text-left text-xs font-bold text-[#FBF676] uppercase tracking-wider">Final Amount</th>
+                        <th className="px-6 py-5 text-left text-xs font-bold text-[#FBF676] uppercase tracking-wider">Wallet Type</th>
+                        <th className="px-6 py-5 text-left text-xs font-bold text-[#FBF676] uppercase tracking-wider">Status</th>
                       </tr>
                     </thead>
-                    <tbody className="bg-gray-900/50 divide-y divide-yellow-500/10">
+                    <tbody className="bg-[rgba(5,12,32,0.45)] divide-y divide-[#FBF676]/10">
                       {withdrawals.map((wd) => (
-                        <tr key={wd.id} className="hover:bg-gradient-to-r hover:from-yellow-500/5 hover:via-yellow-500/10 hover:to-transparent transition-all duration-300 group">
-                          <td className="px-6 py-5 whitespace-nowrap text-sm text-gray-400">
+                        <tr key={wd.id} className="hover:bg-[rgba(251,246,118,0.08)] transition-all duration-300 group">
+                          <td className="px-6 py-5 whitespace-nowrap text-sm text-white/55">
                             {formatDateTimeLongUK(wd.createdAt)}
                           </td>
-                          <td className="px-6 py-5 whitespace-nowrap text-sm font-mono text-yellow-400 font-semibold">
+                          <td className="px-6 py-5 whitespace-nowrap text-sm font-mono text-[#FBF676] font-semibold">
                             {wd.withdrawalId || wd.id.substring(0, 8)}
                           </td>
                           <td className="px-6 py-5 whitespace-nowrap text-sm font-bold text-white">
                             ${wd.amount.toFixed(2)}
                           </td>
-                          <td className="px-6 py-5 whitespace-nowrap text-sm text-gray-400 font-semibold">
+                          <td className="px-6 py-5 whitespace-nowrap text-sm text-white/55 font-semibold">
                             ${wd.charges.toFixed(2)}
                           </td>
-                          <td className="px-6 py-5 whitespace-nowrap text-sm font-extrabold text-yellow-400 group-hover:text-yellow-300 transition-colors">
+                          <td className="px-6 py-5 whitespace-nowrap text-sm font-extrabold text-[#FBF676]">
                             ${wd.finalAmount.toFixed(2)}
                           </td>
-                          <td className="px-6 py-5 whitespace-nowrap text-sm text-gray-300 capitalize font-semibold">
+                          <td className="px-6 py-5 whitespace-nowrap text-sm text-white/75 capitalize font-semibold">
                             {wd.walletType}
                           </td>
                           <td className="px-6 py-5 whitespace-nowrap text-sm">
-                            <span className={`px-4 py-1.5 inline-flex text-xs leading-5 font-bold rounded-full shadow-lg ${
+                            <span className={`px-4 py-1.5 inline-flex text-xs leading-5 font-bold rounded-full border ${
                               wd.status === 'approved' 
-                                ? 'bg-gradient-to-r from-yellow-500/30 to-yellow-600/20 text-yellow-300 border border-yellow-500/50 shadow-yellow-500/20'
+                                ? 'bg-[rgba(251,246,118,0.15)] text-[#FBF676] border-[#FBF676]/40'
                                 : wd.status === 'pending' 
-                                ? 'bg-gray-700/50 text-yellow-200 border border-yellow-500/30'
-                                : 'bg-red-900/40 text-red-400 border border-red-500/40'
+                                ? 'bg-white/10 text-white/70 border-white/20'
+                                : 'bg-red-900/40 text-red-400 border-red-500/40'
                             }`}>
                               {wd.status}
                             </span>
@@ -657,7 +665,7 @@ export default function WithdrawPage() {
           {/* Wallet Address Modal */}
           {showWalletModal && (
             <div className="fixed inset-0 bg-black/80 backdrop-blur-sm overflow-y-auto h-full w-full z-50">
-              <div className="relative top-10 mx-auto p-6 border border-yellow-500/30 w-full max-w-2xl shadow-2xl rounded-2xl bg-gradient-to-br from-gray-900/95 via-gray-800/95 to-gray-900/95 backdrop-blur-sm">
+              <div className="relative top-10 mx-auto p-6 border border-yellow-500/30 w-full max-w-2xl shadow-2xl rounded-2xl bg-gradient-to-br from-[#08152F]/95 via-[#0C1A6B]/90 to-[#05627C]/85 backdrop-blur-xl">
                 <div className="mt-3">
                   <h3 className="text-xl font-extrabold text-white mb-6 flex items-center gap-2">
                     <span className="bg-gradient-to-r from-yellow-300 via-yellow-400 to-yellow-600 bg-clip-text text-transparent">Setup Payment Information</span>
@@ -695,7 +703,8 @@ export default function WithdrawPage() {
                               e.preventDefault();
                             }
                           }}
-                          className="w-full px-4 py-3 border border-yellow-500/40 rounded-xl bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-yellow-500/50 focus:border-yellow-500/70 font-mono text-sm font-semibold"
+                          className="w-full px-4 py-3 border border-[#FBF676]/40 rounded-xl bg-[#081028] text-white focus:outline-none focus:ring-2 focus:ring-[#FBF676]/40 focus:border-[#FBF676]/70 font-mono text-sm font-semibold"
+                          style={{ colorScheme: 'dark' }}
                           placeholder="Enter your USDT TRC20 wallet address (starts with T)"
                           autoComplete="off"
                         />

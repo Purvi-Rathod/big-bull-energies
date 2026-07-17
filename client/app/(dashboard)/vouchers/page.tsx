@@ -184,7 +184,7 @@ export default function VouchersPage() {
   }
 
   return (
-    <div className="w-full bg-gradient-to-br from-black via-gray-900 to-black min-h-screen py-8 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+    <div className="w-full min-h-screen py-4 md:py-8 px-2 sm:px-4 md:px-6 lg:px-8 relative overflow-hidden">
       {/* Decorative background elements */}
       <div className="fixed inset-0 pointer-events-none opacity-20">
         <div className="absolute top-0 left-1/4 w-96 h-96 bg-yellow-500/10 rounded-full blur-3xl"></div>
@@ -211,7 +211,7 @@ export default function VouchersPage() {
 
       <div>
             {vouchers.length === 0 ? (
-              <div className="bg-gradient-to-br from-gray-900/95 via-gray-800/95 to-gray-900/95 backdrop-blur-sm rounded-2xl shadow-2xl border border-yellow-500/30 p-12 text-center">
+              <div className="bg-gradient-to-br from-[#08152F]/95 via-[#0C1A6B]/90 to-[#05627C]/85 backdrop-blur-xl rounded-2xl shadow-2xl border border-yellow-500/30 p-12 text-center">
                 <p className="text-gray-400 text-lg mb-6">No vouchers found</p>
                 <button
                   onClick={() => setShowCreateModal(true)}
@@ -229,7 +229,7 @@ export default function VouchersPage() {
                   const investmentValue = voucher.investmentValue || voucher.amount * (voucher.multiplier || 2);
                   
                   return (
-                    <div key={voucher.id} className="group bg-gradient-to-br from-gray-900/95 via-gray-800/95 to-gray-900/95 backdrop-blur-sm rounded-2xl shadow-2xl border border-yellow-500/30 p-6 hover:border-yellow-500/60 hover:shadow-yellow-500/20 transition-all duration-300">
+                    <div key={voucher.id} className="group bg-gradient-to-br from-[#08152F]/95 via-[#0C1A6B]/90 to-[#05627C]/85 backdrop-blur-xl rounded-2xl shadow-2xl border border-yellow-400/30 p-6 hover:border-yellow-500/60 hover:shadow-yellow-500/20 transition-all duration-300">
                       <div className="flex justify-between items-start mb-4">
                         <div className="flex-1">
                           <h3 className="text-lg font-extrabold text-yellow-400 font-mono text-sm mb-1">{voucher.voucherId}</h3>
@@ -258,7 +258,7 @@ export default function VouchersPage() {
                       </div>
 
                       <div className="space-y-3 mb-4">
-                        <div className="p-4 bg-gradient-to-r from-yellow-500/20 via-yellow-600/15 to-yellow-500/20 rounded-xl border-2 border-yellow-500/40 shadow-lg shadow-yellow-500/10">
+                        <div className="p-4 bg-gradient-to-r from-yellow-500/20 via-yellow-600/15 to-yellow-500/20 rounded-xl border-2 border-yellow-400/40 shadow-lg shadow-yellow-500/10">
                           <div className="flex justify-between items-center mb-2">
                             <span className="font-bold text-gray-200">Purchase Amount:</span>
                             <span className="text-xl font-extrabold text-yellow-400">
@@ -277,7 +277,7 @@ export default function VouchersPage() {
                         </div>
 
                         <div className="grid grid-cols-2 gap-3 text-sm">
-                          <div className="p-3 bg-gray-800/80 rounded-xl border border-gray-700/50">
+                          <div className="p-3 bg-[#08152F]/80 rounded-xl border border-yellow-400/50">
                             <div className="text-gray-400 text-xs mb-1 font-semibold">Created At</div>
                             <div className="font-bold text-white">
                               {new Date(voucher.createdOn || voucher.createdAt).toLocaleDateString()}
@@ -355,8 +355,8 @@ export default function VouchersPage() {
 
         {/* Create Voucher Modal */}
         {showCreateModal && (
-          <div className="fixed inset-0 bg-black/80 backdrop-blur-sm overflow-y-auto h-full w-full z-50">
-            <div className="relative top-20 mx-auto p-6 border border-yellow-500/30 w-96 shadow-2xl rounded-2xl bg-gradient-to-br from-gray-900/95 via-gray-800/95 to-gray-900/95 backdrop-blur-sm">
+          <div className="fixed inset-0 bg-[#08152F]/80 backdrop-blur-sm overflow-y-auto h-full w-full z-50">
+            <div className="relative top-20 mx-auto p-6 border border-yellow-500/30 w-96 shadow-2xl rounded-2xl bg-gradient-to-br from-[#08152F]/95 via-[#0C1A6B]/90 to-[#05627C]/85 backdrop-blur-xl">
               <div className="mt-3">
                 <h3 className="text-xl font-extrabold text-white mb-6 flex items-center gap-2">
                   <span className="bg-gradient-to-r from-yellow-300 via-yellow-400 to-yellow-600 bg-clip-text text-transparent">Create Voucher</span>

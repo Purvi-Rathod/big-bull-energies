@@ -95,22 +95,22 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="w-full bg-gradient-to-br from-black via-gray-900 to-black min-h-screen py-8 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+    <div className="w-full min-h-screen py-4 md:py-8 px-2 sm:px-4 md:px-6 lg:px-8 relative overflow-hidden">
       {/* Decorative background elements */}
       <div className="fixed inset-0 pointer-events-none opacity-20">
-        <div className="absolute top-0 left-1/4 w-96 h-96 bg-yellow-500/10 rounded-full blur-3xl"></div>
-        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-yellow-600/10 rounded-full blur-3xl"></div>
+        <div className="absolute top-0 left-1/4 w-96 h-96 bg-yellow-300/10 rounded-full blur-3xl"></div>
+        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-yellow-300/10 rounded-full blur-3xl"></div>
       </div>
 
       <div className="relative z-10">
       <div className="mb-8">
         <h1 className="text-3xl font-extrabold mb-2 text-white">
-          <span className="bg-gradient-to-r from-yellow-300 via-yellow-400 to-yellow-600 bg-clip-text text-transparent drop-shadow-lg">My Profile</span>
+        <span className="bg-gradient-to-r from-yellow-300 via-yellow-400 to-yellow-500 bg-clip-text text-transparent drop-shadow-lg">My Profile</span>
         </h1>
         <p className="mt-1 text-sm text-gray-400">Manage your account information and settings</p>
       </div>
 
-      <div className="bg-gradient-to-br from-gray-900/95 via-gray-800/95 to-gray-900/95 backdrop-blur-sm rounded-2xl shadow-2xl border border-yellow-500/30 p-8">
+      <div className="bg-gradient-to-br from-[#08152F]/95 via-[#0C1A6B]/90 to-[#05627C]/85 backdrop-blur-xl rounded-2xl shadow-2xl border border-yellow-500/30 p-8">
         <form onSubmit={handleSubmit} className="space-y-8">
           {/* Basic Information */}
           <div>
@@ -121,7 +121,7 @@ export default function ProfilePage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <label htmlFor="name" className="block text-sm font-bold text-yellow-400 mb-3">
-                  Full Name <span className="text-red-400">*</span>
+                  Full Name <span className="text-yellow-400">*</span>
                 </label>
                 <input
                   type="text"
@@ -130,7 +130,7 @@ export default function ProfilePage() {
                   required
                   value={formData.name}
                   onChange={handleChange}
-                  className="w-full px-4 py-3 border border-yellow-500/40 rounded-xl bg-gray-800 text-white focus:ring-2 focus:ring-yellow-500/50 focus:border-yellow-500/70 font-semibold"
+                  className="w-full px-4 py-3 border border-yellow-500/40 rounded-xl bg-[#08152F]/80 text-white focus:ring-2 focus:ring-yellow-500/50 focus:border-yellow-500/70 font-semibold"
                 />
               </div>
 
@@ -138,9 +138,9 @@ export default function ProfilePage() {
                 <label htmlFor="email" className="block text-sm font-bold text-yellow-400 mb-3">
                   Email Address
                 </label>
-                <div className="p-4 bg-gray-800/80 border border-yellow-500/30 rounded-xl">
+                <div className="p-4 bg-[#08152F]/80 border border-yellow-400/30 rounded-xl">
                   <p className="text-sm text-white font-semibold">{formData.email}</p>
-                  <p className="text-xs text-gray-400 mt-2 font-semibold">
+                  <p className="text-xs text-yellow-400 mt-2 font-semibold">
                     Email address cannot be changed. Contact admin support if you need to update it.
                   </p>
                 </div>
@@ -156,13 +156,13 @@ export default function ProfilePage() {
                   name="phone"
                   value={formData.phone}
                   onChange={handleChange}
-                  className="w-full px-4 py-3 border border-yellow-500/40 rounded-xl bg-gray-800 text-white focus:ring-2 focus:ring-yellow-500/50 focus:border-yellow-500/70 font-semibold"
+                  className="w-full px-4 py-3 border border-yellow-500/40 rounded-xl bg-[#08152F]/80 text-white focus:ring-2 focus:ring-yellow-500/50 focus:border-yellow-500/70 font-semibold"
                 />
               </div>
 
               <div>
                 <label htmlFor="country" className="block text-sm font-bold text-yellow-400 mb-3">
-                  Country <span className="text-red-400">*</span>
+                  Country <span className="text-yellow-300">*</span>
                 </label>
                 <select
                   id="country"
@@ -170,7 +170,7 @@ export default function ProfilePage() {
                   required
                   value={formData.country}
                   onChange={handleChange}
-                  className="w-full px-4 py-3 border border-yellow-500/40 rounded-xl bg-gray-800 text-white focus:ring-2 focus:ring-yellow-500/50 focus:border-yellow-500/70 font-semibold"
+                  className="w-full px-4 py-3 border border-yellow-500/40 rounded-xl bg-[#08152F]/80 text-white focus:ring-2 focus:ring-yellow-500/50 focus:border-yellow-500/70 font-semibold"
                 >
                   <option value="">Select your country</option>
                   {countries.map((country) => (
@@ -194,9 +194,9 @@ export default function ProfilePage() {
                 <label className="block text-sm font-bold text-yellow-400 mb-3">
                   User ID
                 </label>
-                <div className="p-4 bg-gray-800/80 border border-yellow-500/30 rounded-xl">
+                <div className="p-4 bg-[#08152F]/80 border border-yellow-400/30 rounded-xl">
                   <p className="text-sm font-mono text-yellow-400 break-all font-extrabold">{formData.userId || user?.userId || 'N/A'}</p>
-                  <p className="text-xs text-gray-400 mt-2 font-semibold">
+                  <p className="text-xs text-yellow-400 mt-2 font-semibold">
                     Your unique user identifier
                   </p>
                 </div>
@@ -260,7 +260,7 @@ export default function ProfilePage() {
                               toast.error('Failed to copy link. Please copy manually.');
                             }
                           }}
-                          className="px-6 py-3 bg-gradient-to-r from-yellow-500 to-yellow-600 text-black rounded-xl hover:from-yellow-400 hover:to-yellow-500 text-sm font-bold transition-all shadow-lg shadow-yellow-500/30 hover:shadow-yellow-500/50 hover:scale-105 active:scale-95"
+                          className="px-6 py-3 bg-gradient-to-r from-yellow-400 to-yellow-600 text-black rounded-xl hover:from-yellow-400 hover:to-yellow-500 text-sm font-bold transition-all shadow-lg shadow-yellow-500/30 hover:shadow-yellow-500/50 hover:scale-105 active:scale-95"
                         >
                           Copy
                         </button>
@@ -317,7 +317,7 @@ export default function ProfilePage() {
                               toast.error('Failed to copy link. Please copy manually.');
                             }
                           }}
-                          className="px-6 py-3 bg-gradient-to-r from-yellow-500 to-yellow-600 text-black rounded-xl hover:from-yellow-400 hover:to-yellow-500 text-sm font-bold transition-all shadow-lg shadow-yellow-500/30 hover:shadow-yellow-500/50 hover:scale-105 active:scale-95"
+                          className="px-6 py-3 bg-gradient-to-r from-yellow-400 to-yellow-600 text-black rounded-xl hover:from-yellow-400 hover:to-yellow-500 text-sm font-bold transition-all shadow-lg shadow-yellow-500/30 hover:shadow-yellow-500/50 hover:scale-105 active:scale-95"
                         >
                           Copy
                         </button>
@@ -339,17 +339,17 @@ export default function ProfilePage() {
               <label className="block text-sm font-bold text-yellow-400 mb-3">
                 USDT TRC20 Wallet Address
               </label>
-              <div className="p-4 bg-gray-800/80 border border-yellow-500/30 rounded-xl">
+              <div className="p-4 bg-[#08152F]/80 border border-yellow-400/30 rounded-xl">
                 {formData.walletAddress ? (
                   <>
                     <p className="text-sm font-mono text-white break-all font-semibold">{formData.walletAddress}</p>
-                    <p className="text-xs text-gray-400 mt-2 font-semibold">
+                    <p className="text-xs text-yellow-400 mt-2 font-semibold">
                       Wallet address cannot be changed. Contact admin support if you need to update it.
                     </p>
                   </>
                 ) : (
                   <>
-                    <p className="text-sm text-gray-400 font-semibold">No wallet address set</p>
+                    <p className="text-sm text-yellow-400 font-semibold">No wallet address set</p>
                     <p className="text-xs text-yellow-400 mt-2 font-semibold">
                       Required for withdrawals. Set up your wallet address in the Withdraw page.
                     </p>
@@ -364,7 +364,7 @@ export default function ProfilePage() {
             <button
               type="submit"
               disabled={saving}
-              className="px-8 py-3 bg-gradient-to-r from-yellow-500 to-yellow-600 text-black rounded-xl hover:from-yellow-400 hover:to-yellow-500 font-bold transition-all shadow-lg shadow-yellow-500/30 hover:shadow-yellow-500/50 hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-8 py-3 bg-gradient-to-r from-yellow-400 to-yellow-500 text-black rounded-xl hover:from-yellow-400 hover:to-yellow-500 font-bold transition-all shadow-lg shadow-yellow-500/30 hover:shadow-yellow-500/50 hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {saving ? 'Saving...' : 'Save Changes'}
             </button>

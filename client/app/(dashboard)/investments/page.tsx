@@ -109,7 +109,7 @@ export default function InvestmentsPage() {
   }
 
   return (
-    <div className="w-full bg-gradient-to-br from-black via-gray-900 to-black min-h-screen py-4 md:py-8 px-2 sm:px-4 md:px-6 lg:px-8 relative overflow-hidden">
+    <div className="w-full min-h-screen py-4 md:py-8 px-2 sm:px-4 md:px-6 lg:px-8 relative overflow-hidden">
       {/* Decorative background elements */}
       <div className="fixed inset-0 pointer-events-none opacity-20">
         <div className="absolute top-0 left-1/4 w-96 h-96 bg-yellow-500/10 rounded-full blur-3xl"></div>
@@ -131,7 +131,7 @@ export default function InvestmentsPage() {
           )}
 
             {investments.length === 0 ? (
-              <div className="bg-gradient-to-br from-gray-900/95 via-gray-800/95 to-gray-900/95 backdrop-blur-sm rounded-xl md:rounded-2xl shadow-2xl border border-yellow-500/30 p-6 md:p-12 text-center">
+              <div className="bg-gradient-to-br from-[#08152F]/95 via-[#0C1A6B]/90 to-[#05627C]/85 backdrop-blur-xl rounded-xl md:rounded-2xl shadow-2xl border border-yellow-500/30 p-6 md:p-12 text-center">
                 <p className="text-gray-400 text-base md:text-lg mb-4 md:mb-6">No investments yet</p>
                 <button
                   onClick={() => router.push('/plans')}
@@ -149,7 +149,7 @@ export default function InvestmentsPage() {
                     return (
                       <div
                         key={inv.id}
-                        className="bg-gradient-to-br from-gray-900/95 via-gray-800/95 to-gray-900/95 backdrop-blur-sm rounded-xl shadow-xl border border-yellow-500/30 p-4 hover:border-yellow-500/60 transition-all"
+                        className="bg-gradient-to-br from-[#08152F]/95 via-[#0C1A6B]/90 to-[#05627C]/85 backdrop-blur-xl rounded-xl shadow-xl border border-yellow-500/30 p-4 hover:border-yellow-500/60 transition-all"
                       >
                         <div className="flex justify-between items-start mb-3">
                           <div className="flex-1">
@@ -220,7 +220,7 @@ export default function InvestmentsPage() {
                 </div>
 
                 {/* Desktop Table View */}
-                <div className="hidden md:block bg-gradient-to-br from-gray-900/95 via-gray-800/95 to-gray-900/95 backdrop-blur-sm rounded-xl md:rounded-2xl shadow-2xl border border-yellow-500/30 overflow-hidden">
+                <div className="hidden md:block bg-gradient-to-br from-[#08152F]/95 via-[#0C1A6B]/90 to-[#05627C]/85 backdrop-blur-xl rounded-xl md:rounded-2xl shadow-2xl border border-yellow-500/30 overflow-hidden">
                   <div className="overflow-x-auto">
                     <div className="inline-block min-w-full align-middle">
                       <div className="overflow-hidden">
@@ -313,7 +313,7 @@ export default function InvestmentsPage() {
       {/* Investment Details Modal */}
       {showModal && selectedInvestment && (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-sm overflow-y-auto h-full w-full z-50 p-4">
-          <div className="relative top-4 md:top-10 mx-auto p-4 md:p-6 border border-yellow-500/30 w-full max-w-2xl shadow-2xl rounded-xl md:rounded-2xl bg-gradient-to-br from-gray-900/95 via-gray-800/95 to-gray-900/95 backdrop-blur-sm">
+          <div className="relative top-4 md:top-10 mx-auto p-4 md:p-6 border border-yellow-500/30 w-full max-w-2xl shadow-2xl rounded-xl md:rounded-2xl bg-gradient-to-br from-[#08152F]/95 via-[#0C1A6B]/90 to-[#05627C]/85 backdrop-blur-xl">
             <div className="mt-0 md:mt-3">
               <div className="flex justify-between items-center mb-4 md:mb-6">
                 <h3 className="text-lg md:text-2xl font-extrabold text-white flex items-center gap-2">

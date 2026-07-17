@@ -119,23 +119,23 @@ export default function CareerLevelsPage() {
   }
 
   return (
-    <div className="w-full bg-gradient-to-br from-black via-gray-900 to-black min-h-screen py-8 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+    <div className="w-full min-h-screen py-4 md:py-8 px-2 sm:px-4 md:px-6 lg:px-8 relative overflow-hidden">
       {/* Decorative background elements */}
       <div className="fixed inset-0 pointer-events-none opacity-20">
-        <div className="absolute top-0 left-1/4 w-96 h-96 bg-yellow-500/10 rounded-full blur-3xl"></div>
-        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-yellow-600/10 rounded-full blur-3xl"></div>
+        <div className="absolute top-0 left-1/4 w-96 h-96 bg-yellow-300/10 rounded-full blur-3xl"></div>
+        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-yellow-300/10 rounded-full blur-3xl"></div>
       </div>
 
       <div className="relative z-10">
       <div className="mb-8">
         <h1 className="text-3xl font-extrabold mb-2 text-white">
-          <span className="bg-gradient-to-r from-yellow-300 via-yellow-400 to-yellow-600 bg-clip-text text-transparent drop-shadow-lg">Career Levels</span>
+          <span className="bg-gradient-to-r from-yellow-300 via-yellow-400 to-yellow-500 bg-clip-text text-transparent drop-shadow-lg">Career Levels</span>
         </h1>
         <p className="mt-1 text-sm text-gray-400">Track your career level progress and rewards</p>
       </div>
 
       {error && (
-        <div className="mb-6 bg-red-900/30 border border-red-500/50 text-red-400 px-4 py-3 rounded-lg backdrop-blur-sm">
+        <div className="mb-6 bg-red-900/30 border border-red-400/50 text-yellow-400 px-4 py-3 rounded-lg backdrop-blur-sm">
           {error}
         </div>
       )}
@@ -143,7 +143,7 @@ export default function CareerLevelsPage() {
       {progress && (
         <>
           {/* Current Level Card */}
-          <div className="bg-gradient-to-br from-gray-900/95 via-gray-800/95 to-gray-900/95 backdrop-blur-sm rounded-2xl shadow-2xl border border-yellow-500/30 p-8 mb-8">
+          <div className="bg-gradient-to-br from-[#08152F]/95 via-[#0C1A6B]/90 to-[#05627C]/85 backdrop-blur-xl rounded-2xl shadow-2xl border border-yellow-500/30 p-8 mb-8">
             <h2 className="text-2xl font-extrabold text-white mb-6 flex items-center gap-2">
               <span className="w-1 h-6 bg-gradient-to-b from-yellow-400 to-yellow-600 rounded"></span>
               Current Level
@@ -184,14 +184,14 @@ export default function CareerLevelsPage() {
 
                 {/* Left & Right Business Targets (Per Side) */}
                 {binaryTree && (
-                  <div className="mt-6 p-5 bg-gray-800/80 rounded-xl border border-gray-700/50">
+                  <div className="mt-6 p-5 bg-[#08152F]/80 rounded-xl border border-yellow-400/50">
                     <h3 className="text-base font-extrabold text-yellow-400 mb-4">
                       Left & Right Business Targets (per side)
                     </h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       {/* Left Side */}
                       <div className="p-5 bg-gradient-to-r from-yellow-500/10 to-yellow-600/5 rounded-xl border border-yellow-500/30">
-                        <div className="flex justify-between text-xs text-gray-300 mb-2 font-semibold">
+                        <div className="flex justify-between text-xs text-yellow-300 mb-2 font-semibold">
                           <span>Left Business</span>
                           <span className="text-yellow-400">
                             $
@@ -206,7 +206,7 @@ export default function CareerLevelsPage() {
                             })}
                           </span>
                         </div>
-                        <div className="w-full bg-gray-700/50 rounded-full h-3">
+                        <div className="w-full bg-[#08152F]/80 rounded-full h-3">
                           <div
                             className="bg-gradient-to-r from-yellow-500 to-yellow-600 h-3 rounded-full transition-all duration-300 shadow-lg shadow-yellow-500/30"
                             style={{
@@ -217,7 +217,7 @@ export default function CareerLevelsPage() {
                             }}
                           ></div>
                         </div>
-                        <p className="mt-2 text-xs text-gray-400 font-semibold">
+                        <p className="mt-2 text-xs text-yellow-400 font-semibold">
                           {getSideProgressPercentage(
                             binaryTree.leftBusiness,
                             progress.currentLevel.investmentThreshold
@@ -228,7 +228,7 @@ export default function CareerLevelsPage() {
 
                       {/* Right Side */}
                       <div className="p-5 bg-gradient-to-r from-yellow-500/10 to-yellow-600/5 rounded-xl border border-yellow-500/30">
-                        <div className="flex justify-between text-xs text-gray-300 mb-2 font-semibold">
+                        <div className="flex justify-between text-xs text-yellow-300 mb-2 font-semibold">
                           <span>Right Business</span>
                           <span className="text-yellow-400">
                             $
@@ -243,7 +243,7 @@ export default function CareerLevelsPage() {
                             })}
                           </span>
                         </div>
-                        <div className="w-full bg-gray-700/50 rounded-full h-3">
+                        <div className="w-full bg-[#08152F]/80 rounded-full h-3">
                           <div
                             className="bg-gradient-to-r from-yellow-500 to-yellow-600 h-3 rounded-full transition-all duration-300 shadow-lg shadow-yellow-500/30"
                             style={{
@@ -254,7 +254,7 @@ export default function CareerLevelsPage() {
                             }}
                           ></div>
                         </div>
-                        <p className="mt-2 text-xs text-gray-400 font-semibold">
+                        <p className="mt-2 text-xs text-yellow-400 font-semibold">
                           {getSideProgressPercentage(
                             binaryTree.rightBusiness,
                             progress.currentLevel.investmentThreshold
@@ -263,7 +263,7 @@ export default function CareerLevelsPage() {
                         </p>
                       </div>
                     </div>
-                    <p className="mt-4 text-xs text-gray-400 font-semibold">
+                    <p className="mt-4 text-xs text-yellow-400 font-semibold">
                       Career level reward unlocks when{' '}
                       <span className="font-extrabold text-yellow-400">both</span> left and right business reach the
                       full target amount.
@@ -280,20 +280,20 @@ export default function CareerLevelsPage() {
 
           {/* Statistics Cards */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            <div className="group bg-gradient-to-br from-gray-900/95 via-gray-800/95 to-gray-900/95 backdrop-blur-sm rounded-2xl shadow-2xl border border-yellow-500/30 p-6 hover:border-yellow-500/60 hover:shadow-yellow-500/20 transition-all duration-300">
-              <h3 className="text-sm font-bold text-gray-400 mb-3">Total Business Volume</h3>
-              <p className="text-3xl font-extrabold bg-gradient-to-r from-white to-yellow-100 bg-clip-text text-transparent">
+            <div className="group bg-gradient-to-br from-[#08152F]/95 via-[#0C1A6B]/90 to-[#05627C]/85 backdrop-blur-xl rounded-2xl shadow-2xl border border-yellow-500/30 p-6 hover:border-yellow-500/60 hover:shadow-yellow-500/20 transition-all duration-300">
+              <h3 className="text-sm font-bold text-yellow-400 mb-3">Total Business Volume</h3>
+              <p className="text-3xl font-extrabold text-yellow-400">
                 ${progress.totalBusinessVolume.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
               </p>
             </div>
-            <div className="group bg-gradient-to-br from-gray-900/95 via-gray-800/95 to-gray-900/95 backdrop-blur-sm rounded-2xl shadow-2xl border border-yellow-500/30 p-6 hover:border-yellow-500/60 hover:shadow-yellow-500/20 transition-all duration-300">
-              <h3 className="text-sm font-bold text-gray-400 mb-3">Total Rewards Earned</h3>
+            <div className="group bg-gradient-to-br from-[#08152F]/95 via-[#0C1A6B]/90 to-[#05627C]/85 backdrop-blur-xl rounded-2xl shadow-2xl border border-yellow-500/30 p-6 hover:border-yellow-500/60 hover:shadow-yellow-500/20 transition-all duration-300">
+              <h3 className="text-sm font-bold text-yellow-400 mb-3">Total Rewards Earned</h3>
               <p className="text-3xl font-extrabold text-yellow-400">
                 ${progress.totalRewardsEarned.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
               </p>
             </div>
-            <div className="group bg-gradient-to-br from-gray-900/95 via-gray-800/95 to-gray-900/95 backdrop-blur-sm rounded-2xl shadow-2xl border border-yellow-500/30 p-6 hover:border-yellow-500/60 hover:shadow-yellow-500/20 transition-all duration-300">
-              <h3 className="text-sm font-bold text-gray-400 mb-3">Levels Completed</h3>
+            <div className="group bg-gradient-to-br from-[#08152F]/95 via-[#0C1A6B]/90 to-[#05627C]/85 backdrop-blur-xl rounded-2xl shadow-2xl border border-yellow-500/30 p-6 hover:border-yellow-500/60 hover:shadow-yellow-500/20 transition-all duration-300">
+              <h3 className="text-sm font-bold text-yellow-400 mb-3">Levels Completed</h3>
               <p className="text-3xl font-extrabold text-yellow-400">
                 {progress.completedLevels.length}
               </p>
@@ -302,7 +302,7 @@ export default function CareerLevelsPage() {
 
           {/* Completed Levels */}
           {progress.completedLevels.length > 0 && (
-            <div className="bg-gradient-to-br from-gray-900/95 via-gray-800/95 to-gray-900/95 backdrop-blur-sm rounded-2xl shadow-2xl border border-yellow-500/30 p-8 mb-8">
+            <div className="bg-gradient-to-br from-[#08152F]/95 via-[#0C1A6B]/90 to-[#05627C]/85 backdrop-blur-xl rounded-2xl shadow-2xl border border-yellow-500/30 p-8 mb-8">
               <h2 className="text-2xl font-extrabold text-white mb-6 flex items-center gap-2">
                 <span className="w-1 h-6 bg-gradient-to-b from-yellow-400 to-yellow-600 rounded"></span>
                 Completed Levels
@@ -340,7 +340,7 @@ export default function CareerLevelsPage() {
 
           {/* All Available Levels */}
           {allLevels.length > 0 && (
-            <div className="bg-gradient-to-br from-gray-900/95 via-gray-800/95 to-gray-900/95 backdrop-blur-sm rounded-2xl shadow-2xl border border-yellow-500/30 p-8">
+            <div className="bg-gradient-to-br from-[#08152F]/95 via-[#0C1A6B]/90 to-[#05627C]/85 backdrop-blur-xl rounded-2xl shadow-2xl border border-yellow-500/30 p-8">
               <h2 className="text-2xl font-extrabold text-white mb-6 flex items-center gap-2">
                 <span className="w-1 h-6 bg-gradient-to-b from-yellow-400 to-yellow-600 rounded"></span>
                 All Career Levels
@@ -409,7 +409,7 @@ export default function CareerLevelsPage() {
       )}
 
       {!progress && !loading && (
-        <div className="bg-gradient-to-br from-gray-900/95 via-gray-800/95 to-gray-900/95 backdrop-blur-sm rounded-2xl shadow-2xl border border-yellow-500/30 p-12 text-center">
+        <div className="bg-gradient-to-br from-[#08152F]/95 via-[#0C1A6B]/90 to-[#05627C]/85 backdrop-blur-xl rounded-2xl shadow-2xl border border-yellow-500/30 p-12 text-center">
           <p className="text-gray-300 text-lg font-bold">No career progress found. Start investing to begin your career journey!</p>
         </div>
       )}

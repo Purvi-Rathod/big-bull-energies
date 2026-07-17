@@ -297,8 +297,8 @@ export default function WithdrawPage() {
     <div className="w-full min-h-screen py-4 md:py-8 px-2 sm:px-4 md:px-6 lg:px-8 relative overflow-hidden">
       {/* Decorative background elements */}
       <div className="fixed inset-0 pointer-events-none opacity-20">
-        <div className="absolute top-0 left-1/4 w-96 h-96 bg-yellow-400/10 rounded-full blur-3xl"></div>
-        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-yellow-400/10 rounded-full blur-3xl"></div>
+        <div className="absolute top-0 left-1/4 w-96 h-96 bg-[#FBF676]/10 rounded-full blur-3xl"></div>
+        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-[#FBF676]/10 rounded-full blur-3xl"></div>
       </div>
 
       <div className="relative z-10">
@@ -528,12 +528,12 @@ export default function WithdrawPage() {
                       {withdrawing ? 'Processing...' : 'Submit Withdrawal Request'}
                     </button>
                     {!walletAddress && (
-                      <p className="mt-3 text-sm text-yellow-400 text-center font-semibold">
+                      <p className="mt-3 text-sm text-[#FBF676] text-center font-semibold">
                         Please set your USDT TRC20 wallet address to proceed
                       </p>
                     )}
                     {userProfile?.accountType !== 'free' && targetStatus && (targetStatus.binaryTargetAmount ?? 0) > 0 && !targetStatus.isCompleted && (
-                      <p className="mt-3 text-sm text-yellow-400 text-center font-semibold">
+                      <p className="mt-3 text-sm text-[#FBF676] text-center font-semibold">
                         Complete your binary target to unlock withdrawal
                       </p>
                     )}
@@ -557,7 +557,7 @@ export default function WithdrawPage() {
                       setModalWalletAddress(''); // Reset modal input when opening modal
                       setShowWalletModal(true);
                     }}
-                    className="px-6 py-3 bg-gradient-to-r from-yellow-300 to-yellow-400 text-black rounded-xl hover:from-yellow-400 hover:to-yellow-500 font-bold transition-all shadow-lg shadow-yellow-500/30 hover:shadow-yellow-500/50 hover:scale-105 active:scale-95"
+                    className="px-6 py-3 bg-[#FBF676] text-[#0C1A6B] rounded-xl hover:bg-[#e8e04a] font-bold transition-all shadow-lg shadow-[#FBF676]/25 hover:shadow-[#FBF676]/30 hover:scale-105 active:scale-95"
                   >
                     Setup Payment Info
                   </button>
@@ -589,7 +589,7 @@ export default function WithdrawPage() {
                   <p className="text-xs text-red-300 font-semibold">
                     You need to set a USDT TRC20 wallet address to request withdrawals.
                   </p>
-                  <p className="text-xs text-gray-400 mt-2 font-semibold">
+                  <p className="text-xs text-[#FBF676] mt-2 font-semibold">
                     Only USDT TRC20 wallet addresses are accepted for withdrawals
                   </p>
                 </div>
@@ -665,27 +665,27 @@ export default function WithdrawPage() {
           {/* Wallet Address Modal */}
           {showWalletModal && (
             <div className="fixed inset-0 bg-black/80 backdrop-blur-sm overflow-y-auto h-full w-full z-50">
-              <div className="relative top-10 mx-auto p-6 border border-yellow-500/30 w-full max-w-2xl shadow-2xl rounded-2xl bg-gradient-to-br from-[#08152F]/95 via-[#0C1A6B]/90 to-[#05627C]/85 backdrop-blur-xl">
+              <div className="relative top-10 mx-auto p-6 border border-[#FBF676]/25 w-full max-w-2xl shadow-2xl rounded-2xl backdrop-blur-md bg-[rgba(8,16,40,0.95)]">
                 <div className="mt-3">
                   <h3 className="text-xl font-extrabold text-white mb-6 flex items-center gap-2">
                     <span className="bg-gradient-to-r from-yellow-300 via-yellow-400 to-yellow-600 bg-clip-text text-transparent">Setup Payment Information</span>
                   </h3>
-                  <p className="text-sm text-gray-300 mb-6 font-semibold">
+                  <p className="text-sm text-yellow-300 mb-6 font-semibold">
                     Set your USDT TRC20 wallet address to enable withdrawals.
                   </p>
-                  <div className="mb-6 p-4 bg-gradient-to-r from-yellow-500/20 via-yellow-600/15 to-yellow-500/20 border-2 border-yellow-500/40 rounded-xl">
-                    <p className="text-sm font-bold text-yellow-400 mb-2">Payment Method:</p>
+                  <div className="mb-6 p-4 bg-[rgba(251,246,118,0.12)] border-2 border-[#FBF676]/35 rounded-xl">
+                    <p className="text-sm font-bold text-[#FBF676] mb-2">Payment Method:</p>
                     <p className="text-xs text-white font-semibold">
-                      Only <strong className="text-yellow-400">USDT TRC20</strong> wallet addresses are accepted for withdrawals.
+                      Only <strong className="text-[#FBF676]">USDT TRC20</strong> wallet addresses are accepted for withdrawals.
                     </p>
                   </div>
                   
                   <div>
-                    <label className="block text-sm font-bold text-yellow-400 mb-3">
-                      USDT TRC20 Wallet Address {userWalletAddress && <span className="text-gray-400">(Cannot be changed)</span>}
+                    <label className="block text-sm font-bold text-[#FBF676] mb-3">
+                      USDT TRC20 Wallet Address {userWalletAddress && <span className="text-[#FBF676]">(Cannot be changed)</span>}
                     </label>
                     {userWalletAddress ? (
-                      <div className="p-4 bg-gray-800/80 border border-yellow-500/30 rounded-xl">
+                      <div className="p-4 bg-yellow-900/80 border border-[#FBF676]/25 rounded-xl">
                         <p className="text-sm font-mono text-white break-all font-semibold">{userWalletAddress}</p>
                         <p className="mt-2 text-xs text-red-400 font-bold">
                           ⚠️ Wallet address cannot be changed once set. Contact admin support if you need to update it.
@@ -708,10 +708,10 @@ export default function WithdrawPage() {
                           placeholder="Enter your USDT TRC20 wallet address (starts with T)"
                           autoComplete="off"
                         />
-                        <p className="mt-2 text-xs text-gray-400 font-semibold">
+                        <p className="mt-2 text-xs text-[#FBF676] font-semibold">
                           Enter your USDT TRC20 wallet address for withdrawals. This can only be set once.
                         </p>
-                        <p className="mt-2 text-xs text-yellow-400 font-bold">
+                        <p className="mt-2 text-xs text-[#FBF676] font-bold">
                           💡 USDT TRC20 wallet addresses start with "T" (e.g., Txxxxxxxxxxxxxxxxxxxxxxxxxxxxx).
                         </p>
                       </>
@@ -725,7 +725,7 @@ export default function WithdrawPage() {
                         setShowWalletModal(false);
                         setModalWalletAddress(''); // Reset modal input on cancel
                       }}
-                      className="px-6 py-2.5 text-sm font-bold text-gray-300 bg-gray-700 rounded-xl hover:bg-gray-600 transition-all"
+                      className="px-6 py-2.5 text-sm font-bold text-[#FBF676] bg-yellow-900 rounded-xl hover:bg-yellow-800 transition-all"
                     >
                       Cancel
                     </button>
@@ -733,7 +733,7 @@ export default function WithdrawPage() {
                       type="button"
                       onClick={handleUpdatePaymentInfo}
                       disabled={!modalWalletAddress || modalWalletAddress.trim().length === 0}
-                      className="px-6 py-2.5 text-sm font-bold text-black bg-gradient-to-r from-yellow-500 to-yellow-600 rounded-xl hover:from-yellow-400 hover:to-yellow-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg shadow-yellow-500/30 hover:shadow-yellow-500/50 hover:scale-105 active:scale-95"
+                      className="px-6 py-2.5 text-sm font-bold text-black bg-[#FBF676] rounded-xl hover:bg-[#e8e04a] disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg shadow-[#FBF676]/25 hover:shadow-[#FBF676]/30 hover:scale-105 active:scale-95"
                     >
                       Save
                     </button>

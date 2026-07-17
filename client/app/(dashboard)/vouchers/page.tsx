@@ -187,8 +187,8 @@ export default function VouchersPage() {
     <div className="w-full min-h-screen py-4 md:py-8 px-2 sm:px-4 md:px-6 lg:px-8 relative overflow-hidden">
       {/* Decorative background elements */}
       <div className="fixed inset-0 pointer-events-none opacity-20">
-        <div className="absolute top-0 left-1/4 w-96 h-96 bg-yellow-500/10 rounded-full blur-3xl"></div>
-        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-yellow-600/10 rounded-full blur-3xl"></div>
+        <div className="absolute top-0 left-1/4 w-96 h-96 bg-[#FBF676]/10 rounded-full blur-3xl"></div>
+        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-[#FBF676]/10 rounded-full blur-3xl"></div>
       </div>
 
       <div className="relative z-10">
@@ -198,7 +198,7 @@ export default function VouchersPage() {
         </h1>
         <button
           onClick={() => setShowCreateModal(true)}
-          className="px-6 py-3 bg-gradient-to-r from-yellow-500 to-yellow-600 text-black rounded-xl hover:from-yellow-400 hover:to-yellow-500 font-bold transition-all shadow-lg shadow-yellow-500/30 hover:shadow-yellow-500/50 hover:scale-105 active:scale-95"
+          className="px-6 py-3 bg-[#FBF676] text-[#0C1A6B] rounded-xl hover:bg-[#e8e04a] font-bold transition-all shadow-lg shadow-[#FBF676]/25 hover:shadow-[#FBF676]/30 hover:scale-105 active:scale-95"
         >
           + Create Voucher
         </button>
@@ -211,11 +211,11 @@ export default function VouchersPage() {
 
       <div>
             {vouchers.length === 0 ? (
-              <div className="bg-gradient-to-br from-[#08152F]/95 via-[#0C1A6B]/90 to-[#05627C]/85 backdrop-blur-xl rounded-2xl shadow-2xl border border-yellow-500/30 p-12 text-center">
-                <p className="text-gray-400 text-lg mb-6">No vouchers found</p>
+              <div className="rounded-2xl shadow-2xl border border-[#FBF676]/25 backdrop-blur-md bg-[rgba(8,16,40,0.75)] p-12 text-center">
+                <p className="text-white/55 text-lg mb-6">No vouchers found</p>
                 <button
                   onClick={() => setShowCreateModal(true)}
-                  className="px-8 py-3 bg-gradient-to-r from-yellow-500 to-yellow-600 text-black rounded-xl hover:from-yellow-400 hover:to-yellow-500 font-bold transition-all shadow-lg shadow-yellow-500/30 hover:shadow-yellow-500/50 hover:scale-105 active:scale-95"
+                  className="px-8 py-3 bg-[#FBF676] text-[#0C1A6B] rounded-xl hover:bg-[#e8e04a] font-bold transition-all shadow-lg shadow-[#FBF676]/25 hover:shadow-[#FBF676]/30 hover:scale-105 active:scale-95"
                 >
                   Create Your First Voucher
                 </button>
@@ -229,11 +229,11 @@ export default function VouchersPage() {
                   const investmentValue = voucher.investmentValue || voucher.amount * (voucher.multiplier || 2);
                   
                   return (
-                    <div key={voucher.id} className="group bg-gradient-to-br from-[#08152F]/95 via-[#0C1A6B]/90 to-[#05627C]/85 backdrop-blur-xl rounded-2xl shadow-2xl border border-yellow-400/30 p-6 hover:border-yellow-500/60 hover:shadow-yellow-500/20 transition-all duration-300">
+                    <div key={voucher.id} className="group backdrop-blur-md bg-[rgba(8,16,40,0.95)] rounded-2xl shadow-2xl border border-[#FBF676]/30 p-6 hover:border-[#FBF676]/60 hover:shadow-[#FBF676]/20 transition-all duration-300">
                       <div className="flex justify-between items-start mb-4">
                         <div className="flex-1">
-                          <h3 className="text-lg font-extrabold text-yellow-400 font-mono text-sm mb-1">{voucher.voucherId}</h3>
-                          <p className="text-xs text-gray-400">
+                          <h3 className="text-lg font-extrabold text-[#FBF676] font-mono text-sm mb-1">{voucher.voucherId}</h3>
+                          <p className="text-xs text-white/55">
                             Created: {new Date(voucher.createdOn || voucher.createdAt).toLocaleString()}
                           </p>
                           {daysSinceCreation !== null && (
@@ -245,12 +245,12 @@ export default function VouchersPage() {
                         <span
                           className={`px-4 py-1.5 text-xs font-bold rounded-full shadow-lg whitespace-nowrap ${
                             voucher.status === 'active' && !expired
-                              ? 'bg-gradient-to-r from-yellow-500/30 to-yellow-600/20 text-yellow-300 border border-yellow-500/50 shadow-yellow-500/20'
+                              ? 'bg-[rgba(251,246,118,0.15)] text-[#FBF676] border border-[#FBF676]/40'
                               : voucher.status === 'used'
-                              ? 'bg-gray-700/50 text-gray-300 border border-gray-600'
+                              ? 'bg-gray-700/50 text-white/75 border border-gray-600'
                               : expired
                               ? 'bg-red-900/40 text-red-400 border border-red-500/40'
-                              : 'bg-gray-700/50 text-gray-300 border border-gray-600'
+                              : 'bg-gray-700/50 text-white/75 border border-gray-600'
                           }`}
                         >
                           {expired ? 'Expired' : voucher.status}
@@ -258,27 +258,27 @@ export default function VouchersPage() {
                       </div>
 
                       <div className="space-y-3 mb-4">
-                        <div className="p-4 bg-gradient-to-r from-yellow-500/20 via-yellow-600/15 to-yellow-500/20 rounded-xl border-2 border-yellow-400/40 shadow-lg shadow-yellow-500/10">
+                        <div className="p-4 bg-[rgba(251,246,118,0.12)] rounded-xl border-2 border-[#FBF676]/40 shadow-lg shadow-[#FBF676]/15">
                           <div className="flex justify-between items-center mb-2">
-                            <span className="font-bold text-gray-200">Purchase Amount:</span>
-                            <span className="text-xl font-extrabold text-yellow-400">
+                            <span className="font-bold text-white/85">Purchase Amount:</span>
+                            <span className="text-xl font-extrabold text-[#FBF676]">
                               ${voucher.amount.toFixed(2)}
                             </span>
                           </div>
                           <div className="flex justify-between items-center">
-                            <span className="text-sm text-gray-300 font-semibold">Investment Value:</span>
-                            <span className="text-lg font-extrabold text-yellow-400">
+                            <span className="text-sm text-white/75 font-semibold">Investment Value:</span>
+                            <span className="text-lg font-extrabold text-[#FBF676]">
                               ${investmentValue.toFixed(2)}
                             </span>
                           </div>
-                          <div className="text-xs text-gray-400 mt-2 font-semibold">
+                          <div className="text-xs text-white/55 mt-2 font-semibold">
                             Multiplier: {voucher.multiplier || 2}x
                           </div>
                         </div>
 
                         <div className="grid grid-cols-2 gap-3 text-sm">
-                          <div className="p-3 bg-[#08152F]/80 rounded-xl border border-yellow-400/50">
-                            <div className="text-gray-400 text-xs mb-1 font-semibold">Created At</div>
+                          <div className="p-3 bg-[rgba(5,12,32,0.9)] rounded-xl border border-[#FBF676]/50">
+                            <div className="text-white/55 text-xs mb-1 font-semibold">Created At</div>
                             <div className="font-bold text-white">
                               {new Date(voucher.createdOn || voucher.createdAt).toLocaleDateString()}
                             </div>
@@ -289,7 +289,7 @@ export default function VouchersPage() {
 
                           {voucher.expiry && (
                             <div className={`p-3 rounded-xl border ${expired ? 'bg-red-900/30 border-red-500/40' : 'bg-gray-800/80 border-gray-700/50'}`}>
-                              <div className="text-gray-400 text-xs mb-1 font-semibold">Expiry Date</div>
+                              <div className="text-white/55 text-xs mb-1 font-semibold">Expiry Date</div>
                               <div className={`font-bold ${expired ? 'text-red-400' : 'text-white'}`}>
                                 {new Date(voucher.expiry).toLocaleDateString()}
                               </div>
@@ -301,19 +301,19 @@ export default function VouchersPage() {
                         </div>
 
                         {voucher.expiry && daysRemaining !== null && (
-                          <div className={`p-4 rounded-xl border-2 ${expired ? 'bg-red-900/30 border-red-500/50' : daysRemaining <= 7 ? 'bg-yellow-500/20 border-yellow-500/50' : 'bg-gray-800/80 border-yellow-500/30'}`}>
+                          <div className={`p-4 rounded-xl border-2 ${expired ? 'bg-red-900/30 border-red-500/50' : daysRemaining <= 7 ? 'bg-[rgba(251,246,118,0.12)] border-[#FBF676]/50' : 'bg-[rgba(5,12,32,0.9)] border-[#FBF676]/25'}`}>
                             <div className="flex justify-between items-center">
-                              <span className={`font-bold ${expired ? 'text-red-400' : daysRemaining <= 7 ? 'text-yellow-300' : 'text-gray-200'}`}>
+                              <span className={`font-bold ${expired ? 'text-red-400' : daysRemaining <= 7 ? 'text-yellow-300' : 'text-white/85'}`}>
                                 Days Remaining:
                               </span>
-                              <span className={`text-lg font-extrabold ${expired ? 'text-red-400' : daysRemaining <= 7 ? 'text-yellow-400' : 'text-yellow-400'}`}>
+                              <span className={`text-lg font-extrabold ${expired ? 'text-red-400' : daysRemaining <= 7 ? 'text-[#FBF676]' : 'text-[#FBF676]'}`}>
                                 {expired ? 'Expired' : daysRemaining <= 0 ? '0' : `${daysRemaining} day${daysRemaining !== 1 ? 's' : ''}`}
                               </span>
                             </div>
                             {!expired && daysRemaining > 0 && (
                               <div className="mt-3 w-full bg-gray-700/50 rounded-full h-2">
                                 <div
-                                  className={`h-2 rounded-full ${daysRemaining <= 7 ? 'bg-yellow-500' : 'bg-yellow-400'}`}
+                                  className={`h-2 rounded-full ${daysRemaining <= 7 ? 'bg-[#FBF676]' : 'bg-[#FBF676]'}`}
                                   style={{ width: `${Math.min(100, (daysRemaining / 120) * 100)}%` }}
                                 ></div>
                               </div>
@@ -322,10 +322,10 @@ export default function VouchersPage() {
                         )}
 
                         {voucher.usedAt && (
-                          <div className="p-3 bg-gray-800/80 rounded-xl border border-yellow-500/30">
+                          <div className="p-3 bg-gray-800/80 rounded-xl border border-[#FBF676]/25">
                             <div className="flex justify-between items-center text-sm">
-                              <span className="text-gray-400">Used On:</span>
-                              <span className="font-bold text-yellow-400">
+                              <span className="text-white/55">Used On:</span>
+                              <span className="font-bold text-[#FBF676]">
                                 {new Date(voucher.usedAt).toLocaleString()}
                               </span>
                             </div>
@@ -334,7 +334,7 @@ export default function VouchersPage() {
 
                         {voucher.fromWalletType && (
                           <div className="flex justify-between items-center text-sm p-3 bg-gray-800/80 rounded-xl border border-gray-700/50">
-                            <span className="text-gray-400">Created From:</span>
+                            <span className="text-white/55">Created From:</span>
                             <span className="font-bold text-white">{voucher.fromWalletType} Wallet</span>
                           </div>
                         )}
@@ -342,7 +342,7 @@ export default function VouchersPage() {
                         {voucher.createdBy && (
                           <div className="flex justify-between items-center text-xs p-3 bg-gray-800/80 rounded-xl border border-gray-700/50">
                             <span className="text-gray-500">Created By:</span>
-                            <span className="text-gray-300">{voucher.createdBy.name} ({voucher.createdBy.userId})</span>
+                            <span className="text-white/75">{voucher.createdBy.name} ({voucher.createdBy.userId})</span>
                           </div>
                         )}
                       </div>
@@ -355,14 +355,14 @@ export default function VouchersPage() {
 
         {/* Create Voucher Modal */}
         {showCreateModal && (
-          <div className="fixed inset-0 bg-[#08152F]/80 backdrop-blur-sm overflow-y-auto h-full w-full z-50">
-            <div className="relative top-20 mx-auto p-6 border border-yellow-500/30 w-96 shadow-2xl rounded-2xl bg-gradient-to-br from-[#08152F]/95 via-[#0C1A6B]/90 to-[#05627C]/85 backdrop-blur-xl">
+          <div className="fixed inset-0 bg-[rgba(5,12,32,0.9)] backdrop-blur-sm overflow-y-auto h-full w-full z-50">
+            <div className="relative top-20 mx-auto p-6 border border-[#FBF676]/25 w-96 shadow-2xl rounded-2xl backdrop-blur-md bg-[rgba(8,16,40,0.95)]">
               <div className="mt-3">
                 <h3 className="text-xl font-extrabold text-white mb-6 flex items-center gap-2">
                   <span className="bg-gradient-to-r from-yellow-300 via-yellow-400 to-yellow-600 bg-clip-text text-transparent">Create Voucher</span>
                 </h3>
                 <div className="mb-5">
-                  <label className="block text-sm font-bold text-yellow-400 mb-3">
+                  <label className="block text-sm font-bold text-[#FBF676] mb-3">
                     Amount (USD)
                   </label>
                   <input
@@ -371,22 +371,22 @@ export default function VouchersPage() {
                     onChange={(e) => setCreateAmount(e.target.value)}
                     min={minVoucherAmount}
                     step="0.01"
-                    className="w-full px-4 py-3 border border-yellow-500/40 rounded-xl bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-yellow-500/50 focus:border-yellow-500/70 font-semibold"
+                    className="w-full px-4 py-3 border border-[#FBF676]/40 rounded-xl bg-[#081028] text-white focus:outline-none focus:ring-2 focus:ring-[#FBF676]/40 focus:border-[#FBF676]/70 font-semibold"
                     placeholder={`Enter amount (minimum $${minVoucherAmount.toFixed(2)})`}
                   />
-                  <p className="mt-2 text-xs text-gray-400 font-semibold">
-                    Minimum voucher amount: <span className="text-yellow-400">${minVoucherAmount.toFixed(2)}</span>
+                  <p className="mt-2 text-xs text-white/55 font-semibold">
+                    Minimum voucher amount: <span className="text-[#FBF676]">${minVoucherAmount.toFixed(2)}</span>
                   </p>
                 </div>
                 <div className="mb-6">
-                  <label className="block text-sm font-bold text-yellow-400 mb-3">
+                  <label className="block text-sm font-bold text-[#FBF676] mb-3">
                     From Wallet (Required)
                   </label>
                   <select
                     value={fromWalletType}
                     onChange={(e) => setFromWalletType(e.target.value)}
                     required
-                    className="w-full px-4 py-3 border border-yellow-500/40 rounded-xl bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-yellow-500/50 focus:border-yellow-500/70 font-semibold"
+                    className="w-full px-4 py-3 border border-[#FBF676]/40 rounded-xl bg-[#081028] text-white focus:outline-none focus:ring-2 focus:ring-[#FBF676]/40 focus:border-[#FBF676]/70 font-semibold"
                   >
                     <option value="">Select a wallet</option>
                     {wallets
@@ -418,14 +418,14 @@ export default function VouchersPage() {
                       setFromWalletType('');
                       setError('');
                     }}
-                    className="px-6 py-2.5 text-sm font-bold text-gray-300 bg-gray-700 rounded-xl hover:bg-gray-600 transition-all"
+                    className="px-6 py-2.5 text-sm font-bold text-white/75 bg-gray-700 rounded-xl hover:bg-gray-600 transition-all"
                   >
                     Cancel
                   </button>
                   <button
                     onClick={handleCreateVoucher}
                     disabled={creating}
-                    className="px-6 py-2.5 text-sm font-bold text-black bg-gradient-to-r from-yellow-500 to-yellow-600 rounded-xl hover:from-yellow-400 hover:to-yellow-500 disabled:opacity-50 transition-all shadow-lg shadow-yellow-500/30 hover:shadow-yellow-500/50 hover:scale-105 active:scale-95"
+                    className="px-6 py-2.5 text-sm font-bold text-black bg-[#FBF676] rounded-xl hover:bg-[#e8e04a] disabled:opacity-50 transition-all shadow-lg shadow-[#FBF676]/25 hover:shadow-[#FBF676]/30 hover:scale-105 active:scale-95"
                   >
                     {creating ? 'Creating...' : 'Create Voucher'}
                   </button>

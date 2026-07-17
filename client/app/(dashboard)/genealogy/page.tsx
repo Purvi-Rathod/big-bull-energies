@@ -348,10 +348,10 @@ export default function UserGenealogyPage() {
     <div className="w-full h-full px-2 sm:px-0">
       {/* Header Section */}
       <div className="mb-4 md:mb-6">
-        <h1 className="text-2xl md:text-4xl font-bold bg-gradient-to-r from-yellow-300 via-yellow-400 to-yellow-500 bg-clip-text text-transparent">
+        <h1 className="text-2xl md:text-4xl font-bold bg-gradient-to-r from-yellow-300 via-yellow-400 to-yellow-600 bg-clip-text text-transparent">
           My Genealogy
         </h1>
-        <p className="mt-1 md:mt-2 text-xs md:text-sm text-yellow-400">Explore your binary referral tree and downlines</p>
+        <p className="mt-1 md:mt-2 text-xs md:text-sm text-[#FBF676]">Explore your binary referral tree and downlines</p>
       </div>
 
       {/* Navigation Controls */}
@@ -391,7 +391,7 @@ export default function UserGenealogyPage() {
 
             {/* Result Dropdown */}
             {searchResults.length > 0 && (
-              <div className="absolute top-full left-0 z-50 bg-[#08152F]/80 w-full mt-1 rounded-lg shadow-lg max-h-60 overflow-y-auto border border-yellow-400/30">
+              <div className="absolute top-full left-0 z-50 bg-[rgba(5,12,32,0.9)] w-full mt-1 rounded-lg shadow-lg max-h-60 overflow-y-auto border border-[#FBF676]/30">
                 {searchResults.map((node) => (
                   <div
                     key={node.userId}
@@ -400,10 +400,10 @@ export default function UserGenealogyPage() {
                       setSearchTerm('');
                       setSearchResults([]);
                     }}
-                    className="px-4 py-2 hover:bg-[#08152F]/70 text-yellow-400 cursor-pointer"
+                    className="px-4 py-2 hover:bg-[#08152F]/70 text-[#FBF676] cursor-pointer"
                   >
                     <p className="text-sm font-medium">{node.name}</p>
-                    <p className="text-xs text-yellow-400">{node.userId}</p>
+                    <p className="text-xs text-[#FBF676]">{node.userId}</p>
                   </div>
                 ))}
               </div>
@@ -411,22 +411,22 @@ export default function UserGenealogyPage() {
           </div>
 
           <div className="hidden sm:block flex-1"></div>
-          <div className="text-xs md:text-sm text-yellow-400 flex flex-col sm:flex-row items-start sm:items-center gap-1 sm:gap-2 bg-[#08152F]/80 px-3 md:px-4 py-2 rounded-lg border border-yellow-400/30">
-            <span className="font-medium text-yellow-400">Current Root:</span>
-            <span className="font-bold text-yellow-400 truncate">{treeData.rootName}</span>
-            <span className="text-yellow-400 font-mono text-[10px] md:text-xs truncate">({treeData.rootUserId})</span>
+          <div className="text-xs md:text-sm text-[#FBF676] flex flex-col sm:flex-row items-start sm:items-center gap-1 sm:gap-2 bg-[rgba(5,12,32,0.9)] px-3 md:px-4 py-2 rounded-lg border border-[#FBF676]/30">
+            <span className="font-medium text-[#FBF676]">Current Root:</span>
+            <span className="font-bold text-[#FBF676] truncate">{treeData.rootName}</span>
+            <span className="text-[#FBF676] font-mono text-[10px] md:text-xs truncate">({treeData.rootUserId})</span>
           </div>
         </div>
       )}
 
       {/* Error Display */}
       {error && (
-        <div className="bg-gradient-to-r from-[#08152F]/95 via-[#0C1A6B]/90 to-[#05627C]/85 rounded-xl p-4 mb-6 shadow-lg border border-yellow-500/30">
+        <div className="bg-[rgba(8,16,40,0.75)] rounded-xl p-4 mb-6 shadow-lg border border-[#FBF676]/25">
           <div className="flex items-center gap-3">
-            <svg className="w-5 h-5 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-5 h-5 text-[#FBF676]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
-            <div className="text-yellow-400 font-medium">{error}</div>
+            <div className="text-[#FBF676] font-medium">{error}</div>
           </div>
         </div>
       )}
@@ -435,10 +435,10 @@ export default function UserGenealogyPage() {
       {loading && (
         <div className="flex flex-col items-center justify-center py-16">
           <div className="relative">
-            <div className="animate-spin rounded-full h-16 w-16 border-4 border-yellow-500"></div>
-            <div className="animate-spin rounded-full h-16 w-16 border-4 border-yellow-600 border-t-transparent absolute top-0 left-0"></div>
+            <div className="animate-spin rounded-full h-16 w-16 border-4 border-[#FBF676]/40"></div>
+            <div className="animate-spin rounded-full h-16 w-16 border-4 border-[#FBF676] border-t-transparent absolute top-0 left-0"></div>
           </div>
-          <p className="mt-4 text-yellow-400 font-medium">Loading your genealogy tree...</p>
+          <p className="mt-4 text-[#FBF676] font-medium">Loading your genealogy tree...</p>
         </div>
       )}
 
@@ -529,12 +529,12 @@ export default function UserGenealogyPage() {
 
       {/* Empty State */}
       {!treeData && !loading && (
-        <div className="bg-[#08152F]/80 rounded-lg shadow p-12 text-center border border-yellow-400/30">
-          <svg className="mx-auto h-12 w-12 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div className="bg-[rgba(5,12,32,0.9)] rounded-lg shadow p-12 text-center border border-[#FBF676]/30">
+          <svg className="mx-auto h-12 w-12 text-[#FBF676]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
           </svg>
-          <h3 className="mt-4 text-lg font-medium text-yellow-400">No Tree Loaded</h3>
-          <p className="mt-2 text-sm text-yellow-400">Loading your genealogy tree...</p>
+          <h3 className="mt-4 text-lg font-medium text-[#FBF676]">No Tree Loaded</h3>
+          <p className="mt-2 text-sm text-[#FBF676]">Loading your genealogy tree...</p>
         </div>
       )}
 

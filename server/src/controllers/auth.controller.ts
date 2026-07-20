@@ -1,7 +1,7 @@
 import { asyncHandler } from "../utils/asyncHandler";
 import { AppError } from "../utils/AppError";
 import { signAuthToken } from "../utils/jwt";
-import { User } from "../models/User";
+import { User, IUser } from "../models/User";
 import { initializeUser } from "../services/userInit.service";
 import { generateNextUserId, findUserByUserId } from "../services/userId.service";
 import { sendSignupWelcomeEmail, sendPasswordResetEmail } from "../lib/mail-service/email.service";
@@ -158,21 +158,37 @@ export const userSignup = asyncHandler(async (req, res) => {
   // If referrer is NOT admin and position is not provided, it will be auto-assigned
   // If referrer is NOT admin and both positions are filled, system will find next available
 
-  // Generate userId in format BIGBULL-XXXXXX
-  const userId = await generateNextUserId();
-
   // Create user with inactive status by default (will be activated when they invest)
-  const user = await User.create({
-    userId,
-    name,
-    email: email ? email.toLowerCase() : undefined,
-    phone: phone || undefined,
-    password,
-    country: country || undefined,
-    referrer: referrer?._id || null,
-    position: finalPosition || null,
-    status: "inactive", // New users are inactive until they invest
-  });
+  // Retry on rare userId collisions (concurrent signups)
+  const MAX_USER_ID_RETRIES = 3;
+  let user: IUser | null = null;
+  for (let attempt = 0; attempt < MAX_USER_ID_RETRIES; attempt++) {
+    const userId = await generateNextUserId();
+    try {
+      user = await User.create({
+        userId,
+        name,
+        email: email ? email.toLowerCase() : undefined,
+        phone: phone || undefined,
+        password,
+        country: country || undefined,
+        referrer: referrer?._id || null,
+        position: finalPosition || null,
+        status: "inactive", // New users are inactive until they invest
+      });
+      break;
+    } catch (err: any) {
+      const isDupUserId =
+        err?.code === 11000 &&
+        (err?.keyPattern?.userId || err?.message?.includes("userId"));
+      if (!isDupUserId || attempt === MAX_USER_ID_RETRIES - 1) {
+        throw err;
+      }
+    }
+  }
+  if (!user) {
+    throw new AppError("Failed to create account. Please try again.", 500);
+  }
 
   // Initialize binary tree and wallets
   try {

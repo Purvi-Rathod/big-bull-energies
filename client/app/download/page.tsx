@@ -1,74 +1,161 @@
 "use client";
 
+import Image from "next/image";
+import Link from "next/link";
 import Footer from "@/components/Footer";
-import { Download } from "lucide-react";
+import { Download, FileText, ArrowUpRight, Home } from "lucide-react";
+
+const FONT_STACK =
+  "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif";
+
+const PRIMARY = "#05627C";
+
+const GOLD = "#F5B300";
 
 export default function DownloadPage() {
   return (
-    <div className="min-h-screen bg-gray-50" style={{ paddingTop: "156px" }}>
-      <div className="container mx-auto px-4 py-16">
-        <div className="max-w-4xl mx-auto text-center">
-          <div className="mb-8">
-            <svg
-              className="w-24 h-24 mx-auto mb-6 text-[#05627C]"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={1.5}
-                d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-              />
-            </svg>
-          </div>
-          <h1
-            className="text-4xl md:text-5xl font-bold mb-6"
-            style={{ color: "#05627C" }}
-          >
-            Download Brochure
-          </h1>
+    <div
+      className="min-h-screen w-full overflow-x-hidden"
+      style={{ fontFamily: FONT_STACK, paddingTop: "156px" }}
+    >
+      {/* Hero / brochure section with full-bleed background image */}
+      <section className="relative w-full">
+        <div className="relative w-full min-h-[820px] md:min-h-[880px] flex flex-col overflow-hidden">
+          {/* Background image - place your local image at /public/images/download-hero.png */}
+          <Image
+            src="/images/download-hero.png"
+            alt="Big Bull Energies wind turbines and solar panels landscape"
+            fill
+            priority
+            className="object-cover"
+          />
+          {/* Soft radial fade so the card + text stay legible over the photo */}
           <div
-            className="bg-white rounded-lg shadow-sm p-8 md:p-12 mb-8"
-            style={{ borderColor: "#E5E7EB" }}
-          >
-            <p className="text-lg text-gray-600 mb-6 leading-relaxed">
-              Download our comprehensive brochure to learn more about Big Bull
-              Energies, our renewable energy projects, and investment
-              opportunities.
-            </p>
-            <a
-              href="/crown-bankers-brochure.pdf"
-              download="Big Bull-Bankers-Brochure.pdf"
-              className="inline-flex items-center gap-3 px-8 py-4 rounded-lg font-semibold text-white transition hover:opacity-90 shadow-lg hover:shadow-xl"
-              style={{ backgroundColor: "#05627C" }}
-            >
-              <Download className="w-5 h-5" />
-              Download PDF Brochure
-            </a>
-            <p className="text-sm text-gray-500 mt-4">
-              PDF file • Opens in new tab
-            </p>
-          </div>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <a
-              href="/contact"
-              className="inline-block px-8 py-3 rounded-lg font-semibold text-white transition hover:opacity-90"
-              style={{ backgroundColor: "#05627C" }}
-            >
-              Contact Us
-            </a>
-            <a
-              href="/"
-              className="inline-block px-8 py-3 rounded-lg font-semibold border transition hover:bg-gray-100"
-              style={{ borderColor: "#05627C", color: "#05627C" }}
-            >
-              Back to Home
-            </a>
+            className="absolute inset-0"
+            style={{
+              background:
+                "radial-gradient(ellipse 70% 60% at 50% 38%, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.55) 45%, rgba(255,255,255,0.15) 70%, rgba(255,255,255,0) 100%)",
+            }}
+          />
+
+          <div className="relative container mx-auto px-4 sm:px-6 lg:px-8 flex-1 flex flex-col items-center justify-center pt-16 sm:pt-20 md:pt-32 pb-24">
+            <div className="max-w-3xl w-full text-center mx-auto">
+              {/* Icon badge */}
+              <div className="relative w-24 h-24 mx-auto mb-8">
+                <div
+                  className="absolute inset-0 rounded-full border-2 border-dashed"
+                  style={{ borderColor: "rgba(5,98,124,0.35)" }}
+                />
+                <div
+                  className="absolute inset-2 rounded-full flex items-center justify-center shadow-lg"
+                  style={{ backgroundColor: PRIMARY }}
+                >
+                  <Download className="w-9 h-9 text-white" />
+                </div>
+                <span
+                  className="absolute -top-1 -right-1 w-3 h-3 rounded-full"
+                  style={{ backgroundColor: GOLD }}
+                />
+                <span
+                  className="absolute -bottom-1 -left-1 w-2.5 h-2.5 rounded-full"
+                  style={{ backgroundColor: GOLD }}
+                />
+              </div>
+
+              <h1
+                className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4"
+                style={{ color: PRIMARY }}
+              >
+                Download <span style={{ color: PRIMARY }}>Brochure</span>
+              </h1>
+              <div
+                className="h-1 w-16 mx-auto mb-8 rounded-full"
+                style={{ backgroundColor: GOLD }}
+              />
+
+              <p
+                className="text-base md:text-lg leading-relaxed mb-10 max-w-2xl mx-auto"
+                style={{ color: PRIMARY, opacity: 0.75 }}
+              >
+                Download our comprehensive brochure to learn more about Big
+                Bull Energies, our renewable energy projects, and investment
+                opportunities.
+              </p>
+
+              {/* White brochure card */}
+              <div className="relative bg-white rounded-2xl shadow-xl px-6 sm:px-10 md:px-14 py-10 sm:py-12 mb-10 overflow-hidden">
+                {/* decorative dot grids */}
+                <div
+                  className="absolute top-6 left-6 w-16 h-16 pointer-events-none"
+                  style={{
+                    backgroundImage:
+                      "radial-gradient(circle, rgba(11,31,58,0.12) 1.5px, transparent 1.5px)",
+                    backgroundSize: "10px 10px",
+                  }}
+                />
+                <div
+                  className="absolute bottom-6 right-6 w-16 h-16 pointer-events-none"
+                  style={{
+                    backgroundImage:
+                      "radial-gradient(circle, rgba(11,31,58,0.12) 1.5px, transparent 1.5px)",
+                    backgroundSize: "10px 10px",
+                  }}
+                />
+
+                <div className="relative flex flex-col items-center">
+                  <div
+                    className="relative w-16 h-16 rounded-lg flex items-center justify-center mb-6 border-2"
+                    style={{ borderColor: "rgba(5,98,124,0.35)" }}
+                  >
+                    <FileText className="w-8 h-8" style={{ color: PRIMARY }} strokeWidth={1.5} />
+                    <span
+                      className="absolute -bottom-2 left-1/2 -translate-x-1/2 text-[10px] font-bold px-1.5 py-0.5 rounded text-white"
+                      style={{ backgroundColor: PRIMARY }}
+                    >
+                      PDF
+                    </span>
+                  </div>
+
+                  <a
+                    href="/crown-bankers-brochure.pdf"
+                    download="Big-Bull-Energies-Brochure.pdf"
+                    className="inline-flex items-center gap-3 px-8 py-4 rounded-lg font-bold text-white transition hover:opacity-90 shadow-lg hover:shadow-xl"
+                    style={{ backgroundColor: PRIMARY }}
+                  >
+                    <Download className="w-5 h-5" />
+                    Download PDF Brochure
+                  </a>
+
+                  <p className="text-sm mt-4" style={{ color: PRIMARY, opacity: 0.55 }}>
+                    PDF file &nbsp;•&nbsp; Opens in new tab
+                  </p>
+                </div>
+              </div>
+
+              {/* Secondary actions */}
+              <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+                <Link
+                  href="/contact"
+                  className="inline-flex items-center gap-2 px-8 py-3.5 rounded-lg font-bold text-white transition hover:opacity-90 shadow-md"
+                  style={{ backgroundColor: PRIMARY }}
+                >
+                  <ArrowUpRight className="w-4 h-4" />
+                  Contact Us
+                </Link>
+                <Link
+                  href="/"
+                  className="inline-flex items-center gap-2 px-8 py-3.5 rounded-lg font-bold border-2 bg-white/90 transition hover:bg-white"
+                  style={{ borderColor: PRIMARY, color: PRIMARY }}
+                >
+                  <Home className="w-4 h-4" />
+                  Back to Home
+                </Link>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
+      </section>
+
       <Footer />
     </div>
   );

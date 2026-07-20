@@ -1,11 +1,19 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Play, Image as ImageIcon, Video, Filter } from "lucide-react";
+import {
+  Play,
+  Image as ImageIcon,
+  Video,
+  Filter,
+  Users,
+  Calendar,
+  Zap,
+  ChevronRight,
+} from "lucide-react";
 import Footer from "@/components/Footer";
-import { table } from "console";
 
 /** YouTube embed params: no branding, no title, no controls — raw video only. */
 function getYouTubeEmbedParams(autoplay: boolean): string {
@@ -70,6 +78,16 @@ function isEmbeddableVideoUrl(url: string): boolean {
   return /youtu\.be\/|youtube\.com\/(watch\?|embed\/)|vimeo\.com\//.test(u);
 }
 
+/** Pick an icon for a category based on its name, matching the reference design (leaders/events/solar farms). */
+function getCategoryIcon(category: string) {
+  const c = category.toLowerCase();
+  if (c.includes("leader") || c.includes("team") || c.includes("people")) return Users;
+  if (c.includes("event")) return Calendar;
+  if (c.includes("farm") || c.includes("solar") || c.includes("plant")) return Zap;
+  if (c.includes("video")) return Video;
+  return ImageIcon;
+}
+
 interface GalleryItem {
   _id?: string;
   id?: string;
@@ -83,12 +101,18 @@ interface GalleryItem {
   status: "Active" | "InActive";
 }
 
+const BRAND_COLOR = "#05627C";
+const BRAND_TINT = "#E8F5F0";
+
 export default function GalleryPage() {
   const [items, setItems] = useState<GalleryItem[]>([]);
   const [categories, setCategories] = useState<string[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string>("");
   const [loading, setLoading] = useState(true);
   const [selectedItem, setSelectedItem] = useState<GalleryItem | null>(null);
+
+  // One horizontal-scroll ref per category, used by the "next" chevron button.
+  const scrollRefs = useRef<Record<string, HTMLDivElement | null>>({});
 
   useEffect(() => {
     fetchGalleryItems();
@@ -106,7 +130,6 @@ export default function GalleryPage() {
       const data = await response.json();
 
       if (data.status === "success" && data.data) {
-        console.table(data.data.items);
         setItems(data.data.items || []);
         if (data.data.categories) {
           setCategories(data.data.categories);
@@ -127,6 +150,12 @@ export default function GalleryPage() {
     setSelectedItem(null);
   };
 
+  const scrollCategory = (category: string, direction: 1 | -1) => {
+    const el = scrollRefs.current[category];
+    if (!el) return;
+    el.scrollBy({ left: direction * el.clientWidth * 0.9, behavior: "smooth" });
+  };
+
   // Group items by category
   const groupedItems: { [key: string]: GalleryItem[] } = {};
   items.forEach((item) => {
@@ -141,52 +170,91 @@ export default function GalleryPage() {
     groupedItems[category].sort((a, b) => a.order - b.order);
   });
 
-  return (
-    <main className="min-h-screen w-full overflow-x-hidden pt-24 sm:pt-28 md:pt-32 lg:pt-[126px]">
-      {/* Hero Section */}
-      {/* <section className="relative w-full bg-[#E8F5F0] py-12 sm:py-16 md:py-20 lg:py-24">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="max-w-4xl mx-auto text-center">
-            <div className="flex items-center justify-center gap-2 sm:gap-3 mb-4 sm:mb-6">
-              <div className="h-px w-8 sm:w-12" style={{ backgroundColor: "#05627C" }}></div>
-              <span
-                className="text-xs font-medium uppercase tracking-wide"
-                style={{ color: "#05627C" }}
-              >
-                GALLERY
-              </span>
-            </div>
-            <h1
-              className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl 2xl:text-7xl font-normal leading-tight mb-4 sm:mb-6 px-2"
-              style={{
-                color: "#05627C",
-                fontFamily: "var(--font-font4), sans-serif",
-              }}
-            >
-              Our Visual Story
-            </h1>
-            <p
-              className="text-sm sm:text-base md:text-lg lg:text-xl leading-relaxed max-w-2xl mx-auto px-2"
-              style={{
-                color: "#05627C",
-                fontFamily: "var(--font-font4), sans-serif",
-              }}
-            >
-              Explore our solar plants, office spaces, events, and more through photos and videos.
-            </p>
+  const renderTile = (item: GalleryItem) => (
+    <div
+      key={item._id || item.id}
+      className="group relative aspect-square bg-gray-100 rounded-lg overflow-hidden hover:shadow-xl transition-all snap-start flex-none w-[calc(50%-8px)] sm:w-[calc(50%-12px)] lg:w-[calc(33.333%-16px)] xl:w-[calc(25%-18px)]"
+    >
+      {item.mediaType === "video" ? (
+        <>
+          <div
+            className="absolute inset-0 w-full h-full"
+            onClick={(e) => {
+              e.stopPropagation();
+              handleItemClick(item);
+            }}
+          >
+            {isEmbeddableVideoUrl(item.mediaUrl) ? (
+              <iframe
+                src={getVideoEmbedUrl(item.mediaUrl, true)}
+                className="w-full h-full pointer-events-auto"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+                title={item.title}
+              />
+            ) : (
+              <video
+                src={item.mediaUrl}
+                autoPlay
+                muted
+                loop
+                playsInline
+                controls
+                className="w-full h-full object-contain bg-black"
+                title={item.title}
+              />
+            )}
+          </div>
+          <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-3 pointer-events-none">
+            <h3 className="text-white font-semibold text-sm">{item.title}</h3>
+            {item.description && (
+              <p className="text-white/80 text-xs mt-0.5 line-clamp-2">
+                {item.description}
+              </p>
+            )}
+          </div>
+        </>
+      ) : (
+        <div onClick={() => handleItemClick(item)} className="cursor-pointer w-full h-full">
+          <img
+            src={item.mediaUrl}
+            alt={item.title}
+            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+            onError={(e) => {
+              const target = e.target as HTMLImageElement;
+              target.parentElement!.innerHTML = `
+                <div class="w-full h-full flex items-center justify-center bg-gray-200">
+                  <svg class="w-16 h-16 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
+                </div>
+              `;
+            }}
+          />
+          <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-4 opacity-0 group-hover:opacity-100 transition-opacity">
+            <h3 className="text-white font-semibold text-sm sm:text-base">{item.title}</h3>
+            {item.description && (
+              <p className="text-white/80 text-xs sm:text-sm mt-1 line-clamp-2">
+                {item.description}
+              </p>
+            )}
           </div>
         </div>
-      </section> */}
+      )}
+    </div>
+  );
 
+  return (
+    <main className="min-h-screen w-full overflow-x-hidden pt-24 sm:pt-28 md:pt-32 lg:pt-[126px]">
       {/* Category Filter */}
       {categories.length > 0 && (
         <section
           className="relative w-full bg-white py-6 sm:py-8 border-b-2"
-          style={{ borderColor: "#05627C", opacity: 0.9 }}
+          style={{ borderColor: BRAND_COLOR, opacity: 0.9 }}
         >
           <div className="container mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex items-center gap-2 sm:gap-4 flex-wrap justify-center">
-              <Filter className="w-5 h-5" style={{ color: "#05627C" }} />
+              <Filter className="w-5 h-5" style={{ color: BRAND_COLOR }} />
               <button
                 onClick={() => setSelectedCategory("")}
                 className={`px-4 sm:px-6 py-2 rounded-lg text-sm sm:text-base font-medium transition ${
@@ -223,196 +291,143 @@ export default function GalleryPage() {
               <div className="text-center">
                 <div
                   className="inline-block animate-spin rounded-full h-12 w-12 border-b-2"
-                  style={{ borderColor: "#05627C" }}
+                  style={{ borderColor: BRAND_COLOR }}
                 ></div>
-                <p className="mt-4" style={{ color: "#05627C" }}>
+                <p className="mt-4" style={{ color: BRAND_COLOR }}>
                   Loading gallery...
                 </p>
               </div>
             </div>
           ) : items.length === 0 ? (
             <div className="text-center py-20">
-              <p className="text-lg" style={{ color: "#05627C" }}>
+              <p className="text-lg" style={{ color: BRAND_COLOR }}>
                 No gallery items found.
               </p>
             </div>
-          ) : (
-            <>
-              {/* Show grouped by category if no filter */}
-              {!selectedCategory ? (
-                Object.keys(groupedItems).map((category) => (
-                  <div key={category} className="mb-12 sm:mb-16">
+          ) : !selectedCategory ? (
+            // Grouped-by-category view, one horizontally-scrollable row per category
+            Object.keys(groupedItems).map((category) => {
+              const CategoryIcon = getCategoryIcon(category);
+              const catItems = groupedItems[category];
+              const showArrow = catItems.length > 4;
+              return (
+                <div key={category} className="mb-12 sm:mb-16">
+                  {/* Category header: icon badge + title + underline accent */}
+                  <div className="flex items-center gap-3 mb-1">
+                    <div
+                      className="w-9 h-9 sm:w-10 sm:h-10 rounded-md flex items-center justify-center flex-shrink-0"
+                      style={{ backgroundColor: BRAND_COLOR }}
+                    >
+                      <CategoryIcon className="w-5 h-5 text-white" />
+                    </div>
                     <h2
-                      className="text-2xl sm:text-3xl md:text-4xl font-bold mb-6 sm:mb-8"
-                      style={{ color: "#05627C" }}
+                      className="text-2xl sm:text-3xl md:text-4xl font-bold"
+                      style={{ color: BRAND_COLOR }}
                     >
                       {category}
                     </h2>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
-                      {groupedItems[category].map((item) => (
-                        <div
-                          key={item._id || item.id}
-                          className="group relative aspect-square bg-gray-100 rounded-lg overflow-hidden hover:shadow-xl transition-all"
-                        >
-                          {item.mediaType === "video" ? (
-                            <>
-                              <div
-                                className="absolute inset-0 w-full h-full"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleItemClick(item);
-                                }}
-                              >
-                                {isEmbeddableVideoUrl(item.mediaUrl) ? (
-                                  <iframe
-                                    src={getVideoEmbedUrl(item.mediaUrl, true)}
-                                    className="w-full h-full pointer-events-auto"
-                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                                    allowFullScreen
-                                    title={item.title}
-                                  />
-                                ) : (
-                                  <video
-                                    src={item.mediaUrl}
-                                    autoPlay
-                                    muted
-                                    loop
-                                    playsInline
-                                    controls
-                                    className="w-full h-full object-contain bg-black"
-                                    title={item.title}
-                                  />
-                                )}
-                              </div>
-                              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-3 pointer-events-none">
-                                <h3 className="text-white font-semibold text-sm">
-                                  {item.title}
-                                </h3>
-                                {item.description && (
-                                  <p className="text-white/80 text-xs mt-0.5 line-clamp-2">
-                                    {item.description}
-                                  </p>
-                                )}
-                              </div>
-                            </>
-                          ) : (
-                            <div
-                              onClick={() => handleItemClick(item)}
-                              className="cursor-pointer w-full h-full"
-                            >
-                              <img
-                                src={item.mediaUrl}
-                                alt={item.title}
-                                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
-                                onError={(e) => {
-                                  const target = e.target as HTMLImageElement;
-                                  target.parentElement!.innerHTML = `
-                                    <div class="w-full h-full flex items-center justify-center bg-gray-200">
-                                      <svg class="w-16 h-16 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                      </svg>
-                                    </div>
-                                  `;
-                                }}
-                              />
-                              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-4 opacity-0 group-hover:opacity-100 transition-opacity">
-                                <h3 className="text-white font-semibold text-sm sm:text-base">
-                                  {item.title}
-                                </h3>
-                                {item.description && (
-                                  <p className="text-white/80 text-xs sm:text-sm mt-1 line-clamp-2">
-                                    {item.description}
-                                  </p>
-                                )}
-                              </div>
-                            </div>
-                          )}
-                        </div>
-                      ))}
-                    </div>
                   </div>
-                ))
-              ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
-                  {items.map((item) => (
+                  <div
+                    className="h-1 w-10 rounded mb-6 sm:mb-8 ml-12 sm:ml-[52px]"
+                    style={{ backgroundColor: BRAND_COLOR }}
+                  />
+
+                  <div className="relative">
                     <div
-                      key={item._id || item.id}
-                      className="group relative aspect-square bg-gray-100 rounded-lg overflow-hidden hover:shadow-xl transition-all"
+                      ref={(el) => {
+                        scrollRefs.current[category] = el;
+                      }}
+                      className="flex gap-4 sm:gap-6 overflow-x-auto scroll-smooth snap-x snap-mandatory [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
                     >
-                      {item.mediaType === "video" ? (
-                        <>
-                          <div
-                            className="absolute inset-0 w-full h-full"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleItemClick(item);
-                            }}
-                          >
-                            {isEmbeddableVideoUrl(item.mediaUrl) ? (
-                              <iframe
-                                src={getVideoEmbedUrl(item.mediaUrl, true)}
-                                className="w-full h-full pointer-events-auto"
-                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                                allowFullScreen
-                                title={item.title}
-                              />
-                            ) : (
-                              <video
-                                src={item.mediaUrl}
-                                controls
-                                className="w-full h-full object-contain bg-black"
-                                title={item.title}
-                              />
-                            )}
-                          </div>
-                          <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-3 pointer-events-none">
-                            <h3 className="text-white font-semibold text-sm">
-                              {item.title}
-                            </h3>
-                            {item.description && (
-                              <p className="text-white/80 text-xs mt-0.5 line-clamp-2">
-                                {item.description}
-                              </p>
-                            )}
-                          </div>
-                        </>
-                      ) : (
-                        <div
-                          onClick={() => handleItemClick(item)}
-                          className="cursor-pointer w-full h-full"
-                        >
-                          <img
-                            src={item.mediaUrl}
-                            alt={item.title}
-                            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
-                            onError={(e) => {
-                              const target = e.target as HTMLImageElement;
-                              target.parentElement!.innerHTML = `
-                                <div class="w-full h-full flex items-center justify-center bg-gray-200">
-                                  <svg class="w-16 h-16 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                  </svg>
-                                </div>
-                              `;
-                            }}
-                          />
-                          <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-4 opacity-0 group-hover:opacity-100 transition-opacity">
-                            <h3 className="text-white font-semibold text-sm sm:text-base">
-                              {item.title}
-                            </h3>
-                            {item.description && (
-                              <p className="text-white/80 text-xs sm:text-sm mt-1 line-clamp-2">
-                                {item.description}
-                              </p>
-                            )}
-                          </div>
-                        </div>
-                      )}
+                      {catItems.map((item) => renderTile(item))}
                     </div>
-                  ))}
+
+                    {showArrow && (
+                      <button
+                        onClick={() => scrollCategory(category, 1)}
+                        aria-label={`Show more ${category} items`}
+                        className="hidden sm:flex absolute right-2 top-1/2 -translate-y-1/2 z-10 w-9 h-9 rounded-full bg-white shadow-lg items-center justify-center hover:bg-gray-50 transition"
+                      >
+                        <ChevronRight className="w-5 h-5" style={{ color: BRAND_COLOR }} />
+                      </button>
+                    )}
+                  </div>
                 </div>
-              )}
-            </>
+              );
+            })
+          ) : (
+            // Filtered (single category) view — plain responsive grid
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
+              {items.map((item) => (
+                <div
+                  key={item._id || item.id}
+                  className="group relative aspect-square bg-gray-100 rounded-lg overflow-hidden hover:shadow-xl transition-all"
+                >
+                  {item.mediaType === "video" ? (
+                    <>
+                      <div
+                        className="absolute inset-0 w-full h-full"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleItemClick(item);
+                        }}
+                      >
+                        {isEmbeddableVideoUrl(item.mediaUrl) ? (
+                          <iframe
+                            src={getVideoEmbedUrl(item.mediaUrl, true)}
+                            className="w-full h-full pointer-events-auto"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                            allowFullScreen
+                            title={item.title}
+                          />
+                        ) : (
+                          <video
+                            src={item.mediaUrl}
+                            controls
+                            className="w-full h-full object-contain bg-black"
+                            title={item.title}
+                          />
+                        )}
+                      </div>
+                      <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-3 pointer-events-none">
+                        <h3 className="text-white font-semibold text-sm">{item.title}</h3>
+                        {item.description && (
+                          <p className="text-white/80 text-xs mt-0.5 line-clamp-2">
+                            {item.description}
+                          </p>
+                        )}
+                      </div>
+                    </>
+                  ) : (
+                    <div onClick={() => handleItemClick(item)} className="cursor-pointer w-full h-full">
+                      <img
+                        src={item.mediaUrl}
+                        alt={item.title}
+                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                        onError={(e) => {
+                          const target = e.target as HTMLImageElement;
+                          target.parentElement!.innerHTML = `
+                            <div class="w-full h-full flex items-center justify-center bg-gray-200">
+                              <svg class="w-16 h-16 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                              </svg>
+                            </div>
+                          `;
+                        }}
+                      />
+                      <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-4 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <h3 className="text-white font-semibold text-sm sm:text-base">{item.title}</h3>
+                        {item.description && (
+                          <p className="text-white/80 text-xs sm:text-sm mt-1 line-clamp-2">
+                            {item.description}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
           )}
         </div>
       </section>
@@ -423,34 +438,18 @@ export default function GalleryPage() {
           className="fixed inset-0 bg-black bg-opacity-90 z-50 flex items-center justify-center p-4"
           onClick={closeModal}
         >
-          <div
-            className="max-w-6xl w-full max-h-[90vh] relative"
-            onClick={(e) => e.stopPropagation()}
-          >
+          <div className="max-w-6xl w-full max-h-[90vh] relative" onClick={(e) => e.stopPropagation()}>
             <button
               onClick={closeModal}
               className="absolute top-4 right-4 z-10 w-10 h-10 bg-white/20 hover:bg-white/30 rounded-full flex items-center justify-center text-white transition"
             >
-              <svg
-                className="w-6 h-6"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M6 18L18 6M6 6l12 12"
-                />
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
             <div className="bg-white rounded-lg overflow-hidden">
               {selectedItem.mediaType === "video" ? (
-                <div
-                  className="relative w-full bg-black rounded-t-lg"
-                  style={{ paddingBottom: "56.25%" }}
-                >
+                <div className="relative w-full bg-black rounded-t-lg" style={{ paddingBottom: "56.25%" }}>
                   {isEmbeddableVideoUrl(selectedItem.mediaUrl) ? (
                     <iframe
                       key={`video-${selectedItem._id ?? selectedItem.id ?? selectedItem.mediaUrl}`}
@@ -479,17 +478,10 @@ export default function GalleryPage() {
                 />
               )}
               <div className="p-6">
-                <h3
-                  className="text-2xl font-bold mb-2"
-                  style={{ color: "#05627C" }}
-                >
+                <h3 className="text-2xl font-bold mb-2" style={{ color: BRAND_COLOR }}>
                   {selectedItem.title}
                 </h3>
-                {selectedItem.description && (
-                  <p className="text-gray-700 mb-2">
-                    {selectedItem.description}
-                  </p>
-                )}
+                {selectedItem.description && <p className="text-gray-700 mb-2">{selectedItem.description}</p>}
                 <span className="inline-block px-3 py-1 text-sm font-medium rounded-full bg-[#E8F5F0] text-[#05627C]">
                   {selectedItem.category}
                 </span>

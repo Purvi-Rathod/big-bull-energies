@@ -478,7 +478,7 @@ function LoginContent() {
               )}
             </button>
           </form>
-          <p className="mt-7 text-center text-sm text-[#9FB8C9]">
+          {/* <p className="mt-7 text-center text-sm text-[#9FB8C9]">
             Administrator?{" "}
             <Link
               href="/admin/login"
@@ -487,7 +487,7 @@ function LoginContent() {
             >
               Admin login
             </Link>
-          </p>
+          </p> */}
         </div>
       </div>
     </div>

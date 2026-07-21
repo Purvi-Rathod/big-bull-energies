@@ -102,9 +102,11 @@ if [[ "${SKIP_PULL:-0}" != "1" ]]; then
     fail "Not a git repository: $PROJECT_ROOT"
   fi
 
+  # Discard local edits to tracked files so pull never blocks deploy
   git fetch origin
   git checkout "$DEPLOY_BRANCH"
-  git pull origin "$DEPLOY_BRANCH"
+  git reset --hard "origin/$DEPLOY_BRANCH"
+  git clean -fd -e 'server/.env' -e 'client/.env.local' -e 'client/.env.production'
   ok "At commit: $(git rev-parse --short HEAD) — $(git log -1 --pretty=%s)"
 else
   warn "Skipping git pull (SKIP_PULL=1)"

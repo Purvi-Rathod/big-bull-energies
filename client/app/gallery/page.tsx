@@ -113,7 +113,7 @@ export default function GalleryPage() {
   const fetchCategories = async () => {
     try {
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL || "https://api.crownbankers.com/api/v1"}/gallery`,
+        `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api/v1"}/gallery`,
       );
       const data = await response.json();
       if (data.status === "success" && data.data?.categories) {
@@ -131,7 +131,7 @@ export default function GalleryPage() {
         ? `?category=${encodeURIComponent(selectedCategory)}`
         : "";
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL || "https://api.crownbankers.com/api/v1"}/gallery${params}`,
+        `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api/v1"}/gallery${params}`,
       );
       const data = await response.json();
 

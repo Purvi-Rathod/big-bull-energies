@@ -4,388 +4,284 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import Footer from "@/components/Footer";
+import OurValuesSection from "@/components/leadership/OurValuesSection";
+
+const FONT_STACK =
+  "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif";
+const PRIMARY = "#05627C";
+const ACCENT = "#3FA9C8";
+const GOLD = "#F5CF0B";
+
+const leaders = [
+  {
+    id: 1,
+    name: "Adrian Cadiz",
+    title: "Chief Executive Officer",
+    description:
+      "With nearly two decades of experience in marketing, business operations, and strategic growth, Adrian leads Big Bull Energies with a focus on renewable energy and financial innovation.",
+    image: "/leader1.jpg",
+  },
+  {
+    id: 2,
+    name: "Edward Barrington",
+    title: "Chief Marketing Officer",
+    description:
+      "Edward oversees all marketing initiatives, driving brand development and market expansion to grow Big Bull Energies' global presence.",
+    image: "/leader2.png",
+  },
+  {
+    id: 3,
+    name: "Anee Sandrova",
+    title: "Relationship Manager",
+    description:
+      "Anee manages relations and operations in the Netherlands, overseeing our solar plant in Groningen and coordinating renewable energy projects.",
+    image: "/leader3.png",
+  },
+  {
+    id: 4,
+    name: "Sophie Taylor",
+    title: "Chief Financial Officer",
+    description:
+      "Sophie leads financial strategy, making critical decisions on investments and resource allocation to ensure sustainable growth and stability.",
+    image: "/leader4.png",
+  },
+  {
+    id: 5,
+    name: "Joseph Carter",
+    title: "Director of Operations",
+    description:
+      "Joseph leads the administrative division, handling user inquiries and ensuring smooth internal operations for all Big Bull Energies members.",
+    image: "/leader5.png",
+  },
+];
+
+function SectionWrap({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-[1220px] mx-auto">{children}</div>
+    </div>
+  );
+}
+
+function GoldTag({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="flex items-center gap-2 sm:gap-3 mb-3 sm:mb-4">
+      <div className="h-px w-8 sm:w-10" style={{ backgroundColor: GOLD }} />
+      <span
+        className="text-[10px] sm:text-xs font-bold uppercase tracking-widest"
+        style={{ color: GOLD }}
+      >
+        {children}
+      </span>
+    </div>
+  );
+}
 
 export default function LeadershipPage() {
-  const leaders = [
-    {
-      id: 1,
-      name: "Adrian Cadiz",
-      title: "Chief Executive Officer",
-      description:
-        "With nearly two decades of experience in marketing, business operations, and strategic growth, Adrian Cadiz leads Big Bull Energies as CEO. His expertise extends to the renewable energy sector, where he has played a key role in integrating financial solutions with solar and EV projects. Under his leadership, Big Bull Energies continues to drive innovation, efficiency, and expansion across all operations.",
-      image: "/leader1.jpg",
-      facebookUrl: "https://www.facebook.com/adrian.cadiz", // Add actual Facebook URL
-    },
-    {
-      id: 2,
-      name: "Edward Barrington",
-      title: "Chief Marketing Officer (CMO)",
-      description:
-        "As the Chief Marketing Officer, Edward Barrington oversees all marketing initiatives at Big Bull Energies. His expertise in brand development and market expansion plays a crucial role in growing the company's global presence.",
-      image: "/leader2.png",
-      facebookUrl: null, // No Facebook link
-    },
-    {
-      id: 3,
-      name: "Anee Sandrova",
-      title: "Relationship Manager (RM)",
-      description:
-        "Anee Sandrova manages relations and operations in the Netherlands, particularly overseeing the Big Bull Energies solar plant in Groningen. Her role ensures seamless coordination and development of our renewable energy projects.",
-      image: "/leader3.png",
-      facebookUrl: "https://www.facebook.com/annee.sandrova", // Add actual Facebook URL
-    },
-    {
-      id: 4,
-      name: "Sophie Taylor",
-      title: "Chief Financial Officer (CFO)",
-      description:
-        "Sophie Taylor and her team handle the financial strategies at Big Bull Energies, making critical decisions on investments and resource allocation. Her expertise ensures sustainable financial growth and stability.",
-      image: "/leader4.png",
-      facebookUrl: null, // No Facebook link
-    },
-    {
-      id: 5,
-      name: "Joseph Carter",
-      title: "Director of Operations",
-      description:
-        "Joseph Carter leads the administrative division, handling user inquiries and ensuring smooth internal operations. His dedication to efficiency and customer support enhances the overall experience for Big Bull Energies members.",
-      image: "/leader5.png",
-      facebookUrl: null, // No Facebook link
-    },
-  ];
+  const topRow = leaders.slice(0, 3);
+  const bottomRow = leaders.slice(3, 5);
 
   return (
-    <main className="min-h-screen w-full overflow-x-hidden pt-24 sm:pt-28 md:pt-32 lg:pt-[126px]">
-      {/* Hero Section */}
-      <section className="relative w-full h-[50vh] sm:h-[55vh] md:h-[60vh] lg:h-[70vh] overflow-hidden">
+    <main
+      className="min-h-screen w-full overflow-x-hidden pt-24 sm:pt-28 md:pt-32 lg:pt-[126px]"
+      style={{ fontFamily: FONT_STACK }}
+    >
+      {/* Hero */}
+      <section className="relative w-full overflow-hidden min-h-[420px] sm:min-h-[480px] md:min-h-[520px] lg:min-h-[560px] flex items-center">
         <Image
-          src="https://res.cloudinary.com/dygdftjr8/image/upload/v1771927306/Screenshot_2026-02-24_at_15.31.36_sbqtdp.png"
-          alt="Leadership - Our Team"
+          src="/images/leadership-Hero.png"
+          alt="Big Bull Energies leadership"
           fill
-          className="object-cover"
           priority
+          className="object-cover object-center"
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-gray-900/20 to-transparent"></div>
-        {/* Hero Text Overlay */}
-        <div className="absolute inset-0 flex items-center">
-          <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="max-w-2xl bg-white p-6 sm:p-8 md:p-10 lg:p-12">
-              <div className="flex items-center gap-2 sm:gap-3 mb-4 sm:mb-6">
-                <div
-                  className="h-px w-8 sm:w-12"
-                  style={{ backgroundColor: "#05627C" }}
-                ></div>
-                <span
-                  className="text-xs font-medium uppercase tracking-wide"
-                  style={{ color: "#05627C" }}
-                >
-                  WHO WE ARE
-                </span>
-              </div>
-              <h1
-                className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl 2xl:text-7xl font-normal leading-tight mb-4 sm:mb-6"
-                style={{
-                  color: "#05627C",
-                  fontFamily: "var(--font-font4), sans-serif",
-                }}
-              >
-                Leadership that drives innovation
-              </h1>
-            </div>
+        <div
+          className="absolute inset-0 sm:hidden"
+          style={{
+            background:
+              "linear-gradient(180deg, rgba(232,245,240,0.96) 0%, rgba(232,245,240,0.88) 50%, rgba(232,245,240,0.3) 100%)",
+          }}
+        />
+        <div
+          className="absolute inset-0 hidden sm:block"
+          style={{
+            background:
+              "linear-gradient(90deg, rgba(232,245,240,0.97) 0%, rgba(232,245,240,0.88) 28%, rgba(232,245,240,0.45) 45%, rgba(232,245,240,0.05) 58%, transparent 70%)",
+          }}
+        />
+        <SectionWrap>
+          <div className="relative z-10 max-w-xl py-8 sm:py-10">
+            <GoldTag>Who We Are</GoldTag>
+            <h1
+              className="text-2xl sm:text-3xl md:text-4xl lg:text-[2.75rem] font-extrabold leading-tight mb-3 sm:mb-4"
+              style={{ color: PRIMARY }}
+            >
+              Leadership that drives{" "}
+              <span style={{ color: ACCENT }}>innovation</span>
+            </h1>
+            <p
+              className="text-xs sm:text-sm md:text-base leading-relaxed"
+              style={{ color: PRIMARY, opacity: 0.75 }}
+            >
+              Our leadership team brings decades of combined expertise in
+              renewable energy, finance, and technology to guide Big Bull
+              Energies toward a sustainable future.
+            </p>
           </div>
-        </div>
+        </SectionWrap>
       </section>
 
-      {/* Leadership Team Section */}
+      {/* Our Leadership */}
       <section className="relative w-full bg-white py-12 sm:py-16 md:py-20 lg:py-24">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="max-w-7xl mx-auto">
-            {/* Section Header */}
-            <div className="text-center mb-8 sm:mb-10 md:mb-12 lg:mb-16 px-2">
-              <div className="flex items-center justify-center gap-2 sm:gap-3 mb-4 sm:mb-6">
-                <div
-                  className="h-px w-8 sm:w-12"
-                  style={{ backgroundColor: "#05627C" }}
-                ></div>
-                <span
-                  className="text-xs font-medium uppercase tracking-wide"
-                  style={{ color: "#05627C" }}
-                >
-                  OUR LEADERSHIP
-                </span>
-              </div>
-              <h2
-                className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-normal leading-tight mb-4 sm:mb-6 px-2"
-                style={{
-                  color: "#05627C",
-                  fontFamily: "var(--font-font4), sans-serif",
-                }}
+        <SectionWrap>
+          <div className="text-center mb-10 sm:mb-12 md:mb-16">
+            <div className="flex justify-center mb-4 sm:mb-5">
+              <GoldTag>Our Leadership</GoldTag>
+            </div>
+            <h2
+              className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4 sm:mb-5"
+              style={{ color: PRIMARY }}
+            >
+              Unified by our vision. Led by our experience.
+            </h2>
+            <p
+              className="text-sm sm:text-base leading-relaxed max-w-2xl mx-auto"
+              style={{ color: "#64748b" }}
+            >
+              Our leadership team brings decades of combined experience in
+              renewable energy, finance, and technology to drive Big Bull
+              Energies&apos; mission forward.
+            </p>
+          </div>
+
+          {/* Row 1 — 3 cards */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6 lg:gap-8 mb-5 sm:mb-6 lg:mb-8">
+            {topRow.map((leader) => (
+              <LeaderCard key={leader.id} leader={leader} />
+            ))}
+          </div>
+
+          {/* Row 2 — 2 cards centered */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-5 sm:gap-6 lg:gap-8">
+            {bottomRow.map((leader, i) => (
+              <div
+                key={leader.id}
+                className={`lg:col-span-2 ${i === 0 ? "lg:col-start-2" : "lg:col-start-4"}`}
               >
-                Unified by our vision. Led by our experience.
+                <LeaderCard leader={leader} />
+              </div>
+            ))}
+          </div>
+        </SectionWrap>
+      </section>
+
+      <OurValuesSection />
+
+      {/* Our Mission */}
+      <section className="relative w-full bg-white py-12 sm:py-16 md:py-20 lg:py-24">
+        <SectionWrap>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-14 items-center">
+            <div>
+              <GoldTag>Our Mission</GoldTag>
+              <h2
+                className="text-2xl sm:text-3xl md:text-4xl font-bold leading-snug mb-4 sm:mb-5"
+                style={{ color: PRIMARY }}
+              >
+                We make good{" "}
+                <span style={{ color: ACCENT }}>things happen.</span>
               </h2>
               <p
-                className="text-sm sm:text-base md:text-lg lg:text-xl leading-relaxed max-w-3xl mx-auto px-2"
-                style={{
-                  color: "#05627C",
-                  fontFamily: "var(--font-font4), sans-serif",
-                }}
+                className="text-sm sm:text-base leading-relaxed mb-6 sm:mb-8 max-w-lg"
+                style={{ color: "#64748b" }}
               >
-                Our leadership team brings decades of combined experience in
-                renewable energy, finance, and technology to drive Big Bull
-                Bankers&apos; mission forward.
+                As a leading energy developer, we demonstrate our commitment to
+                building relationships with the communities, customers, and
+                partners with which we work. We encourage our employees to give
+                back to their communities through volunteer time off.
               </p>
-            </div>
-
-            {/* Leaders Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 lg:gap-12">
-              {leaders.map((leader) => (
-                <div
-                  key={leader.id}
-                  className="flex flex-col bg-white overflow-hidden border border-gray-200"
-                >
-                  {/* Leader Image */}
-                  <div className="relative w-full h-[300px] sm:h-[350px] md:h-[400px] lg:h-[450px] xl:h-[500px] overflow-hidden">
-                    <Image
-                      src={leader.image}
-                      alt={leader.name}
-                      fill
-                      className="object-cover"
-                    />
-                    {/* Green Banner Overlay */}
-                    <div
-                      className="absolute top-2 sm:top-3 md:top-4 left-2 sm:left-3 md:left-4 px-2 sm:px-3 py-1"
-                      style={{ backgroundColor: "#05627C" }}
-                    >
-                      <span className="text-xs font-medium uppercase tracking-wide text-white">
-                        LEADERSHIP
-                      </span>
-                    </div>
-                    {/* Large Text Overlay */}
-                    <div className="absolute bottom-4 sm:bottom-6 md:bottom-8 left-2 sm:left-3 md:left-4 right-2 sm:right-3 md:right-4">
-                      <h3
-                        className="text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold text-white leading-tight mb-1 sm:mb-2"
-                        style={{
-                          fontFamily: "var(--font-font4), sans-serif",
-                          textShadow: "2px 2px 4px rgba(0,0,0,0.5)",
-                        }}
-                      >
-                        {leader.name.split(" ")[0]}
-                      </h3>
-                      <p
-                        className="text-base sm:text-lg md:text-xl lg:text-2xl font-medium text-white"
-                        style={{
-                          fontFamily: "var(--font-font4), sans-serif",
-                          textShadow: "2px 2px 4px rgba(0,0,0,0.5)",
-                        }}
-                      >
-                        {leader.name.split(" ").slice(1).join(" ")}
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Leader Info */}
-                  <div className="p-4 sm:p-6 md:p-8 flex-1 flex flex-col bg-white">
-                    <h4
-                      className="text-lg sm:text-xl md:text-2xl font-bold mb-3 sm:mb-4"
-                      style={{ color: "#05627C" }}
-                    >
-                      {leader.title}
-                    </h4>
-                    <p
-                      className="text-sm sm:text-base leading-relaxed mb-4 sm:mb-6 flex-1"
-                      style={{
-                        color: "#05627C",
-                        fontFamily: "var(--font-font4), sans-serif",
-                      }}
-                    >
-                      {leader.description}
-                    </p>
-                    {/* Yellow Read Button - Only for CEO and RM */}
-                    {leader.facebookUrl && (
-                      <div className="flex items-center gap-2 sm:gap-3">
-                        <a
-                          href={leader.facebookUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center transition hover:scale-110 flex-shrink-0"
-                          style={{ backgroundColor: "#ffcf0B" }}
-                          aria-label={`View ${leader.name}'s Facebook Profile`}
-                        >
-                          <ArrowRight className="w-5 h-5 sm:w-6 sm:h-6 text-gray-900" />
-                        </a>
-                        <a
-                          href={leader.facebookUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-xs sm:text-sm font-medium uppercase tracking-wide transition hover:opacity-70"
-                          style={{ color: "#05627C" }}
-                        >
-                          VIEW PROFILE
-                        </a>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Diversity & Inclusion Section */}
-      <section className="relative w-full py-12 sm:py-16 md:py-20 lg:py-24 overflow-hidden">
-        <div
-          className="absolute inset-0"
-          style={{ backgroundColor: "#05627C" }}
-        >
-          {/* Curved Lines Pattern */}
-          <svg
-            className="absolute inset-0 w-full h-full opacity-20"
-            viewBox="0 0 1200 600"
-            preserveAspectRatio="none"
-          >
-            <path
-              d="M0,100 Q300,50 600,100 T1200,100"
-              stroke="#E8F5F0"
-              strokeWidth="2"
-              fill="none"
-            />
-            <path
-              d="M0,200 Q300,150 600,200 T1200,200"
-              stroke="#E8F5F0"
-              strokeWidth="2"
-              fill="none"
-            />
-            <path
-              d="M0,300 Q300,250 600,300 T1200,300"
-              stroke="#E8F5F0"
-              strokeWidth="2"
-              fill="none"
-            />
-            <path
-              d="M0,400 Q300,350 600,400 T1200,400"
-              stroke="#E8F5F0"
-              strokeWidth="2"
-              fill="none"
-            />
-            <path
-              d="M0,500 Q300,450 600,500 T1200,500"
-              stroke="#E8F5F0"
-              strokeWidth="2"
-              fill="none"
-            />
-          </svg>
-        </div>
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <div className="max-w-5xl mx-auto text-center px-2">
-            <p
-              className="text-lg sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl 2xl:text-5xl leading-relaxed mb-6 sm:mb-8"
-              style={{
-                color: "#ffffff",
-                fontFamily: "var(--font-font4), sans-serif",
-              }}
-            >
-              We believe that our colleagues power Big Bull Energies&apos;
-              success and our innovative solutions are generated by the
-              diversity of ideas and perspectives that are shared by employees
-              who bring their whole self to work.
-            </p>
-            <p
-              className="text-base sm:text-lg md:text-xl lg:text-2xl leading-relaxed"
-              style={{
-                color: "#ffffff",
-                fontFamily: "var(--font-font4), sans-serif",
-              }}
-            >
-              Fostering an environment where diverse perspectives are sought and
-              everyone feels included enables our employees to grow to their
-              full potential.
-            </p>
-          </div>
-        </div>
-      </section>
-
-      {/* Execution Section */}
-      <section className="relative w-full bg-white py-12 sm:py-16 md:py-20 lg:py-24">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="max-w-7xl mx-auto">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-10 md:gap-12 lg:gap-16 items-center">
-              {/* Left Side - Heading and Main Statement */}
-              <div className="flex flex-col order-2 lg:order-1">
-                <span
-                  className="text-xs font-medium uppercase tracking-wide mb-4 sm:mb-6"
-                  style={{ color: "#05627C" }}
-                >
-                  EXECUTION
+              <Link
+                href="/contact"
+                className="inline-flex items-center gap-3 font-bold pl-6 pr-2 py-2.5 text-xs uppercase tracking-wide rounded-full transition hover:brightness-105"
+                style={{ backgroundColor: GOLD, color: "#1a1a1a" }}
+              >
+                Get In Touch
+                <span className="w-10 h-10 rounded-full flex items-center justify-center bg-white shadow-md">
+                  <ArrowRight className="w-4 h-4" style={{ color: PRIMARY }} />
                 </span>
-                <h2
-                  className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl 2xl:text-7xl font-normal leading-tight"
-                  style={{
-                    color: "#05627C",
-                    fontFamily: "var(--font-font4), sans-serif",
-                  }}
-                >
-                  We make good things happen.
-                </h2>
-              </div>
+              </Link>
+            </div>
 
-              {/* Right Side - Description */}
-              <div className="flex flex-col order-1 lg:order-2">
-                <p
-                  className="text-sm sm:text-base md:text-lg lg:text-xl leading-relaxed"
-                  style={{
-                    color: "#05627C",
-                    fontFamily: "var(--font-font4), sans-serif",
-                  }}
-                >
-                  As a leading energy developer, we demonstrate our commitment
-                  to building relationships with the communities, customers and
-                  partners with which we work. To further enhance this
-                  commitment, we also encourage our employees to give back to
-                  their communities through their volunteer time off.
-                </p>
-              </div>
+            <div className="relative w-full aspect-[4/3] sm:aspect-[16/11] rounded-2xl sm:rounded-3xl overflow-hidden shadow-[0_20px_60px_rgba(5,98,124,0.15)]">
+              <Image
+                src="/images/leadership-cta.png"
+                alt="Renewable energy 3D illustration"
+                fill
+                className="object-cover"
+                sizes="(max-width: 1024px) 100vw, 560px"
+              />
             </div>
           </div>
-        </div>
-      </section>
-
-      {/* Employee Growth Section */}
-      {/* <section className="relative w-full h-[50vh] sm:h-[60vh] md:h-[70vh] lg:h-[80vh] xl:h-screen bg-[#E8F5F0] overflow-hidden">
-        <Image
-          src="/employ-chart.png"
-          alt="Employee Growth Chart"
-          fill
-          className="object-contain sm:object-cover"
-          priority
-        />
-      </section> */}
-
-      {/* CTA Section */}
-      <section className="relative w-full bg-white py-12 sm:py-16 md:py-20 lg:py-24">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col items-center justify-center text-center px-2">
-            <h2
-              className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-normal mb-6 sm:mb-8"
-              style={{
-                color: "#05627C",
-                fontFamily: "var(--font-font4), sans-serif",
-              }}
-            >
-              Join our mission to transform energy and finance.
-            </h2>
-            <Link
-              href="/contact"
-              className="inline-block bg-[#ffcf0B] text-gray-900 font-bold px-6 sm:px-8 lg:px-12 py-3 sm:py-4 lg:py-5 text-xs sm:text-sm md:text-base uppercase tracking-wide transition hover:opacity-90 w-full sm:w-auto text-center"
-              style={{ borderRadius: "0" }}
-            >
-              GET IN TOUCH
-            </Link>
-          </div>
-        </div>
+        </SectionWrap>
       </section>
 
       <Footer />
     </main>
+  );
+}
+
+function LeaderCard({
+  leader,
+}: {
+  leader: (typeof leaders)[0];
+}) {
+  return (
+    <div className="flex flex-col rounded-2xl sm:rounded-3xl overflow-hidden bg-white shadow-[0_8px_30px_rgba(5,98,124,0.1)] border border-slate-100 h-full">
+      {/* Photo with gradient backdrop */}
+      <div className="relative h-[260px] sm:h-[280px] md:h-[300px] overflow-hidden">
+        <div
+          className="absolute inset-0"
+          style={{
+            background: "linear-gradient(180deg, #c8e8f2 0%, #e8f5f0 55%, #ffffff 100%)",
+          }}
+        />
+        <Image
+          src={leader.image}
+          alt={leader.name}
+          fill
+          className="object-cover object-top"
+          sizes="(max-width: 768px) 100vw, 380px"
+        />
+      </div>
+
+      {/* Info */}
+      <div className="p-5 sm:p-6 flex flex-col flex-1 relative">
+        <h3
+          className="text-lg sm:text-xl font-bold mb-1"
+          style={{ color: PRIMARY }}
+        >
+          {leader.name}
+        </h3>
+        <p
+          className="text-xs sm:text-sm font-semibold mb-3 sm:mb-4"
+          style={{ color: ACCENT }}
+        >
+          {leader.title}
+        </p>
+        <p
+          className="text-xs sm:text-sm leading-relaxed flex-1 mb-4"
+          style={{ color: "#64748b" }}
+        >
+          {leader.description}
+        </p>
+        <Link
+          href="/contact"
+          className="self-end w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center transition hover:scale-105"
+          style={{ backgroundColor: ACCENT }}
+          aria-label={`Contact ${leader.name}`}
+        >
+          <ArrowRight className="w-4 h-4 text-white" />
+        </Link>
+      </div>
+    </div>
   );
 }

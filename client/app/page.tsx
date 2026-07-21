@@ -18,7 +18,7 @@ export default function Home() {
       <HeroSection />
       <ExpertiseSection />
       <TechnologiesMarquee />
-      <EnergyTechnologiesSection />
+      {/* <EnergyTechnologiesSection /> */}
       <ProjectsSection />
       <TestimonialMarquee />
       {/* <ImpactSection /> */}

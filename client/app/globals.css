@@ -435,45 +435,101 @@ select:-webkit-autofill {
   }
 }
 
+@keyframes values-orbit-spin-outer {
+  from {
+    transform: rotateX(70deg) rotateZ(0deg);
+    opacity: 0.22;
+  }
+  50% {
+    opacity: 0.4;
+  }
+  to {
+    transform: rotateX(70deg) rotateZ(360deg);
+    opacity: 0.22;
+  }
+}
+
 @keyframes values-orbit-spin-slow {
   from {
-    transform: translate(-50%, -50%) rotateX(68deg) rotateZ(0deg);
+    transform: rotateX(68deg) rotateZ(0deg);
     opacity: 0.25;
   }
   50% {
     opacity: 0.45;
   }
   to {
-    transform: translate(-50%, -50%) rotateX(68deg) rotateZ(360deg);
+    transform: rotateX(68deg) rotateZ(360deg);
     opacity: 0.25;
+  }
+}
+
+@keyframes values-orbit-spin-wide {
+  from {
+    transform: rotateX(74deg) rotateZ(45deg);
+    opacity: 0.2;
+  }
+  50% {
+    opacity: 0.38;
+  }
+  to {
+    transform: rotateX(74deg) rotateZ(405deg);
+    opacity: 0.2;
   }
 }
 
 @keyframes values-orbit-spin-mid {
   from {
-    transform: translate(-50%, -50%) rotateX(72deg) rotateZ(60deg);
+    transform: rotateX(72deg) rotateZ(60deg);
     opacity: 0.2;
   }
   50% {
     opacity: 0.35;
   }
   to {
-    transform: translate(-50%, -50%) rotateX(72deg) rotateZ(420deg);
+    transform: rotateX(72deg) rotateZ(420deg);
     opacity: 0.2;
   }
 }
 
 @keyframes values-orbit-spin-fast {
   from {
-    transform: translate(-50%, -50%) rotateX(64deg) rotateZ(120deg);
+    transform: rotateX(64deg) rotateZ(120deg);
     opacity: 0.3;
   }
   50% {
     opacity: 0.5;
   }
   to {
-    transform: translate(-50%, -50%) rotateX(64deg) rotateZ(480deg);
+    transform: rotateX(64deg) rotateZ(480deg);
     opacity: 0.3;
+  }
+}
+
+@keyframes values-orbit-spin-inner {
+  from {
+    transform: rotateX(62deg) rotateZ(30deg);
+    opacity: 0.28;
+  }
+  50% {
+    opacity: 0.48;
+  }
+  to {
+    transform: rotateX(62deg) rotateZ(390deg);
+    opacity: 0.28;
+  }
+}
+
+@keyframes values-orbit-spin-tight {
+  from {
+    transform: rotateX(60deg) rotateZ(150deg);
+    opacity: 0.32;
+  }
+  50% {
+    opacity: 0.52;
+  }
+  to {
+    transform: rotateX(60deg) rotateZ(510deg);
+    opacity: 0.32;
   }
 }
 
@@ -490,11 +546,11 @@ select:-webkit-autofill {
   0%,
   100% {
     opacity: 0.6;
-    transform: translate(-50%, -50%) scale(1);
+    transform: scale(1);
   }
   50% {
     opacity: 1;
-    transform: translate(-50%, -50%) scale(1.08);
+    transform: scale(1.08);
   }
 }
 
@@ -532,8 +588,27 @@ select:-webkit-autofill {
   animation: values-globe-float 7s ease-in-out infinite;
 }
 
+.values-orbit-outer,
+.values-orbit-slow,
+.values-orbit-wide,
+.values-orbit-mid,
+.values-orbit-fast,
+.values-orbit-inner,
+.values-orbit-tight {
+  transform-style: preserve-3d;
+  transform-origin: center center;
+}
+
+.values-orbit-outer {
+  animation: values-orbit-spin-outer 32s linear infinite;
+}
+
 .values-orbit-slow {
   animation: values-orbit-spin-slow 28s linear infinite;
+}
+
+.values-orbit-wide {
+  animation: values-orbit-spin-wide 24s linear infinite reverse;
 }
 
 .values-orbit-mid {
@@ -542,6 +617,14 @@ select:-webkit-autofill {
 
 .values-orbit-fast {
   animation: values-orbit-spin-fast 14s linear infinite;
+}
+
+.values-orbit-inner {
+  animation: values-orbit-spin-inner 18s linear infinite reverse;
+}
+
+.values-orbit-tight {
+  animation: values-orbit-spin-tight 12s linear infinite;
 }
 
 .values-particle-orbit {
@@ -568,9 +651,13 @@ select:-webkit-autofill {
 
 @media (prefers-reduced-motion: reduce) {
   .values-globe-float,
+  .values-orbit-outer,
   .values-orbit-slow,
+  .values-orbit-wide,
   .values-orbit-mid,
   .values-orbit-fast,
+  .values-orbit-inner,
+  .values-orbit-tight,
   .values-particle-orbit,
   .values-glow-pulse,
   .values-platform-pulse,

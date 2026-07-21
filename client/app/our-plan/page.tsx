@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import {
   DollarSign,
@@ -9,13 +10,42 @@ import {
   TrendingUp,
   Percent,
   Award,
+  Calculator,
+  Zap,
+  ShieldCheck,
+  Wallet,
 } from "lucide-react";
 import Footer from "@/components/Footer";
+
+const FONT_STACK =
+  "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif";
+const PRIMARY = "#05627C";
+const ACCENT = "#3FA9C8";
+const GOLD = "#F5CF0B";
+const MINT = "#E8F5F0";
 
 export default function OurPlanPage() {
   const [investmentAmount, setInvestmentAmount] = useState<string>("435");
   const [calculatedResults, setCalculatedResults] = useState<any>(null);
   const [activeTab, setActiveTab] = useState<string>("roi");
+  const [roadmapRevealed, setRoadmapRevealed] = useState(false);
+  const roadmapRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const el = roadmapRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setRoadmapRevealed(true);
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.2 },
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
 
   const investmentPlans = [
     {
@@ -103,227 +133,197 @@ export default function OurPlanPage() {
     });
   };
 
+  const tabs = [
+    { id: "roi", label: "Daily ROI", icon: TrendingUp },
+    { id: "referral", label: "Referral Income", icon: Users },
+    { id: "binary", label: "Binary Income", icon: Network },
+    { id: "principal", label: "Principal Return", icon: DollarSign },
+  ];
+
+  const roadmap = [
+    {
+      year: "2022",
+      icon: Award,
+      title: "A Dream Takes Shape",
+      desc: "Conceptualized Big Bull Energies as a bridge between renewable energy and financial solutions.",
+    },
+    {
+      year: "2023",
+      icon: Zap,
+      title: "Laying the Foundation",
+      desc: "Registered our website domain. Broke ground on our first solar plant.",
+    },
+    {
+      year: "2024",
+      icon: TrendingUp,
+      title: "A Year of Transformation",
+      desc: "Completed first solar plant. Registered in New Zealand and the UK.",
+    },
+    {
+      year: "2025",
+      icon: Network,
+      title: "Global Expansion",
+      desc: "Opened second plant in Groningen, Netherlands. Hosting global events.",
+    },
+    {
+      year: "2026",
+      icon: ShieldCheck,
+      title: "Pioneering the Future",
+      desc: "Begin manufacturing EV and solar components. Expansion to 30+ countries.",
+    },
+    {
+      year: "2027",
+      icon: Wallet,
+      title: "Smart Tech & Clean Mobility",
+      desc: "Deploy AI-powered energy tracking. Launch EV Charging Stations.",
+    },
+    {
+      year: "2028",
+      icon: Award,
+      title: "Global Leader",
+      desc: "Operate 100+ solar plants worldwide. Fully integrated smart grids.",
+    },
+  ];
+
   return (
-    <main className="min-h-screen w-full overflow-x-hidden pt-24 sm:pt-28 md:pt-32 lg:pt-[126px]">
-      {/* Hero Section */}
-      <section className="relative w-full bg-[#E8F5F0] py-12 sm:py-16 md:py-20 lg:py-24">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="max-w-4xl mx-auto text-center">
-            <div className="flex items-center justify-center gap-2 sm:gap-3 mb-4 sm:mb-6">
-              <div
-                className="h-px w-8 sm:w-12"
-                style={{ backgroundColor: "#05627C" }}
-              ></div>
-              <span
-                className="text-xs font-medium uppercase tracking-wide"
-                style={{ color: "#05627C" }}
+    <main
+      className="min-h-screen w-full overflow-x-hidden pt-24 sm:pt-28 md:pt-32 lg:pt-[126px]"
+      style={{ fontFamily: FONT_STACK }}
+    >
+      {/* Hero Section — full-bleed background image */}
+      <section className="relative w-full overflow-hidden min-h-[380px] sm:min-h-[420px] md:min-h-[460px] lg:min-h-[480px] flex items-center">
+        {/* Background image - place your local image at /public/images/plan-hero.png */}
+        <Image
+          src="/images/plan-hero.png"
+          alt="Solar panels and wind turbines landscape"
+          fill
+          priority
+          className="object-cover"
+        />
+        {/* Mobile overlay: strong, mostly-solid fade so text stays readable on narrow screens */}
+        <div
+          className="absolute inset-0 sm:hidden"
+          style={{
+            background:
+              "linear-gradient(180deg, rgba(232,245,240,0.95) 0%, rgba(232,245,240,0.9) 55%, rgba(232,245,240,0.55) 100%)",
+          }}
+        />
+        {/* Desktop/tablet overlay: left-to-right fade */}
+        <div
+          className="absolute inset-0 hidden sm:block"
+          style={{
+            background:
+              "linear-gradient(90deg, rgba(232,245,240,0.97) 0%, rgba(232,245,240,0.9) 35%, rgba(232,245,240,0.45) 58%, rgba(232,245,240,0.05) 78%, rgba(232,245,240,0) 95%)",
+          }}
+        />
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full">
+          <div className="max-w-7xl mx-auto">
+            <div className="max-w-xl">
+              <div className="flex items-center gap-2 sm:gap-3 mb-3 sm:mb-4">
+                <div className="h-px w-8 sm:w-10" style={{ backgroundColor: GOLD }} />
+                <span
+                  className="text-[10px] sm:text-xs font-bold uppercase tracking-widest"
+                  style={{ color: PRIMARY }}
+                >
+                  Invest With Us
+                </span>
+              </div>
+              <h1
+                className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold leading-tight mb-3 sm:mb-4"
+                style={{ color: PRIMARY }}
               >
-                OUR PLAN
-              </span>
+                Investment Packages <br className="hidden sm:block" />
+                and <span style={{ color: ACCENT }}>Return</span>
+              </h1>
+              <p
+                className="text-xs sm:text-sm md:text-base lg:text-lg leading-relaxed"
+                style={{ color: PRIMARY, opacity: 0.75 }}
+              >
+                Explore our flexible investment packages designed for
+                sustainable growth and maximum returns.
+              </p>
             </div>
-            <h1
-              className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl 2xl:text-7xl font-normal leading-tight mb-4 sm:mb-6 px-2"
-              style={{
-                color: "#05627C",
-                fontFamily: "var(--font-font4), sans-serif",
-              }}
-            >
-              Investment Packages and Return
-            </h1>
-            <p
-              className="text-sm sm:text-base md:text-lg lg:text-xl leading-relaxed max-w-2xl mx-auto px-2"
-              style={{
-                color: "#05627C",
-                fontFamily: "var(--font-font4), sans-serif",
-              }}
-            >
-              Explore our official plans designed for maximum growth and
-              sustainable returns based on your investment capacity.
-            </p>
           </div>
         </div>
       </section>
 
       {/* Investment Plans Section */}
-      <section className="relative w-full bg-white py-12 sm:py-16 md:py-20 lg:py-24">
+      <section className="relative w-full bg-white py-10 sm:py-12 md:py-16 lg:py-20">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-7xl mx-auto">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 lg:gap-12">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5 sm:gap-6 lg:gap-8">
               {investmentPlans.map((plan) => (
                 <div
                   key={plan.id}
-                  className="bg-white p-6 sm:p-8 md:p-10 border-2 transition-all hover:shadow-xl"
-                  style={{ borderColor: "#05627C" }}
+                  className="bg-white rounded-2xl p-5 sm:p-6 md:p-7 border transition-all hover:shadow-xl"
+                  style={{ borderColor: "rgba(5,98,124,0.18)" }}
                 >
-                  {/* Plan Name */}
-                  <h3
-                    className="text-xl sm:text-2xl md:text-3xl font-bold mb-4 sm:mb-6 text-center"
-                    style={{ color: "#05627C" }}
-                  >
-                    {plan.name}
-                  </h3>
-
-                  {/* Investment Range */}
-                  <div className="text-center mb-4 sm:mb-6">
-                    <p
-                      className="text-sm sm:text-base md:text-lg lg:text-xl font-semibold"
-                      style={{ color: "#05627C" }}
-                    >
-                      Amount Range:
-                    </p>
-                    <p
-                      className="text-base sm:text-lg md:text-xl font-bold mt-1"
-                      style={{ color: "#05627C" }}
-                    >
-                      {plan.minAmount} – {plan.maxAmount}
-                    </p>
-                  </div>
-
-                  {/* Plan Details */}
-                  <div className="space-y-3 sm:space-y-4 mb-6 sm:mb-8">
+                  <div className="flex items-center gap-3 mb-4">
                     <div
-                      className="flex justify-between items-center border-b pb-2"
-                      style={{ borderColor: "#000000" }}
+                      className="w-10 h-10 sm:w-11 sm:h-11 rounded-full flex items-center justify-center flex-shrink-0"
+                      style={{ backgroundColor: MINT }}
                     >
-                      <span
-                        className="text-xs sm:text-sm md:text-base font-medium"
-                        style={{ color: "#000000" }}
-                      >
-                        Daily ROI:
-                      </span>
-                      <span
-                        className="text-sm sm:text-base md:text-lg font-bold"
-                        style={{ color: "#000000" }}
-                      >
-                        {plan.roi}
-                      </span>
+                      <Network className="w-4 h-4 sm:w-5 sm:h-5" style={{ color: PRIMARY }} />
                     </div>
-                    <div
-                      className="flex justify-between items-center border-b pb-2"
-                      style={{ borderColor: "#05627C" }}
-                    >
-                      <span
-                        className="text-xs sm:text-sm md:text-base font-medium"
-                        style={{ color: "#000000" }}
+                    <div className="min-w-0">
+                      <h3
+                        className="text-base sm:text-lg md:text-xl font-bold truncate"
+                        style={{ color: PRIMARY }}
                       >
-                        Duration:
-                      </span>
-                      <span
-                        className="text-sm sm:text-base md:text-lg font-bold"
-                        style={{ color: "#000000" }}
+                        {plan.name}
+                      </h3>
+                      <p className="text-xs" style={{ color: PRIMARY, opacity: 0.6 }}>
+                        Amount Range:
+                      </p>
+                      <p
+                        className="text-xs sm:text-sm font-semibold"
+                        style={{ color: ACCENT }}
                       >
-                        {plan.bondDays}
-                      </span>
-                    </div>
-                    <div
-                      className="flex justify-between items-center border-b pb-2"
-                      style={{ borderColor: "#05627C" }}
-                    >
-                      <span
-                        className="text-xs sm:text-sm md:text-base font-medium"
-                        style={{ color: "#000000" }}
-                      >
-                        Referral Income:
-                      </span>
-                      <span
-                        className="text-sm sm:text-base md:text-lg font-bold"
-                        style={{ color: "#000000" }}
-                      >
-                        {plan.referral}
-                      </span>
-                    </div>
-                    <div
-                      className="flex justify-between items-center border-b pb-2"
-                      style={{ borderColor: "#05627C" }}
-                    >
-                      <span
-                        className="text-xs sm:text-sm md:text-base font-medium"
-                        style={{ color: "#000000" }}
-                      >
-                        Binary Income:
-                      </span>
-                      <span
-                        className="text-sm sm:text-base md:text-lg font-bold"
-                        style={{ color: "#000000" }}
-                      >
-                        {plan.binary}
-                      </span>
-                    </div>
-                    <div
-                      className="flex justify-between items-center border-b pb-2"
-                      style={{ borderColor: "#05627C" }}
-                    >
-                      <span
-                        className="text-xs sm:text-sm md:text-base font-medium"
-                        style={{ color: "#000000" }}
-                      >
-                        Binary Capping:
-                      </span>
-                      <span
-                        className="text-sm sm:text-base md:text-lg font-bold"
-                        style={{ color: "#05627C" }}
-                      >
-                        {plan.binaryCapping}
-                      </span>
-                    </div>
-                    <div
-                      className="flex justify-between items-center border-b pb-2"
-                      style={{ borderColor: "#05627C" }}
-                    >
-                      <span
-                        className="text-xs sm:text-sm md:text-base font-medium"
-                        style={{ color: "#000000" }}
-                      >
-                        Principal Return:
-                      </span>
-                      <span
-                        className="text-sm sm:text-base md:text-lg font-bold"
-                        style={{ color: "#05627C" }}
-                      >
-                        {plan.principalReturn}
-                      </span>
-                    </div>
-                    <div
-                      className="flex justify-between items-center border-b pb-2"
-                      style={{ borderColor: "#05627C" }}
-                    >
-                      <span
-                        className="text-xs sm:text-sm md:text-base font-medium"
-                        style={{ color: "#000000" }}
-                      >
-                        Total ROI Returns:
-                      </span>
-                      <span
-                        className="text-sm sm:text-base md:text-lg font-bold"
-                        style={{ color: "#05627C" }}
-                      >
-                        {plan.totalROIReturns}
-                      </span>
-                    </div>
-                    <div
-                      className="flex justify-between items-center pb-2"
-                      style={{ borderColor: "#05627C" }}
-                    >
-                      <span
-                        className="text-xs sm:text-sm md:text-base font-medium"
-                        style={{ color: "#000000" }}
-                      >
-                        Total Returns:
-                      </span>
-                      <span
-                        className="text-sm sm:text-base md:text-lg font-bold"
-                        style={{ color: "#05627C" }}
-                      >
-                        {plan.totalReturns}
-                      </span>
+                        {plan.minAmount} – {plan.maxAmount}
+                      </p>
                     </div>
                   </div>
 
-                  {/* Invest Now Button */}
+                  <div className="space-y-0 mb-6">
+                    {[
+                      ["Daily ROI:", plan.roi],
+                      ["Duration:", plan.bondDays],
+                      ["Referral Income:", plan.referral],
+                      ["Binary Income:", plan.binary],
+                      ["Binary Cap (Pair):", plan.binaryCapping],
+                      ["Payout (Wallet):", plan.principalReturn],
+                      ["Total ROI Return:", plan.totalROIReturns],
+                      ["Total Rebate:", plan.totalReturns],
+                    ].map(([label, value], i) => (
+                      <div
+                        key={label}
+                        className="flex justify-between items-center gap-2 py-2.5"
+                        style={
+                          i < 7
+                            ? { borderBottom: "1px solid rgba(5,98,124,0.1)" }
+                            : undefined
+                        }
+                      >
+                        <span
+                          className="text-xs sm:text-sm font-medium"
+                          style={{ color: PRIMARY, opacity: 0.65 }}
+                        >
+                          {label}
+                        </span>
+                        <span
+                          className="text-xs sm:text-sm font-bold whitespace-nowrap"
+                          style={{ color: PRIMARY }}
+                        >
+                          {value}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+
                   <Link
                     href="/contact"
-                    className="block w-full text-center bg-[#ffcf0B] text-gray-900 font-bold px-6 py-4 text-sm md:text-base uppercase tracking-wide transition hover:opacity-90"
-                    style={{ borderRadius: "0" }}
+                    className="block w-full text-center font-bold px-6 py-3.5 text-xs sm:text-sm rounded-lg uppercase tracking-wide transition hover:opacity-90"
+                    style={{ backgroundColor: GOLD, color: "#1a1a1a" }}
                   >
                     Invest Now
                   </Link>
@@ -334,232 +334,129 @@ export default function OurPlanPage() {
         </div>
       </section>
 
-      {/* Investment Calculator Section */}
-      <section className="relative w-full bg-[#E8F5F0] py-12 sm:py-16 md:py-20 lg:py-24">
+      {/* Investment Calculator Section — horizontal card */}
+      <section className="relative w-full bg-white pb-10 sm:pb-12 md:pb-16 lg:pb-20">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="max-w-4xl mx-auto">
-            <h2
-              className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-6 sm:mb-8 text-center"
-              style={{ color: "#05627C" }}
-            >
-              Investment Calculator
-            </h2>
+          <div className="max-w-7xl mx-auto">
             <div
-              className="bg-white rounded-lg p-6 sm:p-8 md:p-10 shadow-lg border-2"
-              style={{ borderColor: "#05627C" }}
+              className="relative rounded-2xl p-5 sm:p-6 md:p-8 lg:p-10 overflow-hidden"
+              style={{ backgroundColor: MINT }}
             >
-              {/* Input Section */}
-              <div className="mb-8">
-                <label
-                  className="block text-base md:text-lg font-semibold mb-3"
-                  style={{ color: "#05627C" }}
-                >
-                  Amount ($25 minimum)
-                </label>
-                <div className="relative">
-                  <div className="absolute left-4 top-1/2 transform -translate-y-1/2">
-                    <DollarSign
-                      className="w-5 h-5"
-                      style={{ color: "#05627C" }}
-                    />
+              {/* decorative dot grid */}
+              <div
+                className="absolute top-6 right-6 w-24 h-24 pointer-events-none hidden md:block"
+                style={{
+                  backgroundImage:
+                    "radial-gradient(circle, rgba(5,98,124,0.18) 1.5px, transparent 1.5px)",
+                  backgroundSize: "12px 12px",
+                }}
+              />
+              <div className="relative flex flex-col lg:flex-row lg:items-center gap-5 sm:gap-6 lg:gap-10">
+                <div className="flex items-center gap-3 sm:gap-4 lg:flex-shrink-0">
+                  <div
+                    className="w-12 h-12 sm:w-14 sm:h-14 rounded-full flex items-center justify-center flex-shrink-0"
+                    style={{ backgroundColor: PRIMARY }}
+                  >
+                    <Calculator className="w-6 h-6 sm:w-7 sm:h-7 text-white" />
                   </div>
-                  <input
-                    type="number"
-                    value={investmentAmount}
-                    onChange={(e) => setInvestmentAmount(e.target.value)}
-                    min="25"
-                    className="w-full pl-12 pr-4 py-4 border-2 text-lg font-semibold"
-                    style={{
-                      borderColor: "#05627C",
-                      color: "#05627C",
-                      backgroundColor: "#ffffff",
-                      borderRadius: "0",
-                    }}
-                    placeholder="Enter amount"
-                  />
+                  <h2
+                    className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold"
+                    style={{ color: PRIMARY }}
+                  >
+                    Investment
+                    <br className="hidden sm:block" /> Calculator
+                  </h2>
+                </div>
+
+                <div className="flex-1 flex flex-col sm:flex-row gap-3 sm:gap-4 w-full lg:max-w-xl">
+                  <div className="flex-1">
+                    <label
+                      className="block text-xs font-bold uppercase tracking-wide mb-2"
+                      style={{ color: PRIMARY, opacity: 0.7 }}
+                    >
+                      Amount ($25 minimum)
+                    </label>
+                    <div className="relative">
+                      <DollarSign
+                        className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5"
+                        style={{ color: PRIMARY }}
+                      />
+                      <input
+                        type="number"
+                        value={investmentAmount}
+                        onChange={(e) => setInvestmentAmount(e.target.value)}
+                        min="25"
+                        className="w-full pl-10 pr-4 py-3 sm:py-3.5 rounded-lg border text-base font-semibold bg-white focus:outline-none focus:ring-2"
+                        style={
+                          {
+                            borderColor: "rgba(5,98,124,0.25)",
+                            color: PRIMARY,
+                            ["--tw-ring-color" as string]: PRIMARY,
+                          } as React.CSSProperties
+                        }
+                        placeholder="Enter amount"
+                      />
+                    </div>
+                  </div>
+                  <button
+                    onClick={calculateReturns}
+                    className="w-full sm:w-auto sm:self-end px-6 sm:px-8 py-3 sm:py-3.5 rounded-lg text-white font-bold text-xs sm:text-sm uppercase tracking-wide transition hover:opacity-90 whitespace-nowrap"
+                    style={{ backgroundColor: PRIMARY }}
+                  >
+                    Calculate Returns
+                  </button>
                 </div>
               </div>
 
-              {/* Calculate Button */}
-              <button
-                onClick={calculateReturns}
-                className="w-full py-4 text-white font-bold text-base md:text-lg uppercase tracking-wide transition hover:opacity-90 mb-8"
-                style={{
-                  backgroundColor: "#05627C",
-                  borderRadius: "0",
-                }}
-              >
-                Calculate Returns
-              </button>
-
               {/* Results Section */}
               {calculatedResults && (
-                <div className="space-y-6">
-                  {/* Plan Details */}
-                  <div
-                    className="space-y-4 pb-6 border-b-2"
-                    style={{ borderColor: "#05627C" }}
-                  >
-                    <div className="flex justify-between items-center">
-                      <span
-                        className="text-base md:text-lg font-semibold"
-                        style={{ color: "#000000" }}
-                      >
-                        Applied Plan:
-                      </span>
-                      <span
-                        className="text-base md:text-lg font-bold"
-                        style={{ color: "#05627C" }}
-                      >
-                        {calculatedResults.plan}
-                      </span>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span
-                        className="text-base md:text-lg font-semibold"
-                        style={{ color: "#000000" }}
-                      >
-                        Daily ROI:
-                      </span>
-                      <span
-                        className="text-base md:text-lg font-bold"
-                        style={{ color: "#05627C" }}
-                      >
-                        {calculatedResults.dailyROI}
-                      </span>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span
-                        className="text-base md:text-lg font-semibold"
-                        style={{ color: "#000000" }}
-                      >
-                        Bond Period:
-                      </span>
-                      <span
-                        className="text-base md:text-lg font-bold"
-                        style={{ color: "#05627C" }}
-                      >
-                        {calculatedResults.bondDays}
-                      </span>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span
-                        className="text-sm sm:text-base md:text-lg font-semibold"
-                        style={{ color: "#000000" }}
-                      >
-                        Principal Return:
-                      </span>
-                      <span
-                        className="text-sm sm:text-base md:text-lg font-bold"
-                        style={{ color: "#05627C" }}
-                      >
-                        {calculatedResults.principalReturn}
-                      </span>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span
-                        className="text-sm sm:text-base md:text-lg font-semibold"
-                        style={{ color: "#000000" }}
-                      >
-                        Total ROI Returns:
-                      </span>
-                      <span
-                        className="text-sm sm:text-base md:text-lg font-bold"
-                        style={{ color: "#05627C" }}
-                      >
-                        {calculatedResults.totalROIReturns}
-                      </span>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span
-                        className="text-sm sm:text-base md:text-lg font-semibold"
-                        style={{ color: "#000000" }}
-                      >
-                        Total Returns (ROI + Principal):
-                      </span>
-                      <span
-                        className="text-sm sm:text-base md:text-lg font-bold"
-                        style={{ color: "#05627C" }}
-                      >
-                        {calculatedResults.totalReturns}
-                      </span>
-                    </div>
+                <div
+                  className="relative mt-6 sm:mt-8 pt-6 sm:pt-8 space-y-5 sm:space-y-6"
+                  style={{ borderTop: "1px solid rgba(5,98,124,0.15)" }}
+                >
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 md:gap-x-10 gap-y-3">
+                    {[
+                      ["Applied Plan:", calculatedResults.plan],
+                      ["Daily ROI:", calculatedResults.dailyROI],
+                      ["Bond Period:", calculatedResults.bondDays],
+                      ["Principal Return:", calculatedResults.principalReturn],
+                      ["Total ROI Returns:", calculatedResults.totalROIReturns],
+                      [
+                        "Total Returns (ROI + Principal):",
+                        calculatedResults.totalReturns,
+                      ],
+                      ["Daily Return:", `$${calculatedResults.dailyReturn}`],
+                      ["ROI Profit (Total):", `$${calculatedResults.roiProfit}`],
+                      ["Principal Amount:", `$${calculatedResults.principalAmount}`],
+                      [
+                        "Principal Return Amount:",
+                        `$${calculatedResults.principalReturnAmount}`,
+                      ],
+                    ].map(([label, value]) => (
+                      <div key={label} className="flex justify-between items-center gap-2">
+                        <span
+                          className="text-xs sm:text-sm font-semibold"
+                          style={{ color: PRIMARY, opacity: 0.7 }}
+                        >
+                          {label}
+                        </span>
+                        <span className="text-xs sm:text-sm font-bold whitespace-nowrap" style={{ color: PRIMARY }}>
+                          {value}
+                        </span>
+                      </div>
+                    ))}
                   </div>
 
-                  {/* Financial Returns */}
-                  <div
-                    className="space-y-4 pb-6 border-b-2"
-                    style={{ borderColor: "#05627C" }}
-                  >
-                    <div className="flex justify-between items-center">
-                      <span
-                        className="text-sm sm:text-base md:text-lg font-semibold"
-                        style={{ color: "#000000" }}
-                      >
-                        Daily Return:
-                      </span>
-                      <span
-                        className="text-sm sm:text-base md:text-lg font-bold"
-                        style={{ color: "#05627C" }}
-                      >
-                        ${calculatedResults.dailyReturn}
-                      </span>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span
-                        className="text-sm sm:text-base md:text-lg font-semibold"
-                        style={{ color: "#000000" }}
-                      >
-                        ROI Profit (Total):
-                      </span>
-                      <span
-                        className="text-sm sm:text-base md:text-lg font-bold"
-                        style={{ color: "#05627C" }}
-                      >
-                        ${calculatedResults.roiProfit}
-                      </span>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span
-                        className="text-sm sm:text-base md:text-lg font-semibold"
-                        style={{ color: "#000000" }}
-                      >
-                        Principal Amount:
-                      </span>
-                      <span
-                        className="text-sm sm:text-base md:text-lg font-bold"
-                        style={{ color: "#05627C" }}
-                      >
-                        ${calculatedResults.principalAmount}
-                      </span>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span
-                        className="text-sm sm:text-base md:text-lg font-semibold"
-                        style={{ color: "#000000" }}
-                      >
-                        Principal Return Amount:
-                      </span>
-                      <span
-                        className="text-sm sm:text-base md:text-lg font-bold"
-                        style={{ color: "#05627C" }}
-                      >
-                        ${calculatedResults.principalReturnAmount}
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Total Return */}
-                  <div className="flex justify-between items-center pt-4 bg-[#E8F5F0] p-4 rounded-lg">
+                  <div className="flex flex-col xs:flex-row justify-between items-center gap-2 pt-4 bg-white p-4 sm:p-5 rounded-lg">
                     <span
-                      className="text-lg sm:text-xl md:text-2xl font-bold"
-                      style={{ color: "#05627C" }}
+                      className="text-base sm:text-lg md:text-xl font-bold"
+                      style={{ color: PRIMARY }}
                     >
                       Total Return:
                     </span>
                     <span
-                      className="text-xl sm:text-2xl md:text-3xl font-bold"
-                      style={{ color: "#05627C" }}
+                      className="text-lg sm:text-xl md:text-2xl font-bold"
+                      style={{ color: PRIMARY }}
                     >
                       ${calculatedResults.totalReturn}
                     </span>
@@ -571,625 +468,314 @@ export default function OurPlanPage() {
         </div>
       </section>
 
-      {/* Informational Tabs Section - Explaining Key Concepts */}
-      <section className="relative w-full bg-[#E8F5F0] py-12 sm:py-16 md:py-20 lg:py-24">
+      {/* Informational Tabs Section */}
+      <section className="relative w-full bg-white py-10 sm:py-12 md:py-16 lg:py-20">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="max-w-6xl mx-auto">
-            <div className="text-center mb-8 sm:mb-10 md:mb-12">
+          <div className="max-w-7xl mx-auto">
+            <div className="text-center mb-6 sm:mb-8 md:mb-10">
               <h2
-                className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold mb-4 sm:mb-6 px-2"
-                style={{ color: "#05627C" }}
+                className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold mb-3"
+                style={{ color: PRIMARY }}
               >
                 Understanding Your Earnings
               </h2>
               <p
-                className="text-sm sm:text-base md:text-lg leading-relaxed max-w-3xl mx-auto px-2"
-                style={{ color: "#05627C" }}
+                className="text-xs sm:text-sm md:text-base leading-relaxed max-w-2xl mx-auto"
+                style={{ color: PRIMARY, opacity: 0.65 }}
               >
-                Learn about the different ways you can earn with Big Bull
-                Energies and how each income stream works.
+                Learn how different income components work together to
+                maximize your returns.
               </p>
             </div>
 
-            {/* Tabs */}
-            <div
-              className="bg-white rounded-lg shadow-lg border-2 mb-6 sm:mb-8"
-              style={{ borderColor: "#05627C" }}
-            >
-              <div
-                className="flex flex-wrap border-b-2"
-                style={{ borderColor: "#05627C" }}
-              >
-                <button
-                  onClick={() => setActiveTab("roi")}
-                  className={`flex-1 min-w-[120px] px-4 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm font-bold uppercase tracking-wide transition ${
-                    activeTab === "roi"
-                      ? "bg-[#05627C] text-white"
-                      : "bg-white text-[#05627C] hover:bg-[#E8F5F0]"
-                  }`}
-                  style={{ borderRadius: "0" }}
-                >
-                  <div className="flex items-center justify-center gap-2">
-                    <TrendingUp className="w-4 h-4" />
-                    <span>Daily ROI</span>
-                  </div>
-                </button>
-                <button
-                  onClick={() => setActiveTab("referral")}
-                  className={`flex-1 min-w-[120px] px-4 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm font-bold uppercase tracking-wide transition ${
-                    activeTab === "referral"
-                      ? "bg-[#05627C] text-white"
-                      : "bg-white text-[#05627C] hover:bg-[#E8F5F0]"
-                  }`}
-                  style={{ borderRadius: "0" }}
-                >
-                  <div className="flex items-center justify-center gap-2">
-                    <Users className="w-4 h-4" />
-                    <span>Referral Income</span>
-                  </div>
-                </button>
-                <button
-                  onClick={() => setActiveTab("binary")}
-                  className={`flex-1 min-w-[120px] px-4 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm font-bold uppercase tracking-wide transition ${
-                    activeTab === "binary"
-                      ? "bg-[#05627C] text-white"
-                      : "bg-white text-[#05627C] hover:bg-[#E8F5F0]"
-                  }`}
-                  style={{ borderRadius: "0" }}
-                >
-                  <div className="flex items-center justify-center gap-2">
-                    <Network className="w-4 h-4" />
-                    <span>Binary Income</span>
-                  </div>
-                </button>
-                <button
-                  onClick={() => setActiveTab("principal")}
-                  className={`flex-1 min-w-[120px] px-4 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm font-bold uppercase tracking-wide transition ${
-                    activeTab === "principal"
-                      ? "bg-[#05627C] text-white"
-                      : "bg-white text-[#05627C] hover:bg-[#E8F5F0]"
-                  }`}
-                  style={{ borderRadius: "0" }}
-                >
-                  <div className="flex items-center justify-center gap-2">
-                    <DollarSign className="w-4 h-4" />
-                    <span>Principal Return</span>
-                  </div>
-                </button>
-              </div>
+            {/* Tab buttons */}
+            <div className="flex flex-wrap justify-center gap-2 sm:gap-3 mb-6 sm:mb-8">
+              {tabs.map((tab) => {
+                const Icon = tab.icon;
+                const isActive = activeTab === tab.id;
+                return (
+                  <button
+                    key={tab.id}
+                    onClick={() => setActiveTab(tab.id)}
+                    className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 md:px-5 py-2 sm:py-2.5 rounded-lg text-[11px] sm:text-xs md:text-sm font-bold uppercase tracking-wide transition"
+                    style={
+                      isActive
+                        ? { backgroundColor: PRIMARY, color: "#fff" }
+                        : {
+                          backgroundColor: "#fff",
+                          color: PRIMARY,
+                          border: "1px solid rgba(5,98,124,0.2)",
+                        }
+                    }
+                  >
+                    <Icon className="w-3.5 h-3.5 sm:w-4 sm:h-4 flex-shrink-0" />
+                    {tab.label}
+                  </button>
+                );
+              })}
+            </div>
 
-              {/* Tab Content */}
-              <div className="p-6 sm:p-8 md:p-10">
-                {activeTab === "roi" && (
-                  <div className="space-y-4 sm:space-y-6">
-                    <h3
-                      className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4"
-                      style={{ color: "#05627C" }}
-                    >
-                      Daily ROI (Return on Investment)
-                    </h3>
-                    <div className="space-y-4">
-                      <p
-                        className="text-sm sm:text-base md:text-lg leading-relaxed"
-                        style={{ color: "#05627C" }}
-                      >
+            {/* Tab Content */}
+            <div
+              className="rounded-2xl p-5 sm:p-6 md:p-8 lg:p-10"
+              style={{ backgroundColor: MINT }}
+            >
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8 items-start">
+                <div className="lg:col-span-2 space-y-4 sm:space-y-5">
+                  {activeTab === "roi" && (
+                    <>
+                      <h3 className="text-xl sm:text-2xl md:text-3xl font-bold" style={{ color: PRIMARY }}>
+                        Daily ROI (Return on Investment)
+                      </h3>
+                      <p className="text-xs sm:text-sm md:text-base leading-relaxed" style={{ color: PRIMARY, opacity: 0.8 }}>
                         <strong>What is Daily ROI?</strong> Daily ROI is the
                         percentage return you earn on your investment every
-                        single day. This is calculated based on your chosen
-                        investment package.
+                        single day, calculated based on your chosen package.
                       </p>
-                      <div className="bg-[#E8F5F0] p-4 sm:p-6 rounded-lg">
-                        <h4
-                          className="font-bold mb-2 text-base sm:text-lg"
-                          style={{ color: "#05627C" }}
-                        >
+                      <div className="bg-white p-4 sm:p-6 rounded-lg">
+                        <h4 className="font-bold mb-3 text-sm sm:text-base" style={{ color: PRIMARY }}>
                           How It Works:
                         </h4>
-                        <ul
-                          className="space-y-2 text-sm sm:text-base"
-                          style={{ color: "#05627C" }}
-                        >
-                          <li className="flex items-start gap-2">
-                            <span className="font-bold">•</span>
-                            <span>
-                              Each package has a specific daily ROI percentage
-                              (1.5% - 2%)
-                            </span>
-                          </li>
-                          <li className="flex items-start gap-2">
-                            <span className="font-bold">•</span>
-                            <span>
-                              ROI is calculated daily and credited to your
-                              account
-                            </span>
-                          </li>
-                          <li className="flex items-start gap-2">
-                            <span className="font-bold">•</span>
-                            <span>
-                              Example: Invest $1,000 at 1.5% daily ROI = $15 per
-                              day
-                            </span>
-                          </li>
-                          <li className="flex items-start gap-2">
-                            <span className="font-bold">•</span>
-                            <span>
-                              ROI accumulates over the bond period (180-200
-                              days)
-                            </span>
-                          </li>
+                        <ul className="space-y-2 text-xs sm:text-sm" style={{ color: PRIMARY }}>
+                          {[
+                            "Each package has a specific daily ROI percentage (1.5% - 2%)",
+                            "ROI is calculated daily and credited to your account",
+                            "Example: Invest $1,000 at 1.5% daily ROI = $15 per day",
+                            "ROI accumulates over the bond period (180-200 days)",
+                          ].map((line) => (
+                            <li key={line} className="flex items-start gap-2">
+                              <span style={{ color: ACCENT }} className="font-bold">✓</span>
+                              <span className="opacity-80">{line}</span>
+                            </li>
+                          ))}
                         </ul>
                       </div>
-                      <div
-                        className="border-l-4 pl-4 sm:pl-6 py-2"
-                        style={{ borderColor: "#05627C" }}
-                      >
-                        <p
-                          className="text-sm sm:text-base italic"
-                          style={{ color: "#05627C" }}
-                        >
-                          <strong>Tip:</strong> Higher investment amounts unlock
-                          better daily ROI rates. Check our investment packages
-                          to see the rates for each tier.
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                )}
+                    </>
+                  )}
 
-                {activeTab === "referral" && (
-                  <div className="space-y-4 sm:space-y-6">
-                    <h3
-                      className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4"
-                      style={{ color: "#05627C" }}
-                    >
-                      Referral Income
-                    </h3>
-                    <div className="space-y-4">
-                      <p
-                        className="text-sm sm:text-base md:text-lg leading-relaxed"
-                        style={{ color: "#05627C" }}
-                      >
-                        <strong>What is Referral Income?</strong> When you refer
-                        someone to Big Bull Energies and they make an
-                        investment, you earn a percentage commission on their
-                        investment amount.
+                  {activeTab === "referral" && (
+                    <>
+                      <h3 className="text-xl sm:text-2xl md:text-3xl font-bold" style={{ color: PRIMARY }}>
+                        Referral Income
+                      </h3>
+                      <p className="text-xs sm:text-sm md:text-base leading-relaxed" style={{ color: PRIMARY, opacity: 0.8 }}>
+                        <strong>What is Referral Income?</strong> When you
+                        refer someone and they invest, you earn a percentage
+                        commission on their investment amount.
                       </p>
-                      <div className="bg-[#E8F5F0] p-4 sm:p-6 rounded-lg">
-                        <h4
-                          className="font-bold mb-2 text-base sm:text-lg"
-                          style={{ color: "#05627C" }}
-                        >
+                      <div className="bg-white p-4 sm:p-6 rounded-lg">
+                        <h4 className="font-bold mb-3 text-sm sm:text-base" style={{ color: PRIMARY }}>
                           How It Works:
                         </h4>
-                        <ul
-                          className="space-y-2 text-sm sm:text-base"
-                          style={{ color: "#05627C" }}
-                        >
-                          <li className="flex items-start gap-2">
-                            <span className="font-bold">•</span>
-                            <span>
-                              Share your unique referral link with others
-                            </span>
-                          </li>
-                          <li className="flex items-start gap-2">
-                            <span className="font-bold">•</span>
-                            <span>
-                              When they sign up and invest, you earn 8% - 10%
-                              commission
-                            </span>
-                          </li>
-                          <li className="flex items-start gap-2">
-                            <span className="font-bold">•</span>
-                            <span>
-                              Commission rate depends on your investment package
-                              tier
-                            </span>
-                          </li>
-                          <li className="flex items-start gap-2">
-                            <span className="font-bold">•</span>
-                            <span>
-                              Example: Refer someone who invests $5,000 = $400 -
-                              $500 referral bonus
-                            </span>
-                          </li>
-                          <li className="flex items-start gap-2">
-                            <span className="font-bold">•</span>
-                            <span>
-                              No limit on the number of people you can refer
-                            </span>
-                          </li>
+                        <ul className="space-y-2 text-xs sm:text-sm" style={{ color: PRIMARY }}>
+                          {[
+                            "Share your unique referral link with others",
+                            "When they sign up and invest, you earn 8% - 10% commission",
+                            "Commission rate depends on your investment package tier",
+                            "Example: Refer someone who invests $5,000 = $400 - $500 referral bonus",
+                            "No limit on the number of people you can refer",
+                          ].map((line) => (
+                            <li key={line} className="flex items-start gap-2">
+                              <span style={{ color: ACCENT }} className="font-bold">✓</span>
+                              <span className="opacity-80">{line}</span>
+                            </li>
+                          ))}
                         </ul>
                       </div>
-                      <div
-                        className="border-l-4 pl-4 sm:pl-6 py-2"
-                        style={{ borderColor: "#05627C" }}
-                      >
-                        <p
-                          className="text-sm sm:text-base italic"
-                          style={{ color: "#05627C" }}
-                        >
-                          <strong>Tip:</strong> Building a strong referral
-                          network can significantly boost your earnings. The
-                          more active investors you refer, the more referral
-                          income you generate.
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                )}
+                    </>
+                  )}
 
-                {activeTab === "binary" && (
-                  <div className="space-y-4 sm:space-y-6">
-                    <h3
-                      className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4"
-                      style={{ color: "#05627C" }}
-                    >
-                      Binary Income
-                    </h3>
-                    <div className="space-y-4">
-                      <p
-                        className="text-sm sm:text-base md:text-lg leading-relaxed"
-                        style={{ color: "#05627C" }}
-                      >
-                        <strong>What is Binary Income?</strong> Binary income is
-                        earned when your referred members (and their referrals)
-                        make investments, creating a balanced binary tree
-                        structure. You earn based on the smaller leg&apos;s
-                        volume.
+                  {activeTab === "binary" && (
+                    <>
+                      <h3 className="text-xl sm:text-2xl md:text-3xl font-bold" style={{ color: PRIMARY }}>
+                        Binary Income
+                      </h3>
+                      <p className="text-xs sm:text-sm md:text-base leading-relaxed" style={{ color: PRIMARY, opacity: 0.8 }}>
+                        <strong>What is Binary Income?</strong> Binary income
+                        is earned when your referred members create a
+                        balanced binary tree. You earn based on the smaller
+                        leg&apos;s volume.
                       </p>
-                      <div className="bg-[#E8F5F0] p-4 sm:p-6 rounded-lg">
-                        <h4
-                          className="font-bold mb-2 text-base sm:text-lg"
-                          style={{ color: "#05627C" }}
-                        >
+                      <div className="bg-white p-4 sm:p-6 rounded-lg">
+                        <h4 className="font-bold mb-3 text-sm sm:text-base" style={{ color: PRIMARY }}>
                           How It Works:
                         </h4>
-                        <ul
-                          className="space-y-2 text-sm sm:text-base"
-                          style={{ color: "#05627C" }}
-                        >
-                          <li className="flex items-start gap-2">
-                            <span className="font-bold">•</span>
-                            <span>
-                              Your referrals are placed in a binary tree
-                              structure (left and right legs)
-                            </span>
-                          </li>
-                          <li className="flex items-start gap-2">
-                            <span className="font-bold">•</span>
-                            <span>
-                              Binary bonus is calculated on the smaller
-                              leg&apos;s total investment volume
-                            </span>
-                          </li>
-                          <li className="flex items-start gap-2">
-                            <span className="font-bold">•</span>
-                            <span>
-                              Standard binary rate is 10% of the smaller leg
-                            </span>
-                          </li>
-                          <li className="flex items-start gap-2">
-                            <span className="font-bold">•</span>
-                            <span>
-                              Example: Left leg = $2,800, Right leg = $4,650 →
-                              Binary bonus = 10% of $2,800 = $280
-                            </span>
-                          </li>
-                          <li className="flex items-start gap-2">
-                            <span className="font-bold">•</span>
-                            <span>
-                              Daily capping limits apply based on your package
-                              ($1,000 - $10,000 per day)
-                            </span>
-                          </li>
+                        <ul className="space-y-2 text-xs sm:text-sm" style={{ color: PRIMARY }}>
+                          {[
+                            "Your referrals are placed in a binary tree (left and right legs)",
+                            "Binary bonus is calculated on the smaller leg's total volume",
+                            "Standard binary rate is 10% of the smaller leg",
+                            "Example: Left leg = $2,800, Right leg = $4,650 → Bonus = $280",
+                            "Daily capping limits apply based on your package ($1,000 - $10,000)",
+                          ].map((line) => (
+                            <li key={line} className="flex items-start gap-2">
+                              <span style={{ color: ACCENT }} className="font-bold">✓</span>
+                              <span className="opacity-80">{line}</span>
+                            </li>
+                          ))}
                         </ul>
                       </div>
-                      <div
-                        className="border-l-4 pl-4 sm:pl-6 py-2"
-                        style={{ borderColor: "#05627C" }}
-                      >
-                        <p
-                          className="text-sm sm:text-base italic"
-                          style={{ color: "#05627C" }}
-                        >
-                          <strong>Tip:</strong> Focus on building both legs of
-                          your binary tree evenly to maximize your binary income
-                          potential. Balance is key!
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                )}
+                    </>
+                  )}
 
-                {activeTab === "principal" && (
-                  <div className="space-y-4 sm:space-y-6">
-                    <h3
-                      className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4"
-                      style={{ color: "#05627C" }}
-                    >
-                      Principal Return
-                    </h3>
-                    <div className="space-y-4">
-                      <p
-                        className="text-sm sm:text-base md:text-lg leading-relaxed"
-                        style={{ color: "#05627C" }}
-                      >
-                        <strong>What is Principal Return?</strong> At the end of
-                        your investment bond period, you receive a percentage of
-                        your original investment amount back. This percentage
-                        varies by package tier.
+                  {activeTab === "principal" && (
+                    <>
+                      <h3 className="text-xl sm:text-2xl md:text-3xl font-bold" style={{ color: PRIMARY }}>
+                        Principal Return
+                      </h3>
+                      <p className="text-xs sm:text-sm md:text-base leading-relaxed" style={{ color: PRIMARY, opacity: 0.8 }}>
+                        <strong>What is Principal Return?</strong> At the end
+                        of your bond period, you receive a percentage of your
+                        original investment back — this varies by package tier.
                       </p>
-                      <div className="bg-[#E8F5F0] p-4 sm:p-6 rounded-lg">
-                        <h4
-                          className="font-bold mb-2 text-base sm:text-lg"
-                          style={{ color: "#05627C" }}
-                        >
+                      <div className="bg-white p-4 sm:p-6 rounded-lg">
+                        <h4 className="font-bold mb-3 text-sm sm:text-base" style={{ color: PRIMARY }}>
                           How It Works:
                         </h4>
-                        <ul
-                          className="space-y-2 text-sm sm:text-base"
-                          style={{ color: "#05627C" }}
-                        >
-                          <li className="flex items-start gap-2">
-                            <span className="font-bold">•</span>
-                            <span>
-                              Solar Starter: 60% of principal returned
-                            </span>
-                          </li>
-                          <li className="flex items-start gap-2">
-                            <span className="font-bold">•</span>
-                            <span>Power Growth: 80% of principal returned</span>
-                          </li>
-                          <li className="flex items-start gap-2">
-                            <span className="font-bold">•</span>
-                            <span>
-                              Elite Energy: 100% of principal returned
-                            </span>
-                          </li>
-                          <li className="flex items-start gap-2">
-                            <span className="font-bold">•</span>
-                            <span>
-                              Example: Invest $10,000 in Power Growth → Receive
-                              $8,000 back at bond maturity
-                            </span>
-                          </li>
-                          <li className="flex items-start gap-2">
-                            <span className="font-bold">•</span>
-                            <span>
-                              Principal return is paid at the end of the bond
-                              period (180-200 days)
-                            </span>
-                          </li>
+                        <ul className="space-y-2 text-xs sm:text-sm" style={{ color: PRIMARY }}>
+                          {[
+                            "Solar Starter: 60% of principal returned",
+                            "Power Growth: 80% of principal returned",
+                            "Elite Energy: 100% of principal returned",
+                            "Example: Invest $10,000 in Power Growth → Receive $8,000 back at maturity",
+                            "Principal return is paid at the end of the bond period (180-200 days)",
+                          ].map((line) => (
+                            <li key={line} className="flex items-start gap-2">
+                              <span style={{ color: ACCENT }} className="font-bold">✓</span>
+                              <span className="opacity-80">{line}</span>
+                            </li>
+                          ))}
                         </ul>
                       </div>
-                      <div
-                        className="border-l-4 pl-4 sm:pl-6 py-2"
-                        style={{ borderColor: "#05627C" }}
-                      >
-                        <p
-                          className="text-sm sm:text-base italic"
-                          style={{ color: "#05627C" }}
-                        >
-                          <strong>Tip:</strong> Higher-tier packages offer
-                          better principal return rates. Consider your
-                          investment goals when choosing a package.
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                )}
+                    </>
+                  )}
+                </div>
+
+                <div className="relative w-full h-40 sm:h-48 md:h-56 lg:h-full lg:min-h-[280px] rounded-xl overflow-hidden">
+                  {/* Background image - place your local image at /public/images/plan-tab-side.png */}
+                  <Image
+                    src="/images/plan-tab-side.png"
+                    alt="Solar plant at sunset"
+                    fill
+                    className="object-cover"
+                  />
+                </div>
               </div>
             </div>
 
-            {/* Additional Resources Links */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
-              <Link
-                href="/how-it-works"
-                className="bg-white p-4 sm:p-6 rounded-lg border-2 hover:shadow-lg transition text-center"
-                style={{ borderColor: "#05627C" }}
-              >
-                <Award
-                  className="w-8 h-8 mx-auto mb-2"
-                  style={{ color: "#05627C" }}
-                />
-                <h4
-                  className="font-bold mb-2 text-sm sm:text-base"
-                  style={{ color: "#05627C" }}
+            {/* Feature mini-cards */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 md:gap-6 mt-6 sm:mt-8">
+              {[
+                { icon: Wallet, title: "Instant Withdrawals", desc: "Withdraw earnings anytime" },
+                { icon: ShieldCheck, title: "Capital Back", desc: "Get your investment back" },
+                { icon: Percent, title: "Secure & Transparent", desc: "100% security for your funds" },
+              ].map(({ icon: Icon, title, desc }) => (
+                <div
+                  key={title}
+                  className="flex items-center gap-3 p-4 sm:p-5 rounded-xl border"
+                  style={{ borderColor: "rgba(5,98,124,0.18)" }}
                 >
-                  How It Works
-                </h4>
-                <p className="text-xs sm:text-sm" style={{ color: "#05627C" }}>
-                  Complete guide to the platform
-                </p>
-              </Link>
-              <Link
-                href="/career-levels-info"
-                className="bg-white p-4 sm:p-6 rounded-lg border-2 hover:shadow-lg transition text-center"
-                style={{ borderColor: "#05627C" }}
-              >
-                <Award
-                  className="w-8 h-8 mx-auto mb-2"
-                  style={{ color: "#05627C" }}
-                />
-                <h4
-                  className="font-bold mb-2 text-sm sm:text-base"
-                  style={{ color: "#05627C" }}
-                >
-                  Career Levels
-                </h4>
-                <p className="text-xs sm:text-sm" style={{ color: "#05627C" }}>
-                  Unlock advanced rewards
-                </p>
-              </Link>
-              <Link
-                href="/binary-investment-system"
-                className="bg-white p-4 sm:p-6 rounded-lg border-2 hover:shadow-lg transition text-center"
-                style={{ borderColor: "#05627C" }}
-              >
-                <Network
-                  className="w-8 h-8 mx-auto mb-2"
-                  style={{ color: "#05627C" }}
-                />
-                <h4
-                  className="font-bold mb-2 text-sm sm:text-base"
-                  style={{ color: "#05627C" }}
-                >
-                  Binary System
-                </h4>
-                <p className="text-xs sm:text-sm" style={{ color: "#05627C" }}>
-                  Understand binary tree structure
-                </p>
-              </Link>
+                  <div
+                    className="w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center flex-shrink-0"
+                    style={{ backgroundColor: MINT }}
+                  >
+                    <Icon className="w-4 h-4 sm:w-5 sm:h-5" style={{ color: PRIMARY }} />
+                  </div>
+                  <div className="min-w-0">
+                    <h4 className="font-bold text-xs sm:text-sm" style={{ color: PRIMARY }}>
+                      {title}
+                    </h4>
+                    <p className="text-[11px] sm:text-xs" style={{ color: PRIMARY, opacity: 0.6 }}>
+                      {desc}
+                    </p>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         </div>
       </section>
 
       {/* Extra Income Opportunities Section */}
-      <section className="relative w-full bg-white py-12 sm:py-16 md:py-20 lg:py-24">
+      <section className="relative w-full bg-white py-10 sm:py-12 md:py-16 lg:py-20">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="max-w-6xl mx-auto">
+          <div className="max-w-7xl mx-auto">
             <h2
-              className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold mb-8 sm:mb-10 md:mb-12 text-center px-2"
-              style={{ color: "#05627C" }}
+              className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold mb-6 sm:mb-8 md:mb-10 text-center"
+              style={{ color: PRIMARY }}
             >
               Extra Income Opportunities at Big Bull Energies
             </h2>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 lg:gap-12">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 sm:gap-6 md:gap-8">
               {/* Referral Bonus */}
-              <div className="bg-[#E8F5F0] p-6 sm:p-8 md:p-10">
+              <div className="rounded-2xl p-5 sm:p-6 md:p-8" style={{ backgroundColor: MINT }}>
                 <div className="flex items-center gap-3 sm:gap-4 mb-4 sm:mb-6">
                   <div
-                    className="w-12 h-12 sm:w-16 sm:h-16 rounded-full flex items-center justify-center flex-shrink-0"
-                    style={{ backgroundColor: "#05627C" }}
+                    className="w-11 h-11 sm:w-12 sm:h-12 md:w-14 md:h-14 rounded-full flex items-center justify-center flex-shrink-0"
+                    style={{ backgroundColor: PRIMARY }}
                   >
-                    <Users className="w-6 h-6 sm:w-8 sm:h-8 text-white" />
+                    <Users className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
                   </div>
-                  <h3
-                    className="text-xl sm:text-2xl md:text-3xl font-bold"
-                    style={{ color: "#05627C" }}
-                  >
+                  <h3 className="text-lg sm:text-xl md:text-2xl font-bold" style={{ color: PRIMARY }}>
                     Referral Bonus
                   </h3>
                 </div>
-                <p
-                  className="text-sm sm:text-base md:text-lg leading-relaxed"
-                  style={{
-                    color: "#05627C",
-                    fontFamily: "var(--font-font4), sans-serif",
-                  }}
-                >
-                  At Big Bull Energies, we value the power of community and
-                  shared success. Our Referral Bonus program is designed to
-                  reward your efforts in bringing new investors into our
-                  network.
+                <p className="text-xs sm:text-sm md:text-base leading-relaxed" style={{ color: PRIMARY, opacity: 0.8 }}>
+                  Refer your friends and earn a generous referral bonus. Build
+                  your network and increase your income by helping others
+                  grow with Big Bull Energies.
                 </p>
-                <p
-                  className="text-sm sm:text-base md:text-lg leading-relaxed mt-3 sm:mt-4"
-                  style={{
-                    color: "#05627C",
-                    fontFamily: "var(--font-font4), sans-serif",
-                  }}
-                >
-                  By referring others, you not only help them unlock financial
-                  growth but also earn a bonus of 8% to 10% as a thank-you for
-                  growing our investment family. Together, we can achieve more!
+                <p className="text-xs sm:text-sm md:text-base leading-relaxed mt-3" style={{ color: PRIMARY, opacity: 0.8 }}>
+                  By referring others, you help them unlock financial growth
+                  and earn a bonus of 8% to 10% as a thank-you for growing our
+                  investment family.
                 </p>
               </div>
 
               {/* Binary Bonus */}
-              <div className="bg-[#E8F5F0] p-6 sm:p-8 md:p-10">
+              <div className="rounded-2xl p-5 sm:p-6 md:p-8" style={{ backgroundColor: MINT }}>
                 <div className="flex items-center gap-3 sm:gap-4 mb-4 sm:mb-6">
                   <div
-                    className="w-12 h-12 sm:w-16 sm:h-16 rounded-full flex items-center justify-center flex-shrink-0"
-                    style={{ backgroundColor: "#05627C" }}
+                    className="w-11 h-11 sm:w-12 sm:h-12 md:w-14 md:h-14 rounded-full flex items-center justify-center flex-shrink-0"
+                    style={{ backgroundColor: PRIMARY }}
                   >
-                    <Network className="w-6 h-6 sm:w-8 sm:h-8 text-white" />
+                    <Network className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
                   </div>
-                  <h3
-                    className="text-xl sm:text-2xl md:text-3xl font-bold"
-                    style={{ color: "#05627C" }}
-                  >
+                  <h3 className="text-lg sm:text-xl md:text-2xl font-bold" style={{ color: PRIMARY }}>
                     Binary Bonus
                   </h3>
                 </div>
-                <p
-                  className="text-sm sm:text-base md:text-lg leading-relaxed"
-                  style={{
-                    color: "#05627C",
-                    fontFamily: "var(--font-font4), sans-serif",
-                  }}
-                >
-                  The Binary Bonus at Big Bull Energies is a rewarding incentive
-                  designed for members who introduce new investors to our
-                  investment ecosystem. Earnings are calculated based on the
-                  lesser leg&apos;s total investment.
+                <p className="text-xs sm:text-sm md:text-base leading-relaxed" style={{ color: PRIMARY, opacity: 0.8 }}>
+                  Earn exciting Binary bonuses when your team achieves the
+                  required targets, calculated on the lesser leg&apos;s total
+                  investment.
                 </p>
-                <div className="mt-4 sm:mt-6 space-y-2 sm:space-y-3">
-                  <div
-                    className="flex justify-between items-center border-b pb-2"
-                    style={{ borderColor: "#05627C", opacity: 0.3 }}
-                  >
-                    <span
-                      className="text-xs sm:text-sm md:text-base font-medium"
-                      style={{ color: "#05627C" }}
+                <div className="mt-4 sm:mt-6 space-y-2 bg-white rounded-lg p-3 sm:p-4">
+                  {[
+                    ["Left business volume:", "$2,800"],
+                    ["Right business volume:", "$4,650"],
+                    ["Binary bonus (10%):", "$280"],
+                  ].map(([label, value], i) => (
+                    <div
+                      key={label}
+                      className="flex justify-between items-center gap-2 py-1.5"
+                      style={
+                        i < 2 ? { borderBottom: "1px solid rgba(5,98,124,0.1)" } : undefined
+                      }
                     >
-                      Left business volume:
-                    </span>
-                    <span
-                      className="text-sm sm:text-base md:text-lg font-bold"
-                      style={{ color: "#05627C" }}
-                    >
-                      $2,800
-                    </span>
-                  </div>
-                  <div
-                    className="flex justify-between items-center border-b pb-2"
-                    style={{ borderColor: "#05627C", opacity: 0.3 }}
-                  >
-                    <span
-                      className="text-xs sm:text-sm md:text-base font-medium"
-                      style={{ color: "#05627C" }}
-                    >
-                      Right business volume:
-                    </span>
-                    <span
-                      className="text-sm sm:text-base md:text-lg font-bold"
-                      style={{ color: "#05627C" }}
-                    >
-                      $4,650
-                    </span>
-                  </div>
-                  <div
-                    className="flex justify-between items-center border-b pb-2"
-                    style={{ borderColor: "#05627C", opacity: 0.3 }}
-                  >
-                    <span
-                      className="text-xs sm:text-sm md:text-base font-medium"
-                      style={{ color: "#05627C" }}
-                    >
-                      Binary bonus (10%):
-                    </span>
-                    <span
-                      className="text-sm sm:text-base md:text-lg font-bold"
-                      style={{ color: "#05627C" }}
-                    >
-                      $280
-                    </span>
-                  </div>
+                      <span className="text-xs sm:text-sm font-medium" style={{ color: PRIMARY, opacity: 0.7 }}>
+                        {label}
+                      </span>
+                      <span className="text-xs sm:text-sm font-bold whitespace-nowrap" style={{ color: PRIMARY }}>
+                        {value}
+                      </span>
+                    </div>
+                  ))}
                 </div>
-                <p
-                  className="text-xs sm:text-sm md:text-base mt-3 sm:mt-4 italic"
-                  style={{
-                    color: "#05627C",
-                    opacity: 0.8,
-                    fontFamily: "var(--font-font4), sans-serif",
-                  }}
-                >
+                <p className="text-[11px] sm:text-xs md:text-sm mt-3 italic" style={{ color: PRIMARY, opacity: 0.6 }}>
                   The binary bonus is calculated based on the lesser leg
-                  ($2,800). Assuming a 10% binary bonus rate, the bonus earned
-                  would be $280.
+                  ($2,800). At a 10% rate, the bonus earned is $280.
                 </p>
               </div>
             </div>
@@ -1197,314 +783,64 @@ export default function OurPlanPage() {
         </div>
       </section>
 
-      {/* Roadmap Section */}
-      <section className="relative w-full bg-white py-12 sm:py-16 md:py-20 lg:py-24">
+      {/* Roadmap Section — horizontal timeline */}
+      <section className="relative w-full bg-white py-10 sm:py-12 md:py-16 lg:py-20">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="max-w-6xl mx-auto">
+          <div className="max-w-7xl mx-auto">
             <h2
-              className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold mb-8 sm:mb-10 md:mb-12 text-center px-2"
-              style={{ color: "#05627C" }}
+              className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold mb-8 sm:mb-10 md:mb-14 text-center"
+              style={{ color: PRIMARY }}
             >
               Big Bull Energies Roadmap (2022 – 2028)
             </h2>
-            <div className="relative">
-              {/* Vertical Timeline Line */}
-              <div
-                className="hidden md:block absolute left-8 top-0 bottom-0 w-0.5"
-                style={{ backgroundColor: "#05627C", opacity: 0.2 }}
-              ></div>
 
-              <div className="space-y-8 sm:space-y-10 md:space-y-12 lg:space-y-16">
-                {/* 2022 */}
-                <div className="relative flex flex-col md:flex-row gap-4 sm:gap-6 md:gap-8 items-start">
-                  <div className="md:w-32 flex-shrink-0 flex items-start">
-                    <div className="flex items-center gap-3 sm:gap-4 w-full">
+            <div ref={roadmapRef} className="relative overflow-x-auto pb-4">
+              <div className="relative min-w-[720px] sm:min-w-[820px] lg:min-w-0">
+                {/* connecting line */}
+                <div
+                  className="absolute left-0 right-0 top-6 sm:top-7 h-0.5"
+                  style={{ backgroundColor: "rgba(5,98,124,0.2)" }}
+                />
+                <div className="relative grid grid-cols-7 gap-2 sm:gap-3">
+                  {roadmap.map((step, i) => {
+                    const Icon = step.icon;
+                    const isLast = i === roadmap.length - 1;
+                    return (
                       <div
-                        className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-full flex items-center justify-center shadow-md flex-shrink-0"
-                        style={{ backgroundColor: "#E8F5F0" }}
+                        key={step.year}
+                        className="flex flex-col items-center text-center px-1 transition-all duration-700 ease-out"
+                        style={{
+                          opacity: roadmapRevealed ? 1 : 0,
+                          transform: roadmapRevealed
+                            ? "translateY(0)"
+                            : "translateY(16px)",
+                          transitionDelay: `${i * 150}ms`,
+                        }}
                       >
                         <div
-                          className="text-base sm:text-lg md:text-xl lg:text-2xl xl:text-3xl font-bold"
-                          style={{ color: "#05627C" }}
+                          className="w-11 h-11 sm:w-12 sm:h-12 md:w-14 md:h-14 rounded-full flex items-center justify-center mb-2 sm:mb-3 relative z-10 shadow-sm"
+                          style={{
+                            backgroundColor: isLast ? PRIMARY : "#fff",
+                            border: isLast ? "none" : `2px solid ${PRIMARY}33`,
+                          }}
                         >
-                          2022
+                          <Icon
+                            className="w-5 h-5 sm:w-6 sm:h-6"
+                            style={{ color: isLast ? "#fff" : PRIMARY }}
+                          />
                         </div>
+                        <span className="text-xs sm:text-sm font-bold mb-1" style={{ color: PRIMARY }}>
+                          {step.year}
+                        </span>
+                        <h3 className="text-[11px] sm:text-xs md:text-sm font-bold mb-1" style={{ color: PRIMARY }}>
+                          {step.title}
+                        </h3>
+                        <p className="text-[10px] sm:text-[11px] md:text-xs leading-snug" style={{ color: PRIMARY, opacity: 0.65 }}>
+                          {step.desc}
+                        </p>
                       </div>
-                      <div
-                        className="hidden md:block w-6 sm:w-8 h-0.5"
-                        style={{ backgroundColor: "#05627C" }}
-                      ></div>
-                    </div>
-                  </div>
-                  <div className="flex-1 bg-[#E8F5F0] p-4 sm:p-6 md:p-8 rounded-lg">
-                    <h3
-                      className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold mb-3 sm:mb-4"
-                      style={{ color: "#05627C" }}
-                    >
-                      A Dream Takes Shape
-                    </h3>
-                    <p
-                      className="text-sm sm:text-base md:text-lg lg:text-xl leading-relaxed"
-                      style={{
-                        color: "#05627C",
-                        fontFamily: "var(--font-font4), sans-serif",
-                      }}
-                    >
-                      Conceptualized Big Bull Energies as a bridge between
-                      renewable energy and financial solutions. Built the
-                      foundation for a global platform focused on sustainable
-                      finance.
-                    </p>
-                  </div>
-                </div>
-
-                {/* 2023 */}
-                <div className="relative flex flex-col md:flex-row gap-4 sm:gap-6 md:gap-8 items-start">
-                  <div className="md:w-32 flex-shrink-0 flex items-start">
-                    <div className="flex items-center gap-3 sm:gap-4 w-full">
-                      <div
-                        className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-full flex items-center justify-center shadow-md flex-shrink-0"
-                        style={{ backgroundColor: "#E8F5F0" }}
-                      >
-                        <div
-                          className="text-base sm:text-lg md:text-xl lg:text-2xl xl:text-3xl font-bold"
-                          style={{ color: "#05627C" }}
-                        >
-                          2023
-                        </div>
-                      </div>
-                      <div
-                        className="hidden md:block w-6 sm:w-8 h-0.5"
-                        style={{ backgroundColor: "#05627C" }}
-                      ></div>
-                    </div>
-                  </div>
-                  <div className="flex-1 bg-[#E8F5F0] p-4 sm:p-6 md:p-8 rounded-lg">
-                    <h3
-                      className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold mb-3 sm:mb-4"
-                      style={{ color: "#05627C" }}
-                    >
-                      Laying the Foundation
-                    </h3>
-                    <p
-                      className="text-sm sm:text-base md:text-lg lg:text-xl leading-relaxed"
-                      style={{
-                        color: "#05627C",
-                        fontFamily: "var(--font-font4), sans-serif",
-                      }}
-                    >
-                      Registered our website domain. Broke ground on our first
-                      solar plant, marking our entry into the renewable energy
-                      sector and global expansion.
-                    </p>
-                  </div>
-                </div>
-
-                {/* 2024 */}
-                <div className="relative flex flex-col md:flex-row gap-4 sm:gap-6 md:gap-8 items-start">
-                  <div className="md:w-32 flex-shrink-0 flex items-start">
-                    <div className="flex items-center gap-3 sm:gap-4 w-full">
-                      <div
-                        className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-full flex items-center justify-center shadow-md flex-shrink-0"
-                        style={{ backgroundColor: "#E8F5F0" }}
-                      >
-                        <div
-                          className="text-base sm:text-lg md:text-xl lg:text-2xl xl:text-3xl font-bold"
-                          style={{ color: "#05627C" }}
-                        >
-                          2024
-                        </div>
-                      </div>
-                      <div
-                        className="hidden md:block w-6 sm:w-8 h-0.5"
-                        style={{ backgroundColor: "#05627C" }}
-                      ></div>
-                    </div>
-                  </div>
-                  <div className="flex-1 bg-[#E8F5F0] p-4 sm:p-6 md:p-8 rounded-lg">
-                    <h3
-                      className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold mb-3 sm:mb-4"
-                      style={{ color: "#05627C" }}
-                    >
-                      A Year of Transformation
-                    </h3>
-                    <p
-                      className="text-sm sm:text-base md:text-lg lg:text-xl leading-relaxed"
-                      style={{
-                        color: "#05627C",
-                        fontFamily: "var(--font-font4), sans-serif",
-                      }}
-                    >
-                      Completed first solar plant. Registered in New Zealand and
-                      the UK. Opened new corporate office and launching the
-                      mobile app soon.
-                    </p>
-                  </div>
-                </div>
-
-                {/* 2025 */}
-                <div className="relative flex flex-col md:flex-row gap-4 sm:gap-6 md:gap-8 items-start">
-                  <div className="md:w-32 flex-shrink-0 flex items-start">
-                    <div className="flex items-center gap-3 sm:gap-4 w-full">
-                      <div
-                        className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-full flex items-center justify-center shadow-md flex-shrink-0"
-                        style={{ backgroundColor: "#E8F5F0" }}
-                      >
-                        <div
-                          className="text-base sm:text-lg md:text-xl lg:text-2xl xl:text-3xl font-bold"
-                          style={{ color: "#05627C" }}
-                        >
-                          2025
-                        </div>
-                      </div>
-                      <div
-                        className="hidden md:block w-6 sm:w-8 h-0.5"
-                        style={{ backgroundColor: "#05627C" }}
-                      ></div>
-                    </div>
-                  </div>
-                  <div className="flex-1 bg-[#E8F5F0] p-4 sm:p-6 md:p-8 rounded-lg">
-                    <h3
-                      className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold mb-3 sm:mb-4"
-                      style={{ color: "#05627C" }}
-                    >
-                      Global Expansion & Second Solar Plant
-                    </h3>
-                    <p
-                      className="text-sm sm:text-base md:text-lg lg:text-xl leading-relaxed"
-                      style={{
-                        color: "#05627C",
-                        fontFamily: "var(--font-font4), sans-serif",
-                      }}
-                    >
-                      Opened second plant in Groningen, Netherlands. Expanding
-                      registrations to additional countries and hosting global
-                      events.
-                    </p>
-                  </div>
-                </div>
-
-                {/* 2026 */}
-                <div className="relative flex flex-col md:flex-row gap-4 sm:gap-6 md:gap-8 items-start">
-                  <div className="md:w-32 flex-shrink-0 flex items-start">
-                    <div className="flex items-center gap-3 sm:gap-4 w-full">
-                      <div
-                        className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-full flex items-center justify-center shadow-md flex-shrink-0"
-                        style={{ backgroundColor: "#E8F5F0" }}
-                      >
-                        <div
-                          className="text-base sm:text-lg md:text-xl lg:text-2xl xl:text-3xl font-bold"
-                          style={{ color: "#05627C" }}
-                        >
-                          2026
-                        </div>
-                      </div>
-                      <div
-                        className="hidden md:block w-6 sm:w-8 h-0.5"
-                        style={{ backgroundColor: "#05627C" }}
-                      ></div>
-                    </div>
-                  </div>
-                  <div className="flex-1 bg-[#E8F5F0] p-4 sm:p-6 md:p-8 rounded-lg">
-                    <h3
-                      className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold mb-3 sm:mb-4"
-                      style={{ color: "#05627C" }}
-                    >
-                      Pioneering the Future
-                    </h3>
-                    <p
-                      className="text-sm sm:text-base md:text-lg lg:text-xl leading-relaxed"
-                      style={{
-                        color: "#05627C",
-                        fontFamily: "var(--font-font4), sans-serif",
-                      }}
-                    >
-                      Begin manufacturing EV and solar components. Expansion to
-                      over 30 countries and AI-driven efficiency solutions.
-                    </p>
-                  </div>
-                </div>
-
-                {/* 2027 */}
-                <div className="relative flex flex-col md:flex-row gap-4 sm:gap-6 md:gap-8 items-start">
-                  <div className="md:w-32 flex-shrink-0 flex items-start">
-                    <div className="flex items-center gap-3 sm:gap-4 w-full">
-                      <div
-                        className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-full flex items-center justify-center shadow-md flex-shrink-0"
-                        style={{ backgroundColor: "#E8F5F0" }}
-                      >
-                        <div
-                          className="text-base sm:text-lg md:text-xl lg:text-2xl xl:text-3xl font-bold"
-                          style={{ color: "#05627C" }}
-                        >
-                          2027
-                        </div>
-                      </div>
-                      <div
-                        className="hidden md:block w-6 sm:w-8 h-0.5"
-                        style={{ backgroundColor: "#05627C" }}
-                      ></div>
-                    </div>
-                  </div>
-                  <div className="flex-1 bg-[#E8F5F0] p-4 sm:p-6 md:p-8 rounded-lg">
-                    <h3
-                      className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold mb-3 sm:mb-4"
-                      style={{ color: "#05627C" }}
-                    >
-                      Smart Technology & Clean Mobility
-                    </h3>
-                    <p
-                      className="text-sm sm:text-base md:text-lg lg:text-xl leading-relaxed"
-                      style={{
-                        color: "#05627C",
-                        fontFamily: "var(--font-font4), sans-serif",
-                      }}
-                    >
-                      Deploy AI-powered energy tracking. Launch EV Charging
-                      Stations and expand into autonomous driving tech.
-                    </p>
-                  </div>
-                </div>
-
-                {/* 2028 */}
-                <div className="relative flex flex-col md:flex-row gap-4 sm:gap-6 md:gap-8 items-start">
-                  <div className="md:w-32 flex-shrink-0 flex items-start">
-                    <div className="flex items-center gap-3 sm:gap-4 w-full">
-                      <div
-                        className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-full flex items-center justify-center shadow-md flex-shrink-0"
-                        style={{ backgroundColor: "#05627C" }}
-                      >
-                        <div
-                          className="text-base sm:text-lg md:text-xl lg:text-2xl xl:text-3xl font-bold"
-                          style={{ color: "#ffffff" }}
-                        >
-                          2028
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <div
-                    className="flex-1 bg-[#E8F5F0] p-4 sm:p-6 md:p-8 rounded-lg border-2"
-                    style={{ borderColor: "#05627C" }}
-                  >
-                    <h3
-                      className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold mb-3 sm:mb-4"
-                      style={{ color: "#05627C" }}
-                    >
-                      Global Leader in Sustainable Finance & Energy
-                    </h3>
-                    <p
-                      className="text-sm sm:text-base md:text-lg lg:text-xl leading-relaxed"
-                      style={{
-                        color: "#05627C",
-                        fontFamily: "var(--font-font4), sans-serif",
-                      }}
-                    >
-                      Operate 100+ solar plants worldwide. Fully integrated
-                      smart grids and financial technology innovation
-                      leadership.
-                    </p>
-                  </div>
+                    );
+                  })}
                 </div>
               </div>
             </div>
@@ -1512,37 +848,56 @@ export default function OurPlanPage() {
         </div>
       </section>
 
-      {/* Additional Info Section */}
-      <section className="relative w-full bg-[#E8F5F0] py-12 sm:py-16 md:py-20 lg:py-24">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="max-w-4xl mx-auto text-center">
-            <h2
-              className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-normal mb-4 sm:mb-6 px-2"
-              style={{
-                color: "#05627C",
-                fontFamily: "var(--font-font4), sans-serif",
-              }}
-            >
-              Choose the plan that fits your investment goals
-            </h2>
-            <p
-              className="text-sm sm:text-base md:text-lg lg:text-xl leading-relaxed mb-6 sm:mb-8 px-2"
-              style={{
-                color: "#05627C",
-                fontFamily: "var(--font-font4), sans-serif",
-              }}
-            >
-              All our investment plans are designed to provide sustainable
-              returns while supporting renewable energy projects. Start your
-              investment journey with Big Bull Energies today.
-            </p>
-            <Link
-              href="/contact"
-              className="inline-block bg-[#ffcf0B] text-gray-900 font-bold px-6 sm:px-8 lg:px-12 py-3 sm:py-4 lg:py-5 text-xs sm:text-sm md:text-base uppercase tracking-wide transition hover:opacity-90 w-full sm:w-auto text-center"
-              style={{ borderRadius: "0" }}
-            >
-              GET STARTED
-            </Link>
+      {/* Final CTA — full-bleed background image */}
+      <section className="relative w-full overflow-hidden min-h-[300px] sm:min-h-[330px] md:min-h-[360px] flex items-center">
+        {/* Background image - place your local image at /public/images/plan-cta.png */}
+        <Image
+          src="/images/plan-cta.png"
+          alt="Wind turbines on hillside"
+          fill
+          className="object-cover"
+        />
+        {/* Mobile overlay: strong bottom-weighted fade so text stays readable */}
+        <div
+          className="absolute inset-0 sm:hidden"
+          style={{
+            background:
+              "linear-gradient(180deg, rgba(232,245,240,0.35) 0%, rgba(232,245,240,0.85) 55%, rgba(232,245,240,0.97) 100%)",
+          }}
+        />
+        {/* Desktop/tablet overlay: left-to-right fade */}
+        <div
+          className="absolute inset-0 hidden sm:block"
+          style={{
+            background:
+              "linear-gradient(90deg, rgba(232,245,240,0.15) 0%, rgba(232,245,240,0.55) 35%, rgba(232,245,240,0.92) 60%, rgba(232,245,240,0.98) 100%)",
+          }}
+        />
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full">
+          <div className="max-w-7xl mx-auto">
+            <div className="max-w-xl ml-auto">
+              <h2
+                className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold mb-3 sm:mb-4"
+                style={{ color: PRIMARY }}
+              >
+                Choose the plan that fits your investment goals
+              </h2>
+              <p
+                className="text-xs sm:text-sm md:text-base leading-relaxed mb-5 sm:mb-6"
+                style={{ color: PRIMARY, opacity: 0.75 }}
+              >
+                A sustainable future starts with smart investments. Select a
+                plan that aligns with your goals and start earning with Big
+                Bull Energies today.
+              </p>
+              <Link
+                href="/contact"
+                className="inline-block font-bold px-7 sm:px-8 md:px-10 py-3 sm:py-3.5 md:py-4 text-xs sm:text-sm rounded-lg uppercase tracking-wide transition hover:opacity-90"
+                style={{ backgroundColor: GOLD, color: "#1a1a1a" }}
+              >
+                Get Started
+              </Link>
+            </div>
           </div>
         </div>
       </section>

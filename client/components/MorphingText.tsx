@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-
 import { cn } from "@/lib/utils";
 
 const useMorphingText = (texts: string[]) => {
@@ -17,30 +16,43 @@ const useMorphingText = (texts: string[]) => {
       setTimeout(() => {
         setCurrentIndex((prev) => (prev + 1) % texts.length);
         setIsVisible(true);
-      }, 300); // Fade out, then change text, then fade in
-    }, 3000); // Change word every 3 seconds
+      }, 300);
+    }, 3000);
 
     return () => clearInterval(interval);
   }, [texts]);
 
-  return { textRef, currentText: texts[currentIndex] || texts[0], isVisible };
+  return {
+    textRef,
+    currentText: texts[currentIndex] || texts[0],
+    isVisible,
+  };
 };
 
 interface MorphingTextProps {
   className?: string;
   texts: string[];
   style?: React.CSSProperties;
+  /** Render as inline span instead of full-width block */
+  inline?: boolean;
 }
 
-const Texts: React.FC<Pick<MorphingTextProps, "texts"> & { style?: React.CSSProperties }> = ({ texts, style }) => {
+const MorphingText: React.FC<MorphingTextProps> = ({
+  texts,
+  className,
+  style,
+  inline = false,
+}) => {
   const { textRef, currentText, isVisible } = useMorphingText(texts);
-  return (
+
+  const content = (
     <span
       ref={textRef}
+      className={inline ? className : undefined}
       style={{
         ...style,
         opacity: isVisible ? 1 : 0,
-        transform: isVisible ? "translateY(0)" : "translateY(8px)",
+        transform: isVisible ? "translateY(0)" : "translateY(10px)",
         transition: "opacity 0.4s ease-in-out, transform 0.4s ease-in-out",
         display: "inline-block",
       }}
@@ -48,9 +60,9 @@ const Texts: React.FC<Pick<MorphingTextProps, "texts"> & { style?: React.CSSProp
       {currentText}
     </span>
   );
-};
 
-const MorphingText: React.FC<MorphingTextProps> = ({ texts, className, style }) => {
+  if (inline) return content;
+
   return (
     <div
       className={cn(
@@ -59,10 +71,9 @@ const MorphingText: React.FC<MorphingTextProps> = ({ texts, className, style }) 
       )}
       style={style}
     >
-      <Texts texts={texts} style={style} />
+      {content}
     </div>
   );
 };
 
 export { MorphingText };
-

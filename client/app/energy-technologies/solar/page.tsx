@@ -1,541 +1,663 @@
 "use client";
 
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Globe, SolarPanel } from "lucide-react";
-import { useState, useEffect, useRef } from "react";
+import {
+  ArrowRight,
+  Briefcase,
+  CheckCircle2,
+  Leaf,
+  Sun,
+  Zap,
+} from "lucide-react";
+import {
+  motion,
+  useInView,
+  useMotionValue,
+  useSpring,
+  useTransform,
+  type Variants,
+} from "framer-motion";
 import Footer from "@/components/Footer";
 
-function SolarMarquee() {
-  const [isVisible, setIsVisible] = useState(false);
-  const sectionRef = useRef<HTMLDivElement>(null);
-  const items = ["SOLAR", "SOLAR", "SOLAR", "SOLAR"];
+const PRIMARY = "#05627C";
+const GOLD = "#F5CF0B";
+const DARK = "#0B1F2A";
+const MUTED = "#6b7c85";
+const ACCENT = "#3FA9C8";
+const FONT_HEADING = "var(--font-font4), sans-serif";
+
+const fadeUp: Variants = {
+  hidden: { opacity: 0, y: 28 },
+  show: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.7, ease: [0.22, 1, 0.36, 1] },
+  },
+};
+
+const stagger: Variants = {
+  hidden: {},
+  show: { transition: { staggerChildren: 0.1 } },
+};
+
+const HERO_FEATURES = [
+  {
+    icon: Sun,
+    title: "Clean Energy",
+    desc: "Zero-emission power from the sun.",
+  },
+  {
+    icon: Zap,
+    title: "Cost Effective",
+    desc: "Stable, competitive energy pricing.",
+  },
+  {
+    icon: Leaf,
+    title: "Reliable Performance",
+    desc: "Proven technology, durable assets.",
+  },
+  {
+    icon: Briefcase,
+    title: "Sustainable Future",
+    desc: "Long-term returns with impact.",
+  },
+];
+
+const INTRO_PILLARS = [
+  {
+    icon: Sun,
+    title: "Renewable",
+    desc: "Unlimited solar resource powering clean generation.",
+  },
+  {
+    icon: Zap,
+    title: "Efficient",
+    desc: "Modern panels that maximize every ray of sunlight.",
+  },
+  {
+    icon: Leaf,
+    title: "Sustainable",
+    desc: "Lower carbon footprint with lasting community value.",
+  },
+];
+
+const PROCESS_STEPS = [
+  "Sunlight hits the solar panels.",
+  "Direct current (DC) flows from the panels to an inverter that turns it into alternating current (AC).",
+  "Transformer increases voltage of electricity.",
+  "Electricity travels through transmission lines.",
+  "Transformer decreases voltage of electricity.",
+  "Electricity travels through collection lines.",
+  "Electricity is delivered to customers.",
+];
+
+const STATS = [
+  { value: 2, suffix: "", label: "Solar plants operational" },
+  { value: 500, suffix: "+", label: "Megawatts of solar capacity" },
+  { value: 50, suffix: "+", label: "Projects in our investment portfolio" },
+];
+
+const WHY_POINTS = [
+  "A stable fuel price throughout a project's lifespan",
+  "Strengthened energy independence",
+  "Carbon-free energy",
+];
+
+function AnimatedStat({
+  value,
+  suffix,
+  label,
+  icon: Icon,
+}: {
+  value: number;
+  suffix: string;
+  label: string;
+  icon: typeof Sun;
+}) {
+  const ref = useRef<HTMLDivElement>(null);
+  const inView = useInView(ref, { once: true, amount: 0.5 });
+  const motionVal = useMotionValue(0);
+  const spring = useSpring(motionVal, { stiffness: 60, damping: 20 });
+  const display = useTransform(spring, (v) => `${Math.round(v)}${suffix}`);
+  const [text, setText] = useState(`0${suffix}`);
 
   useEffect(() => {
-    const section = sectionRef.current;
-    if (!section) return;
+    if (inView) motionVal.set(value);
+  }, [inView, motionVal, value]);
 
-    const checkVisibility = () => {
-      if (!section) return;
-      const rect = section.getBoundingClientRect();
-      const viewportMiddle = window.innerHeight * 0.5;
-      if (rect.top <= viewportMiddle && rect.top >= -rect.height) {
-        setIsVisible(true);
-      }
-    };
-
-    window.addEventListener("scroll", checkVisibility);
-    checkVisibility();
-
-    return () => {
-      window.removeEventListener("scroll", checkVisibility);
-    };
-  }, []);
+  useEffect(() => {
+    const unsub = display.on("change", (v) => setText(v));
+    return () => unsub();
+  }, [display]);
 
   return (
-    <section
-      ref={sectionRef}
-      className="relative w-full overflow-hidden bg-white pt-12 sm:pt-16 md:pt-20 lg:pt-24 pb-6 sm:pb-8 md:pb-10 lg:pb-12"
-    >
-      <div className={`flex ${isVisible ? "animate-scroll" : ""}`}>
-        {items.map((item, index) => (
-          <div key={index} className="flex items-center whitespace-nowrap">
-            <span
-              className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl 2xl:text-8xl font-bold uppercase tracking-tight"
-              style={{
-                color: "#05627C",
-                fontFamily: "var(--font-custom), 'CustomFont', sans-serif",
-                WebkitTextStroke: "2px #05627C",
-                WebkitTextFillColor: "transparent",
-              }}
-            >
-              {item}
-            </span>
-            <span
-              className="mx-4 sm:mx-6 md:mx-8 lg:mx-10 xl:mx-12 text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl 2xl:text-8xl"
-              style={{ color: "#05627C" }}
-            >
-              ·
-            </span>
-          </div>
-        ))}
+    <div ref={ref} className="flex flex-col gap-2.5 sm:gap-3 min-w-0">
+      <div
+        className="w-11 h-11 rounded-full flex items-center justify-center"
+        style={{ backgroundColor: "rgba(5,98,124,0.1)" }}
+      >
+        <Icon className="w-5 h-5" style={{ color: PRIMARY }} strokeWidth={1.75} />
       </div>
-    </section>
+      <p
+        className="text-4xl sm:text-5xl font-bold tabular-nums leading-none"
+        style={{ fontFamily: FONT_HEADING, color: DARK }}
+      >
+        {text}
+      </p>
+      <p className="text-sm leading-snug max-w-[200px]" style={{ color: MUTED }}>
+        {label}
+      </p>
+    </div>
   );
 }
 
 export default function SolarPage() {
   return (
-    <main className="min-h-screen w-full overflow-x-hidden pt-24 sm:pt-28 md:pt-32 lg:pt-[126px]">
-      {/* Hero Section with Background Image */}
-      <section className="relative w-full h-[50vh] sm:h-[55vh] md:h-[60vh] lg:h-[70vh] overflow-hidden">
-        <Image
-          src="https://res.cloudinary.com/dygdftjr8/image/upload/v1771927306/Screenshot_2026-02-24_at_15.31.36_sbqtdp.png"
-          alt="Solar Energy"
-          fill
-          className="object-cover"
-          priority
+    <main className="min-h-screen w-full overflow-x-hidden bg-white">
+      {/* ── Hero ── */}
+      <section className="relative w-full min-h-[100svh] min-h-[100dvh] flex flex-col justify-end overflow-hidden pt-24 sm:pt-28 lg:pt-[126px]">
+        <motion.div
+          className="absolute inset-0 z-0"
+          initial={{ scale: 1.08 }}
+          animate={{ scale: 1 }}
+          transition={{ duration: 8, ease: "easeOut" }}
+        >
+          <Image
+            src="/hero-solar.webp"
+            alt="Solar farm at sunset"
+            fill
+            priority
+            className="object-cover object-center"
+            sizes="100vw"
+            quality={90}
+          />
+        </motion.div>
+
+        <div
+          className="absolute inset-0 z-[1] pointer-events-none"
+          style={{
+            background:
+              "linear-gradient(90deg, rgba(8,24,40,0.8) 0%, rgba(8,24,40,0.5) 40%, rgba(8,24,40,0.18) 68%, transparent 100%)",
+          }}
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-gray-900/20 to-transparent"></div>
+        <div
+          className="absolute inset-0 z-[1] pointer-events-none"
+          style={{
+            background:
+              "linear-gradient(to top, rgba(8,24,40,0.92) 0%, rgba(8,24,40,0.35) 40%, transparent 65%)",
+          }}
+        />
 
-        {/* White Overlay on Left with Curved Lines */}
-        <div className="absolute left-0 top-0 w-full sm:w-1/2 lg:w-1/3 h-full bg-white">
-          {/* Curved Green Lines */}
-          <div className="absolute top-0 left-0 w-full h-full overflow-hidden">
-            <svg
-              className="absolute top-0 left-0 w-full h-full"
-              viewBox="0 0 200 200"
-              preserveAspectRatio="none"
+        <div className="relative z-10 container mx-auto px-4 sm:px-6 lg:px-8 flex-1 flex flex-col justify-center pb-6 sm:pb-8">
+          <div className="max-w-[1220px] mx-auto w-full">
+            <motion.div
+              className="max-w-xl lg:max-w-[580px]"
+              variants={stagger}
+              initial="hidden"
+              animate="show"
             >
-              <path
-                d="M0,50 Q50,30 100,50 T200,50"
-                stroke="#05627C"
-                strokeWidth="2"
-                fill="none"
-                opacity="0.3"
-              />
-              <path
-                d="M0,80 Q50,60 100,80 T200,80"
-                stroke="#05627C"
-                strokeWidth="2"
-                fill="none"
-                opacity="0.3"
-              />
-              <path
-                d="M0,110 Q50,90 100,110 T200,110"
-                stroke="#05627C"
-                strokeWidth="2"
-                fill="none"
-                opacity="0.3"
-              />
-            </svg>
-          </div>
-
-          {/* Content */}
-          <div className="relative z-10 p-4 sm:p-6 md:p-8 lg:p-12 xl:p-16 h-full flex flex-col justify-center">
-            {/* Breadcrumbs/Navigation */}
-            <div className="flex items-center gap-2 sm:gap-3 mb-6 sm:mb-8 flex-wrap">
-              <div className="h-px w-8 sm:w-12 bg-[#05627C]"></div>
-              <Link
-                href="/energy-technologies"
-                className="text-xs font-medium uppercase tracking-wide hover:opacity-70 transition"
-                style={{ color: "#05627C" }}
+              <motion.h1
+                variants={fadeUp}
+                className="text-[2.1rem] sm:text-5xl md:text-[3.25rem] lg:text-[3.5rem] font-bold leading-[1.1] mb-4 sm:mb-5 text-white"
+                style={{ fontFamily: FONT_HEADING }}
               >
-                ENERGY TECHNOLOGIES
-              </Link>
-              <div className="h-4 w-px bg-gray-300"></div>
-              <SolarPanel
-                className="w-3 h-3 sm:w-4 sm:h-4"
-                style={{ color: "#ffcf0B" }}
-              />
-              <span
-                className="text-xs font-medium uppercase tracking-wide"
-                style={{ color: "#05627C" }}
+                Affordable,{" "}
+                <span style={{ color: ACCENT }}>clean</span> energy powered by
+                the sun.
+              </motion.h1>
+
+              <motion.p
+                variants={fadeUp}
+                className="text-sm sm:text-[15px] md:text-base leading-relaxed text-white/85 max-w-md mb-7 sm:mb-8"
               >
-                SOLAR
-              </span>
-            </div>
+                Sustainable solar solutions that deliver reliable clean power,
+                strong investor returns, and a clearer path to a low-carbon
+                future.
+              </motion.p>
 
-            {/* Headline */}
-            <h1
-              className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl 2xl:text-7xl font-normal leading-tight"
-              style={{
-                color: "#05627C",
-                fontFamily: "var(--font-font4), sans-serif",
-              }}
-            >
-              Affordable, clean
-              <br className="hidden sm:block" />
-              <span className="sm:hidden"> </span>
-              energy—powered
-              <br className="hidden sm:block" />
-              <span className="sm:hidden"> </span>
-              by the sun.
-            </h1>
-          </div>
-        </div>
-      </section>
-
-      {/* Solar Marquee */}
-      <SolarMarquee />
-
-      {/* Main Content Section */}
-      <section className="relative w-full bg-white py-8 sm:py-12 md:py-16 lg:py-24">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 lg:gap-12">
-            {/* Left Column - Text Content */}
-            <div className="flex flex-col order-2 lg:order-1">
-              {/* Breadcrumbs/Navigation */}
-              <div className="flex items-center gap-2 sm:gap-3 mb-6 sm:mb-8 flex-wrap">
-                <div className="h-px w-8 sm:w-12 bg-[#05627C]"></div>
+              <motion.div variants={fadeUp}>
                 <Link
-                  href="/energy-technologies"
-                  className="text-xs font-medium uppercase tracking-wide hover:opacity-70 transition"
-                  style={{ color: "#05627C" }}
+                  href="#solutions"
+                  className="gas-cta-gold group inline-flex items-center gap-2.5 font-bold px-6 py-3.5 text-xs sm:text-sm uppercase tracking-[0.06em] rounded-lg transition-all duration-300"
+                  style={{ backgroundColor: GOLD, color: "#1a1a1a" }}
                 >
-                  ENERGY TECHNOLOGIES
+                  Explore Solar Solutions
+                  <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
                 </Link>
-                <div className="h-4 w-px bg-gray-300"></div>
-                <SolarPanel
-                  className="w-3 h-3 sm:w-4 sm:h-4"
-                  style={{ color: "#ffcf0B" }}
-                />
-                <span
-                  className="text-xs font-medium uppercase tracking-wide"
-                  style={{ color: "#05627C" }}
-                >
-                  SOLAR
-                </span>
-              </div>
-
-              {/* Headline */}
-              <h1
-                className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl 2xl:text-7xl font-normal leading-tight mb-6 sm:mb-8"
-                style={{
-                  color: "#05627C",
-                  fontFamily: "var(--font-font4), sans-serif",
-                }}
-              >
-                A core component of Big Bull Energies&apos; investment
-                portfolio.
-              </h1>
-            </div>
-
-            {/* Right Column - Circular Image and Caption */}
-            <div className="flex flex-col order-1 lg:order-2">
-              <div className="relative w-full aspect-square max-w-[350px] sm:max-w-[400px] md:max-w-[450px] lg:max-w-[500px] mx-auto mb-4 sm:mb-6">
-                <div className="relative w-full h-full rounded-full overflow-hidden">
-                  <Image
-                    src="https://res.cloudinary.com/dygdftjr8/image/upload/v1771656810/Screenshot_2026-02-21_at_12.23.11_fdjt2y.png"
-                    alt="Solar Power Plant"
-                    fill
-                    className="object-cover"
-                    priority
-                  />
-                </div>
-              </div>
-              <p
-                className="text-sm sm:text-base md:text-lg lg:text-xl leading-relaxed"
-                style={{
-                  color: "#05627C",
-                  fontFamily: "var(--font-font4), sans-serif",
-                }}
-              >
-                Solar energy harnesses the power of the sun to generate clean,
-                renewable electricity. Big Bull Energies invests in solar
-                projects that provide sustainable energy solutions, reduce
-                carbon emissions, and generate returns for our investors while
-                supporting the transition to a cleaner energy future.
-              </p>
-            </div>
+              </motion.div>
+            </motion.div>
           </div>
         </div>
-      </section>
 
-      {/* Statistics Section */}
-      <section className="relative w-full bg-[#E8F5F0] py-12 sm:py-16 md:py-20 lg:py-24">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 lg:gap-12">
-            {/* Left Side - Statistics */}
-            <div className="flex flex-col order-2 lg:order-1">
-              <h2
-                className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-6 sm:mb-8"
-                style={{ color: "#05627C" }}
-              >
-                Our solar investment portfolio
-              </h2>
-
-              {/* Statistics */}
-              <div className="space-y-4 sm:space-y-6">
-                {/* Stat 1 */}
-                <div>
-                  <div className="h-px bg-[#05627C] mb-3 sm:mb-4"></div>
-                  <div className="flex flex-col sm:flex-row sm:items-baseline gap-2 sm:gap-3">
-                    <span
-                      className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold"
-                      style={{ color: "#05627C" }}
-                    >
-                      2
-                    </span>
-                    <span
-                      className="text-sm sm:text-base md:text-lg lg:text-xl"
-                      style={{ color: "#05627C" }}
-                    >
-                      solar plants operational
-                    </span>
-                  </div>
-                </div>
-
-                {/* Stat 2 */}
-                <div>
-                  <div className="h-px bg-[#05627C] mb-3 sm:mb-4"></div>
-                  <div className="flex flex-col sm:flex-row sm:items-baseline gap-2 sm:gap-3">
-                    <span
-                      className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold"
-                      style={{ color: "#05627C" }}
-                    >
-                      500+
-                    </span>
-                    <span
-                      className="text-sm sm:text-base md:text-lg lg:text-xl"
-                      style={{ color: "#05627C" }}
-                    >
-                      megawatts of solar capacity
-                    </span>
-                  </div>
-                </div>
-
-                {/* Stat 3 */}
-                <div>
-                  <div className="h-px bg-[#05627C] mb-3 sm:mb-4"></div>
-                  <div className="flex flex-col sm:flex-row sm:items-baseline gap-2 sm:gap-3">
-                    <span
-                      className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold"
-                      style={{ color: "#05627C" }}
-                    >
-                      50+
-                    </span>
-                    <span
-                      className="text-sm sm:text-base md:text-lg lg:text-xl"
-                      style={{ color: "#05627C" }}
-                    >
-                      solar projects in our investment portfolio
-                    </span>
-                  </div>
-                </div>
-
-                {/* Final line */}
-                <div className="h-px bg-[#05627C] mt-3 sm:mt-4"></div>
-              </div>
-            </div>
-
-            {/* Right Side - Illustration and CTA */}
-            <div className="relative flex flex-col items-start lg:items-end order-1 lg:order-2">
-              {/* CTA Link */}
-              <Link
-                href="/projects"
-                className="text-xs sm:text-sm md:text-base font-bold uppercase tracking-wide mb-6 sm:mb-8 hover:opacity-70 transition"
-                style={{
-                  color: "#05627C",
-                  textDecoration: "underline",
-                  textUnderlineOffset: "4px",
-                }}
-              >
-                VIEW Big Bull Energies PROJECTS
-              </Link>
-
-              {/* Line Art Illustration */}
-              <div className="relative w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg">
-                <img
-                  src="/solar3.svg"
-                  alt="Solar Farm Illustration"
-                  className="w-full h-auto"
-                  onError={(e) => {
-                    // Fallback to soloar1.svg if solar3.svg doesn't exist
-                    const target = e.target as HTMLImageElement;
-                    if (target.src.includes("solar3.svg")) {
-                      target.src = "/soloar1.svg";
-                    }
-                  }}
-                />
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* How Solar Works Section */}
-      <section className="relative w-full bg-white py-12 sm:py-16 md:py-20 lg:py-24">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <h2
-            className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-8 sm:mb-10 md:mb-12 text-center"
-            style={{ color: "#05627C" }}
-          >
-            How solar energy works
-          </h2>
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-10 md:gap-12 lg:gap-16">
-            {/* Left Side - Steps List */}
-            <div className="flex flex-col gap-4 sm:gap-5 md:gap-6 order-2 lg:order-1">
-              <p
-                className="text-sm sm:text-base md:text-lg lg:text-xl leading-relaxed mb-4 sm:mb-6"
-                style={{ color: "#05627C" }}
-              >
-                Solar technology is simple, scalable and reliable, and provides
-                great flexibility for the future of the grid.
-              </p>
-              {[
-                {
-                  number: 1,
-                  text: "Sunlight hits the solar panels.",
-                },
-                {
-                  number: 2,
-                  text: "Direct current (DC) flows from the panels to an inverter that turns it into alternating current (AC).",
-                },
-                {
-                  number: 3,
-                  text: "Transformer increases voltage of electricity.",
-                },
-                {
-                  number: 4,
-                  text: "Electricity travels through transmission lines.",
-                },
-                {
-                  number: 5,
-                  text: "Transformer decreases voltage of electricity.",
-                },
-                {
-                  number: 6,
-                  text: "Electricity travels through collection lines.",
-                },
-                {
-                  number: 7,
-                  text: "Electricity is delivered to customers.",
-                },
-              ].map((step) => (
+        <motion.div
+          className="relative z-10 border-t border-white/10"
+          style={{
+            background: "rgba(8,24,40,0.55)",
+            backdropFilter: "blur(14px)",
+          }}
+          initial={{ opacity: 0, y: 24 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.45, duration: 0.7 }}
+        >
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="max-w-[1220px] mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-0 py-5 sm:py-6">
+              {HERO_FEATURES.map(({ icon: Icon, title, desc }, i) => (
                 <div
-                  key={step.number}
-                  className="flex items-start gap-3 sm:gap-4"
+                  key={title}
+                  className={`flex items-start gap-3 sm:px-4 lg:px-5 ${
+                    i > 0 ? "lg:border-l lg:border-white/15" : ""
+                  }`}
                 >
-                  <div
-                    className="flex-shrink-0 w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center font-bold text-base sm:text-lg shadow-md"
+                  <span
+                    className="shrink-0 w-10 h-10 rounded-full flex items-center justify-center border"
                     style={{
-                      backgroundColor: "#E8F5F0",
-                      color: "#05627C",
-                      border: "2px solid #05627C",
-                      boxShadow: "0 4px 6px rgba(4, 43, 25, 0.1)",
+                      borderColor: "rgba(63,169,200,0.45)",
+                      color: "#7DD3E8",
                     }}
                   >
-                    {step.number}
+                    <Icon className="w-[18px] h-[18px]" strokeWidth={1.75} />
+                  </span>
+                  <div>
+                    <p className="text-sm font-semibold text-white">{title}</p>
+                    <p className="text-xs text-white/65 mt-0.5">{desc}</p>
                   </div>
-                  <p
-                    className="text-sm sm:text-base md:text-lg lg:text-xl leading-relaxed flex-1"
-                    style={{ color: "#05627C" }}
-                  >
-                    {step.text}
-                  </p>
                 </div>
               ))}
             </div>
-
-            {/* Right Side - Diagram Illustration */}
-            <div className="relative w-full h-[300px] sm:h-[350px] md:h-[400px] lg:h-[500px] xl:h-[600px] order-1 lg:order-2 mb-4 sm:mb-0">
-              <Image
-                src="/solar2.webp"
-                alt="How Solar Energy Works Diagram"
-                fill
-                className="object-contain"
-              />
-            </div>
           </div>
-        </div>
+        </motion.div>
       </section>
 
-      {/* Why Solar Section */}
-      <section className="relative w-full bg-[#E8F5F0] py-12 sm:py-16 md:py-20 lg:py-24">
+      {/* ── About Solar ── */}
+      <section
+        id="solutions"
+        className="relative w-full bg-white py-14 sm:py-16 md:py-20 lg:py-24 overflow-hidden"
+      >
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-10 md:gap-12 lg:gap-16">
-            {/* Left Side - Text Content */}
-            <div className="flex flex-col order-2 lg:order-1">
-              <h2
-                className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-4 sm:mb-6"
-                style={{ color: "#05627C" }}
+          <div className="max-w-[1220px] mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-14 xl:gap-16 items-center">
+            <motion.div
+              variants={stagger}
+              initial="hidden"
+              whileInView="show"
+              viewport={{ once: true, amount: 0.25 }}
+            >
+              <motion.div
+                variants={fadeUp}
+                className="flex items-center gap-2.5 flex-wrap text-[11px] sm:text-xs font-semibold uppercase tracking-[0.14em] mb-5 sm:mb-6"
+                style={{ color: MUTED }}
               >
-                Why solar
-              </h2>
-              <p
-                className="text-sm sm:text-base md:text-lg lg:text-xl leading-relaxed mb-4 sm:mb-6"
-                style={{ color: "#05627C" }}
+                <Sun className="w-3.5 h-3.5" style={{ color: GOLD }} />
+                <span>Energy Technologies</span>
+                <span className="opacity-40">&gt;</span>
+                <span style={{ color: PRIMARY }}>Solar</span>
+              </motion.div>
+
+              <motion.h2
+                variants={fadeUp}
+                className="text-[1.85rem] sm:text-4xl lg:text-[2.65rem] font-bold leading-[1.15] mb-5"
+                style={{ fontFamily: FONT_HEADING, color: DARK }}
               >
-                Solar provides many advantages because of its accessibility
-                around the world. Solar&apos;s benefits include:
-              </p>
-              <div className="space-y-3 sm:space-y-4">
-                <div className="flex items-start gap-2 sm:gap-3">
+                A core component of Big Bull Energies&apos;{" "}
+                <span style={{ color: PRIMARY }}>investment portfolio.</span>
+              </motion.h2>
+
+              <motion.p
+                variants={fadeUp}
+                className="text-sm sm:text-[15px] leading-[1.75] mb-4 max-w-lg"
+                style={{ color: MUTED }}
+              >
+                Solar energy harnesses the power of the sun to generate clean,
+                renewable electricity. Big Bull Energies invests in solar
+                projects that provide sustainable energy solutions and reduce
+                carbon emissions.
+              </motion.p>
+
+              <motion.p
+                variants={fadeUp}
+                className="text-sm sm:text-[15px] leading-[1.75] mb-8 sm:mb-10 max-w-lg"
+                style={{ color: MUTED }}
+              >
+                Our portfolio generates returns for investors while supporting
+                the transition to a cleaner energy future — from utility-scale
+                plants to community-focused deployments.
+              </motion.p>
+
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 sm:gap-4">
+                {INTRO_PILLARS.map(({ icon: Icon, title, desc }) => (
+                  <motion.div
+                    key={title}
+                    variants={fadeUp}
+                    className="flex sm:flex-col items-center sm:items-start gap-3"
+                  >
+                    <span
+                      className="shrink-0 w-11 h-11 rounded-full flex items-center justify-center"
+                      style={{ backgroundColor: "rgba(5,98,124,0.1)" }}
+                    >
+                      <Icon
+                        className="w-5 h-5"
+                        style={{ color: PRIMARY }}
+                        strokeWidth={1.75}
+                      />
+                    </span>
+                    <div>
+                      <p
+                        className="text-sm font-bold mb-0.5"
+                        style={{ color: PRIMARY }}
+                      >
+                        {title}
+                      </p>
+                      <p
+                        className="text-xs sm:text-[13px] leading-relaxed"
+                        style={{ color: MUTED }}
+                      >
+                        {desc}
+                      </p>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+            </motion.div>
+
+            {/* Circular image composition */}
+            <motion.div
+              className="relative w-full max-w-[420px] sm:max-w-[460px] mx-auto lg:max-w-none lg:justify-self-end"
+              initial={{ opacity: 0, scale: 0.94 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true, amount: 0.3 }}
+              transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+            >
+              {/* Dot pattern */}
+              <div
+                className="pointer-events-none absolute -right-2 top-6 hidden sm:grid grid-cols-6 gap-2.5 opacity-40"
+                aria-hidden
+              >
+                {Array.from({ length: 36 }).map((_, i) => (
                   <span
-                    className="text-lg sm:text-xl flex-shrink-0 mt-0.5"
-                    style={{ color: "#05627C" }}
-                  >
-                    →
-                  </span>
-                  <p
-                    className="text-sm sm:text-base md:text-lg lg:text-xl leading-relaxed"
-                    style={{ color: "#05627C" }}
-                  >
-                    A stable fuel price throughout a project&apos;s lifespan
-                  </p>
+                    key={i}
+                    className="w-1.5 h-1.5 rounded-full"
+                    style={{ backgroundColor: "#C5D4DA" }}
+                  />
+                ))}
+              </div>
+
+              <div className="relative w-full aspect-square">
+                <div className="absolute inset-0 rounded-full overflow-hidden shadow-[0_28px_64px_rgba(5,98,124,0.18)]">
+                  <Image
+                    src="/img4.webp"
+                    alt="Solar panels in the landscape"
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 1024px) 90vw, 460px"
+                  />
                 </div>
-                <div className="flex items-start gap-2 sm:gap-3">
-                  <span
-                    className="text-lg sm:text-xl flex-shrink-0 mt-0.5"
-                    style={{ color: "#05627C" }}
-                  >
-                    →
-                  </span>
-                  <p
-                    className="text-sm sm:text-base md:text-lg lg:text-xl leading-relaxed"
-                    style={{ color: "#05627C" }}
-                  >
-                    Strengthened energy independence
-                  </p>
-                </div>
-                <div className="flex items-start gap-2 sm:gap-3">
-                  <span
-                    className="text-lg sm:text-xl flex-shrink-0 mt-0.5"
-                    style={{ color: "#05627C" }}
-                  >
-                    →
-                  </span>
-                  <p
-                    className="text-sm sm:text-base md:text-lg lg:text-xl leading-relaxed"
-                    style={{ color: "#05627C" }}
-                  >
-                    Carbon-free energy
+
+                <div
+                  className="absolute -bottom-2 -left-2 sm:bottom-4 sm:left-0 z-10 w-[42%] max-w-[180px] aspect-square rounded-full flex flex-col items-center justify-center text-center px-4"
+                  style={{
+                    background:
+                      "linear-gradient(145deg, #05627C 0%, #0A4A5C 100%)",
+                    boxShadow: "0 16px 40px rgba(5,98,124,0.35)",
+                  }}
+                >
+                  <Leaf className="w-6 h-6 mb-2" style={{ color: GOLD }} />
+                  <p className="text-[10px] sm:text-[11px] leading-snug text-white/95 font-medium">
+                    Building a cleaner tomorrow, together.
                   </p>
                 </div>
               </div>
-            </div>
+            </motion.div>
+          </div>
+        </div>
+      </section>
 
-            {/* Right Side - Illustration */}
-            <div className="relative w-full h-[300px] sm:h-[350px] md:h-[400px] lg:h-[500px] xl:h-[600px] order-1 lg:order-2 mb-4 sm:mb-0">
-              <img
-                src="/soloar1.svg"
-                alt="Solar Farm with Flowers"
-                className="w-full h-full object-contain"
-                onError={(e) => {
-                  // Fallback to solar3.svg if soloar1.svg doesn't exist
-                  const target = e.target as HTMLImageElement;
-                  if (target.src.includes("soloar1.svg")) {
-                    target.src = "/solar3.svg";
-                  }
-                }}
-              />
+      {/* ── Portfolio stats ── */}
+      <section className="relative w-full bg-[#F4F6F7] py-14 sm:py-16 md:py-20 lg:py-24">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="max-w-[1220px] mx-auto">
+            <motion.div
+              className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-10 sm:mb-12"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+            >
+              <h2
+                className="text-2xl sm:text-3xl md:text-4xl font-bold"
+                style={{ fontFamily: FONT_HEADING, color: DARK }}
+              >
+                Our solar investment portfolio
+              </h2>
+              <Link
+                href="/projects"
+                className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.08em] hover:opacity-80 transition"
+                style={{ color: PRIMARY }}
+              >
+                View All Projects
+                <span
+                  className="w-8 h-8 rounded-full flex items-center justify-center"
+                  style={{ backgroundColor: PRIMARY }}
+                >
+                  <ArrowRight className="w-3.5 h-3.5 text-white" />
+                </span>
+              </Link>
+            </motion.div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-[1.1fr_0.9fr] gap-10 lg:gap-12 items-center">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 sm:gap-6">
+                <AnimatedStat {...STATS[0]} icon={Sun} />
+                <AnimatedStat {...STATS[1]} icon={Zap} />
+                <AnimatedStat {...STATS[2]} icon={Briefcase} />
+              </div>
+
+              <motion.div
+                className="relative w-full aspect-[5/4] sm:aspect-[4/3]"
+                initial={{ opacity: 0, x: 28 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.7 }}
+              >
+                <Image
+                  src="/solar3.svg"
+                  alt="Solar farm illustration"
+                  fill
+                  className="object-contain"
+                  sizes="(max-width: 1024px) 100vw, 45vw"
+                />
+              </motion.div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="relative w-full bg-[#E8F5F0] py-12 sm:py-16 md:py-20 lg:py-24">
+      {/* ── How solar works ── */}
+      <section className="relative w-full bg-white py-14 sm:py-16 md:py-20 lg:py-24">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col items-center justify-center text-center">
+          <div className="max-w-[1220px] mx-auto">
+            <motion.h2
+              className="text-2xl sm:text-3xl md:text-4xl lg:text-[2.5rem] font-bold text-center mb-4"
+              style={{ fontFamily: FONT_HEADING, color: DARK }}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+            >
+              How solar energy works
+            </motion.h2>
+            <motion.p
+              className="text-center text-sm sm:text-[15px] max-w-2xl mx-auto mb-10 sm:mb-12 lg:mb-14"
+              style={{ color: MUTED }}
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              viewport={{ once: true }}
+            >
+              Solar technology is simple, scalable and reliable, and provides
+              great flexibility for the future of the grid.
+            </motion.p>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-14 xl:gap-16 items-center">
+              <motion.ol
+                className="flex flex-col gap-3.5 sm:gap-4 order-2 lg:order-1"
+                variants={stagger}
+                initial="hidden"
+                whileInView="show"
+                viewport={{ once: true, amount: 0.15 }}
+              >
+                {PROCESS_STEPS.map((text, i) => (
+                  <motion.li
+                    key={i}
+                    variants={fadeUp}
+                    className="flex items-start gap-3.5 sm:gap-4"
+                  >
+                    <motion.span
+                      className="shrink-0 w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center text-sm font-bold text-white"
+                      style={{ backgroundColor: PRIMARY }}
+                      whileHover={{ scale: 1.08 }}
+                      transition={{
+                        type: "spring",
+                        stiffness: 320,
+                        damping: 18,
+                      }}
+                    >
+                      {i + 1}
+                    </motion.span>
+                    <p
+                      className="text-sm sm:text-[15px] leading-relaxed pt-1.5"
+                      style={{ color: MUTED }}
+                    >
+                      {text}
+                    </p>
+                  </motion.li>
+                ))}
+              </motion.ol>
+
+              <motion.div
+                className="relative w-full aspect-square sm:aspect-[5/4] lg:aspect-square order-1 lg:order-2"
+                initial={{ opacity: 0, scale: 0.96 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true, amount: 0.3 }}
+                transition={{ duration: 0.75 }}
+              >
+                <Image
+                  src="/solar2.webp"
+                  alt="How solar energy works diagram"
+                  fill
+                  className="object-contain"
+                  sizes="(max-width: 1024px) 100vw, 50vw"
+                />
+              </motion.div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── Why solar ── */}
+      <section className="relative w-full bg-[#F7F9FA] py-14 sm:py-16 md:py-20 lg:py-24">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="max-w-[1220px] mx-auto grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-14 xl:gap-16 items-center">
+            <motion.div
+              variants={stagger}
+              initial="hidden"
+              whileInView="show"
+              viewport={{ once: true, amount: 0.25 }}
+            >
+              <motion.h2
+                variants={fadeUp}
+                className="text-2xl sm:text-3xl md:text-4xl lg:text-[2.5rem] font-bold mb-4 sm:mb-5"
+                style={{ fontFamily: FONT_HEADING, color: DARK }}
+              >
+                Why <span style={{ color: PRIMARY }}>solar</span>
+              </motion.h2>
+
+              <motion.p
+                variants={fadeUp}
+                className="text-sm sm:text-[15px] leading-[1.75] mb-6 sm:mb-7 max-w-lg"
+                style={{ color: MUTED }}
+              >
+                Solar provides many advantages because of its accessibility
+                around the world. Solar&apos;s benefits include:
+              </motion.p>
+
+              <div className="space-y-4 sm:space-y-5">
+                {WHY_POINTS.map((point) => (
+                  <motion.div
+                    key={point}
+                    variants={fadeUp}
+                    className="flex items-start gap-3"
+                  >
+                    <CheckCircle2
+                      className="w-5 h-5 sm:w-6 sm:h-6 shrink-0 mt-0.5"
+                      style={{ color: PRIMARY }}
+                    />
+                    <p
+                      className="text-sm sm:text-[15px] md:text-base leading-relaxed"
+                      style={{ color: MUTED }}
+                    >
+                      {point}
+                    </p>
+                  </motion.div>
+                ))}
+              </div>
+            </motion.div>
+
+            <motion.div
+              className="relative w-full aspect-[5/4] sm:aspect-[4/3]"
+              initial={{ opacity: 0, x: 30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true, amount: 0.3 }}
+              transition={{ duration: 0.7 }}
+            >
+              <Image
+                src="/soloar1.svg"
+                alt="Solar farm illustration"
+                fill
+                className="object-contain"
+                sizes="(max-width: 1024px) 100vw, 50vw"
+              />
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── CTA ── */}
+      <section className="relative w-full bg-white py-10 sm:py-12 lg:py-16">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <motion.div
+            className="max-w-[1220px] mx-auto rounded-2xl sm:rounded-3xl px-6 sm:px-8 lg:px-10 py-7 sm:py-8 lg:py-9 flex flex-col sm:flex-row items-center gap-5 sm:gap-6 lg:gap-8"
+            style={{
+              background:
+                "linear-gradient(135deg, #05627C 0%, #0A4A5C 55%, #083D4A 100%)",
+              boxShadow: "0 20px 50px rgba(5,98,124,0.28)",
+            }}
+            initial={{ opacity: 0, y: 28 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.65 }}
+          >
+            <div
+              className="shrink-0 w-14 h-14 sm:w-16 sm:h-16 rounded-full flex items-center justify-center"
+              style={{ backgroundColor: "rgba(255,255,255,0.12)" }}
+            >
+              <Leaf className="w-7 h-7" style={{ color: GOLD }} />
+            </div>
+
             <h2
-              className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-normal mb-6 sm:mb-8 px-2"
-              style={{
-                color: "#05627C",
-                fontFamily: "var(--font-font4), sans-serif",
-              }}
+              className="flex-1 text-center sm:text-left text-xl sm:text-2xl lg:text-[1.75rem] font-bold text-white leading-snug"
+              style={{ fontFamily: FONT_HEADING }}
             >
               Ready to explore solar solutions?
             </h2>
+
             <Link
               href="/contact"
-              className="inline-block bg-[#ffcf0B] text-gray-900 font-bold px-6 sm:px-8 lg:px-12 py-3 sm:py-4 lg:py-5 text-xs sm:text-sm md:text-base uppercase tracking-wide transition hover:opacity-90 w-full sm:w-auto text-center"
-              style={{ borderRadius: "0" }}
+              className="gas-cta-gold group inline-flex items-center gap-2.5 font-bold px-6 py-3.5 text-xs sm:text-sm uppercase tracking-[0.06em] rounded-lg transition-all duration-300 shrink-0"
+              style={{ backgroundColor: GOLD, color: "#1a1a1a" }}
             >
-              GET IN TOUCH
+              Get In Touch
+              <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
             </Link>
-          </div>
+          </motion.div>
         </div>
       </section>
 

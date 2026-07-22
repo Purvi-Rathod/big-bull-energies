@@ -3,44 +3,50 @@
 import { usePathname } from "next/navigation";
 import Navbar from "./Navbar";
 
+const DASHBOARD_ROUTES = [
+  "/dashboard",
+  "/plans",
+  "/binary",
+  "/investments",
+  "/my-tree",
+  "/genealogy",
+  "/referrals",
+  "/reports",
+  "/tickets",
+  "/vouchers",
+  "/withdraw",
+  "/profile",
+  "/career-levels",
+];
+
+const AUTH_ROUTES = [
+  "/login",
+  "/signup",
+  "/forgot-password",
+  "/reset-password",
+];
+
+const AUTHENTICATED_ROUTES = ["/tree"];
+
+function matchesRoute(pathname: string | null, route: string) {
+  return pathname === route || pathname?.startsWith(`${route}/`);
+}
+
 export default function ConditionalNavbar() {
   const pathname = usePathname();
 
-  // Dashboard routes under (dashboard) route group - these don't have /dashboard prefix
-  const dashboardRoutes = [
-    "/dashboard",
-    "/plans",
-    "/binary",
-    "/investments",
-    "/my-tree",
-    "/genealogy",
-    "/referrals",
-    "/reports",
-    "/tickets",
-    "/vouchers",
-    "/withdraw",
-    "/profile",
-    "/career-levels",
-  ];
-
-  // Additional authenticated routes that should hide navbar
-  const authenticatedRoutes = [
-    "/tree", // Tree visualization page (used by admin and users)
-  ];
-
-  // Check if current pathname is a dashboard route or authenticated route
-  const isDashboardRoute = dashboardRoutes.some(
-    route => pathname === route || pathname?.startsWith(`${route}/`)
+  const isDashboardRoute = DASHBOARD_ROUTES.some((route) =>
+    matchesRoute(pathname, route),
   );
 
-  const isAuthenticatedRoute = authenticatedRoutes.some(
-    route => pathname === route || pathname?.startsWith(`${route}/`)
+  const isAuthRoute = AUTH_ROUTES.some((route) => matchesRoute(pathname, route));
+
+  const isAuthenticatedRoute = AUTHENTICATED_ROUTES.some((route) =>
+    matchesRoute(pathname, route),
   );
 
-  // Hide navbar on login, signup, dashboard, admin, and authenticated pages
   if (
-    pathname === "/login" ||
-    pathname === "/signup" ||
+    isAuthRoute ||
     pathname?.startsWith("/admin") ||
     isDashboardRoute ||
     isAuthenticatedRoute

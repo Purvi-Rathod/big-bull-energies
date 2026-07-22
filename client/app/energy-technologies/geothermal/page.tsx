@@ -1,437 +1,557 @@
 "use client";
 
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Globe, Mountain } from "lucide-react";
-import { useState, useEffect, useRef } from "react";
+import {
+  ArrowRight,
+  CheckCircle2,
+  Clock,
+  Flame,
+  Leaf,
+  Mountain,
+  ShieldCheck,
+  Zap,
+} from "lucide-react";
+import {
+  motion,
+  useInView,
+  useMotionValue,
+  useSpring,
+  useTransform,
+} from "framer-motion";
 import Footer from "@/components/Footer";
 
-function GeothermalMarquee() {
-  const [isVisible, setIsVisible] = useState(false);
-  const sectionRef = useRef<HTMLDivElement>(null);
-  const items = ["GEOTHERMAL", "GEOTHERMAL", "GEOTHERMAL", "GEOTHERMAL"];
+const PRIMARY = "#05627C";
+const GOLD = "#F5CF0B";
+const DARK = "#0B1F2A";
+const MUTED = "#6b7c85";
+const ACCENT = "#3FA9C8";
+const FONT_HEADING = "var(--font-font4), sans-serif";
+
+const HERO_FEATURES = [
+  {
+    icon: Flame,
+    title: "Always On",
+    desc: "Baseload power, day and night.",
+  },
+  {
+    icon: Leaf,
+    title: "Low Carbon",
+    desc: "Clean heat from beneath the Earth.",
+  },
+  {
+    icon: ShieldCheck,
+    title: "Reliable Output",
+    desc: "Stable generation, weather or not.",
+  },
+  {
+    icon: Clock,
+    title: "Long Lifespan",
+    desc: "Decades of sustainable performance.",
+  },
+];
+
+const INTRO_PILLARS = [
+  {
+    icon: Flame,
+    title: "Renewable",
+    desc: "Earth's heat, naturally replenished.",
+  },
+  {
+    icon: Zap,
+    title: "Dependable",
+    desc: "True baseload power for the grid.",
+  },
+  {
+    icon: Mountain,
+    title: "Sustainable",
+    desc: "Minimal footprint, lasting impact.",
+  },
+];
+
+const PROCESS_STEPS = [
+  "Hot water or steam is extracted from underground reservoirs through production wells.",
+  "The geothermal fluid is brought to the surface and separated into steam and water.",
+  "Steam drives turbines connected to generators that produce electricity.",
+  "Used geothermal fluid is reinjected into the reservoir through injection wells.",
+  "Electrical output is stepped up through transformers for transmission.",
+  "Clean electricity is delivered to the grid for homes and industry.",
+];
+
+const WHY_POINTS = [
+  "Renewable heat with a minimal carbon footprint",
+  "Reliable baseload power available 24/7",
+  "Long operational life with low operating costs",
+];
+
+const STATS = [
+  {
+    value: 5,
+    suffix: "+",
+    label: "Geothermal projects in development",
+    icon: Mountain,
+  },
+  {
+    value: 500,
+    suffix: "+",
+    label: "Megawatts of geothermal capacity planned",
+    icon: Zap,
+  },
+  {
+    value: 100,
+    suffix: "+",
+    label: "Years of sustainable energy potential",
+    icon: Clock,
+  },
+];
+
+function AnimatedStat({
+  value,
+  suffix,
+  label,
+  icon: Icon,
+}: {
+  value: number;
+  suffix: string;
+  label: string;
+  icon: typeof Mountain;
+}) {
+  const ref = useRef<HTMLDivElement>(null);
+  const inView = useInView(ref, { once: true, amount: 0.5 });
+  const motionVal = useMotionValue(0);
+  const spring = useSpring(motionVal, { stiffness: 55, damping: 22 });
+  const display = useTransform(spring, (v) => `${Math.round(v)}${suffix}`);
+  const [text, setText] = useState(`0${suffix}`);
 
   useEffect(() => {
-    const section = sectionRef.current;
-    if (!section) return;
+    if (inView) motionVal.set(value);
+  }, [inView, motionVal, value]);
 
-    const checkVisibility = () => {
-      if (!section) return;
-      const rect = section.getBoundingClientRect();
-      const viewportMiddle = window.innerHeight * 0.5;
-      if (rect.top <= viewportMiddle && rect.top >= -rect.height) {
-        setIsVisible(true);
-      }
-    };
-
-    window.addEventListener("scroll", checkVisibility);
-    checkVisibility();
-
-    return () => {
-      window.removeEventListener("scroll", checkVisibility);
-    };
-  }, []);
+  useEffect(() => {
+    const unsub = display.on("change", (v) => setText(v));
+    return () => unsub();
+  }, [display]);
 
   return (
-    <section
-      ref={sectionRef}
-      className="relative w-full overflow-hidden bg-white pt-12 sm:pt-16 md:pt-20 lg:pt-24 pb-6 sm:pb-8 md:pb-10 lg:pb-12"
+    <div
+      ref={ref}
+      className="flex items-start gap-4 sm:gap-5 py-5 border-b border-[#d8e2e6] last:border-b-0"
     >
-      <div className={`flex ${isVisible ? "animate-scroll" : ""}`}>
-        {items.map((item, index) => (
-          <div key={index} className="flex items-center whitespace-nowrap">
-            <span
-              className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl 2xl:text-8xl font-bold uppercase tracking-tight"
-              style={{
-                color: "#05627C",
-                fontFamily: "var(--font-custom), 'CustomFont', sans-serif",
-                WebkitTextStroke: "2px #05627C",
-                WebkitTextFillColor: "transparent",
-              }}
-            >
-              {item}
-            </span>
-            <span
-              className="mx-4 sm:mx-6 md:mx-8 lg:mx-10 xl:mx-12 text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl 2xl:text-8xl"
-              style={{ color: "#05627C" }}
-            >
-              ·
-            </span>
-          </div>
-        ))}
+      <div
+        className="shrink-0 w-11 h-11 rounded-full flex items-center justify-center"
+        style={{ backgroundColor: "rgba(5,98,124,0.1)" }}
+      >
+        <Icon className="w-5 h-5" style={{ color: PRIMARY }} strokeWidth={1.75} />
       </div>
-    </section>
+      <div className="min-w-0">
+        <p
+          className="text-3xl sm:text-4xl lg:text-[2.75rem] font-bold tabular-nums leading-none mb-1.5"
+          style={{ fontFamily: FONT_HEADING, color: DARK }}
+        >
+          {text}
+        </p>
+        <p className="text-sm sm:text-[15px] leading-snug" style={{ color: MUTED }}>
+          {label}
+        </p>
+      </div>
+    </div>
   );
 }
 
 export default function GeothermalPage() {
   return (
-    <main className="min-h-screen w-full overflow-x-hidden pt-24 sm:pt-28 md:pt-32 lg:pt-[126px]">
-      {/* Hero Section with Background Image */}
-      <section className="relative w-full h-[40vh] sm:h-[50vh] md:h-[60vh] lg:h-[70vh] overflow-hidden">
-        <Image
-          src="/hero-gas.webp"
-          alt="Geothermal Energy"
-          fill
-          className="object-cover"
-          priority
+    <main className="min-h-screen w-full overflow-x-hidden bg-white">
+      {/* Hero */}
+      <section className="relative w-full min-h-[100svh] min-h-[100dvh] flex flex-col justify-end overflow-hidden pt-24 sm:pt-28 lg:pt-[126px]">
+        <div className="absolute inset-0 z-0">
+          <Image
+            src="/Geothermal-hero.webp"
+            alt="Geothermal energy landscape"
+            fill
+            priority
+            className="object-cover object-center"
+            sizes="100vw"
+            quality={90}
+          />
+        </div>
+
+        <div
+          className="absolute inset-0 z-[1] pointer-events-none"
+          style={{
+            background:
+              "linear-gradient(90deg, rgba(8,24,40,0.82) 0%, rgba(8,24,40,0.55) 38%, rgba(8,24,40,0.2) 65%, transparent 100%)",
+          }}
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-gray-900/20 to-transparent"></div>
-      </section>
+        <div
+          className="absolute inset-0 z-[1] pointer-events-none"
+          style={{
+            background:
+              "linear-gradient(to top, rgba(8,24,40,0.9) 0%, rgba(8,24,40,0.3) 42%, transparent 68%)",
+          }}
+        />
 
-      {/* Geothermal Marquee */}
-      <GeothermalMarquee />
-
-      {/* Main Content Section */}
-      <section className="relative w-full bg-white py-8 sm:py-12 md:py-16 lg:py-24">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 lg:gap-12">
-            {/* Left Column - Text Content */}
-            <div className="flex flex-col order-2 lg:order-1">
-              {/* Breadcrumbs/Navigation */}
-              <div className="flex items-center gap-2 sm:gap-3 mb-6 sm:mb-8 flex-wrap">
-                <div className="h-px w-8 sm:w-12 bg-[#05627C]"></div>
-                <Link
-                  href="/energy-technologies"
-                  className="text-xs font-medium uppercase tracking-wide hover:opacity-70 transition"
-                  style={{ color: "#05627C" }}
-                >
-                  ENERGY TECHNOLOGIES
-                </Link>
-                <div className="h-4 w-px bg-gray-300"></div>
-                <Mountain
-                  className="w-3 h-3 sm:w-4 sm:h-4"
-                  style={{ color: "#ffcf0B" }}
-                />
-                <span
-                  className="text-xs font-medium uppercase tracking-wide"
-                  style={{ color: "#05627C" }}
-                >
-                  GEOTHERMAL
-                </span>
-              </div>
-
-              {/* Headline */}
-              <h1
-                className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl 2xl:text-7xl font-normal leading-tight mb-6 sm:mb-8"
-                style={{
-                  color: "#05627C",
-                  fontFamily: "var(--font-font4), sans-serif",
-                }}
-              >
-                A core component of Invenergy&apos;s energy mix.
-              </h1>
-            </div>
-
-            {/* Right Column - Image and Caption */}
-            <div className="flex flex-col order-1 lg:order-2">
-              <div className="relative w-full h-[250px] sm:h-[300px] md:h-[400px] lg:h-[500px] xl:h-[600px] mb-4 sm:mb-6">
-                <Image
-                  src="/img1.png"
-                  alt="Geothermal Power Plant"
-                  fill
-                  className="object-cover"
-                  priority
-                />
-              </div>
+        <div className="relative z-10 container mx-auto px-4 sm:px-6 lg:px-8 flex-1 flex flex-col justify-center pb-6 sm:pb-8">
+          <div className="max-w-[1220px] mx-auto w-full">
+            <motion.div
+              className="max-w-xl lg:max-w-[560px]"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+            >
               <p
-                className="text-sm sm:text-base md:text-lg lg:text-xl leading-relaxed"
-                style={{
-                  color: "#05627C",
-                  fontFamily: "var(--font-font4), sans-serif",
-                }}
+                className="text-[11px] sm:text-xs font-bold uppercase tracking-[0.2em] mb-4 sm:mb-5"
+                style={{ color: "#7DD3E8" }}
               >
-                Geothermal energy harnesses the Earth&apos;s natural heat to
-                generate clean, renewable electricity. This sustainable energy
-                source provides reliable power generation with minimal
-                environmental impact.
+                Power From The Earth.
               </p>
-            </div>
-          </div>
-        </div>
-      </section>
 
-      {/* Statistics Section */}
-      <section className="relative w-full bg-[#E8F5F0] py-12 sm:py-16 md:py-20 lg:py-24">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 lg:gap-12">
-            {/* Left Side - Statistics */}
-            <div className="flex flex-col order-2 lg:order-1">
-              <h2
-                className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-6 sm:mb-8"
-                style={{ color: "#05627C" }}
+              <h1
+                className="text-[2.1rem] sm:text-5xl md:text-[3.15rem] lg:text-[3.4rem] font-bold leading-[1.1] mb-4 sm:mb-5 text-white"
+                style={{ fontFamily: FONT_HEADING }}
               >
-                Our proven track record in geothermal
-              </h2>
+                Steady heat.{" "}
+                <span style={{ color: ACCENT }}>Clean power.</span>
+              </h1>
 
-              {/* Statistics */}
-              <div className="space-y-4 sm:space-y-6">
-                {/* Stat 1 */}
-                <div>
-                  <div className="h-px bg-[#05627C] mb-3 sm:mb-4"></div>
-                  <div className="flex flex-col sm:flex-row sm:items-baseline gap-2 sm:gap-3">
-                    <span
-                      className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold"
-                      style={{ color: "#05627C" }}
-                    >
-                      5+
-                    </span>
-                    <span
-                      className="text-sm sm:text-base md:text-lg lg:text-xl"
-                      style={{ color: "#05627C" }}
-                    >
-                      geothermal projects in development
-                    </span>
-                  </div>
-                </div>
+              <p className="text-sm sm:text-[15px] md:text-base leading-relaxed text-white/85 max-w-md mb-7 sm:mb-8">
+                Geothermal solutions that harness the Earth&apos;s natural heat
+                for reliable, renewable electricity with lasting grid value.
+              </p>
 
-                {/* Stat 2 */}
-                <div>
-                  <div className="h-px bg-[#05627C] mb-3 sm:mb-4"></div>
-                  <div className="flex flex-col sm:flex-row sm:items-baseline gap-2 sm:gap-3">
-                    <span
-                      className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold"
-                      style={{ color: "#05627C" }}
-                    >
-                      500+
-                    </span>
-                    <span
-                      className="text-sm sm:text-base md:text-lg lg:text-xl"
-                      style={{ color: "#05627C" }}
-                    >
-                      megawatts of geothermal capacity planned
-                    </span>
-                  </div>
-                </div>
-
-                {/* Stat 3 */}
-                <div>
-                  <div className="h-px bg-[#05627C] mb-3 sm:mb-4"></div>
-                  <div className="flex flex-col sm:flex-row sm:items-baseline gap-2 sm:gap-3">
-                    <span
-                      className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold"
-                      style={{ color: "#05627C" }}
-                    >
-                      100+
-                    </span>
-                    <span
-                      className="text-sm sm:text-base md:text-lg lg:text-xl"
-                      style={{ color: "#05627C" }}
-                    >
-                      years of sustainable energy potential
-                    </span>
-                  </div>
-                </div>
-
-                {/* Final line */}
-                <div className="h-px bg-[#05627C] mt-3 sm:mt-4"></div>
-              </div>
-            </div>
-
-            {/* Right Side - Illustration and CTA */}
-            <div className="relative flex flex-col items-start lg:items-end order-1 lg:order-2">
-              {/* CTA Link */}
               <Link
-                href="/projects"
-                className="text-xs sm:text-sm md:text-base font-bold uppercase tracking-wide mb-6 sm:mb-8 hover:opacity-70 transition"
-                style={{
-                  color: "#05627C",
-                  textDecoration: "underline",
-                  textUnderlineOffset: "4px",
-                }}
+                href="#solutions"
+                className="gas-cta-gold group inline-flex items-center gap-2.5 font-bold px-6 py-3.5 text-xs sm:text-sm uppercase tracking-[0.06em] rounded-lg transition-all duration-300"
+                style={{ backgroundColor: GOLD, color: "#1a1a1a" }}
               >
-                VIEW INVENERGY PROJECTS
+                Explore Geothermal Solutions
+                <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
               </Link>
-
-              {/* Line Art Illustration */}
-              <div className="relative w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg">
-                <img
-                  src="/gas1.svg"
-                  alt="Geothermal Energy Facility"
-                  className="w-full h-auto"
-                />
-              </div>
-            </div>
+            </motion.div>
           </div>
         </div>
-      </section>
 
-      {/* How Geothermal Works Section */}
-      <section className="relative w-full bg-white py-12 sm:py-16 md:py-20 lg:py-24">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <h2
-            className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-8 sm:mb-10 md:mb-12 text-center"
-            style={{ color: "#05627C" }}
-          >
-            How geothermal energy works
-          </h2>
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-10 md:gap-12 lg:gap-16">
-            {/* Left Side - Steps List */}
-            <div className="flex flex-col gap-4 sm:gap-5 md:gap-6 order-2 lg:order-1">
-              {[
-                {
-                  number: 1,
-                  text: "Hot water or steam is extracted from underground reservoirs through production wells.",
-                },
-                {
-                  number: 2,
-                  text: "The geothermal fluid is brought to the surface and separated into steam and water.",
-                },
-                {
-                  number: 3,
-                  text: "Steam is used to drive turbines connected to generators that produce electricity.",
-                },
-                {
-                  number: 4,
-                  text: "The used geothermal fluid is reinjected back into the reservoir through injection wells.",
-                },
-                {
-                  number: 5,
-                  text: "The electrical output is transformed to high voltage through transformers.",
-                },
-                {
-                  number: 6,
-                  text: "Electricity is transmitted via transmission lines to the power grid.",
-                },
-              ].map((step) => (
+        <div
+          className="relative z-10 border-t border-white/10"
+          style={{
+            background: "rgba(8,24,40,0.55)",
+            backdropFilter: "blur(14px)",
+          }}
+        >
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="max-w-[1220px] mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-0 py-5 sm:py-6">
+              {HERO_FEATURES.map(({ icon: Icon, title, desc }, i) => (
                 <div
-                  key={step.number}
-                  className="flex items-start gap-3 sm:gap-4"
+                  key={title}
+                  className={`flex items-start gap-3 sm:px-4 lg:px-5 ${
+                    i > 0 ? "lg:border-l lg:border-white/15" : ""
+                  }`}
                 >
-                  <div
-                    className="flex-shrink-0 w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center font-bold text-base sm:text-lg shadow-md"
+                  <span
+                    className="shrink-0 w-10 h-10 rounded-full flex items-center justify-center border"
                     style={{
-                      backgroundColor: "#E8F5F0",
-                      color: "#05627C",
-                      border: "2px solid #05627C",
-                      boxShadow: "0 4px 6px rgba(4, 43, 25, 0.1)",
+                      borderColor: "rgba(63,169,200,0.45)",
+                      color: "#7DD3E8",
                     }}
                   >
-                    {step.number}
+                    <Icon className="w-[18px] h-[18px]" strokeWidth={1.75} />
+                  </span>
+                  <div>
+                    <p className="text-sm font-semibold text-white">{title}</p>
+                    <p className="text-xs text-white/65 mt-0.5">{desc}</p>
                   </div>
-                  <p
-                    className="text-sm sm:text-base md:text-lg lg:text-xl leading-relaxed flex-1"
-                    style={{ color: "#05627C" }}
-                  >
-                    {step.text}
-                  </p>
                 </div>
               ))}
             </div>
-
-            {/* Right Side - Diagram Illustration */}
-            <div className="relative w-full h-[300px] sm:h-[350px] md:h-[400px] lg:h-[500px] xl:h-[600px] order-1 lg:order-2 mb-4 sm:mb-0">
-              <img
-                src="/gas2.webp"
-                alt="How Geothermal Energy Works Diagram"
-                className="w-full h-full object-contain"
-              />
-            </div>
           </div>
         </div>
       </section>
 
-      {/* Why Geothermal Section */}
-      <section className="relative w-full bg-[#E8F5F0] py-12 sm:py-16 md:py-20 lg:py-24">
+      {/* Intro */}
+      <section
+        id="solutions"
+        className="relative w-full bg-white py-14 sm:py-16 md:py-20 lg:py-24 overflow-hidden"
+      >
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-10 md:gap-12 lg:gap-16">
-            {/* Left Side - Text Content */}
-            <div className="flex flex-col order-2 lg:order-1">
+          <div className="max-w-[1220px] mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-14 xl:gap-16 items-center">
+            <div>
+              <div
+                className="flex items-center gap-2.5 flex-wrap text-[11px] sm:text-xs font-semibold uppercase tracking-[0.14em] mb-5 sm:mb-6"
+                style={{ color: MUTED }}
+              >
+                <span style={{ color: PRIMARY }}>Energy Technologies</span>
+                <span className="opacity-40">|</span>
+                <span>Geothermal</span>
+              </div>
+
               <h2
-                className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-4 sm:mb-6"
-                style={{ color: "#05627C" }}
+                className="text-[1.85rem] sm:text-4xl lg:text-[2.65rem] font-bold leading-[1.15] mb-5"
+                style={{ fontFamily: FONT_HEADING, color: DARK }}
               >
-                Why geothermal energy
+                A core component of Big Bull Energies&apos; investment
+                portfolio.
               </h2>
+
               <p
-                className="text-sm sm:text-base md:text-lg lg:text-xl leading-relaxed mb-4 sm:mb-6"
-                style={{ color: "#05627C" }}
+                className="text-sm sm:text-[15px] leading-[1.75] mb-4 max-w-lg"
+                style={{ color: MUTED }}
               >
-                Geothermal energy offers unique advantages as a renewable energy
-                source. Geothermal&apos;s benefits include:
+                Geothermal energy harnesses the Earth&apos;s natural heat to
+                generate clean, renewable electricity — a sustainable source
+                with reliable output and minimal environmental impact.
               </p>
-              <div className="space-y-3 sm:space-y-4">
-                <div className="flex items-start gap-2 sm:gap-3">
-                  <span
-                    className="text-lg sm:text-xl flex-shrink-0 mt-0.5"
-                    style={{ color: "#05627C" }}
+
+              <p
+                className="text-sm sm:text-[15px] leading-[1.75] mb-8 sm:mb-10 max-w-lg"
+                style={{ color: MUTED }}
+              >
+                From early-stage development to long-term generation, our
+                geothermal investments deliver baseload megawatts that
+                strengthen the grid for decades.
+              </p>
+
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 sm:gap-4">
+                {INTRO_PILLARS.map(({ icon: Icon, title, desc }) => (
+                  <div
+                    key={title}
+                    className="flex sm:flex-col items-center sm:items-start gap-3"
                   >
-                    →
-                  </span>
-                  <p
-                    className="text-sm sm:text-base md:text-lg lg:text-xl leading-relaxed"
-                    style={{ color: "#05627C" }}
-                  >
-                    Renewable and sustainable energy source with minimal carbon
-                    footprint
-                  </p>
+                    <span
+                      className="shrink-0 w-11 h-11 rounded-full flex items-center justify-center"
+                      style={{ backgroundColor: "rgba(5,98,124,0.1)" }}
+                    >
+                      <Icon
+                        className="w-5 h-5"
+                        style={{ color: PRIMARY }}
+                        strokeWidth={1.75}
+                      />
+                    </span>
+                    <div>
+                      <p
+                        className="text-sm font-bold mb-0.5"
+                        style={{ color: PRIMARY }}
+                      >
+                        {title}
+                      </p>
+                      <p
+                        className="text-xs sm:text-[13px] leading-relaxed"
+                        style={{ color: MUTED }}
+                      >
+                        {desc}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="relative w-full max-w-[420px] sm:max-w-[460px] mx-auto lg:max-w-none lg:justify-self-end">
+              <div className="relative w-full aspect-square">
+                <div className="absolute inset-0 rounded-full overflow-hidden shadow-[0_28px_64px_rgba(5,98,124,0.18)]">
+                  <Image
+                    src="/geothermal1.webp"
+                    alt="Geothermal power plant"
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 1024px) 90vw, 460px"
+                  />
                 </div>
-                <div className="flex items-start gap-2 sm:gap-3">
-                  <span
-                    className="text-lg sm:text-xl flex-shrink-0 mt-0.5"
-                    style={{ color: "#05627C" }}
-                  >
-                    →
-                  </span>
-                  <p
-                    className="text-sm sm:text-base md:text-lg lg:text-xl leading-relaxed"
-                    style={{ color: "#05627C" }}
-                  >
-                    Reliable base-load power available 24/7 regardless of
-                    weather conditions
-                  </p>
-                </div>
-                <div className="flex items-start gap-2 sm:gap-3">
-                  <span
-                    className="text-lg sm:text-xl flex-shrink-0 mt-0.5"
-                    style={{ color: "#05627C" }}
-                  >
-                    →
-                  </span>
-                  <p
-                    className="text-sm sm:text-base md:text-lg lg:text-xl leading-relaxed"
-                    style={{ color: "#05627C" }}
-                  >
-                    Long operational lifespan with low operating and maintenance
-                    costs
+
+                <div
+                  className="absolute bottom-3 right-0 sm:bottom-6 sm:right-2 z-10 w-[44%] max-w-[190px] rounded-2xl px-4 py-4 text-center"
+                  style={{
+                    background:
+                      "linear-gradient(145deg, #05627C 0%, #0A4A5C 100%)",
+                    boxShadow: "0 16px 40px rgba(5,98,124,0.35)",
+                  }}
+                >
+                  <Flame className="w-6 h-6 mx-auto mb-2" style={{ color: GOLD }} />
+                  <p className="text-[10px] sm:text-[11px] leading-snug text-white/95 font-medium">
+                    Clean heat. Enduring power.
                   </p>
                 </div>
               </div>
             </div>
+          </div>
+        </div>
+      </section>
 
-            {/* Right Side - Illustration */}
-            <div className="relative w-full h-[300px] sm:h-[350px] md:h-[400px] lg:h-[500px] xl:h-[600px] order-1 lg:order-2 mb-4 sm:mb-0">
-              <img
+      {/* Track record */}
+      <section className="relative w-full bg-[#F4F6F7] py-14 sm:py-16 md:py-20 lg:py-24">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="max-w-[1220px] mx-auto">
+            <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-8 sm:mb-10">
+              <h2
+                className="text-2xl sm:text-3xl md:text-4xl font-bold max-w-md"
+                style={{ fontFamily: FONT_HEADING, color: DARK }}
+              >
+                Our proven track record in geothermal
+              </h2>
+              <Link
+                href="/projects"
+                className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.08em] hover:opacity-80 transition"
+                style={{ color: PRIMARY }}
+              >
+                View All Projects
+                <ArrowRight className="w-3.5 h-3.5" />
+              </Link>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-[1.05fr_0.95fr] gap-10 lg:gap-12 items-center">
+              <div>
+                {STATS.map((stat) => (
+                  <AnimatedStat key={stat.label} {...stat} />
+                ))}
+              </div>
+
+              <div className="relative w-full aspect-[5/4] sm:aspect-[4/3]">
+                <Image
+                  src="/gas1.svg"
+                  alt="Geothermal energy infrastructure illustration"
+                  fill
+                  className="object-contain"
+                  sizes="(max-width: 1024px) 100vw, 45vw"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* How it works */}
+      <section className="relative w-full bg-white py-14 sm:py-16 md:py-20 lg:py-24">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="max-w-[1220px] mx-auto">
+            <h2
+              className="text-2xl sm:text-3xl md:text-4xl lg:text-[2.5rem] font-bold text-center mb-10 sm:mb-12 lg:mb-14"
+              style={{ fontFamily: FONT_HEADING, color: DARK }}
+            >
+              How geothermal energy works
+            </h2>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-14 xl:gap-16 items-center">
+              <ol className="flex flex-col gap-3.5 sm:gap-4 order-2 lg:order-1">
+                {PROCESS_STEPS.map((text, i) => (
+                  <li key={i} className="flex items-start gap-3.5 sm:gap-4">
+                    <span
+                      className="shrink-0 w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center text-sm font-bold text-white"
+                      style={{ backgroundColor: PRIMARY }}
+                    >
+                      {i + 1}
+                    </span>
+                    <p
+                      className="text-sm sm:text-[15px] leading-relaxed pt-1.5"
+                      style={{ color: MUTED }}
+                    >
+                      {text}
+                    </p>
+                  </li>
+                ))}
+              </ol>
+
+              <div className="relative w-full aspect-square sm:aspect-[5/4] lg:aspect-square order-1 lg:order-2 rounded-2xl sm:rounded-3xl overflow-hidden">
+                <Image
+                  src="/geothermal1.webp"
+                  alt="How geothermal energy works"
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 1024px) 100vw, 50vw"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Why geothermal */}
+      <section className="relative w-full bg-[#F7F9FA] py-14 sm:py-16 md:py-20 lg:py-24">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="max-w-[1220px] mx-auto grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-14 xl:gap-16 items-center">
+            <div>
+              <h2
+                className="text-2xl sm:text-3xl md:text-4xl lg:text-[2.5rem] font-bold mb-4 sm:mb-5"
+                style={{ fontFamily: FONT_HEADING, color: DARK }}
+              >
+                Why <span style={{ color: PRIMARY }}>geothermal</span>
+              </h2>
+
+              <p
+                className="text-sm sm:text-[15px] leading-[1.75] mb-6 sm:mb-7 max-w-lg"
+                style={{ color: MUTED }}
+              >
+                Geothermal offers unique advantages as a renewable energy source.
+                Key benefits include:
+              </p>
+
+              <div className="space-y-4 sm:space-y-5">
+                {WHY_POINTS.map((point) => (
+                  <div key={point} className="flex items-start gap-3">
+                    <CheckCircle2
+                      className="w-5 h-5 sm:w-6 sm:h-6 shrink-0 mt-0.5"
+                      style={{ color: PRIMARY }}
+                    />
+                    <p
+                      className="text-sm sm:text-[15px] md:text-base leading-relaxed"
+                      style={{ color: MUTED }}
+                    >
+                      {point}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="relative w-full aspect-[5/4] sm:aspect-[4/3]">
+              <Image
                 src="/gas3.svg"
-                alt="Geothermal Energy Benefits"
-                className="w-full h-full object-contain"
+                alt="Geothermal energy benefits illustration"
+                fill
+                className="object-contain"
+                sizes="(max-width: 1024px) 100vw, 50vw"
               />
             </div>
           </div>
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="relative w-full bg-[#E8F5F0] py-12 sm:py-16 md:py-20 lg:py-24">
+      {/* CTA */}
+      <section className="relative w-full bg-white py-10 sm:py-12 lg:py-16">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col items-center justify-center text-center">
+          <motion.div
+            className="max-w-[1220px] mx-auto rounded-2xl sm:rounded-3xl px-6 sm:px-8 lg:px-10 py-7 sm:py-8 lg:py-9 flex flex-col sm:flex-row items-center gap-5 sm:gap-6 lg:gap-8"
+            style={{
+              background:
+                "linear-gradient(135deg, #05627C 0%, #0A4A5C 55%, #083D4A 100%)",
+              boxShadow: "0 20px 50px rgba(5,98,124,0.28)",
+            }}
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.4 }}
+            transition={{ duration: 0.55 }}
+          >
+            <div
+              className="shrink-0 w-14 h-14 sm:w-16 sm:h-16 rounded-full flex items-center justify-center"
+              style={{ backgroundColor: "rgba(255,255,255,0.12)" }}
+            >
+              <Flame className="w-7 h-7" style={{ color: GOLD }} />
+            </div>
+
             <h2
-              className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-normal mb-6 sm:mb-8 px-2"
-              style={{
-                color: "#05627C",
-                fontFamily: "var(--font-font4), sans-serif",
-              }}
+              className="flex-1 text-center sm:text-left text-xl sm:text-2xl lg:text-[1.75rem] font-bold text-white leading-snug"
+              style={{ fontFamily: FONT_HEADING }}
             >
               Ready to explore geothermal solutions?
             </h2>
+
             <Link
               href="/contact"
-              className="inline-block bg-[#ffcf0B] text-gray-900 font-bold px-6 sm:px-8 lg:px-12 py-3 sm:py-4 lg:py-5 text-xs sm:text-sm md:text-base uppercase tracking-wide transition hover:opacity-90 w-full sm:w-auto text-center"
-              style={{ borderRadius: "0" }}
+              className="gas-cta-gold group inline-flex items-center gap-2.5 font-bold px-6 py-3.5 text-xs sm:text-sm uppercase tracking-[0.06em] rounded-lg transition-all duration-300 shrink-0"
+              style={{ backgroundColor: GOLD, color: "#1a1a1a" }}
             >
-              GET IN TOUCH
+              Get In Touch
+              <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
             </Link>
-          </div>
+          </motion.div>
         </div>
       </section>
 

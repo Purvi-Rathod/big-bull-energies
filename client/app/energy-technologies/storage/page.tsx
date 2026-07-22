@@ -1,454 +1,597 @@
 "use client";
 
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Globe, Battery } from "lucide-react";
-import { useState, useEffect, useRef } from "react";
+import {
+  ArrowRight,
+  Battery,
+  BatteryCharging,
+  CheckCircle2,
+  Gauge,
+  Globe2,
+  Leaf,
+  ShieldCheck,
+  Sun,
+  Zap,
+} from "lucide-react";
+import {
+  motion,
+  useInView,
+  useMotionValue,
+  useSpring,
+  useTransform,
+} from "framer-motion";
 import Footer from "@/components/Footer";
 
-function StorageMarquee() {
-  const [isVisible, setIsVisible] = useState(false);
-  const sectionRef = useRef<HTMLDivElement>(null);
-  const items = ["STORAGE", "STORAGE", "STORAGE", "STORAGE"];
+const PRIMARY = "#05627C";
+const GOLD = "#F5CF0B";
+const DARK = "#0B1F2A";
+const MUTED = "#6b7c85";
+const ACCENT = "#3FA9C8";
+const FONT_HEADING = "var(--font-font4), sans-serif";
+
+const HERO_FEATURES = [
+  {
+    icon: ShieldCheck,
+    title: "Grid Reliability",
+    desc: "Stabilizing power when it matters most.",
+  },
+  {
+    icon: Gauge,
+    title: "Peak Performance",
+    desc: "Store energy, use it when demand peaks.",
+  },
+  {
+    icon: BatteryCharging,
+    title: "Scalable Solutions",
+    desc: "Built to scale with your energy needs.",
+  },
+  {
+    icon: Leaf,
+    title: "Clean Tomorrow",
+    desc: "Enabling a sustainable, low-carbon future.",
+  },
+];
+
+const INTRO_PILLARS = [
+  {
+    icon: Battery,
+    title: "Store",
+    desc: "Capture energy when it's abundant.",
+  },
+  {
+    icon: Zap,
+    title: "Manage",
+    desc: "Optimize and balance power intelligently.",
+  },
+  {
+    icon: ShieldCheck,
+    title: "Deliver",
+    desc: "Provide reliable energy when it's needed most.",
+  },
+];
+
+const PROCESS_STEPS = [
+  {
+    num: "01",
+    text: "Energy is generated from renewable sources like solar or wind.",
+  },
+  {
+    num: "02",
+    text: "Excess energy is stored in battery systems during peak generation.",
+  },
+  {
+    num: "03",
+    text: "Smart systems manage charge and discharge for grid balance.",
+  },
+  {
+    num: "04",
+    text: "Stored energy is released when demand exceeds generation.",
+  },
+  {
+    num: "05",
+    text: "Reliable power reaches homes, businesses, and the wider grid.",
+  },
+];
+
+const FLOW_STEPS = [
+  { icon: Sun, label: "Energy Source" },
+  { icon: Battery, label: "Energy Storage" },
+  { icon: Gauge, label: "Smart Management" },
+  { icon: Zap, label: "Reliable Power" },
+];
+
+const WHY_POINTS = [
+  "Grid stability and frequency regulation",
+  "Higher utilization of renewable generation",
+  "Peak demand reduction and load shifting",
+  "A faster, more sustainable energy transition",
+];
+
+const STATS = [
+  {
+    value: 75,
+    suffix: "+",
+    label: "Storage projects worldwide",
+    icon: Battery,
+  },
+  {
+    value: 2.5,
+    suffix: "+ GWh",
+    label: "Energy storage deployed",
+    icon: Zap,
+    decimals: 1,
+  },
+  {
+    value: 15,
+    suffix: "+",
+    label: "Countries served",
+    icon: Globe2,
+  },
+  {
+    value: 98,
+    suffix: "%",
+    label: "System reliability achieved",
+    icon: ShieldCheck,
+  },
+];
+
+function AnimatedStat({
+  value,
+  suffix,
+  label,
+  icon: Icon,
+  decimals = 0,
+}: {
+  value: number;
+  suffix: string;
+  label: string;
+  icon: typeof Battery;
+  decimals?: number;
+}) {
+  const ref = useRef<HTMLDivElement>(null);
+  const inView = useInView(ref, { once: true, amount: 0.45 });
+  const motionVal = useMotionValue(0);
+  const spring = useSpring(motionVal, { stiffness: 55, damping: 22 });
+  const display = useTransform(spring, (v) =>
+    decimals > 0 ? v.toFixed(decimals) : `${Math.round(v)}`,
+  );
+  const [text, setText] = useState(decimals > 0 ? (0).toFixed(decimals) : "0");
 
   useEffect(() => {
-    const section = sectionRef.current;
-    if (!section) return;
+    if (inView) motionVal.set(value);
+  }, [inView, motionVal, value]);
 
-    const checkVisibility = () => {
-      if (!section) return;
-      const rect = section.getBoundingClientRect();
-      const viewportMiddle = window.innerHeight * 0.5;
-      if (rect.top <= viewportMiddle && rect.top >= -rect.height) {
-        setIsVisible(true);
-      }
-    };
-
-    window.addEventListener("scroll", checkVisibility);
-    checkVisibility();
-
-    return () => {
-      window.removeEventListener("scroll", checkVisibility);
-    };
-  }, []);
+  useEffect(() => {
+    const unsub = display.on("change", (v) => setText(v));
+    return () => unsub();
+  }, [display]);
 
   return (
-    <section
-      ref={sectionRef}
-      className="relative w-full overflow-hidden bg-white pt-12 sm:pt-16 md:pt-20 lg:pt-24 pb-6 sm:pb-8 md:pb-10 lg:pb-12"
-    >
-      <div className={`flex ${isVisible ? "animate-scroll" : ""}`}>
-        {items.map((item, index) => (
-          <div key={index} className="flex items-center whitespace-nowrap">
-            <span
-              className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl 2xl:text-8xl font-bold uppercase tracking-tight"
-              style={{
-                color: "#05627C",
-                fontFamily: "var(--font-custom), 'CustomFont', sans-serif",
-                WebkitTextStroke: "2px #05627C",
-                WebkitTextFillColor: "transparent",
-              }}
-            >
-              {item}
-            </span>
-            <span
-              className="mx-4 sm:mx-6 md:mx-8 lg:mx-10 xl:mx-12 text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl 2xl:text-8xl"
-              style={{ color: "#05627C" }}
-            >
-              ·
-            </span>
-          </div>
-        ))}
+    <div ref={ref} className="flex flex-col gap-3 py-2">
+      <div
+        className="w-11 h-11 rounded-full flex items-center justify-center"
+        style={{ backgroundColor: "rgba(5,98,124,0.1)" }}
+      >
+        <Icon className="w-5 h-5" style={{ color: PRIMARY }} strokeWidth={1.75} />
       </div>
-    </section>
+      <p
+        className="text-3xl sm:text-4xl lg:text-[2.6rem] font-bold tabular-nums leading-none"
+        style={{ fontFamily: FONT_HEADING, color: DARK }}
+      >
+        {text}
+        {suffix}
+      </p>
+      <p className="text-sm leading-snug max-w-[200px]" style={{ color: MUTED }}>
+        {label}
+      </p>
+    </div>
   );
 }
 
 export default function StoragePage() {
   return (
-    <main className="min-h-screen w-full overflow-x-hidden pt-24 sm:pt-28 md:pt-32 lg:pt-[126px]">
-      {/* Hero Section with Background Image */}
-      <section className="relative w-full h-[40vh] sm:h-[50vh] md:h-[60vh] lg:h-[70vh] overflow-hidden">
-        <Image
-          src="/storage-hero.png"
-          alt="Energy Storage"
-          fill
-          className="object-cover"
-          priority
+    <main className="min-h-screen w-full overflow-x-hidden bg-white">
+      {/* Hero — light entrance motion only */}
+      <section className="relative w-full min-h-[100svh] min-h-[100dvh] flex flex-col justify-end overflow-hidden pt-24 sm:pt-28 lg:pt-[126px]">
+        <div className="absolute inset-0 z-0">
+          <Image
+            src="/storage-hero.png"
+            alt="Battery energy storage facility"
+            fill
+            priority
+            className="object-cover object-center"
+            sizes="100vw"
+            quality={90}
+          />
+        </div>
+
+        <div
+          className="absolute inset-0 z-[1] pointer-events-none"
+          style={{
+            background:
+              "linear-gradient(90deg, rgba(8,24,40,0.82) 0%, rgba(8,24,40,0.55) 38%, rgba(8,24,40,0.2) 65%, transparent 100%)",
+          }}
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-gray-900/20 to-transparent"></div>
-      </section>
+        <div
+          className="absolute inset-0 z-[1] pointer-events-none"
+          style={{
+            background:
+              "linear-gradient(to top, rgba(8,24,40,0.9) 0%, rgba(8,24,40,0.3) 42%, transparent 68%)",
+          }}
+        />
 
-      {/* Infographic Section */}
-      <section className="relative w-full bg-white py-8 sm:py-12 md:py-16 lg:py-24">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="w-full">
-            <Image
-              src="/solarpage1.webp"
-              alt="Energy Storage at Grid Level Infographic"
-              width={1200}
-              height={800}
-              className="w-full h-auto object-contain"
-              priority
-            />
-          </div>
-        </div>
-      </section>
-
-      {/* Storage Marquee */}
-      <StorageMarquee />
-
-      {/* Main Content Section */}
-      <section className="relative w-full bg-white py-8 sm:py-12 md:py-16 lg:py-24">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 lg:gap-12">
-            {/* Left Column - Text Content */}
-            <div className="flex flex-col order-2 lg:order-1">
-              {/* Breadcrumbs/Navigation */}
-              <div className="flex items-center gap-2 sm:gap-3 mb-6 sm:mb-8 flex-wrap">
-                <div className="h-px w-8 sm:w-12 bg-[#05627C]"></div>
-                <Link
-                  href="/energy-technologies"
-                  className="text-xs font-medium uppercase tracking-wide hover:opacity-70 transition"
-                  style={{ color: "#05627C" }}
-                >
-                  ENERGY TECHNOLOGIES
-                </Link>
-                <div className="h-4 w-px bg-gray-300"></div>
-                <Battery
-                  className="w-3 h-3 sm:w-4 sm:h-4"
-                  style={{ color: "#ffcf0B" }}
-                />
-                <span
-                  className="text-xs font-medium uppercase tracking-wide"
-                  style={{ color: "#05627C" }}
-                >
-                  STORAGE
-                </span>
-              </div>
-
-              {/* Headline */}
+        <div className="relative z-10 container mx-auto px-4 sm:px-6 lg:px-8 flex-1 flex flex-col justify-center pb-6 sm:pb-8">
+          <div className="max-w-[1220px] mx-auto w-full">
+            <motion.div
+              className="max-w-xl lg:max-w-[580px]"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+            >
               <h1
-                className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl 2xl:text-7xl font-normal leading-tight mb-6 sm:mb-8"
-                style={{
-                  color: "#05627C",
-                  fontFamily: "var(--font-font4), sans-serif",
-                }}
+                className="text-[2.15rem] sm:text-5xl md:text-[3.15rem] lg:text-[3.45rem] font-bold leading-[1.1] mb-4 sm:mb-5 text-white"
+                style={{ fontFamily: FONT_HEADING }}
               >
-                A core component of Invenergy&apos;s energy mix.
+                Smarter storage{" "}
+                <span style={{ color: ACCENT }}>Stronger future.</span>
               </h1>
-            </div>
 
-            {/* Right Column - Circular Image and Caption */}
-            <div className="flex flex-col order-1 lg:order-2">
-              <div className="relative w-full aspect-square max-w-[350px] sm:max-w-[400px] md:max-w-[450px] lg:max-w-[500px] mx-auto mb-4 sm:mb-6">
-                <div className="relative w-full h-full rounded-full overflow-hidden">
-                  <Image
-                    src="/img4.webp"
-                    alt="Energy Storage Facility"
-                    fill
-                    className="object-cover"
-                    priority
-                  />
-                </div>
-              </div>
-              <p
-                className="text-sm sm:text-base md:text-lg lg:text-xl leading-relaxed"
-                style={{
-                  color: "#05627C",
-                  fontFamily: "var(--font-font4), sans-serif",
-                }}
-              >
-                Energy storage systems capture and store energy for later use,
-                providing grid stability and enabling greater integration of
-                renewable energy sources.
+              <p className="text-sm sm:text-[15px] md:text-base leading-relaxed text-white/85 max-w-md mb-7 sm:mb-8">
+                Advanced battery energy storage solutions that power reliability,
+                balance the grid and accelerate the clean energy transition.
               </p>
-            </div>
-          </div>
-        </div>
-      </section>
 
-      {/* Statistics Section */}
-      <section className="relative w-full bg-[#E8F5F0] py-12 sm:py-16 md:py-20 lg:py-24">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 lg:gap-12">
-            {/* Left Side - Statistics */}
-            <div className="flex flex-col order-2 lg:order-1">
-              <h2
-                className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-6 sm:mb-8"
-                style={{ color: "#05627C" }}
-              >
-                Our proven track record in storage
-              </h2>
-
-              {/* Statistics */}
-              <div className="space-y-4 sm:space-y-6">
-                {/* Stat 1 */}
-                <div>
-                  <div className="h-px bg-[#05627C] mb-3 sm:mb-4"></div>
-                  <div className="flex flex-col sm:flex-row sm:items-baseline gap-2 sm:gap-3">
-                    <span
-                      className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold"
-                      style={{ color: "#05627C" }}
-                    >
-                      25+
-                    </span>
-                    <span
-                      className="text-sm sm:text-base md:text-lg lg:text-xl"
-                      style={{ color: "#05627C" }}
-                    >
-                      storage projects developed
-                    </span>
-                  </div>
-                </div>
-
-                {/* Stat 2 */}
-                <div>
-                  <div className="h-px bg-[#05627C] mb-3 sm:mb-4"></div>
-                  <div className="flex flex-col sm:flex-row sm:items-baseline gap-2 sm:gap-3">
-                    <span
-                      className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold"
-                      style={{ color: "#05627C" }}
-                    >
-                      2.5
-                    </span>
-                    <span
-                      className="text-sm sm:text-base md:text-lg lg:text-xl"
-                      style={{ color: "#05627C" }}
-                    >
-                      gigawatts of storage capacity
-                    </span>
-                  </div>
-                </div>
-
-                {/* Stat 3 */}
-                <div>
-                  <div className="h-px bg-[#05627C] mb-3 sm:mb-4"></div>
-                  <div className="flex flex-col sm:flex-row sm:items-baseline gap-2 sm:gap-3">
-                    <span
-                      className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold"
-                      style={{ color: "#05627C" }}
-                    >
-                      15+
-                    </span>
-                    <span
-                      className="text-sm sm:text-base md:text-lg lg:text-xl"
-                      style={{ color: "#05627C" }}
-                    >
-                      gigawatts of storage projects in our development pipeline
-                    </span>
-                  </div>
-                </div>
-
-                {/* Final line */}
-                <div className="h-px bg-[#05627C] mt-3 sm:mt-4"></div>
-              </div>
-            </div>
-
-            {/* Right Side - Illustration and CTA */}
-            <div className="relative flex flex-col items-start lg:items-end order-1 lg:order-2">
-              {/* CTA Link */}
               <Link
-                href="/projects"
-                className="text-xs sm:text-sm md:text-base font-bold uppercase tracking-wide mb-6 sm:mb-8 hover:opacity-70 transition"
-                style={{
-                  color: "#05627C",
-                  textDecoration: "underline",
-                  textUnderlineOffset: "4px",
-                }}
+                href="#solutions"
+                className="gas-cta-gold group inline-flex items-center gap-2.5 font-bold px-6 py-3.5 text-xs sm:text-sm uppercase tracking-[0.06em] rounded-lg transition-all duration-300"
+                style={{ backgroundColor: GOLD, color: "#1a1a1a" }}
               >
-                VIEW INVENERGY PROJECTS
+                Explore Storage Solutions
+                <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
               </Link>
-
-              {/* Line Art Illustration */}
-              <div className="relative w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg">
-                <img
-                  src="/gas1.svg"
-                  alt="Energy Storage Facility"
-                  className="w-full h-auto"
-                />
-              </div>
-            </div>
+            </motion.div>
           </div>
         </div>
-      </section>
 
-      {/* How Storage Works Section */}
-      <section className="relative w-full bg-white py-12 sm:py-16 md:py-20 lg:py-24">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <h2
-            className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-8 sm:mb-10 md:mb-12 text-center"
-            style={{ color: "#05627C" }}
-          >
-            How energy storage works
-          </h2>
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-10 md:gap-12 lg:gap-16">
-            {/* Left Side - Steps List */}
-            <div className="flex flex-col gap-4 sm:gap-5 md:gap-6 order-2 lg:order-1">
-              {[
-                {
-                  number: 1,
-                  text: "Energy is generated from renewable sources like solar or wind.",
-                },
-                {
-                  number: 2,
-                  text: "Excess energy is stored in battery systems during peak generation.",
-                },
-                {
-                  number: 3,
-                  text: "Stored energy is discharged when demand exceeds generation.",
-                },
-                {
-                  number: 4,
-                  text: "Storage systems help balance grid supply and demand in real-time.",
-                },
-                {
-                  number: 5,
-                  text: "Advanced control systems optimize charging and discharging cycles.",
-                },
-                {
-                  number: 6,
-                  text: "Stored energy provides backup power during outages or peak demand periods.",
-                },
-              ].map((step) => (
+        <div
+          className="relative z-10 border-t border-white/10"
+          style={{
+            background: "rgba(8,24,40,0.55)",
+            backdropFilter: "blur(14px)",
+          }}
+        >
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="max-w-[1220px] mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-0 py-5 sm:py-6">
+              {HERO_FEATURES.map(({ icon: Icon, title, desc }, i) => (
                 <div
-                  key={step.number}
-                  className="flex items-start gap-3 sm:gap-4"
+                  key={title}
+                  className={`flex items-start gap-3 sm:px-4 lg:px-5 ${
+                    i > 0 ? "lg:border-l lg:border-white/15" : ""
+                  }`}
                 >
-                  <div
-                    className="flex-shrink-0 w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center font-bold text-base sm:text-lg shadow-md"
+                  <span
+                    className="shrink-0 w-10 h-10 rounded-full flex items-center justify-center border"
                     style={{
-                      backgroundColor: "#E8F5F0",
-                      color: "#05627C",
-                      border: "2px solid #05627C",
-                      boxShadow: "0 4px 6px rgba(4, 43, 25, 0.1)",
+                      borderColor: "rgba(63,169,200,0.45)",
+                      color: "#7DD3E8",
                     }}
                   >
-                    {step.number}
+                    <Icon className="w-[18px] h-[18px]" strokeWidth={1.75} />
+                  </span>
+                  <div>
+                    <p className="text-sm font-semibold text-white">{title}</p>
+                    <p className="text-xs text-white/65 mt-0.5">{desc}</p>
                   </div>
-                  <p
-                    className="text-sm sm:text-base md:text-lg lg:text-xl leading-relaxed flex-1"
-                    style={{ color: "#05627C" }}
-                  >
-                    {step.text}
-                  </p>
                 </div>
               ))}
             </div>
-
-            {/* Right Side - Diagram Illustration */}
-            <div className="relative w-full h-[300px] sm:h-[350px] md:h-[400px] lg:h-[500px] xl:h-[600px] order-1 lg:order-2 mb-4 sm:mb-0">
-              <Image
-                src="/image copy.png"
-                alt="How Energy Storage Works Diagram"
-                fill
-                className="object-contain"
-              />
-            </div>
           </div>
         </div>
       </section>
 
-      {/* Why Storage Section */}
-      <section className="relative w-full bg-[#E8F5F0] py-12 sm:py-16 md:py-20 lg:py-24">
+      {/* Intelligent storage — static */}
+      <section
+        id="solutions"
+        className="relative w-full bg-white py-14 sm:py-16 md:py-20 lg:py-24 overflow-hidden"
+      >
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-10 md:gap-12 lg:gap-16">
-            {/* Left Side - Text Content */}
-            <div className="flex flex-col order-2 lg:order-1">
+          <div className="max-w-[1220px] mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-14 xl:gap-16 items-center">
+            <div>
+              <div
+                className="flex items-center gap-2.5 flex-wrap text-[11px] sm:text-xs font-semibold uppercase tracking-[0.14em] mb-5 sm:mb-6"
+                style={{ color: MUTED }}
+              >
+                <span style={{ color: PRIMARY }}>Energy Technologies</span>
+                <span className="opacity-40">/</span>
+                <span>Storage</span>
+              </div>
+
               <h2
-                className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-4 sm:mb-6"
-                style={{ color: "#05627C" }}
+                className="text-[1.85rem] sm:text-4xl lg:text-[2.65rem] font-bold leading-[1.15] mb-5"
+                style={{ fontFamily: FONT_HEADING, color: DARK }}
               >
-                Why energy storage
+                Intelligent storage for a resilient grid.
               </h2>
+
               <p
-                className="text-sm sm:text-base md:text-lg lg:text-xl leading-relaxed mb-4 sm:mb-6"
-                style={{ color: "#05627C" }}
+                className="text-sm sm:text-[15px] leading-[1.75] mb-8 sm:mb-10 max-w-lg"
+                style={{ color: MUTED }}
               >
-                Energy storage provides critical grid services and enables
-                greater renewable energy integration. Storage benefits include:
+                Battery systems capture surplus renewable energy and release it
+                when the grid needs it most — improving reliability, cutting
+                curtailment, and unlocking cleaner power at scale.
               </p>
-              <div className="space-y-3 sm:space-y-4">
-                <div className="flex items-start gap-2 sm:gap-3">
-                  <span
-                    className="text-lg sm:text-xl flex-shrink-0 mt-0.5"
-                    style={{ color: "#05627C" }}
+
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 sm:gap-4">
+                {INTRO_PILLARS.map(({ icon: Icon, title, desc }) => (
+                  <div
+                    key={title}
+                    className="flex sm:flex-col items-center sm:items-start gap-3"
                   >
-                    →
-                  </span>
-                  <p
-                    className="text-sm sm:text-base md:text-lg lg:text-xl leading-relaxed"
-                    style={{ color: "#05627C" }}
-                  >
-                    Grid stability and reliability through frequency regulation
-                    and load balancing
-                  </p>
-                </div>
-                <div className="flex items-start gap-2 sm:gap-3">
-                  <span
-                    className="text-lg sm:text-xl flex-shrink-0 mt-0.5"
-                    style={{ color: "#05627C" }}
-                  >
-                    →
-                  </span>
-                  <p
-                    className="text-sm sm:text-base md:text-lg lg:text-xl leading-relaxed"
-                    style={{ color: "#05627C" }}
-                  >
-                    Enables higher penetration of intermittent renewable energy
-                    sources
-                  </p>
-                </div>
-                <div className="flex items-start gap-2 sm:gap-3">
-                  <span
-                    className="text-lg sm:text-xl flex-shrink-0 mt-0.5"
-                    style={{ color: "#05627C" }}
-                  >
-                    →
-                  </span>
-                  <p
-                    className="text-sm sm:text-base md:text-lg lg:text-xl leading-relaxed"
-                    style={{ color: "#05627C" }}
-                  >
-                    Provides backup power and peak shaving capabilities
-                  </p>
-                </div>
+                    <span
+                      className="shrink-0 w-11 h-11 rounded-full flex items-center justify-center"
+                      style={{ backgroundColor: "rgba(5,98,124,0.1)" }}
+                    >
+                      <Icon
+                        className="w-5 h-5"
+                        style={{ color: PRIMARY }}
+                        strokeWidth={1.75}
+                      />
+                    </span>
+                    <div>
+                      <p
+                        className="text-sm font-bold mb-0.5"
+                        style={{ color: PRIMARY }}
+                      >
+                        {title}
+                      </p>
+                      <p
+                        className="text-xs sm:text-[13px] leading-relaxed"
+                        style={{ color: MUTED }}
+                      >
+                        {desc}
+                      </p>
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
 
-            {/* Right Side - Illustration */}
-            <div className="relative w-full h-[300px] sm:h-[350px] md:h-[400px] lg:h-[500px] xl:h-[600px] order-1 lg:order-2 mb-4 sm:mb-0">
-              <img
-                src="/gas3.svg"
-                alt="Energy Storage Benefits"
-                className="w-full h-full object-contain"
+            <div className="relative w-full max-w-[520px] mx-auto lg:max-w-none lg:justify-self-end">
+              <div className="relative w-full aspect-[4/3] rounded-2xl sm:rounded-3xl overflow-hidden shadow-[0_28px_64px_rgba(5,98,124,0.16)]">
+                <Image
+                  src="/img4.webp"
+                  alt="Battery storage site with transmission infrastructure"
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 1024px) 90vw, 520px"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Portfolio — count-up motion only */}
+      <section className="relative w-full bg-[#F4F6F7] py-14 sm:py-16 md:py-20 lg:py-24 overflow-hidden">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="max-w-[1220px] mx-auto">
+            <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-8 sm:mb-10">
+              <h2
+                className="text-2xl sm:text-3xl md:text-4xl font-bold max-w-md"
+                style={{ fontFamily: FONT_HEADING, color: DARK }}
+              >
+                Our storage portfolio
+              </h2>
+              <Link
+                href="/projects"
+                className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.08em] hover:opacity-80 transition"
+                style={{ color: PRIMARY }}
+              >
+                View All Projects
+                <ArrowRight className="w-3.5 h-3.5" />
+              </Link>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-[1.15fr_0.85fr] gap-10 lg:gap-12 items-center">
+              <div className="grid grid-cols-2 gap-x-6 gap-y-8 sm:gap-x-10">
+                {STATS.map((stat) => (
+                  <AnimatedStat key={stat.label} {...stat} />
+                ))}
+              </div>
+
+              <div className="relative w-full aspect-[5/4] sm:aspect-[4/3]">
+                <Image
+                  src="/Storage1.svg"
+                  alt="Global storage portfolio illustration"
+                  fill
+                  className="object-contain"
+                  sizes="(max-width: 1024px) 100vw, 40vw"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* How storage works — static */}
+      <section className="relative w-full bg-white py-14 sm:py-16 md:py-20 lg:py-24">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="max-w-[1220px] mx-auto">
+            <h2
+              className="text-2xl sm:text-3xl md:text-4xl lg:text-[2.5rem] font-bold text-center mb-10 sm:mb-12 lg:mb-14"
+              style={{ fontFamily: FONT_HEADING, color: DARK }}
+            >
+              How energy storage works
+            </h2>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-14 xl:gap-16 items-center">
+              <ol className="flex flex-col gap-3.5 sm:gap-4 order-2 lg:order-1">
+                {PROCESS_STEPS.map(({ num, text }) => (
+                  <li key={num} className="flex items-start gap-3.5 sm:gap-4">
+                    <span
+                      className="shrink-0 w-10 h-10 sm:w-11 sm:h-11 rounded-full flex items-center justify-center text-xs sm:text-sm font-bold text-white"
+                      style={{ backgroundColor: PRIMARY }}
+                    >
+                      {num}
+                    </span>
+                    <p
+                      className="text-sm sm:text-[15px] leading-relaxed pt-2"
+                      style={{ color: MUTED }}
+                    >
+                      {text}
+                    </p>
+                  </li>
+                ))}
+              </ol>
+
+              <div className="order-1 lg:order-2">
+                <div className="relative w-full aspect-[5/4] sm:aspect-[4/3] mb-6 sm:mb-8">
+                  <Image
+                    src="/image copy.png"
+                    alt="How energy storage works diagram"
+                    fill
+                    className="object-contain"
+                    sizes="(max-width: 1024px) 100vw, 50vw"
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-2">
+                  {FLOW_STEPS.map(({ icon: Icon, label }, i) => (
+                    <div
+                      key={label}
+                      className="relative flex flex-col items-center text-center gap-2 px-1"
+                    >
+                      <span
+                        className="w-11 h-11 rounded-full flex items-center justify-center"
+                        style={{ backgroundColor: "rgba(5,98,124,0.1)" }}
+                      >
+                        <Icon
+                          className="w-5 h-5"
+                          style={{ color: PRIMARY }}
+                          strokeWidth={1.75}
+                        />
+                      </span>
+                      <p
+                        className="text-[11px] sm:text-xs font-medium leading-snug"
+                        style={{ color: MUTED }}
+                      >
+                        {label}
+                      </p>
+                      {i < FLOW_STEPS.length - 1 && (
+                        <ArrowRight
+                          className="hidden sm:block absolute top-3.5 -right-2 w-3.5 h-3.5 opacity-40"
+                          style={{ color: PRIMARY }}
+                        />
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Why storage — static */}
+      <section className="relative w-full bg-[#F7F9FA] py-14 sm:py-16 md:py-20 lg:py-24">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="max-w-[1220px] mx-auto grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-14 xl:gap-16 items-center">
+            <div>
+              <h2
+                className="text-2xl sm:text-3xl md:text-4xl lg:text-[2.5rem] font-bold mb-4 sm:mb-5"
+                style={{ fontFamily: FONT_HEADING, color: DARK }}
+              >
+                Why storage matters
+              </h2>
+
+              <p
+                className="text-sm sm:text-[15px] leading-[1.75] mb-6 sm:mb-7 max-w-lg"
+                style={{ color: MUTED }}
+              >
+                Energy storage is the backbone of a flexible, resilient grid —
+                turning intermittent renewables into dependable power.
+              </p>
+
+              <div className="space-y-4 sm:space-y-5">
+                {WHY_POINTS.map((point) => (
+                  <div key={point} className="flex items-start gap-3">
+                    <CheckCircle2
+                      className="w-5 h-5 sm:w-6 sm:h-6 shrink-0 mt-0.5"
+                      style={{ color: PRIMARY }}
+                    />
+                    <p
+                      className="text-sm sm:text-[15px] md:text-base leading-relaxed"
+                      style={{ color: MUTED }}
+                    >
+                      {point}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="relative w-full aspect-[5/4] sm:aspect-[4/3] rounded-2xl sm:rounded-3xl overflow-hidden shadow-[0_24px_56px_rgba(5,98,124,0.14)]">
+              <Image
+                src="/img6.webp"
+                alt="Storage containers with renewable energy landscape"
+                fill
+                className="object-cover"
+                sizes="(max-width: 1024px) 100vw, 50vw"
               />
             </div>
           </div>
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="relative w-full bg-[#E8F5F0] py-12 sm:py-16 md:py-20 lg:py-24">
+      {/* CTA — subtle fade-in once */}
+      <section className="relative w-full bg-white py-10 sm:py-12 lg:py-16">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col items-center justify-center text-center">
-            <h2
-              className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-normal mb-6 sm:mb-8 px-2"
+          <motion.div
+            className="max-w-[1220px] mx-auto rounded-2xl sm:rounded-3xl px-6 sm:px-8 lg:px-10 py-7 sm:py-8 lg:py-9 flex flex-col sm:flex-row items-center gap-5 sm:gap-6 lg:gap-8 overflow-hidden relative"
+            style={{
+              background:
+                "linear-gradient(135deg, #05627C 0%, #0A4A5C 55%, #083D4A 100%)",
+              boxShadow: "0 20px 50px rgba(5,98,124,0.28)",
+            }}
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.4 }}
+            transition={{ duration: 0.55 }}
+          >
+            <div
+              className="pointer-events-none absolute inset-0 opacity-[0.12]"
               style={{
-                color: "#05627C",
-                fontFamily: "var(--font-font4), sans-serif",
+                backgroundImage:
+                  "radial-gradient(circle at 20% 50%, rgba(255,255,255,0.35), transparent 45%), radial-gradient(circle at 85% 30%, rgba(245,207,11,0.25), transparent 40%)",
               }}
+            />
+
+            <div
+              className="relative shrink-0 w-14 h-14 sm:w-16 sm:h-16 rounded-full flex items-center justify-center"
+              style={{ backgroundColor: "rgba(255,255,255,0.12)" }}
             >
-              Ready to explore storage solutions?
+              <Battery className="w-7 h-7" style={{ color: GOLD }} />
+            </div>
+
+            <h2
+              className="relative flex-1 text-center sm:text-left text-xl sm:text-2xl lg:text-[1.75rem] font-bold text-white leading-snug"
+              style={{ fontFamily: FONT_HEADING }}
+            >
+              Ready to build a smarter energy future?
             </h2>
+
             <Link
               href="/contact"
-              className="inline-block bg-[#ffcf0B] text-gray-900 font-bold px-6 sm:px-8 lg:px-12 py-3 sm:py-4 lg:py-5 text-xs sm:text-sm md:text-base uppercase tracking-wide transition hover:opacity-90 w-full sm:w-auto text-center"
-              style={{ borderRadius: "0" }}
+              className="relative gas-cta-gold group inline-flex items-center gap-2.5 font-bold px-6 py-3.5 text-xs sm:text-sm uppercase tracking-[0.06em] rounded-lg transition-all duration-300 shrink-0"
+              style={{ backgroundColor: GOLD, color: "#1a1a1a" }}
             >
-              GET IN TOUCH
+              Get In Touch
+              <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
             </Link>
-          </div>
+          </motion.div>
         </div>
       </section>
 

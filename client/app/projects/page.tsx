@@ -1,380 +1,491 @@
 "use client";
 
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight, Zap, Sun, Wind, Battery, Wifi } from "lucide-react";
+import {
+  ArrowRight,
+  Battery,
+  Flame,
+  Globe2,
+  Mountain,
+  Network,
+  Sun,
+  Wind,
+  Zap,
+} from "lucide-react";
+import {
+  motion,
+  useInView,
+  useMotionValue,
+  useSpring,
+  useTransform,
+} from "framer-motion";
 import Footer from "@/components/Footer";
 
-export default function ProjectsPage() {
-  const projectTypes = [
-    {
-      icon: <Sun className="w-10 h-10" />,
-      title: "Solar Projects",
-      description:
-        "Large-scale solar farms providing clean, renewable electricity to communities and businesses.",
-      count: "150+",
-      unit: "projects",
-      href: "/energy-technologies/solar",
-    },
-    {
-      icon: <Wind className="w-10 h-10" />,
-      title: "Wind Projects",
-      description:
-        "Onshore and offshore wind farms harnessing wind energy for sustainable power generation.",
-      count: "80+",
-      unit: "projects",
-      href: "/energy-technologies/wind",
-    },
-    {
-      icon: <Battery className="w-10 h-10" />,
-      title: "Storage Projects",
-      description:
-        "Advanced energy storage solutions enabling reliable renewable energy distribution.",
-      count: "45+",
-      unit: "projects",
-      href: "/energy-technologies/storage",
-    },
-    {
-      icon: <Zap className="w-10 h-10" />,
-      title: "Natural Gas",
-      description:
-        "Clean natural gas facilities providing efficient and reliable energy solutions.",
-      count: "30+",
-      unit: "projects",
-      href: "/energy-technologies/natural-gas",
-    },
-    {
-      icon: <Wifi className="w-10 h-10" />,
-      title: "Transmission",
-      description:
-        "Infrastructure projects connecting renewable energy sources to power grids.",
-      count: "25+",
-      unit: "projects",
-      href: "/energy-technologies/transmission",
-    },
-  ];
+const PRIMARY = "#05627C";
+const GOLD = "#F5CF0B";
+const DARK = "#0B1F2A";
+const MUTED = "#6b7c85";
+const ACCENT = "#3FA9C8";
+const FONT_HEADING = "var(--font-font4), sans-serif";
 
-  const featuredProjects = [
-    {
-      name: "Solar Farm Initiative",
-      location: "Multiple Locations",
-      capacity: "500 MW",
-      type: "Solar",
-      status: "Operating",
-    },
-    {
-      name: "Wind Energy Complex",
-      location: "Coastal Regions",
-      capacity: "300 MW",
-      type: "Wind",
-      status: "In Development",
-    },
-    {
-      name: "Energy Storage Network",
-      location: "Strategic Locations",
-      capacity: "200 MWh",
-      type: "Storage",
-      status: "Operating",
-    },
-  ];
+const PROJECT_TYPES = [
+  {
+    icon: Sun,
+    title: "Solar",
+    description:
+      "Utility-scale solar farms delivering clean electricity to communities and businesses.",
+    count: "150+",
+    href: "/energy-technologies/solar",
+    image: "/hero-solar.webp",
+  },
+  {
+    icon: Wind,
+    title: "Wind",
+    description:
+      "Land-based wind projects harnessing reliable, renewable generation.",
+    count: "80+",
+    href: "/energy-technologies/wind",
+    image: "/wind-hero.png",
+  },
+  {
+    icon: Battery,
+    title: "Storage",
+    description:
+      "Battery systems that balance the grid and unlock more renewables.",
+    count: "45+",
+    href: "/energy-technologies/storage",
+    image: "/storage-hero.png",
+  },
+  {
+    icon: Flame,
+    title: "Natural Gas",
+    description:
+      "Efficient natural gas facilities supporting a flexible energy mix.",
+    count: "30+",
+    href: "/energy-technologies/natural-gas",
+    image: "/hero-gas.webp",
+  },
+  {
+    icon: Network,
+    title: "Transmission",
+    description:
+      "Infrastructure connecting generation assets to the power grid.",
+    count: "25+",
+    href: "/energy-technologies/transmission",
+    image: "/Transmission-hero.webp",
+  },
+  {
+    icon: Mountain,
+    title: "Geothermal",
+    description:
+      "Baseload geothermal projects powered by the Earth's natural heat.",
+    count: "5+",
+    href: "/energy-technologies/geothermal",
+    image: "/Geothermal-hero.webp",
+  },
+];
+
+const FEATURED = [
+  {
+    name: "Solar Farm Initiative",
+    location: "Multiple Locations",
+    capacity: "500 MW",
+    type: "Solar",
+    status: "Operating" as const,
+    href: "/energy-technologies/solar",
+  },
+  {
+    name: "Wind Energy Complex",
+    location: "Coastal Regions",
+    capacity: "300 MW",
+    type: "Wind",
+    status: "In Development" as const,
+    href: "/energy-technologies/wind",
+  },
+  {
+    name: "Energy Storage Network",
+    location: "Strategic Locations",
+    capacity: "200 MWh",
+    type: "Storage",
+    status: "Operating" as const,
+    href: "/energy-technologies/storage",
+  },
+];
+
+const STATS = [
+  { value: 50, suffix: "+", label: "Projects worldwide", icon: Zap },
+  { value: 3, suffix: "", label: "Continents served", icon: Globe2 },
+  { value: 500, suffix: "+", label: "MW of capacity", icon: Sun },
+  { value: 5, suffix: "+", label: "Years of experience", icon: Wind },
+];
+
+function AnimatedStat({
+  value,
+  suffix,
+  label,
+  icon: Icon,
+}: {
+  value: number;
+  suffix: string;
+  label: string;
+  icon: typeof Zap;
+}) {
+  const ref = useRef<HTMLDivElement>(null);
+  const inView = useInView(ref, { once: true, amount: 0.5 });
+  const motionVal = useMotionValue(0);
+  const spring = useSpring(motionVal, { stiffness: 55, damping: 22 });
+  const display = useTransform(spring, (v) => `${Math.round(v)}${suffix}`);
+  const [text, setText] = useState(`0${suffix}`);
+
+  useEffect(() => {
+    if (inView) motionVal.set(value);
+  }, [inView, motionVal, value]);
+
+  useEffect(() => {
+    const unsub = display.on("change", (v) => setText(v));
+    return () => unsub();
+  }, [display]);
 
   return (
-    <div className="min-h-screen bg-gray-50" style={{ paddingTop: "156px" }}>
-      {/* Hero Section */}
-      <section className="relative w-full h-[50vh] md:h-[60vh] overflow-hidden">
-        <Image
-          src="/hero-solar.webp"
-          alt="Big Bull Energies Projects"
-          fill
-          className="object-cover"
-          priority
+    <div ref={ref} className="flex flex-col items-start gap-3">
+      <div
+        className="w-11 h-11 rounded-full flex items-center justify-center"
+        style={{ backgroundColor: "rgba(5,98,124,0.1)" }}
+      >
+        <Icon className="w-5 h-5" style={{ color: PRIMARY }} strokeWidth={1.75} />
+      </div>
+      <p
+        className="text-3xl sm:text-4xl lg:text-[2.6rem] font-bold tabular-nums leading-none"
+        style={{ fontFamily: FONT_HEADING, color: DARK }}
+      >
+        {text}
+      </p>
+      <p className="text-sm leading-snug" style={{ color: MUTED }}>
+        {label}
+      </p>
+    </div>
+  );
+}
+
+export default function ProjectsPage() {
+  return (
+    <main className="min-h-screen w-full overflow-x-hidden bg-white">
+      {/* Hero */}
+      <section className="relative w-full min-h-[100svh] min-h-[100dvh] flex flex-col justify-end overflow-hidden pt-24 sm:pt-28 lg:pt-[126px]">
+        <div className="absolute inset-0 z-0">
+          <Image
+            src="/hero-solar.webp"
+            alt="Big Bull Energies renewable energy projects"
+            fill
+            priority
+            className="object-cover object-center"
+            sizes="100vw"
+            quality={90}
+          />
+        </div>
+
+        <div
+          className="absolute inset-0 z-[1] pointer-events-none"
+          style={{
+            background:
+              "linear-gradient(90deg, rgba(8,24,40,0.84) 0%, rgba(8,24,40,0.55) 40%, rgba(8,24,40,0.18) 68%, transparent 100%)",
+          }}
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-gray-900/60 to-transparent"></div>
-        {/* Hero Text Overlay */}
-        <div className="absolute inset-0 flex items-center">
-          <div className="container mx-auto px-4 lg:px-8">
-            <div className="max-w-3xl bg-white p-8 md:p-10 lg:p-12">
-              <div className="flex items-center gap-3 mb-6">
-                <div
-                  className="h-px w-12"
-                  style={{ backgroundColor: "#05627C" }}
-                ></div>
-                <span
-                  className="text-xs font-medium uppercase tracking-wide"
-                  style={{ color: "#05627C" }}
-                >
-                  OUR PROJECTS
-                </span>
-              </div>
-              <h1
-                className="text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-normal leading-tight mb-6"
-                style={{
-                  color: "#05627C",
-                  fontFamily: "var(--font-font4), sans-serif",
-                }}
-              >
-                Powering the future through innovative energy projects.
-              </h1>
-              <p className="text-lg text-gray-700 leading-relaxed">
-                Big Bull Energies develops, owns, and operates renewable energy
-                projects across multiple continents, delivering clean energy
-                solutions to communities worldwide.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
+        <div
+          className="absolute inset-0 z-[1] pointer-events-none"
+          style={{
+            background:
+              "linear-gradient(to top, rgba(8,24,40,0.88) 0%, rgba(8,24,40,0.25) 45%, transparent 70%)",
+          }}
+        />
 
-      {/* Project Types Section */}
-      <section className="py-16 md:py-20 bg-white">
-        <div className="container mx-auto px-4 lg:px-8">
-          <div className="max-w-4xl mx-auto text-center mb-12">
-            <h2
-              className="text-3xl md:text-4xl lg:text-5xl font-normal mb-4"
-              style={{
-                color: "#05627C",
-                fontFamily: "var(--font-font4), sans-serif",
-              }}
+        <div className="relative z-10 container mx-auto px-4 sm:px-6 lg:px-8 flex-1 flex flex-col justify-center pb-14 sm:pb-16 lg:pb-20">
+          <div className="max-w-[1220px] mx-auto w-full">
+            <motion.div
+              className="max-w-xl lg:max-w-[600px]"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
             >
-              Our Project Portfolio
-            </h2>
-            <p className="text-lg text-gray-600">
-              Explore our diverse range of renewable energy projects spanning
-              multiple technologies and regions.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
-            {projectTypes.map((project, index) => (
-              <Link
-                key={index}
-                href={project.href}
-                className="group p-8 border border-gray-200 hover:shadow-lg transition-all"
-                style={{ borderColor: "#E5E7EB" }}
+              <p
+                className="text-[11px] sm:text-xs font-bold uppercase tracking-[0.2em] mb-4 sm:mb-5"
+                style={{ color: "#7DD3E8" }}
               >
-                <div
-                  className="mb-6 group-hover:scale-110 transition-transform"
-                  style={{ color: "#05627C" }}
+                Our Projects
+              </p>
+
+              <h1
+                className="text-[2.15rem] sm:text-5xl md:text-[3.15rem] lg:text-[3.4rem] font-bold leading-[1.1] mb-4 sm:mb-5 text-white"
+                style={{ fontFamily: FONT_HEADING }}
+              >
+                Powering the future through{" "}
+                <span style={{ color: ACCENT }}>innovative</span> energy
+                projects.
+              </h1>
+
+              <p className="text-sm sm:text-[15px] md:text-base leading-relaxed text-white/85 max-w-md mb-7 sm:mb-8">
+                Big Bull Energies develops, owns, and operates renewable energy
+                projects across multiple continents — delivering clean power to
+                communities worldwide.
+              </p>
+
+              <div className="flex flex-wrap gap-3">
+                <Link
+                  href="#portfolio"
+                  className="gas-cta-gold group inline-flex items-center gap-2.5 font-bold px-6 py-3.5 text-xs sm:text-sm uppercase tracking-[0.06em] rounded-lg transition-all duration-300"
+                  style={{ backgroundColor: GOLD, color: "#1a1a1a" }}
                 >
-                  {project.icon}
-                </div>
-                <div className="mb-4">
-                  <span
-                    className="text-4xl font-bold block mb-1"
-                    style={{ color: "#05627C" }}
-                  >
-                    {project.count}
-                  </span>
-                  <span className="text-sm text-gray-600 uppercase">
-                    {project.unit}
-                  </span>
-                </div>
-                <h3
-                  className="text-xl font-semibold mb-3"
-                  style={{ color: "#05627C" }}
+                  Explore Portfolio
+                  <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
+                </Link>
+                <Link
+                  href="/contact"
+                  className="inline-flex items-center gap-2 font-bold px-6 py-3.5 text-xs sm:text-sm uppercase tracking-[0.06em] rounded-lg border border-white/35 text-white hover:bg-white/10 transition"
                 >
-                  {project.title}
-                </h3>
-                <p className="text-gray-600 leading-relaxed mb-4">
-                  {project.description}
-                </p>
-                <div
-                  className="flex items-center gap-2 text-sm font-semibold"
-                  style={{ color: "#05627C" }}
-                >
-                  Learn More
-                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                </div>
-              </Link>
-            ))}
+                  Contact Us
+                </Link>
+              </div>
+            </motion.div>
           </div>
         </div>
       </section>
 
-      {/* Featured Projects Section */}
-      <section className="py-16 md:py-20 bg-gray-50">
-        <div className="container mx-auto px-4 lg:px-8">
-          <div className="max-w-4xl mx-auto">
-            <div className="text-center mb-12">
+      {/* Portfolio grid */}
+      <section
+        id="portfolio"
+        className="relative w-full bg-white py-14 sm:py-16 md:py-20 lg:py-24"
+      >
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="max-w-[1220px] mx-auto">
+            <div className="max-w-2xl mb-10 sm:mb-12">
               <h2
-                className="text-3xl md:text-4xl lg:text-5xl font-normal mb-4"
-                style={{
-                  color: "#05627C",
-                  fontFamily: "var(--font-font4), sans-serif",
-                }}
+                className="text-2xl sm:text-3xl md:text-4xl font-bold mb-3 sm:mb-4"
+                style={{ fontFamily: FONT_HEADING, color: DARK }}
               >
-                Featured Projects
+                Our project portfolio
               </h2>
-              <p className="text-lg text-gray-600">
-                Highlighting some of our most significant renewable energy
-                initiatives.
+              <p className="text-sm sm:text-[15px] leading-relaxed" style={{ color: MUTED }}>
+                Explore renewable energy projects spanning solar, wind, storage,
+                transmission, and more.
               </p>
             </div>
 
-            <div className="space-y-6">
-              {featuredProjects.map((project, index) => (
-                <div
-                  key={index}
-                  className="bg-white p-8 border border-gray-200 hover:shadow-md transition-shadow"
-                  style={{ borderColor: "#E5E7EB" }}
-                >
-                  <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-4 mb-3">
-                        <h3
-                          className="text-2xl font-semibold"
-                          style={{ color: "#05627C" }}
-                        >
-                          {project.name}
-                        </h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6">
+              {PROJECT_TYPES.map(
+                ({ icon: Icon, title, description, count, href, image }) => (
+                  <Link
+                    key={title}
+                    href={href}
+                    className="group relative overflow-hidden rounded-2xl min-h-[280px] sm:min-h-[300px] flex flex-col justify-end"
+                  >
+                    <Image
+                      src={image}
+                      alt={title}
+                      fill
+                      className="object-cover transition-transform duration-500 group-hover:scale-[1.04]"
+                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                    />
+                    <div
+                      className="absolute inset-0"
+                      style={{
+                        background:
+                          "linear-gradient(to top, rgba(8,24,40,0.92) 0%, rgba(8,24,40,0.45) 48%, rgba(8,24,40,0.15) 100%)",
+                      }}
+                    />
+
+                    <div className="relative z-10 p-5 sm:p-6">
+                      <div className="flex items-center justify-between gap-3 mb-3">
                         <span
-                          className="px-3 py-1 text-xs font-semibold uppercase"
-                          style={{
-                            backgroundColor:
-                              project.status === "Operating"
-                                ? "#10b981"
-                                : "#f59e0b",
-                            color: "#ffffff",
-                          }}
+                          className="w-10 h-10 rounded-full flex items-center justify-center border border-white/25"
+                          style={{ backgroundColor: "rgba(255,255,255,0.08)" }}
                         >
-                          {project.status}
+                          <Icon
+                            className="w-[18px] h-[18px] text-white"
+                            strokeWidth={1.75}
+                          />
+                        </span>
+                        <span className="text-2xl font-bold text-white tabular-nums">
+                          {count}
                         </span>
                       </div>
-                      <div className="flex flex-wrap gap-6 text-gray-600">
-                        <div>
-                          <span
-                            className="font-semibold"
-                            style={{ color: "#05627C" }}
-                          >
-                            Location:
-                          </span>{" "}
-                          {project.location}
-                        </div>
-                        <div>
-                          <span
-                            className="font-semibold"
-                            style={{ color: "#05627C" }}
-                          >
-                            Capacity:
-                          </span>{" "}
-                          {project.capacity}
-                        </div>
-                        <div>
-                          <span
-                            className="font-semibold"
-                            style={{ color: "#05627C" }}
-                          >
-                            Type:
-                          </span>{" "}
-                          {project.type}
-                        </div>
-                      </div>
+                      <h3
+                        className="text-xl font-bold text-white mb-1.5"
+                        style={{ fontFamily: FONT_HEADING }}
+                      >
+                        {title}
+                      </h3>
+                      <p className="text-sm text-white/75 leading-relaxed mb-3">
+                        {description}
+                      </p>
+                      <span className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-[0.08em] text-white/90">
+                        Learn more
+                        <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" />
+                      </span>
+                    </div>
+                  </Link>
+                ),
+              )}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Featured */}
+      <section className="relative w-full bg-[#F4F6F7] py-14 sm:py-16 md:py-20 lg:py-24">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="max-w-[1220px] mx-auto">
+            <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-8 sm:mb-10">
+              <div>
+                <h2
+                  className="text-2xl sm:text-3xl md:text-4xl font-bold mb-2"
+                  style={{ fontFamily: FONT_HEADING, color: DARK }}
+                >
+                  Featured projects
+                </h2>
+                <p className="text-sm sm:text-[15px]" style={{ color: MUTED }}>
+                  Highlighting significant renewable energy initiatives.
+                </p>
+              </div>
+            </div>
+
+            <div className="space-y-3 sm:space-y-4">
+              {FEATURED.map((project) => (
+                <Link
+                  key={project.name}
+                  href={project.href}
+                  className="group flex flex-col lg:flex-row lg:items-center gap-4 sm:gap-6 bg-white rounded-2xl px-5 sm:px-6 lg:px-7 py-5 sm:py-6 border transition-colors hover:border-[rgba(5,98,124,0.28)]"
+                  style={{ borderColor: "rgba(5,98,124,0.1)" }}
+                >
+                  <div className="flex-1 min-w-0">
+                    <div className="flex flex-wrap items-center gap-2.5 mb-2">
+                      <h3
+                        className="text-lg sm:text-xl font-bold"
+                        style={{ fontFamily: FONT_HEADING, color: DARK }}
+                      >
+                        {project.name}
+                      </h3>
+                      <span
+                        className="px-2.5 py-1 text-[10px] sm:text-[11px] font-bold uppercase tracking-wide rounded-md"
+                        style={{
+                          backgroundColor:
+                            project.status === "Operating"
+                              ? "rgba(5,98,124,0.1)"
+                              : "rgba(245,207,11,0.2)",
+                          color:
+                            project.status === "Operating" ? PRIMARY : "#8A7400",
+                        }}
+                      >
+                        {project.status}
+                      </span>
+                    </div>
+
+                    <div
+                      className="flex flex-wrap gap-x-5 gap-y-1.5 text-sm"
+                      style={{ color: MUTED }}
+                    >
+                      <span>
+                        <span className="font-semibold" style={{ color: PRIMARY }}>
+                          Location:
+                        </span>{" "}
+                        {project.location}
+                      </span>
+                      <span>
+                        <span className="font-semibold" style={{ color: PRIMARY }}>
+                          Capacity:
+                        </span>{" "}
+                        {project.capacity}
+                      </span>
+                      <span>
+                        <span className="font-semibold" style={{ color: PRIMARY }}>
+                          Type:
+                        </span>{" "}
+                        {project.type}
+                      </span>
                     </div>
                   </div>
-                </div>
+
+                  <span
+                    className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.08em] shrink-0"
+                    style={{ color: PRIMARY }}
+                  >
+                    View technology
+                    <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" />
+                  </span>
+                </Link>
               ))}
             </div>
           </div>
         </div>
       </section>
 
-      {/* Stats Section */}
-      <section className="py-16 md:py-20 bg-white">
-        <div className="container mx-auto px-4 lg:px-8">
-          <div className="max-w-6xl mx-auto">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
-              <div>
-                <div
-                  className="text-4xl md:text-5xl font-bold mb-2"
-                  style={{ color: "#05627C" }}
-                >
-                  50+
-                </div>
-                <div className="text-sm md:text-base text-gray-600 uppercase tracking-wide">
-                  Projects
-                </div>
-              </div>
-              <div>
-                <div
-                  className="text-4xl md:text-5xl font-bold mb-2"
-                  style={{ color: "#05627C" }}
-                >
-                  3
-                </div>
-                <div className="text-sm md:text-base text-gray-600 uppercase tracking-wide">
-                  Continents
-                </div>
-              </div>
-              <div>
-                <div
-                  className="text-4xl md:text-5xl font-bold mb-2"
-                  style={{ color: "#05627C" }}
-                >
-                  500+
-                </div>
-                <div className="text-sm md:text-base text-gray-600 uppercase tracking-wide">
-                  MW Capacity
-                </div>
-              </div>
-              <div>
-                <div
-                  className="text-4xl md:text-5xl font-bold mb-2"
-                  style={{ color: "#05627C" }}
-                >
-                  5+
-                </div>
-                <div className="text-sm md:text-base text-gray-600 uppercase tracking-wide">
-                  Years Experience
-                </div>
-              </div>
-            </div>
+      {/* Stats */}
+      <section className="relative w-full bg-white py-14 sm:py-16 md:py-20">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="max-w-[1220px] mx-auto grid grid-cols-2 lg:grid-cols-4 gap-8 sm:gap-10">
+            {STATS.map((stat) => (
+              <AnimatedStat key={stat.label} {...stat} />
+            ))}
           </div>
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="py-16 md:py-20 bg-gray-50">
-        <div className="container mx-auto px-4 lg:px-8">
-          <div
-            className="max-w-4xl mx-auto text-center bg-white p-12 border border-gray-200"
-            style={{ borderColor: "#E5E7EB" }}
+      {/* CTA */}
+      <section className="relative w-full bg-white pb-12 sm:pb-14 lg:pb-16">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <motion.div
+            className="max-w-[1220px] mx-auto rounded-2xl sm:rounded-3xl px-6 sm:px-8 lg:px-10 py-7 sm:py-8 lg:py-9 flex flex-col sm:flex-row items-center gap-5 sm:gap-6 lg:gap-8"
+            style={{
+              background:
+                "linear-gradient(135deg, #05627C 0%, #0A4A5C 55%, #083D4A 100%)",
+              boxShadow: "0 20px 50px rgba(5,98,124,0.28)",
+            }}
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.4 }}
+            transition={{ duration: 0.55 }}
           >
-            <h2
-              className="text-3xl md:text-4xl font-normal mb-4"
-              style={{
-                color: "#05627C",
-                fontFamily: "var(--font-font4), sans-serif",
-              }}
+            <div
+              className="shrink-0 w-14 h-14 sm:w-16 sm:h-16 rounded-full flex items-center justify-center"
+              style={{ backgroundColor: "rgba(255,255,255,0.12)" }}
             >
-              Interested in Our Projects?
-            </h2>
-            <p className="text-lg text-gray-600 mb-8 max-w-2xl mx-auto">
-              Learn more about our renewable energy projects and investment
-              opportunities. Get in touch to explore how you can be part of the
-              clean energy revolution.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link
-                href="/contact"
-                className="inline-flex items-center justify-center gap-2 px-8 py-4 font-semibold text-white transition hover:opacity-90 uppercase text-sm"
-                style={{ backgroundColor: "#05627C" }}
+              <Zap className="w-7 h-7" style={{ color: GOLD }} />
+            </div>
+
+            <div className="flex-1 text-center sm:text-left">
+              <h2
+                className="text-xl sm:text-2xl lg:text-[1.75rem] font-bold text-white leading-snug mb-1"
+                style={{ fontFamily: FONT_HEADING }}
               >
-                Contact Us
-                <ArrowRight className="w-5 h-5" />
-              </Link>
+                Interested in our projects?
+              </h2>
+              <p className="text-sm text-white/75">
+                Explore investment opportunities or talk with our team.
+              </p>
+            </div>
+
+            <div className="flex flex-wrap items-center justify-center gap-3 shrink-0">
               <Link
                 href="/our-plan"
-                className="inline-flex items-center justify-center gap-2 px-8 py-4 font-semibold border transition hover:bg-gray-50 uppercase text-sm"
-                style={{ borderColor: "#05627C", color: "#05627C" }}
+                className="inline-flex items-center gap-2 font-bold px-5 py-3 text-xs sm:text-sm uppercase tracking-[0.06em] rounded-lg border border-white/30 text-white hover:bg-white/10 transition"
               >
-                View Investment Plans
+                View Plans
+              </Link>
+              <Link
+                href="/contact"
+                className="gas-cta-gold group inline-flex items-center gap-2.5 font-bold px-6 py-3.5 text-xs sm:text-sm uppercase tracking-[0.06em] rounded-lg transition-all duration-300"
+                style={{ backgroundColor: GOLD, color: "#1a1a1a" }}
+              >
+                Get In Touch
+                <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
               </Link>
             </div>
-          </div>
+          </motion.div>
         </div>
       </section>
 
       <Footer />
-    </div>
+    </main>
   );
 }

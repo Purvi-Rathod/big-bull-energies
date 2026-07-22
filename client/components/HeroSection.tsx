@@ -222,7 +222,7 @@ export default function HeroSection() {
                     </span>
                   </Link>
 
-                  <button
+                  {/* <button
                     type="button"
                     onClick={() => setShowVideo(true)}
                     className="hero-cta-video group inline-flex items-center justify-center sm:justify-start gap-2.5 sm:gap-3 text-white text-[11px] sm:text-sm font-semibold uppercase tracking-wide transition-opacity hover:opacity-90 w-full sm:w-auto py-1.5"
@@ -231,7 +231,7 @@ export default function HeroSection() {
                       <Play className="w-3.5 h-3.5 sm:w-4 sm:h-4 fill-white ml-0.5" />
                     </span>
                     Watch Intro Video
-                  </button>
+                  </button> */}
                 </div>
               </div>
             </div>

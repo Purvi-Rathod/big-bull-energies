@@ -2,18 +2,14 @@ import { Request, Response } from "express";
 import { asyncHandler } from "../utils/asyncHandler";
 import { AppError } from "../utils/AppError";
 import { sendEmail } from "../lib/mail-service/elastic-email";
+import { defaultFrom } from "../lib/mail-service/email.service";
+import { contactInquiryHtml } from "../lib/mail-service/templates/emails";
 
 const SUPPORT_EMAIL =
   process.env.SUPPORT_EMAIL?.trim() ||
   process.env.ELASTIC_FROM_EMAIL?.trim() ||
   process.env.email?.trim() ||
-  "bigbullenergies@gmail.com";
-
-const FROM_EMAIL =
-  process.env.ELASTIC_FROM_EMAIL?.trim() ||
-  process.env.EMAIL_FROM?.trim() ||
-  process.env.EMAIL_USER?.trim() ||
-  SUPPORT_EMAIL;
+  "support@bigbullenergies.com";
 
 /**
  * POST /api/v1/support/contact
@@ -43,32 +39,37 @@ export const submitContactForm = asyncHandler(
     }
 
     const subjectLabel = subject.trim();
-    const html = `
-      <div style="font-family:Arial,Helvetica,sans-serif;line-height:1.6;color:#0B1F2A">
-        <h2 style="color:#05627C;margin:0 0 12px">New website contact message</h2>
-        <p><strong>Name:</strong> ${escapeHtml(name.trim())}</p>
-        <p><strong>Email:</strong> ${escapeHtml(email.trim())}</p>
-        <p><strong>Phone:</strong> ${escapeHtml(phone?.trim() || "—")}</p>
-        <p><strong>Subject:</strong> ${escapeHtml(subjectLabel)}</p>
-        <hr style="border:none;border-top:1px solid #d8e2e6;margin:16px 0" />
-        <p style="white-space:pre-wrap">${escapeHtml(message.trim())}</p>
-      </div>
-    `;
+    const html = contactInquiryHtml({
+      name: name.trim(),
+      email: email.trim(),
+      phone: phone?.trim(),
+      subject: subjectLabel,
+      message: message.trim(),
+    });
 
     const mailSubject = `[Contact] ${subjectLabel} — ${name.trim()}`;
+
+    let fromAddress: string;
+    try {
+      fromAddress = defaultFrom();
+    } catch {
+      fromAddress =
+        process.env.ELASTIC_FROM_EMAIL?.trim() ||
+        process.env.EMAIL_FROM?.trim() ||
+        SUPPORT_EMAIL;
+    }
 
     try {
       await sendEmail({
         to: SUPPORT_EMAIL,
-        from: FROM_EMAIL,
+        from: fromAddress,
         fromName: "Big Bull Energies Website",
         subject: mailSubject,
         html,
         replyTo: email.trim(),
       });
     } catch (err) {
-      // Elastic Email often rejects Gmail "from" addresses unless the domain is verified.
-      // Still accept the inquiry so the form isn't blocked; full payload is in the log.
+      // Elastic Email rejects unverified from-domains. Log full inquiry so nothing is lost.
       console.error("[ContactForm] Failed to send email:", (err as Error).message);
       console.error("[ContactForm] Inquiry (email not delivered):", {
         name: name.trim(),
@@ -77,7 +78,7 @@ export const submitContactForm = asyncHandler(
         subject: subjectLabel,
         message: message.trim(),
         to: SUPPORT_EMAIL,
-        from: FROM_EMAIL,
+        from: fromAddress,
       });
     }
 
@@ -88,12 +89,3 @@ export const submitContactForm = asyncHandler(
     });
   },
 );
-
-function escapeHtml(value: string): string {
-  return value
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#39;");
-}

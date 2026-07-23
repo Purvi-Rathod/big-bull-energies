@@ -548,6 +548,28 @@ async function calculateDailyBinaryBonusesResumable(job: ICalculationJob) {
 
           totalBinaryPaid += binaryResult.binaryBonus;
           processedCount++;
+
+          try {
+            const member = await User.findById(userIdObj).select("name email").lean();
+            if (member?.email) {
+              const clientUrl =
+                process.env.CLIENT_URL ||
+                process.env.FRONTEND_URL ||
+                "http://localhost:3000";
+              const { sendBinaryIncomeEmail } = await import(
+                "../lib/mail-service/email.service"
+              );
+              void sendBinaryIncomeEmail({
+                to: member.email,
+                name: member.name || "Member",
+                amount: binaryResult.binaryBonus,
+                matchedVolume: binaryResult.matched,
+                dashboardLink: `${clientUrl}/binary`,
+              });
+            }
+          } catch (mailErr) {
+            console.error("[Calculation Job] Binary income email failed:", mailErr);
+          }
         }
 
         job.processedUserIds.push(userIdObj);

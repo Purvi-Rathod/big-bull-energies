@@ -1,7 +1,6 @@
 /**
  * Elastic Email API client
- * Sends emails via Elastic Email REST API using ELASTICMAIL_API_KEY.
- * Supports both raw HTML and pre-built templates with merge fields.
+ * Sends transactional emails via Elastic Email REST API (raw HTML).
  * Docs: https://api.elasticemail.com/public/help (v2 email/send)
  */
 
@@ -17,8 +16,32 @@ export interface SendEmailParams {
   replyTo?: string;
 }
 
+function getApiKey(): string {
+  const apiKey = process.env.ELASTICMAIL_API_KEY || process.env.ELASTIC_API_KEY;
+  if (!apiKey) {
+    throw new Error(
+      "ELASTICMAIL_API_KEY (or ELASTIC_API_KEY) is not set — emails cannot be delivered",
+    );
+  }
+  return apiKey;
+}
+
+function warnIfUnverifiedFrom(from: string): void {
+  const domain = from.split("@")[1]?.toLowerCase() || "";
+  if (
+    domain === "gmail.com" ||
+    domain === "yahoo.com" ||
+    domain === "outlook.com" ||
+    domain === "hotmail.com"
+  ) {
+    console.warn(
+      `[Email] From address "${from}" uses a free mailbox domain. Elastic Email usually rejects these unless the domain is verified. Set ELASTIC_FROM_EMAIL to an address on your verified sending domain.`,
+    );
+  }
+}
+
 /**
- * Send a single email with raw HTML (no template).
+ * Send a single transactional email with raw HTML body.
  */
 export async function sendEmail({
   to,
@@ -28,10 +51,8 @@ export async function sendEmail({
   fromName,
   replyTo,
 }: SendEmailParams): Promise<void> {
-  const apiKey = process.env.ELASTICMAIL_API_KEY || process.env.ELASTIC_API_KEY;
-  if (!apiKey) {
-    throw new Error("ELASTICMAIL_API_KEY (or ELASTIC_API_KEY) is not set");
-  }
+  const apiKey = getApiKey();
+  warnIfUnverifiedFrom(from);
 
   const body = new URLSearchParams({
     apikey: apiKey,
@@ -39,6 +60,7 @@ export async function sendEmail({
     to,
     subject,
     bodyHtml: html,
+    isTransactional: "true",
     ...(fromName && { fromName }),
     ...(replyTo && { replyTo }),
   });
@@ -49,15 +71,25 @@ export async function sendEmail({
     body: body.toString(),
   });
 
+  const text = await res.text();
+  let data: any = {};
+  try {
+    data = text ? JSON.parse(text) : {};
+  } catch {
+    data = { raw: text };
+  }
+
   if (!res.ok) {
-    const text = await res.text();
     throw new Error(`Elastic Email API error ${res.status}: ${text}`);
   }
 
-  const data = await res.json().catch(() => ({}));
   if (data && data.success === false) {
     throw new Error(data.error || "Elastic Email API returned success: false");
   }
+
+  console.log(
+    `[Email] Queued via Elastic Email → to=${to} subject="${subject}" transaction=${data?.data || data?.transactionid || "ok"}`,
+  );
 }
 
 export interface SendWithTemplateParams {
@@ -72,9 +104,8 @@ export interface SendWithTemplateParams {
 }
 
 /**
- * Send email using a pre-built Elastic Email template and merge fields.
- * In the Elastic Email template use single braces, e.g. {name}, {loginLink}.
- * Merge keys are passed as merge_name=value, merge_loginLink=value, etc.
+ * @deprecated Prefer sendEmail with in-repo branded HTML templates.
+ * Kept for backwards compatibility with any remaining dashboard templates.
  */
 export async function sendWithTemplate({
   to,
@@ -84,10 +115,8 @@ export async function sendWithTemplate({
   merge,
   fromName,
 }: SendWithTemplateParams): Promise<void> {
-  const apiKey = process.env.ELASTICMAIL_API_KEY || process.env.ELASTIC_API_KEY;
-  if (!apiKey) {
-    throw new Error("ELASTICMAIL_API_KEY (or ELASTIC_API_KEY) is not set");
-  }
+  const apiKey = getApiKey();
+  warnIfUnverifiedFrom(from);
 
   const body = new URLSearchParams({
     apikey: apiKey,
@@ -95,6 +124,7 @@ export async function sendWithTemplate({
     to,
     subject,
     template,
+    isTransactional: "true",
     ...(fromName && { fromName }),
   });
 
@@ -109,12 +139,18 @@ export async function sendWithTemplate({
     body: body.toString(),
   });
 
+  const text = await res.text();
+  let data: any = {};
+  try {
+    data = text ? JSON.parse(text) : {};
+  } catch {
+    data = { raw: text };
+  }
+
   if (!res.ok) {
-    const text = await res.text();
     throw new Error(`Elastic Email API error ${res.status}: ${text}`);
   }
 
-  const data = await res.json().catch(() => ({}));
   if (data && data.success === false) {
     throw new Error(data.error || "Elastic Email API returned success: false");
   }

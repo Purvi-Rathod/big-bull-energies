@@ -78,18 +78,18 @@ const WALLET_ORDER = [
 
 const WALLET_META: Record<
   string,
-  { label: string; tint: string; bar: string }
+  { label: string; accent: string; chip: string }
 > = {
-  roi: { label: 'Daily ROI', tint: '#E6F7FB', bar: '#3FA9C8' },
-  referral: { label: 'Referral', tint: '#E8F5F0', bar: '#05627C' },
-  binary: { label: 'Binary', tint: '#FFF8DB', bar: '#F5CF0B' },
-  career_level: { label: 'Career', tint: '#F0E8FF', bar: '#7C6BCF' },
-  interest: { label: 'Interest', tint: '#E8F5F0', bar: '#2A9D8F' },
-  token: { label: 'Token', tint: '#E6F7FB', bar: '#3FA9C8' },
-  investment: { label: 'Investment', tint: '#E8F5F0', bar: '#05627C' },
-  withdrawal: { label: 'Withdrawal', tint: '#FFF1E8', bar: '#E07A3D' },
-  main: { label: 'Main', tint: '#E8F5F0', bar: '#05627C' },
-  fixed: { label: 'Fixed', tint: '#EEF2F5', bar: '#6b7c85' },
+  roi: { label: 'Daily ROI', accent: '#0A7A96', chip: '#D6F0F7' },
+  referral: { label: 'Referral Income', accent: '#05627C', chip: '#FFF3B0' },
+  binary: { label: 'Binary', accent: '#B8860B', chip: '#FFF3B0' },
+  career_level: { label: 'Career', accent: '#5B4BA8', chip: '#EDE7FF' },
+  interest: { label: 'Interest', accent: '#1F7A6E', chip: '#D8F3EE' },
+  token: { label: 'Token', accent: '#0A7A96', chip: '#D6F0F7' },
+  investment: { label: 'Investment', accent: '#05627C', chip: '#DCEEE8' },
+  withdrawal: { label: 'Withdrawal', accent: '#C45C1A', chip: '#FFE6D6' },
+  main: { label: 'Main Wallet', accent: '#05627C', chip: '#DCEEE8' },
+  fixed: { label: 'Fixed', accent: '#4A5C66', chip: '#E8EEF1' },
 };
 
 async function copyText(text: string, successMsg: string) {
@@ -181,6 +181,8 @@ export default function DashboardPage() {
     if (ib === -1) return -1;
     return ia - ib;
   });
+  const referralWallet = wallets.find((w) => w.type === 'referral');
+  const otherWallets = sortedWallets.filter((w) => w.type !== 'referral');
 
   const totalBalance = wallets.reduce((sum, w) => sum + (w.balance || 0), 0);
   const activeInvestments = investments.filter((i) => i.isBinaryUpdated).length;
@@ -339,15 +341,15 @@ export default function DashboardPage() {
         </div>
       )}
 
-      {/* Wallets — high contrast */}
+      {/* Wallets — high-contrast balances */}
       <section>
         <div className="mb-4 flex items-end justify-between gap-3">
           <div>
             <h2 className="text-lg font-extrabold md:text-xl" style={{ color: INK }}>
-              Wallets
+              Wallets & earnings
             </h2>
             <p className="text-xs font-medium" style={{ color: MUTED }}>
-              Income streams at a glance
+              Balances shown in high contrast for easy reading
             </p>
           </div>
           <Link
@@ -358,31 +360,83 @@ export default function DashboardPage() {
             Withdraw →
           </Link>
         </div>
+
+        {/* Featured Referral Income */}
+        <div
+          className="mb-4 overflow-hidden rounded-2xl border-2 bg-white shadow-md"
+          style={{ borderColor: GOLD }}
+        >
+          <div
+            className="flex flex-col gap-4 px-4 py-5 sm:flex-row sm:items-center sm:justify-between sm:px-6"
+            style={{ background: 'linear-gradient(135deg, #FFF9E6 0%, #FFFFFF 55%)' }}
+          >
+            <div className="min-w-0">
+              <p
+                className="inline-flex items-center gap-1.5 rounded-md px-2 py-1 text-[11px] font-extrabold uppercase tracking-wider"
+                style={{ backgroundColor: GOLD, color: INK }}
+              >
+                <Users className="h-3.5 w-3.5" />
+                Referral Income
+              </p>
+              <p className="mt-2 text-sm font-medium" style={{ color: MUTED }}>
+                Earnings from package activations in your network
+              </p>
+            </div>
+            <div className="sm:text-right">
+              <p
+                className="text-3xl font-black tracking-tight tabular-nums sm:text-4xl"
+                style={{ color: INK }}
+              >
+                ${(referralWallet?.balance ?? 0).toLocaleString(undefined, {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                })}
+              </p>
+              <p className="mt-1 text-xs font-bold uppercase tracking-wide" style={{ color: PRIMARY }}>
+                {referralWallet?.currency || 'USD'} · available to withdraw
+              </p>
+              {(referralWallet?.reserved ?? 0) > 0 && (
+                <p className="mt-1 text-xs font-semibold" style={{ color: MUTED }}>
+                  Reserved ${(referralWallet?.reserved ?? 0).toFixed(2)}
+                </p>
+              )}
+            </div>
+          </div>
+        </div>
+
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
-          {sortedWallets.map((wallet) => {
+          {otherWallets.map((wallet) => {
             const meta = WALLET_META[wallet.type] || {
-              label: wallet.type,
-              tint: '#E8F5F0',
-              bar: PRIMARY,
+              label: wallet.type.replace(/_/g, ' '),
+              accent: PRIMARY,
+              chip: '#E8F5F0',
             };
+            const hasBalance = wallet.balance > 0;
             return (
               <div
                 key={wallet.type}
-                className="overflow-hidden rounded-2xl border border-[#d8e6ec] bg-white shadow-sm transition hover:shadow-md"
+                className="overflow-hidden rounded-2xl border bg-white shadow-sm"
+                style={{
+                  borderColor: hasBalance ? meta.accent : '#d8e6ec',
+                  borderWidth: hasBalance ? 2 : 1,
+                }}
               >
-                <div className="h-1.5 w-full" style={{ backgroundColor: meta.bar }} />
-                <div className="px-3 py-4" style={{ backgroundColor: meta.tint }}>
+                <div className="h-1.5 w-full" style={{ backgroundColor: meta.accent }} />
+                <div className="px-3 py-4">
                   <p
-                    className="truncate text-[11px] font-extrabold uppercase tracking-wide"
-                    style={{ color: INK }}
+                    className="inline-block max-w-full truncate rounded px-1.5 py-0.5 text-[10px] font-extrabold uppercase tracking-wide"
+                    style={{ backgroundColor: meta.chip, color: INK }}
                   >
                     {meta.label}
                   </p>
                   <p
-                    className="mt-2 text-xl font-extrabold tracking-tight"
-                    style={{ color: PRIMARY }}
+                    className="mt-2.5 text-xl font-black tracking-tight tabular-nums sm:text-2xl"
+                    style={{ color: INK }}
                   >
-                    ${wallet.balance.toFixed(2)}
+                    ${wallet.balance.toLocaleString(undefined, {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    })}
                   </p>
                   <p className="mt-1 text-[10px] font-bold uppercase" style={{ color: MUTED }}>
                     {wallet.currency || 'USD'}

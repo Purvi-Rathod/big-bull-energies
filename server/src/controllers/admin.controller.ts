@@ -4705,9 +4705,9 @@ export const createVoucherForUser = asyncHandler(async (req, res) => {
 });
 
 /**
- * Test email template (admin only) – temporary panel for testing Elastic Email templates.
+ * Test branded email (admin only).
  * POST /api/v1/admin/email-templates/test
- * Body: { template: string, to: string, merge: Record<string, string | number> }
+ * Body: { template: string, to: string, merge?: Record<string, string | number> }
  */
 export const testEmailTemplate = asyncHandler(async (req, res) => {
   const { template, to, merge } = (req as any).body || {};
@@ -4722,30 +4722,63 @@ export const testEmailTemplate = asyncHandler(async (req, res) => {
     const n = Number(v);
     return isNaN(n) ? undefined : n;
   };
+  const base =
+    process.env.CLIENT_URL ||
+    process.env.FRONTEND_URL ||
+    "https://bigbullenergies.com";
 
   switch (template) {
     case "SignupWelcome":
-      await sendSignupWelcomeEmail({
-        to,
-        name: get("name") || "Test User",
-        userId: get("userId") || "BIGBULL-000000",
-        loginLink: get("loginLink") || "https://crownbankers.com/login",
-      });
+    case "EmailVerification":
+      if (template === "EmailVerification") {
+        const { sendEmailVerificationEmail } = await import(
+          "../lib/mail-service/email.service"
+        );
+        await sendEmailVerificationEmail({
+          to,
+          name: get("name") || "Test User",
+          userId: get("userId") || "BIGBULL-000000",
+          verifyLink: get("verifyLink") || get("loginLink") || `${base}/login-link?token=test`,
+        });
+      } else {
+        await sendSignupWelcomeEmail({
+          to,
+          name: get("name") || "Test User",
+          userId: get("userId") || "BIGBULL-000000",
+          loginLink: get("loginLink") || `${base}/login-link?token=test`,
+        });
+      }
       break;
     case "InvestmentConfirmation":
+    case "PackagePurchase":
       await sendInvestmentPurchaseEmail({
         to,
         name: get("name") || "Test User",
-        packageName: get("packageName") || "Solar Starter",
+        packageName: get("packageName") || "BBE Starter",
         investmentAmount: getNum("investmentAmount") ?? 1000,
         duration: getNum("duration") ?? 150,
         totalOutputPct: getNum("totalOutputPct") ?? 225,
         startDate: get("startDate") || new Date().toISOString().slice(0, 10),
         endDate: get("endDate") || new Date(Date.now() + 150 * 864e5).toISOString().slice(0, 10),
-        dashboardLink: get("dashboardLink") || "https://crownbankers.com/dashboard",
+        dashboardLink: get("dashboardLink") || `${base}/investments`,
         userId: get("userId"),
       });
       break;
+    case "DepositConfirmation": {
+      const { sendDepositConfirmationEmail } = await import(
+        "../lib/mail-service/email.service"
+      );
+      await sendDepositConfirmationEmail({
+        to,
+        name: get("name") || "Test User",
+        amount: getNum("amount") ?? 500,
+        currency: get("currency") || "USD",
+        paymentId: get("paymentId") || "PAY-TEST-001",
+        method: get("method") || "Crypto (NOWPayments)",
+        dashboardLink: get("dashboardLink") || `${base}/dashboard`,
+      });
+      break;
+    }
     case "WithdrawalCreated":
       await sendWithdrawalCreatedEmail({
         to,
@@ -4755,7 +4788,7 @@ export const testEmailTemplate = asyncHandler(async (req, res) => {
         finalAmount: getNum("finalAmount") ?? 95,
         walletType: get("walletType") || "roi",
         withdrawalId: get("withdrawalId") || "WD-TEST-001",
-        dashboardLink: get("dashboardLink") || "https://crownbankers.com/withdraw",
+        dashboardLink: get("dashboardLink") || `${base}/withdraw`,
       });
       break;
     case "WithdrawalApproved":
@@ -4767,8 +4800,8 @@ export const testEmailTemplate = asyncHandler(async (req, res) => {
         finalAmount: getNum("finalAmount") ?? 95,
         walletType: get("walletType") || "roi",
         withdrawalId: get("withdrawalId") || "WD-TEST-001",
-        transactionId: get("transactionId") || "WD-TEST-001",
-        dashboardLink: get("dashboardLink") || "https://crownbankers.com/withdraw",
+        transactionId: get("transactionId") || "TXN-TEST-001",
+        dashboardLink: get("dashboardLink") || `${base}/withdraw`,
       });
       break;
     case "WithdrawalRejected":
@@ -4781,16 +4814,60 @@ export const testEmailTemplate = asyncHandler(async (req, res) => {
         walletType: get("walletType") || "roi",
         withdrawalId: get("withdrawalId") || "WD-TEST-001",
         reason: get("reason"),
-        dashboardLink: get("dashboardLink") || "https://crownbankers.com/withdraw",
+        dashboardLink: get("dashboardLink") || `${base}/withdraw`,
       });
       break;
     case "PasswordReset":
       await sendPasswordResetEmail({
         to,
         name: get("name") || "Test User",
-        resetLink: get("resetLink") || "https://crownbankers.com/reset-password?token=test",
+        resetLink: get("resetLink") || `${base}/reset-password?token=test`,
       });
       break;
+    case "ReferralIncome": {
+      const { sendReferralIncomeEmail } = await import(
+        "../lib/mail-service/email.service"
+      );
+      await sendReferralIncomeEmail({
+        to,
+        name: get("name") || "Test User",
+        amount: getNum("amount") ?? 70,
+        fromUserName: get("fromUserName") || "Alex Ross",
+        fromUserId: get("fromUserId") || "BIGBULL-000001",
+        packageName: get("packageName") || "BBE Starter",
+        dashboardLink: get("dashboardLink") || `${base}/dashboard`,
+      });
+      break;
+    }
+    case "BinaryIncome": {
+      const { sendBinaryIncomeEmail } = await import(
+        "../lib/mail-service/email.service"
+      );
+      await sendBinaryIncomeEmail({
+        to,
+        name: get("name") || "Test User",
+        amount: getNum("amount") ?? 120,
+        matchedVolume: getNum("matchedVolume") ?? 1000,
+        dashboardLink: get("dashboardLink") || `${base}/binary`,
+      });
+      break;
+    }
+    case "Announcement": {
+      const { sendAnnouncementEmail } = await import(
+        "../lib/mail-service/email.service"
+      );
+      await sendAnnouncementEmail({
+        to,
+        name: get("name") || "Test User",
+        headline: get("headline") || "Platform update from Big Bull Energies",
+        body:
+          get("body") ||
+          "We have an important update for members. Log in to your portal for the latest details.",
+        ctaLabel: get("ctaLabel") || "Open dashboard",
+        ctaUrl: get("ctaUrl") || `${base}/dashboard`,
+      });
+      break;
+    }
     case "TicketCreated":
       await sendTicketCreatedEmail({
         to,
@@ -4819,7 +4896,7 @@ export const testEmailTemplate = asyncHandler(async (req, res) => {
         amount: getNum("amount") ?? 100,
         investmentValue: getNum("investmentValue") ?? 100,
         expiryDate: get("expiryDate") || new Date(Date.now() + 30 * 864e5).toISOString().slice(0, 10),
-        dashboardLink: get("dashboardLink") || "https://crownbankers.com/plans",
+        dashboardLink: get("dashboardLink") || `${base}/vouchers`,
         source: (get("source") as "wallet" | "payment") || "wallet",
       });
       break;
@@ -4831,7 +4908,7 @@ export const testEmailTemplate = asyncHandler(async (req, res) => {
         amount: getNum("amount") ?? 100,
         investmentValue: getNum("investmentValue") ?? 100,
         usedBy: get("usedBy") || "BIGBULL-000001",
-        dashboardLink: get("dashboardLink") || "https://crownbankers.com/plans",
+        dashboardLink: get("dashboardLink") || `${base}/plans`,
       });
       break;
     case "VoucherExpired":
@@ -4842,7 +4919,7 @@ export const testEmailTemplate = asyncHandler(async (req, res) => {
         amount: getNum("amount") ?? 100,
         investmentValue: getNum("investmentValue") ?? 100,
         expiryDate: get("expiryDate") || new Date().toISOString().slice(0, 10),
-        dashboardLink: get("dashboardLink") || "https://crownbankers.com/plans",
+        dashboardLink: get("dashboardLink") || `${base}/plans`,
       });
       break;
     case "CalculationFailure":
@@ -4856,7 +4933,10 @@ export const testEmailTemplate = asyncHandler(async (req, res) => {
       });
       break;
     default:
-      throw new AppError(`Unknown template: ${template}. Use one of: SignupWelcome, InvestmentConfirmation, WithdrawalCreated, WithdrawalApproved, WithdrawalRejected, PasswordReset, TicketCreated, TicketStatusUpdate, VoucherCreated, VoucherUsed, VoucherExpired, CalculationFailure`, 400);
+      throw new AppError(
+        `Unknown template: ${template}. Use one of: SignupWelcome, EmailVerification, PackagePurchase, InvestmentConfirmation, DepositConfirmation, WithdrawalCreated, WithdrawalApproved, WithdrawalRejected, PasswordReset, ReferralIncome, BinaryIncome, Announcement, TicketCreated, TicketStatusUpdate, VoucherCreated, VoucherUsed, VoucherExpired, CalculationFailure`,
+        400,
+      );
   }
 
   const response = res as any;

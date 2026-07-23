@@ -158,6 +158,29 @@ export async function calculateDailyBinaryBonuses() {
 
           totalBinaryPaid += binaryResult.binaryBonus;
           processedCount++;
+
+          // Notify member of binary income (async, non-blocking)
+          try {
+            const member = await User.findById(userIdObj).select("name email").lean();
+            if (member?.email) {
+              const clientUrl =
+                process.env.CLIENT_URL ||
+                process.env.FRONTEND_URL ||
+                "http://localhost:3000";
+              const { sendBinaryIncomeEmail } = await import(
+                "../lib/mail-service/email.service"
+              );
+              void sendBinaryIncomeEmail({
+                to: member.email,
+                name: member.name || "Member",
+                amount: binaryResult.binaryBonus,
+                matchedVolume: binaryResult.matched,
+                dashboardLink: `${clientUrl}/binary`,
+              });
+            }
+          } catch (mailErr) {
+            console.error("[Binary Cron] Binary income email failed:", mailErr);
+          }
         }
       } catch (error) {
         console.error(`[Binary Cron] Error processing user ${tree.user}:`, error);
@@ -957,6 +980,36 @@ async function processReferralBonus(
         fromUserId?.toString(),
         investmentId
       );
+
+      // Notify sponsor of referral income
+      try {
+        const [sponsor, fromUser] = await Promise.all([
+          User.findById(sponsorId).select("name email").lean(),
+          fromUserId
+            ? User.findById(fromUserId).select("name userId").lean()
+            : Promise.resolve(null),
+        ]);
+        if (sponsor?.email) {
+          const clientUrl =
+            process.env.CLIENT_URL ||
+            process.env.FRONTEND_URL ||
+            "http://localhost:3000";
+          const { sendReferralIncomeEmail } = await import(
+            "../lib/mail-service/email.service"
+          );
+          void sendReferralIncomeEmail({
+            to: sponsor.email,
+            name: sponsor.name || "Member",
+            amount: referralBonus,
+            fromUserName: fromUser?.name,
+            fromUserId: fromUser?.userId,
+            packageName: pkg?.packageName || pkg?.name,
+            dashboardLink: `${clientUrl}/dashboard`,
+          });
+        }
+      } catch (mailErr) {
+        console.error("[Investment Service] Referral income email failed:", mailErr);
+      }
     }
   } catch (error) {
     console.error("Error processing referral bonus:", error);

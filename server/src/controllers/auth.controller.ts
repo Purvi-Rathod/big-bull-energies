@@ -239,7 +239,7 @@ export const userSignup = asyncHandler(async (req, res) => {
       const clientUrl = process.env.CLIENT_URL || process.env.FRONTEND_URL || 'http://localhost:3000';
       const loginLink = `${clientUrl}/login-link?token=${tempToken}`;
 
-      // Send email asynchronously (don't wait for it)
+      // Send welcome email with secure login / verification link
       sendSignupWelcomeEmail({
         to: user.email,
         name: user.name,

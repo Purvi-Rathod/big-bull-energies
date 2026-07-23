@@ -1,12 +1,12 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useMemo, useState } from "react";
 import {
   Filter,
   Users,
-  Calendar,
-  Sun,
+  Building2,
   Image as ImageIcon,
+  Download,
 } from "lucide-react";
 import Footer from "@/components/Footer";
 
@@ -15,234 +15,178 @@ const FONT_STACK =
 const PRIMARY = "#05627C";
 const MINT = "#E8F5F0";
 
-/** YouTube embed params: no branding, no title, no controls — raw video only. */
-function getYouTubeEmbedParams(autoplay: boolean): string {
-  const params = new URLSearchParams();
-  if (autoplay) {
-    params.set("autoplay", "1");
-    params.set("mute", "1");
-    params.set("playsinline", "1");
-  }
-  params.set("modestbranding", "1");
-  params.set("rel", "0");
-  params.set("showinfo", "0");
-  params.set("controls", "0");
-  params.set("iv_load_policy", "3");
-  return params.toString();
+interface GalleryItem {
+  id: string;
+  title: string;
+  description?: string;
+  mediaUrl: string;
+  mediaType: "photo";
+  category: string;
+  order: number;
+  fileName: string;
 }
 
-/** Get embed URL for YouTube/Vimeo so iframe can play. Direct video URLs returned as-is. */
-function getVideoEmbedUrl(url: string, autoplay = true): string {
-  if (!url || typeof url !== "string") return url;
-  const u = url.trim();
-  const ytShort = u.match(/(?:youtu\.be\/)([a-zA-Z0-9_-]+)/);
-  if (ytShort) {
-    const base = `https://www.youtube.com/embed/${ytShort[1]}`;
-    return `${base}?${getYouTubeEmbedParams(autoplay)}`;
-  }
-  const ytWatch = u.match(/(?:youtube\.com\/watch\?.*v=)([a-zA-Z0-9_-]+)/);
-  if (ytWatch) {
-    const base = `https://www.youtube.com/embed/${ytWatch[1]}`;
-    return `${base}?${getYouTubeEmbedParams(autoplay)}`;
-  }
-  const ytEmbed = u.match(/youtube\.com\/embed\/([a-zA-Z0-9_-]+)/);
-  if (ytEmbed) {
-    const base = u.split("?")[0];
-    return `${base}?${getYouTubeEmbedParams(autoplay)}`;
-  }
-  const vimeo = u.match(/(?:vimeo\.com\/)(\d+)/);
-  if (vimeo) {
-    const base = `https://player.vimeo.com/video/${vimeo[1]}`;
-    return autoplay ? `${base}?autoplay=1` : base;
-  }
-  return u;
-}
+/** Official Big Bull Energies gallery assets — one photo per person. */
+const GALLERY_ITEMS: GalleryItem[] = [
+  {
+    id: "l1",
+    title: "Alexander Whitmore — CEO",
+    description:
+      "Chief Executive Officer at Big Bull Energies headquarters.",
+    mediaUrl: "/L1.jpeg",
+    mediaType: "photo",
+    category: "Our Leaders",
+    order: 1,
+    fileName: "Alexander-Whitmore-CEO.jpeg",
+  },
+  {
+    id: "l4",
+    title: "Charles Kensington — CMO",
+    description:
+      "Chief Marketing Officer driving Big Bull Energies brand growth.",
+    mediaUrl: "/L4.jpeg",
+    mediaType: "photo",
+    category: "Our Leaders",
+    order: 2,
+    fileName: "Charles-Kensington-CMO.jpeg",
+  },
+  {
+    id: "l2",
+    title: "Jessica Park — COO",
+    description:
+      "Chief Operating Officer leading operations and delivery.",
+    mediaUrl: "/L2.jpeg",
+    mediaType: "photo",
+    category: "Our Leaders",
+    order: 3,
+    fileName: "Jessica-Park-COO.jpeg",
+  },
+  {
+    id: "l3",
+    title: "Henry Caldwell — CSO",
+    description:
+      "Chief Strategy Officer guiding long-term clean energy strategy.",
+    mediaUrl: "/L3.jpeg",
+    mediaType: "photo",
+    category: "Our Leaders",
+    order: 4,
+    fileName: "Henry-Caldwell-CSO.jpeg",
+  },
+  {
+    id: "l5",
+    title: "Leadership Team",
+    description:
+      "The Big Bull Energies leadership team together at headquarters.",
+    mediaUrl: "/L5.jpeg",
+    mediaType: "photo",
+    category: "Team",
+    order: 1,
+    fileName: "Big-Bull-Energies-Leadership-Team.jpeg",
+  },
+];
 
-/** True if URL is YouTube or Vimeo (use iframe). Otherwise use <video> for direct links. */
-function isEmbeddableVideoUrl(url: string): boolean {
-  if (!url || typeof url !== "string") return false;
-  const u = url.trim();
-  return /youtu\.be\/|youtube\.com\/(watch\?|embed\/)|vimeo\.com\//.test(u);
-}
-
-/** Pick a category icon based on keywords in the category name. */
 function getCategoryIcon(category: string) {
   const c = category.toLowerCase();
   if (c.includes("leader") || c.includes("team") || c.includes("people"))
     return Users;
-  if (c.includes("event"))
-    return Calendar;
-  if (c.includes("solar") || c.includes("farm") || c.includes("energy"))
-    return Sun;
+  if (c.includes("office") || c.includes("hq") || c.includes("brand"))
+    return Building2;
   return ImageIcon;
 }
 
-interface GalleryItem {
-  _id?: string;
-  id?: string;
-  title: string;
-  description?: string;
-  mediaUrl: string;
-  mediaType: "photo" | "video";
-  category: string;
-  thumbnailUrl?: string;
-  order: number;
-  status: "Active" | "InActive";
+async function downloadImage(item: GalleryItem) {
+  try {
+    const response = await fetch(item.mediaUrl);
+    if (!response.ok) throw new Error("Download failed");
+    const blob = await response.blob();
+    const objectUrl = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = objectUrl;
+    link.download = item.fileName;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(objectUrl);
+  } catch (error) {
+    console.error("Failed to download image:", error);
+    // Fallback: open the image in a new tab
+    window.open(item.mediaUrl, "_blank", "noopener,noreferrer");
+  }
 }
 
 export default function GalleryPage() {
-  const [items, setItems] = useState<GalleryItem[]>([]);
-  const [categories, setCategories] = useState<string[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string>("");
-  const [loading, setLoading] = useState(true);
   const [selectedItem, setSelectedItem] = useState<GalleryItem | null>(null);
 
-  // Fetch the full category list once, independent of the active filter —
-  // this list must not shrink just because a filtered items response
-  // only contains categories present in that filtered set.
-  useEffect(() => {
-    fetchCategories();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  const categories = useMemo(
+    () =>
+      Array.from(new Set(GALLERY_ITEMS.map((item) => item.category))).sort(
+        (a, b) => a.localeCompare(b),
+      ),
+    [],
+  );
 
-  useEffect(() => {
-    fetchGalleryItems();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+  const items = useMemo(() => {
+    const filtered = selectedCategory
+      ? GALLERY_ITEMS.filter((item) => item.category === selectedCategory)
+      : GALLERY_ITEMS;
+    return [...filtered].sort((a, b) => {
+      if (a.category === b.category) return a.order - b.order;
+      return a.category.localeCompare(b.category);
+    });
   }, [selectedCategory]);
 
-  const fetchCategories = async () => {
-    try {
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api/v1"}/gallery`,
-      );
-      const data = await response.json();
-      if (data.status === "success" && data.data?.categories) {
-        setCategories(data.data.categories);
-      }
-    } catch (error) {
-      console.error("Failed to fetch gallery categories:", error);
-    }
-  };
-
-  const fetchGalleryItems = async () => {
-    try {
-      setLoading(true);
-      const params = selectedCategory
-        ? `?category=${encodeURIComponent(selectedCategory)}`
-        : "";
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api/v1"}/gallery${params}`,
-      );
-      const data = await response.json();
-
-      if (data.status === "success" && data.data) {
-        setItems(data.data.items || []);
-      }
-    } catch (error) {
-      console.error("Failed to fetch gallery items:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleItemClick = (item: GalleryItem) => {
-    setSelectedItem(item);
-  };
-
-  const closeModal = () => {
-    setSelectedItem(null);
-  };
-
-  // Group items by category
-  const groupedItems: { [key: string]: GalleryItem[] } = {};
-  items.forEach((item) => {
-    if (!groupedItems[item.category]) {
-      groupedItems[item.category] = [];
-    }
-    groupedItems[item.category].push(item);
-  });
-
-  // Sort items within each category by order
-  Object.keys(groupedItems).forEach((category) => {
-    groupedItems[category].sort((a, b) => a.order - b.order);
-  });
+  const groupedItems = useMemo(() => {
+    const groups: { [key: string]: GalleryItem[] } = {};
+    items.forEach((item) => {
+      if (!groups[item.category]) groups[item.category] = [];
+      groups[item.category].push(item);
+    });
+    Object.keys(groups).forEach((category) => {
+      groups[category].sort((a, b) => a.order - b.order);
+    });
+    return groups;
+  }, [items]);
 
   const renderGridItem = (item: GalleryItem) => (
     <div
-      key={item._id || item.id}
+      key={item.id}
       className="group relative aspect-square bg-gray-100 rounded-xl overflow-hidden hover:shadow-xl transition-all"
     >
-      {item.mediaType === "video" ? (
-        <>
-          <div
-            className="absolute inset-0 w-full h-full"
-            onClick={(e) => {
-              e.stopPropagation();
-              handleItemClick(item);
-            }}
-          >
-            {isEmbeddableVideoUrl(item.mediaUrl) ? (
-              <iframe
-                src={getVideoEmbedUrl(item.mediaUrl, true)}
-                className="w-full h-full pointer-events-auto"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
-                title={item.title}
-              />
-            ) : (
-              <video
-                src={item.mediaUrl}
-                autoPlay
-                muted
-                loop
-                playsInline
-                controls
-                className="w-full h-full object-contain bg-black"
-                title={item.title}
-              />
-            )}
-          </div>
-          <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-3 pointer-events-none">
-            <h3 className="text-white font-semibold text-sm">{item.title}</h3>
-            {item.description && (
-              <p className="text-white/80 text-xs mt-0.5 line-clamp-2">
-                {item.description}
-              </p>
-            )}
-          </div>
-        </>
-      ) : (
-        <div
-          onClick={() => handleItemClick(item)}
-          className="cursor-pointer w-full h-full"
-        >
-          <img
-            src={item.mediaUrl}
-            alt={item.title}
-            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
-            onError={(e) => {
-              const target = e.target as HTMLImageElement;
-              target.parentElement!.innerHTML = `
-                <div class="w-full h-full flex items-center justify-center bg-gray-200">
-                  <svg class="w-16 h-16 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                  </svg>
-                </div>
-              `;
-            }}
-          />
-          <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-4 opacity-0 group-hover:opacity-100 transition-opacity">
-            <h3 className="text-white font-semibold text-sm sm:text-base">
-              {item.title}
-            </h3>
-            {item.description && (
-              <p className="text-white/80 text-xs sm:text-sm mt-1 line-clamp-2">
-                {item.description}
-              </p>
-            )}
-          </div>
+      <div
+        onClick={() => setSelectedItem(item)}
+        className="cursor-pointer w-full h-full"
+      >
+        <img
+          src={item.mediaUrl}
+          alt={item.title}
+          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+        />
+        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-4 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+          <h3 className="text-white font-semibold text-sm sm:text-base">
+            {item.title}
+          </h3>
+          {item.description && (
+            <p className="text-white/80 text-xs sm:text-sm mt-1 line-clamp-2">
+              {item.description}
+            </p>
+          )}
         </div>
-      )}
+      </div>
+
+      <button
+        type="button"
+        onClick={(e) => {
+          e.stopPropagation();
+          void downloadImage(item);
+        }}
+        className="absolute top-3 right-3 z-10 inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs font-semibold text-white shadow-md transition hover:brightness-110"
+        style={{ backgroundColor: PRIMARY }}
+        aria-label={`Download ${item.title}`}
+      >
+        <Download className="w-3.5 h-3.5" />
+        Download
+      </button>
     </div>
   );
 
@@ -271,7 +215,11 @@ export default function GalleryPage() {
                 style={
                   selectedCategory === ""
                     ? { backgroundColor: PRIMARY, color: "#fff" }
-                    : { backgroundColor: "#fff", color: PRIMARY, border: `1px solid ${PRIMARY}30` }
+                    : {
+                        backgroundColor: "#fff",
+                        color: PRIMARY,
+                        border: `1px solid ${PRIMARY}30`,
+                      }
                 }
               >
                 All
@@ -284,7 +232,11 @@ export default function GalleryPage() {
                   style={
                     selectedCategory === category
                       ? { backgroundColor: PRIMARY, color: "#fff" }
-                      : { backgroundColor: "#fff", color: PRIMARY, border: `1px solid ${PRIMARY}30` }
+                      : {
+                          backgroundColor: "#fff",
+                          color: PRIMARY,
+                          border: `1px solid ${PRIMARY}30`,
+                        }
                   }
                 >
                   {category}
@@ -298,19 +250,7 @@ export default function GalleryPage() {
       {/* Gallery Grid */}
       <section className="relative w-full bg-white py-12 sm:py-16 md:py-20 lg:py-24">
         <div className="container mx-auto px-6 sm:px-8 lg:px-12 xl:px-16">
-          {loading ? (
-            <div className="flex items-center justify-center py-20">
-              <div className="text-center">
-                <div
-                  className="inline-block animate-spin rounded-full h-12 w-12 border-b-2"
-                  style={{ borderColor: PRIMARY }}
-                />
-                <p className="mt-4" style={{ color: PRIMARY }}>
-                  Loading gallery...
-                </p>
-              </div>
-            </div>
-          ) : items.length === 0 ? (
+          {items.length === 0 ? (
             <div className="text-center py-20">
               <p className="text-lg" style={{ color: PRIMARY }}>
                 No gallery items found.
@@ -357,15 +297,16 @@ export default function GalleryPage() {
       {selectedItem && (
         <div
           className="fixed inset-0 bg-black bg-opacity-90 z-50 flex items-center justify-center p-4"
-          onClick={closeModal}
+          onClick={() => setSelectedItem(null)}
         >
           <div
             className="max-w-6xl w-full max-h-[90vh] relative"
             onClick={(e) => e.stopPropagation()}
           >
             <button
-              onClick={closeModal}
+              onClick={() => setSelectedItem(null)}
               className="absolute top-4 right-4 z-10 w-10 h-10 bg-white/20 hover:bg-white/30 rounded-full flex items-center justify-center text-white transition"
+              aria-label="Close"
             >
               <svg
                 className="w-6 h-6"
@@ -382,51 +323,40 @@ export default function GalleryPage() {
               </svg>
             </button>
             <div className="bg-white rounded-lg overflow-hidden">
-              {selectedItem.mediaType === "video" ? (
-                <div
-                  className="relative w-full bg-black rounded-t-lg"
-                  style={{ paddingBottom: "56.25%" }}
-                >
-                  {isEmbeddableVideoUrl(selectedItem.mediaUrl) ? (
-                    <iframe
-                      key={`video-${selectedItem._id ?? selectedItem.id ?? selectedItem.mediaUrl}`}
-                      src={getVideoEmbedUrl(selectedItem.mediaUrl)}
-                      className="absolute inset-0 w-full h-full rounded-t-lg"
-                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                      allowFullScreen
-                      title={selectedItem.title}
-                    />
-                  ) : (
-                    <video
-                      key={`video-${selectedItem._id ?? selectedItem.id ?? selectedItem.mediaUrl}`}
-                      src={selectedItem.mediaUrl}
-                      controls
-                      autoPlay
-                      className="absolute inset-0 w-full h-full rounded-t-lg object-contain"
-                      title={selectedItem.title}
-                    />
+              <img
+                src={selectedItem.mediaUrl}
+                alt={selectedItem.title}
+                className="w-full h-auto max-h-[80vh] object-contain"
+              />
+              <div className="p-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <div>
+                  <h3
+                    className="text-2xl font-bold mb-2"
+                    style={{ color: PRIMARY }}
+                  >
+                    {selectedItem.title}
+                  </h3>
+                  {selectedItem.description && (
+                    <p className="text-gray-700 mb-2">
+                      {selectedItem.description}
+                    </p>
                   )}
+                  <span
+                    className="inline-block px-3 py-1 text-sm font-medium rounded-full"
+                    style={{ backgroundColor: MINT, color: PRIMARY }}
+                  >
+                    {selectedItem.category}
+                  </span>
                 </div>
-              ) : (
-                <img
-                  src={selectedItem.mediaUrl}
-                  alt={selectedItem.title}
-                  className="w-full h-auto max-h-[80vh] object-contain"
-                />
-              )}
-              <div className="p-6">
-                <h3 className="text-2xl font-bold mb-2" style={{ color: PRIMARY }}>
-                  {selectedItem.title}
-                </h3>
-                {selectedItem.description && (
-                  <p className="text-gray-700 mb-2">{selectedItem.description}</p>
-                )}
-                <span
-                  className="inline-block px-3 py-1 text-sm font-medium rounded-full"
-                  style={{ backgroundColor: MINT, color: PRIMARY }}
+                <button
+                  type="button"
+                  onClick={() => void downloadImage(selectedItem)}
+                  className="inline-flex items-center justify-center gap-2 rounded-lg px-5 py-2.5 text-sm font-semibold text-white transition hover:brightness-110"
+                  style={{ backgroundColor: PRIMARY }}
                 >
-                  {selectedItem.category}
-                </span>
+                  <Download className="w-4 h-4" />
+                  Download Image
+                </button>
               </div>
             </div>
           </div>

@@ -1,67 +1,92 @@
 /**
- * Email Service
- * Sends emails via Elastic Email API using pre-built templates and merge fields.
- * Set ELASTICMAIL_API_KEY in env. Create templates in Elastic Email dashboard with the names and merge tags below.
+ * Email Service — Big Bull Energies
+ * Sends branded HTML emails via Elastic Email API (in-repo templates).
+ *
+ * Required env:
+ *   ELASTICMAIL_API_KEY (or ELASTIC_API_KEY)
+ *   ELASTIC_FROM_EMAIL  — address on a domain verified in Elastic Email
+ * Optional:
+ *   EMAIL_FROM_NAME, SUPPORT_EMAIL, CLIENT_URL / FRONTEND_URL
  */
 
-import { sendWithTemplate } from "./elastic-email";
+import { sendEmail } from "./elastic-email";
+import { clientBaseUrl } from "./templates/layout";
+import * as T from "./templates/emails";
 
-const defaultFrom = () =>
-  process.env.EMAIL_USER ||
-  process.env.EMAIL_FROM ||
-  process.env.ELASTIC_FROM_EMAIL ||
-  process.env.SUPPORT_EMAIL ||
-  "bigbullenergies@gmail.com";
+const FROM_NAME = () =>
+  process.env.EMAIL_FROM_NAME || "Big Bull Energies";
 
-/** Elastic Email template names (must match templates in your Elastic Email dashboard) */
-const TEMPLATES = {
-  SignupWelcome: "SignupWelcome",
-  InvestmentConfirmation: "InvestmentConfirmation",
-  WithdrawalCreated: "WithdrawalCreated",
-  WithdrawalApproved: "WithdrawalApproved",
-  WithdrawalRejected: "WithdrawalRejected",
-  PasswordReset: "PasswordReset",
-  TicketCreated: "TicketCreated",
-  TicketStatusUpdate: "TicketStatusUpdate",
-  VoucherCreated: "VoucherCreated",
-  VoucherUsed: "VoucherUsed",
-  VoucherExpired: "VoucherExpired",
-  CalculationFailure: "CalculationFailure",
-} as const;
+/**
+ * Prefer a verified sending domain. Do not default to Gmail — Elastic rejects it.
+ */
+export const defaultFrom = (): string => {
+  const from =
+    process.env.ELASTIC_FROM_EMAIL ||
+    process.env.EMAIL_FROM ||
+    process.env.EMAIL_USER ||
+    process.env.SUPPORT_EMAIL;
 
-interface SendSignupEmailParams {
+  if (!from) {
+    throw new Error(
+      "No from-address configured. Set ELASTIC_FROM_EMAIL to an address on your Elastic Email verified domain.",
+    );
+  }
+  return from.trim();
+};
+
+async function dispatch(options: {
+  to: string;
+  subject: string;
+  html: string;
+  label: string;
+}): Promise<void> {
+  try {
+    await sendEmail({
+      from: defaultFrom(),
+      fromName: FROM_NAME(),
+      to: options.to,
+      subject: options.subject,
+      html: options.html,
+    });
+    console.log(`✅ ${options.label} email sent to ${options.to}`);
+  } catch (error: any) {
+    console.error(
+      `❌ Failed to send ${options.label} email to ${options.to}:`,
+      error?.message || error,
+    );
+  }
+}
+
+export const sendSignupWelcomeEmail = async (p: {
   to: string;
   name: string;
   userId: string;
   loginLink: string;
-}
-// migrated
-export const sendSignupWelcomeEmail = async ({
-  to,
-  name,
-  userId,
-  loginLink,
-}: SendSignupEmailParams): Promise<void> => {
-  try {
-    console.log({ name, userId, loginLink }, "sendSignupWelcomeEmail");
-
-    await sendWithTemplate({
-      from: defaultFrom(),
-      to,
-      subject: "Welcome to Big Bull Energies - Your Account is Ready!",
-      template: TEMPLATES.SignupWelcome,
-      merge: { name, userId, loginLink },
-    });
-    console.log(`✅ Signup welcome email sent to ${to}`);
-  } catch (error: any) {
-    console.error(
-      `❌ Failed to send signup welcome email to ${to}:`,
-      error.message,
-    );
-  }
+}): Promise<void> => {
+  await dispatch({
+    to: p.to,
+    subject: "Welcome to Big Bull Energies — your account is ready",
+    html: T.signupWelcomeHtml(p),
+    label: "Signup welcome",
+  });
 };
 
-interface SendInvestmentPurchaseEmailParams {
+/** Same secure link flow used at registration (acts as email verification / magic login). */
+export const sendEmailVerificationEmail = async (p: {
+  to: string;
+  name: string;
+  userId: string;
+  verifyLink: string;
+}): Promise<void> => {
+  await dispatch({
+    to: p.to,
+    subject: "Verify your email — Big Bull Energies",
+    html: T.emailVerificationHtml(p),
+    label: "Email verification",
+  });
+};
+
+export const sendInvestmentPurchaseEmail = async (p: {
   to: string;
   name: string;
   packageName: string;
@@ -71,55 +96,37 @@ interface SendInvestmentPurchaseEmailParams {
   startDate: string;
   endDate: string;
   dashboardLink: string;
-  /** User ID (e.g. BIGBULL-000123) for template {userId} */
   userId?: string;
-}
-// migrated
-
-export const sendInvestmentPurchaseEmail = async ({
-  to,
-  name,
-  packageName,
-  investmentAmount,
-  duration,
-  totalOutputPct,
-  startDate,
-  endDate,
-  dashboardLink,
-  userId,
-}: SendInvestmentPurchaseEmailParams): Promise<void> => {
-  try {
-    await sendWithTemplate({
-      from: defaultFrom(),
-      to,
-      subject: `Investment Confirmation - ${packageName}`,
-      template: TEMPLATES.InvestmentConfirmation,
-      merge: {
-        name,
-        packageName,
-        investmentAmount,
-        duration,
-        totalOutputPct,
-        startDate,
-        endDate,
-        dashboardLink,
-        // Template fields: User ID, Package Amount, Package Name, Date of Purchase
-        userId: userId ?? "",
-        amount: investmentAmount,
-        package: packageName,
-        date: startDate,
-      },
-    });
-    console.log(`✅ Investment purchase confirmation email sent to ${to}`);
-  } catch (error: any) {
-    console.error(
-      `❌ Failed to send investment purchase email to ${to}:`,
-      error.message,
-    );
-  }
+}): Promise<void> => {
+  await dispatch({
+    to: p.to,
+    subject: `Package confirmed — ${p.packageName}`,
+    html: T.packagePurchaseHtml(p),
+    label: "Package purchase",
+  });
 };
 
-interface SendWithdrawalCreatedEmailParams {
+export const sendDepositConfirmationEmail = async (p: {
+  to: string;
+  name: string;
+  amount: number;
+  currency?: string;
+  paymentId?: string;
+  method?: string;
+  dashboardLink?: string;
+}): Promise<void> => {
+  await dispatch({
+    to: p.to,
+    subject: `Deposit confirmed — $${p.amount.toFixed(2)}`,
+    html: T.depositConfirmationHtml({
+      ...p,
+      dashboardLink: p.dashboardLink || `${clientBaseUrl()}/dashboard`,
+    }),
+    label: "Deposit confirmation",
+  });
+};
+
+export const sendWithdrawalCreatedEmail = async (p: {
   to: string;
   name: string;
   amount: number;
@@ -128,44 +135,16 @@ interface SendWithdrawalCreatedEmailParams {
   walletType: string;
   withdrawalId: string;
   dashboardLink: string;
-}
-// migrated
-export const sendWithdrawalCreatedEmail = async ({
-  to,
-  name,
-  amount,
-  charges,
-  finalAmount,
-  walletType,
-  withdrawalId,
-  dashboardLink,
-}: SendWithdrawalCreatedEmailParams): Promise<void> => {
-  try {
-    await sendWithTemplate({
-      from: defaultFrom(),
-      to,
-      subject: `Withdrawal Request Submitted - $${amount.toFixed(2)}`,
-      template: TEMPLATES.WithdrawalCreated,
-      merge: {
-        name,
-        amount: amount.toFixed(2),
-        charges: charges.toFixed(2),
-        finalAmount: finalAmount.toFixed(2),
-        walletType,
-        withdrawalId,
-        dashboardLink,
-      },
-    });
-    console.log(`✅ Withdrawal created email sent to ${to}`);
-  } catch (error: any) {
-    console.error(
-      `❌ Failed to send withdrawal created email to ${to}:`,
-      error.message,
-    );
-  }
+}): Promise<void> => {
+  await dispatch({
+    to: p.to,
+    subject: `Withdrawal request submitted — $${p.amount.toFixed(2)}`,
+    html: T.withdrawalCreatedHtml(p),
+    label: "Withdrawal created",
+  });
 };
 
-interface SendWithdrawalApprovedEmailParams {
+export const sendWithdrawalApprovedEmail = async (p: {
   to: string;
   name: string;
   amount: number;
@@ -175,46 +154,16 @@ interface SendWithdrawalApprovedEmailParams {
   withdrawalId: string;
   transactionId: string;
   dashboardLink: string;
-}
-// migrated
-export const sendWithdrawalApprovedEmail = async ({
-  to,
-  name,
-  amount,
-  charges,
-  finalAmount,
-  walletType,
-  withdrawalId,
-  transactionId,
-  dashboardLink,
-}: SendWithdrawalApprovedEmailParams): Promise<void> => {
-  try {
-    await sendWithTemplate({
-      from: defaultFrom(),
-      to,
-      subject: `Withdrawal Approved - $${amount.toFixed(2)}`,
-      template: TEMPLATES.WithdrawalApproved,
-      merge: {
-        name,
-        amount: amount.toFixed(2),
-        charges: charges.toFixed(2),
-        finalAmount: finalAmount.toFixed(2),
-        walletType,
-        withdrawalId,
-        transactionId,
-        dashboardLink,
-      },
-    });
-    console.log(`✅ Withdrawal approved email sent to ${to}`);
-  } catch (error: any) {
-    console.error(
-      `❌ Failed to send withdrawal approved email to ${to}:`,
-      error.message,
-    );
-  }
+}): Promise<void> => {
+  await dispatch({
+    to: p.to,
+    subject: `Withdrawal approved — $${p.finalAmount.toFixed(2)}`,
+    html: T.withdrawalApprovedHtml(p),
+    label: "Withdrawal approved",
+  });
 };
 
-interface SendWithdrawalRejectedEmailParams {
+export const sendWithdrawalRejectedEmail = async (p: {
   to: string;
   name: string;
   amount: number;
@@ -224,110 +173,82 @@ interface SendWithdrawalRejectedEmailParams {
   withdrawalId: string;
   reason?: string;
   dashboardLink: string;
-}
-// migrated
-export const sendWithdrawalRejectedEmail = async ({
-  to,
-  name,
-  amount,
-  charges,
-  finalAmount,
-  walletType,
-  withdrawalId,
-  reason,
-  dashboardLink,
-}: SendWithdrawalRejectedEmailParams): Promise<void> => {
-  try {
-    await sendWithTemplate({
-      from: defaultFrom(),
-      to,
-      subject: `Withdrawal Request Rejected - $${amount.toFixed(2)}`,
-      template: TEMPLATES.WithdrawalRejected,
-      merge: {
-        name,
-        amount: amount.toFixed(2),
-        charges: charges.toFixed(2),
-        finalAmount: finalAmount.toFixed(2),
-        walletType,
-        withdrawalId,
-        reason: reason ?? "",
-        dashboardLink,
-      },
-    });
-    console.log(`✅ Withdrawal rejected email sent to ${to}`);
-  } catch (error: any) {
-    console.error(
-      `❌ Failed to send withdrawal rejected email to ${to}:`,
-      error.message,
-    );
-  }
+}): Promise<void> => {
+  await dispatch({
+    to: p.to,
+    subject: `Withdrawal update — $${p.amount.toFixed(2)}`,
+    html: T.withdrawalRejectedHtml(p),
+    label: "Withdrawal rejected",
+  });
 };
 
-interface SendPasswordResetEmailParams {
+export const sendPasswordResetEmail = async (p: {
   to: string;
   name: string;
   resetLink: string;
-}
-// migrated
-
-export const sendPasswordResetEmail = async ({
-  to,
-  name,
-  resetLink,
-}: SendPasswordResetEmailParams): Promise<void> => {
-  try {
-    console.log({ name, resetLink }, "sendPasswordResetEmail");
-
-    await sendWithTemplate({
-      from: defaultFrom(),
-      to,
-      subject: "Reset Your Password - BIG BULL",
-      template: TEMPLATES.PasswordReset,
-      merge: { name, resetLink },
-    });
-    console.log(`✅ Password reset email sent to ${to}`);
-  } catch (error: any) {
-    console.error(
-      `❌ Failed to send password reset email to ${to}:`,
-      error.message,
-    );
-  }
+}): Promise<void> => {
+  await dispatch({
+    to: p.to,
+    subject: "Reset your password — Big Bull Energies",
+    html: T.passwordResetHtml(p),
+    label: "Password reset",
+  });
 };
 
-interface SendTicketCreatedEmailParams {
+export const sendReferralIncomeEmail = async (p: {
+  to: string;
+  name: string;
+  amount: number;
+  fromUserName?: string;
+  fromUserId?: string;
+  packageName?: string;
+  dashboardLink?: string;
+}): Promise<void> => {
+  await dispatch({
+    to: p.to,
+    subject: `Referral income credited — $${p.amount.toFixed(2)}`,
+    html: T.referralIncomeHtml({
+      ...p,
+      dashboardLink: p.dashboardLink || `${clientBaseUrl()}/dashboard`,
+    }),
+    label: "Referral income",
+  });
+};
+
+export const sendBinaryIncomeEmail = async (p: {
+  to: string;
+  name: string;
+  amount: number;
+  matchedVolume?: number;
+  dashboardLink?: string;
+}): Promise<void> => {
+  await dispatch({
+    to: p.to,
+    subject: `Binary income credited — $${p.amount.toFixed(2)}`,
+    html: T.binaryIncomeHtml({
+      ...p,
+      dashboardLink: p.dashboardLink || `${clientBaseUrl()}/binary`,
+    }),
+    label: "Binary income",
+  });
+};
+
+export const sendTicketCreatedEmail = async (p: {
   to: string;
   name: string;
   ticketId: string;
   subject: string;
   department: string;
-}
-// migrated
-
-export const sendTicketCreatedEmail = async ({
-  to,
-  name,
-  ticketId,
-  subject,
-  department,
-}: SendTicketCreatedEmailParams): Promise<void> => {
-  try {
-    await sendWithTemplate({
-      from: defaultFrom(),
-      to,
-      subject: `Support Ticket Created - ${subject}`,
-      template: TEMPLATES.TicketCreated,
-      merge: { name, ticketId, subject, department },
-    });
-    console.log(`✅ Ticket created email sent to ${to}`);
-  } catch (error: any) {
-    console.error(
-      `❌ Failed to send ticket created email to ${to}:`,
-      error.message,
-    );
-  }
+}): Promise<void> => {
+  await dispatch({
+    to: p.to,
+    subject: `Support ticket created — ${p.subject}`,
+    html: T.ticketCreatedHtml(p),
+    label: "Ticket created",
+  });
 };
 
-interface SendTicketStatusUpdateEmailParams {
+export const sendTicketStatusUpdateEmail = async (p: {
   to: string;
   name: string;
   ticketId: string;
@@ -335,41 +256,14 @@ interface SendTicketStatusUpdateEmailParams {
   oldStatus: string;
   newStatus: string;
   reply?: string;
-}
-// migrated
-export const sendTicketStatusUpdateEmail = async ({
-  to,
-  name,
-  ticketId,
-  subject,
-  oldStatus,
-  newStatus,
-  reply,
-}: SendTicketStatusUpdateEmailParams): Promise<void> => {
-  try {
-    await sendWithTemplate({
-      from: defaultFrom(),
-      to,
-      subject: `Ticket Status Updated - ${subject}`,
-      template: TEMPLATES.TicketStatusUpdate,
-      merge: {
-        name,
-        ticketId,
-        subject,
-        oldStatus,
-        newStatus,
-        reply: reply ?? "",
-      },
-    });
-    console.log(`✅ Ticket status update email sent to ${to}`);
-  } catch (error: any) {
-    console.error(
-      `❌ Failed to send ticket status update email to ${to}:`,
-      error.message,
-    );
-  }
+}): Promise<void> => {
+  await dispatch({
+    to: p.to,
+    subject: `Ticket update — ${p.subject}`,
+    html: T.ticketStatusUpdateHtml(p),
+    label: "Ticket status update",
+  });
 };
-// migrated
 
 export const sendVoucherCreatedEmail = async (params: {
   to: string;
@@ -381,29 +275,12 @@ export const sendVoucherCreatedEmail = async (params: {
   dashboardLink: string;
   source?: "wallet" | "payment";
 }): Promise<void> => {
-  try {
-    await sendWithTemplate({
-      from: defaultFrom(),
-      to: params.to,
-      subject: `Voucher Created - ${params.voucherId}`,
-      template: TEMPLATES.VoucherCreated,
-      merge: {
-        name: params.name,
-        voucherId: params.voucherId,
-        amount: params.amount.toFixed(2),
-        investmentValue: params.investmentValue.toFixed(2),
-        expiryDate: params.expiryDate,
-        dashboardLink: params.dashboardLink,
-        source: params.source ?? "wallet",
-      },
-    });
-    console.log(`✅ Voucher created email sent to ${params.to}`);
-  } catch (error: any) {
-    console.error(
-      `❌ Failed to send voucher created email to ${params.to}:`,
-      error.message,
-    );
-  }
+  await dispatch({
+    to: params.to,
+    subject: `Voucher created — ${params.voucherId}`,
+    html: T.voucherCreatedHtml(params),
+    label: "Voucher created",
+  });
 };
 
 export const sendVoucherUsedEmail = async (params: {
@@ -415,28 +292,12 @@ export const sendVoucherUsedEmail = async (params: {
   usedBy: string;
   dashboardLink: string;
 }): Promise<void> => {
-  try {
-    await sendWithTemplate({
-      from: defaultFrom(),
-      to: params.to,
-      subject: `Voucher Used - ${params.voucherId}`,
-      template: TEMPLATES.VoucherUsed,
-      merge: {
-        name: params.name,
-        voucherId: params.voucherId,
-        amount: params.amount.toFixed(2),
-        investmentValue: params.investmentValue.toFixed(2),
-        usedBy: params.usedBy,
-        dashboardLink: params.dashboardLink,
-      },
-    });
-    console.log(`✅ Voucher used email sent to ${params.to}`);
-  } catch (error: any) {
-    console.error(
-      `❌ Failed to send voucher used email to ${params.to}:`,
-      error.message,
-    );
-  }
+  await dispatch({
+    to: params.to,
+    subject: `Voucher used — ${params.voucherId}`,
+    html: T.voucherUsedHtml(params),
+    label: "Voucher used",
+  });
 };
 
 export const sendVoucherExpiredEmail = async (params: {
@@ -448,72 +309,50 @@ export const sendVoucherExpiredEmail = async (params: {
   expiryDate: string;
   dashboardLink: string;
 }): Promise<void> => {
-  try {
-    await sendWithTemplate({
-      from: defaultFrom(),
-      to: params.to,
-      subject: `Voucher Expired - ${params.voucherId}`,
-      template: TEMPLATES.VoucherExpired,
-      merge: {
-        name: params.name,
-        voucherId: params.voucherId,
-        amount: params.amount.toFixed(2),
-        investmentValue: params.investmentValue.toFixed(2),
-        expiryDate: params.expiryDate,
-        dashboardLink: params.dashboardLink,
-      },
-    });
-    console.log(`✅ Voucher expired email sent to ${params.to}`);
-  } catch (error: any) {
-    console.error(
-      `❌ Failed to send voucher expired email to ${params.to}:`,
-      error.message,
-    );
-  }
+  await dispatch({
+    to: params.to,
+    subject: `Voucher expired — ${params.voucherId}`,
+    html: T.voucherExpiredHtml(params),
+    label: "Voucher expired",
+  });
 };
 
-interface SendCalculationFailureEmailParams {
+export const sendAnnouncementEmail = async (p: {
+  to: string;
+  name?: string;
+  headline: string;
+  body: string;
+  ctaLabel?: string;
+  ctaUrl?: string;
+}): Promise<void> => {
+  await dispatch({
+    to: p.to,
+    subject: p.headline,
+    html: T.announcementHtml(p),
+    label: "Announcement",
+  });
+};
+
+export const sendCalculationFailureEmail = async (p: {
   to: string;
   jobId: string;
   jobType: string;
   error: string;
   processedItems: number;
   totalItems: number;
-}
+}): Promise<void> => {
+  const progressPct =
+    p.totalItems > 0 ? Math.round((p.processedItems / p.totalItems) * 100) : 0;
+  const adminLink = `${clientBaseUrl()}/admin/settings`;
 
-export const sendCalculationFailureEmail = async ({
-  to,
-  jobId,
-  jobType,
-  error,
-  processedItems,
-  totalItems,
-}: SendCalculationFailureEmailParams): Promise<void> => {
-  try {
-    const progressPct =
-      totalItems > 0 ? Math.round((processedItems / totalItems) * 100) : 0;
-    const adminLink = `${process.env.CLIENT_URL || "https://crownbankers.com"}/admin/settings`;
-
-    await sendWithTemplate({
-      from: defaultFrom(),
-      to,
-      subject: `⚠️ Calculation Job Failed - ${jobType}`,
-      template: TEMPLATES.CalculationFailure,
-      merge: {
-        jobId,
-        jobType,
-        error,
-        processedItems: String(processedItems),
-        totalItems: String(totalItems),
-        progressPct: String(progressPct),
-        adminLink,
-      },
-    });
-    console.log(`✅ Calculation failure email sent to ${to}`);
-  } catch (error: any) {
-    console.error(
-      `❌ Failed to send calculation failure email to ${to}:`,
-      error.message,
-    );
-  }
+  await dispatch({
+    to: p.to,
+    subject: `Calculation job failed — ${p.jobType}`,
+    html: T.calculationFailureHtml({
+      ...p,
+      progressPct,
+      adminLink,
+    }),
+    label: "Calculation failure",
+  });
 };

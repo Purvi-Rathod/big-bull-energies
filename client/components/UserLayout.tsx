@@ -166,10 +166,10 @@ export default function UserLayout({
         />
       </div>
 
-      {/* Mobile overlay */}
+      {/* Mobile overlay — above bottom tabs so drawer + logout stay usable */}
       {!isDesktop && sidebarOpen && (
         <div
-          className="fixed inset-0 z-20 bg-[#0B1F2A]/40 backdrop-blur-[2px] md:hidden"
+          className="fixed inset-0 z-[45] bg-[#0B1F2A]/40 backdrop-blur-[2px] md:hidden"
           onClick={() => setSidebarOpen(false)}
           aria-hidden
         />
@@ -177,7 +177,7 @@ export default function UserLayout({
 
       {/* Sidebar */}
       <aside
-        className={`fixed z-30 flex h-[100dvh] max-h-screen flex-col border-r transition-transform duration-300 ease-in-out ${
+        className={`fixed z-50 flex h-[100dvh] max-h-[100dvh] flex-col border-r transition-transform duration-300 ease-in-out ${
           isDesktop
             ? sidebarOpen
               ? "w-[272px] translate-x-0"
@@ -191,7 +191,6 @@ export default function UserLayout({
           borderColor: "rgba(5,98,124,0.12)",
           boxShadow: "4px 0 24px rgba(5,98,124,0.06)",
           backdropFilter: "blur(12px)",
-          paddingBottom: "env(safe-area-inset-bottom)",
         }}
         aria-label="Main navigation"
       >
@@ -322,7 +321,7 @@ export default function UserLayout({
         </nav>
 
         <div
-          className="flex-shrink-0 border-t p-3"
+          className="flex-shrink-0 border-t p-3 pb-[max(0.75rem,env(safe-area-inset-bottom,0px))] md:pb-3"
           style={{ borderColor: "rgba(5,98,124,0.1)" }}
         >
           {navExpanded && user && (
@@ -351,7 +350,7 @@ export default function UserLayout({
             type="button"
             onClick={handleLogout}
             title={!navExpanded ? "Logout" : undefined}
-            className={`flex w-full items-center gap-2.5 rounded-xl px-2.5 py-2.5 text-sm font-semibold text-red-600 transition hover:bg-red-50 ${
+            className={`flex w-full items-center gap-2.5 rounded-xl border border-red-200 bg-red-50 px-2.5 py-3 text-sm font-bold text-red-600 transition hover:bg-red-100 ${
               !navExpanded ? "justify-center" : ""
             }`}
           >
@@ -421,9 +420,11 @@ export default function UserLayout({
         </main>
       </div>
 
-      {/* Mobile bottom tabs */}
+      {/* Mobile bottom tabs — hidden while menu drawer is open so Logout stays visible */}
       <nav
-        className="fixed bottom-0 left-0 right-0 z-40 border-t md:hidden"
+        className={`fixed bottom-0 left-0 right-0 z-40 border-t md:hidden ${
+          sidebarOpen ? "pointer-events-none invisible" : ""
+        }`}
         style={{
           background: "rgba(255,255,255,0.98)",
           borderColor: "rgba(5,98,124,0.12)",
@@ -431,6 +432,7 @@ export default function UserLayout({
           paddingBottom: "env(safe-area-inset-bottom, 0px)",
         }}
         aria-label="Mobile navigation"
+        aria-hidden={sidebarOpen || undefined}
       >
         <div className="flex items-stretch justify-around px-0.5 py-1">
           {MOBILE_TABS.map((item) => {

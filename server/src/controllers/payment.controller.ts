@@ -892,6 +892,33 @@ export const handlePaymentCallback = asyncHandler(async (req, res) => {
           await payment.save();
 
           // Investment confirmation email is sent by processInvestment (investment.service)
+          // Also send deposit confirmation for the gateway payment
+          try {
+            const payer = await User.findById(userId).select("name email").lean();
+            if (payer?.email) {
+              const clientUrl =
+                process.env.CLIENT_URL ||
+                process.env.FRONTEND_URL ||
+                "http://localhost:3000";
+              const { sendDepositConfirmationEmail } = await import(
+                "../lib/mail-service/email.service"
+              );
+              void sendDepositConfirmationEmail({
+                to: payer.email,
+                name: payer.name || "Member",
+                amount: parseFloat(payment.amount.toString()),
+                currency: "USD",
+                paymentId: txnId,
+                method: "Crypto (NOWPayments)",
+                dashboardLink: `${clientUrl}/investments`,
+              });
+            }
+          } catch (depMailErr) {
+            console.error(
+              "[NOWPayments Callback] Deposit confirmation email failed:",
+              depMailErr,
+            );
+          }
 
           console.log(`[NOWPayments Callback] ✅✅✅ INVESTMENT CREATED SUCCESSFULLY ✅✅✅`);
           console.log(`[NOWPayments Callback] Investment Details:`);

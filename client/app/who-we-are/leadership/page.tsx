@@ -15,43 +15,35 @@ const GOLD = "#F5CF0B";
 const leaders = [
   {
     id: 1,
-    name: "Adrian Cadiz",
+    name: "Alexander Whitmore",
     title: "Chief Executive Officer",
     description:
-      "With nearly two decades of experience in marketing, business operations, and strategic growth, Adrian leads Big Bull Energies with a focus on renewable energy and financial innovation.",
-    image: "/leader1.jpg",
+      "Alexander leads Big Bull Energies with a clear focus on renewable energy growth, operational excellence, and long-term value for partners and communities worldwide.",
+    image: "/L1.jpeg",
   },
   {
     id: 2,
-    name: "Edward Barrington",
+    name: "Charles Kensington",
     title: "Chief Marketing Officer",
     description:
-      "Edward oversees all marketing initiatives, driving brand development and market expansion to grow Big Bull Energies' global presence.",
-    image: "/leader2.png",
+      "Charles drives brand strategy and market expansion, building Big Bull Energies' global presence across renewable energy and investor communities.",
+    image: "/L4.jpeg",
   },
   {
     id: 3,
-    name: "Anee Sandrova",
-    title: "Relationship Manager",
+    name: "Jessica Park",
+    title: "Chief Operating Officer",
     description:
-      "Anee manages relations and operations in the Netherlands, coordinating Big Bull Energies wind projects and partner relationships across European markets.",
-    image: "/leader3.png",
+      "Jessica oversees day-to-day operations and project delivery, ensuring Big Bull Energies executes reliably across markets and energy portfolios.",
+    image: "/L2.jpeg",
   },
   {
     id: 4,
-    name: "Sophie Taylor",
-    title: "Chief Financial Officer",
+    name: "Henry Caldwell",
+    title: "Chief Strategy Officer",
     description:
-      "Sophie leads financial strategy, making critical decisions on investments and resource allocation to ensure sustainable growth and stability.",
-    image: "/leader4.png",
-  },
-  {
-    id: 5,
-    name: "Joseph Carter",
-    title: "Director of Operations",
-    description:
-      "Joseph leads the administrative division, handling user inquiries and ensuring smooth internal operations for all Big Bull Energies members.",
-    image: "/leader5.png",
+      "Henry shapes long-term strategy and investment direction, guiding Big Bull Energies toward sustainable growth and innovation in clean energy.",
+    image: "/L3.jpeg",
   },
 ];
 
@@ -78,9 +70,6 @@ function GoldTag({ children }: { children: React.ReactNode }) {
 }
 
 export default function LeadershipPage() {
-  const topRow = leaders.slice(0, 3);
-  const bottomRow = leaders.slice(3, 5);
-
   return (
     <main
       className="min-h-screen w-full overflow-x-hidden pt-24 sm:pt-28 md:pt-32 lg:pt-[156px]"
@@ -90,7 +79,7 @@ export default function LeadershipPage() {
       <section className="relative w-full overflow-hidden min-h-[420px] sm:min-h-[480px] md:min-h-[520px] lg:min-h-[560px] flex items-center">
         <Image
           src="/images/leadership-Hero.png"
-          alt="Big Bull Energies leadership"
+          alt="Big Bull Energies leadership team"
           fill
           priority
           className="object-cover object-center"
@@ -148,28 +137,15 @@ export default function LeadershipPage() {
               className="text-sm sm:text-base leading-relaxed max-w-2xl mx-auto"
               style={{ color: "#64748b" }}
             >
-              Our leadership team brings decades of combined experience in
-              renewable energy, finance, and technology to drive Big Bull
-              Energies&apos; mission forward.
+              Meet the Big Bull Energies leadership team — dedicated to
+              advancing clean energy, building trusted partnerships, and
+              delivering lasting impact.
             </p>
           </div>
 
-          {/* Row 1 — 3 cards */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6 lg:gap-8 mb-5 sm:mb-6 lg:mb-8">
-            {topRow.map((leader) => (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-6 lg:gap-8">
+            {leaders.map((leader) => (
               <LeaderCard key={leader.id} leader={leader} />
-            ))}
-          </div>
-
-          {/* Row 2 — 2 cards centered */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-5 sm:gap-6 lg:gap-8">
-            {bottomRow.map((leader, i) => (
-              <div
-                key={leader.id}
-                className={`lg:col-span-2 ${i === 0 ? "lg:col-start-2" : "lg:col-start-4"}`}
-              >
-                <LeaderCard leader={leader} />
-              </div>
             ))}
           </div>
         </SectionWrap>
@@ -213,10 +189,10 @@ export default function LeadershipPage() {
 
             <div className="relative w-full aspect-[4/3] sm:aspect-[16/11] rounded-2xl sm:rounded-3xl overflow-hidden shadow-[0_20px_60px_rgba(5,98,124,0.15)]">
               <Image
-                src="/images/leadership-cta.png"
-                alt="Renewable energy 3D illustration"
+                src="/L13.jpeg"
+                alt="Big Bull Energies leadership"
                 fill
-                className="object-cover"
+                className="object-cover object-top"
                 sizes="(max-width: 1024px) 100vw, 560px"
               />
             </div>

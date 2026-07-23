@@ -11,8 +11,15 @@ const SITE_URL =
   "https://crownbankers.com";
 const SITE_NAME = "Big Bull Energies";
 const OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions";
-const SUPPORT_WHATSAPP = "+44 7452 321003";
-const SUPPORT_EMAIL = "bigbullenergies@gmail.com";
+const SUPPORT_WHATSAPP =
+  process.env.SUPPORT_PHONE?.trim() ||
+  process.env.CONTACT_PHONE_DISPLAY?.trim() ||
+  "+44 7452 321003";
+const SUPPORT_EMAIL =
+  process.env.SUPPORT_EMAIL?.trim() ||
+  process.env.ELASTIC_FROM_EMAIL?.trim() ||
+  process.env.email?.trim() ||
+  "bigbullenergies@gmail.com";
 
 let rulebookCache: string | null = null;
 let faqCache: string | null = null;

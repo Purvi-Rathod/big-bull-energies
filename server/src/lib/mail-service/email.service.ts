@@ -9,7 +9,9 @@ import { sendWithTemplate } from "./elastic-email";
 const defaultFrom = () =>
   process.env.EMAIL_USER ||
   process.env.EMAIL_FROM ||
-  "noreply@crownbankers.com";
+  process.env.ELASTIC_FROM_EMAIL ||
+  process.env.SUPPORT_EMAIL ||
+  "bigbullenergies@gmail.com";
 
 /** Elastic Email template names (must match templates in your Elastic Email dashboard) */
 const TEMPLATES = {

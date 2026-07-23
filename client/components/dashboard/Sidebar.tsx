@@ -297,7 +297,7 @@ export default function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
                   className="px-3 py-2 rounded-3xl font-semibold text-sm text-center"
                   style={{ backgroundColor: "#ffcf0B", color: "#05627C" }}
                 >
-                  Elite Energy
+                  No Package
                 </div>
               </div>
 

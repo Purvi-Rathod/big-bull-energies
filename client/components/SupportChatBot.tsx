@@ -73,7 +73,7 @@ export default function SupportChatBot() {
         type="button"
         onClick={() => setOpen((o) => !o)}
         aria-label="Open AI support chat"
-        className="fixed bottom-20 right-20 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-indigo-600 text-white shadow-lg transition-all duration-200 hover:scale-110 hover:bg-indigo-500 hover:shadow-xl focus:outline-none focus:ring-4 focus:ring-indigo-500/50 md:bottom-8 md:right-24 md:h-16 md:w-16"
+        className="fixed bottom-[calc(5.75rem+env(safe-area-inset-bottom,0px))] right-[4.5rem] z-50 flex h-12 w-12 items-center justify-center rounded-full bg-indigo-600 text-white shadow-lg transition-all duration-200 hover:scale-110 hover:bg-indigo-500 hover:shadow-xl focus:outline-none focus:ring-4 focus:ring-indigo-500/50 sm:h-14 sm:w-14 sm:right-20 md:bottom-8 md:right-24 md:h-16 md:w-16"
       >
         <svg
           className="h-7 w-7 md:h-8 md:w-8"
@@ -94,8 +94,8 @@ export default function SupportChatBot() {
       {/* Chat panel */}
       {open && (
         <div
-          className="fixed bottom-36 right-5 z-50 flex w-[calc(100vw-2.5rem)] max-w-md flex-col overflow-hidden rounded-2xl border border-gray-700 bg-gray-900 shadow-2xl md:bottom-24 md:right-24 md:h-[420px] md:w-[380px]"
-          style={{ height: "min(75vh, 420px)" }}
+          className="fixed bottom-[calc(9.5rem+env(safe-area-inset-bottom,0px))] right-4 z-50 flex w-[calc(100vw-2rem)] max-w-md flex-col overflow-hidden rounded-2xl border border-gray-700 bg-gray-900 shadow-2xl md:bottom-24 md:right-24 md:h-[420px] md:w-[380px]"
+          style={{ height: "min(70dvh, 420px)" }}
         >
           <div className="flex items-center justify-between border-b border-gray-700 bg-gray-800/80 px-4 py-3">
             <span className="font-semibold text-white">AI Support</span>

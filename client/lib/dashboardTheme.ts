@@ -1,50 +1,68 @@
-/** Shared dashboard theme — matches withdraw page styling */
+/** Shared Big Bull Energies member-portal theme (light, high-contrast, responsive) */
 
 export const dashboardTheme = {
-  accent: '#FBF676',
-  accentDark: '#0C1A6B',
-  inputBg: '#081028',
+  primary: '#05627C',
+  accent: '#3FA9C8',
+  gold: '#F5CF0B',
+  ink: '#0B1F2A',
+  muted: '#5A6F78',
+  soft: '#E8F5F0',
+  softBlue: '#E6F7FB',
+  goldSoft: '#FFF9E6',
+  border: '#d8e6ec',
+  white: '#FFFFFF',
 
-  page: 'w-full min-h-full py-4 md:py-8 px-2 sm:px-4 md:px-6 lg:px-8 relative overflow-hidden',
-  pageInner: 'relative z-10',
+  page: 'mx-auto w-full max-w-7xl min-w-0 space-y-5 sm:space-y-6 md:space-y-8',
+  pageInner: 'min-w-0',
 
   title:
-    'bg-gradient-to-r from-yellow-300 via-yellow-400 to-yellow-600 bg-clip-text text-transparent drop-shadow-lg',
-  subtitle: 'mt-1 text-sm text-white/55',
+    'text-xl sm:text-2xl md:text-3xl font-extrabold tracking-tight text-[#0B1F2A] break-words',
+  subtitle: 'mt-1 text-xs sm:text-sm font-medium text-[#5A6F78]',
 
-  card: 'rounded-2xl shadow-2xl border border-[#FBF676]/25 p-6 md:p-8 backdrop-blur-md bg-[rgba(8,16,40,0.75)]',
-  cardInner: 'p-5 bg-[rgba(5,12,32,0.9)] border border-[#FBF676]/30 rounded-xl',
-  cardHighlight: 'p-4 bg-[rgba(251,246,118,0.12)] border-2 border-[#FBF676]/35 rounded-xl',
+  card: 'rounded-xl sm:rounded-2xl border border-[#d8e6ec] bg-white p-4 sm:p-6 md:p-8 shadow-sm min-w-0',
+  cardInner: 'p-3 sm:p-4 md:p-5 rounded-xl border border-[#d8e6ec] bg-[#F7FBFC] min-w-0',
+  cardHighlight:
+    'p-3 sm:p-4 rounded-xl border border-[rgba(245,207,11,0.45)] bg-[#FFF9E6] min-w-0',
+  cardEmpty:
+    'rounded-xl sm:rounded-2xl border border-[#d8e6ec] bg-white p-8 sm:p-10 md:p-12 text-center shadow-sm',
 
-  label: 'block text-sm font-bold text-[#FBF676] mb-3',
-  labelMuted: 'text-sm text-[#FBF676]/80 font-semibold',
+  label: 'block text-sm font-bold text-[#05627C] mb-2',
+  labelMuted: 'text-sm font-semibold text-[#5A6F78]',
 
   input:
-    'w-full px-4 py-3 border border-[#FBF676]/40 rounded-xl bg-[#081028] text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-[#FBF676]/40 focus:border-[#FBF676]/70 font-semibold',
+    'w-full min-w-0 px-3 sm:px-4 py-2.5 sm:py-3 border border-[#d8e6ec] rounded-xl bg-[#F7FBFC] text-[#0B1F2A] placeholder:text-[#5A6F78]/60 focus:outline-none focus:ring-2 focus:ring-[#3FA9C8]/35 focus:border-[#05627C] font-semibold text-sm sm:text-base',
   select:
-    'w-full px-4 py-3 border border-[#FBF676]/40 rounded-xl bg-[#081028] text-white focus:outline-none focus:ring-2 focus:ring-[#FBF676]/40 focus:border-[#FBF676]/70 font-semibold appearance-none',
+    'w-full min-w-0 px-3 sm:px-4 py-2.5 sm:py-3 border border-[#d8e6ec] rounded-xl bg-[#F7FBFC] text-[#0B1F2A] focus:outline-none focus:ring-2 focus:ring-[#3FA9C8]/35 focus:border-[#05627C] font-semibold appearance-none text-sm sm:text-base',
 
   btnPrimary:
-    'px-6 py-3 bg-[#FBF676] text-[#0C1A6B] rounded-xl hover:bg-[#e8e04a] font-bold transition-all shadow-lg shadow-[#FBF676]/25 hover:scale-[1.01] active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed',
+    'inline-flex items-center justify-center px-4 sm:px-6 py-2.5 sm:py-3 bg-[#F5CF0B] text-[#0B1F2A] rounded-xl hover:opacity-90 font-extrabold transition-all shadow-sm disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base w-full sm:w-auto',
   btnSecondary:
-    'px-6 py-3 border border-[#FBF676]/40 rounded-xl text-[#FBF676] hover:bg-[#FBF676]/10 font-semibold transition-all',
+    'inline-flex items-center justify-center px-4 sm:px-6 py-2.5 sm:py-3 border border-[#d8e6ec] rounded-xl text-[#05627C] bg-white hover:bg-[#E8F5F0] font-bold transition-all text-sm sm:text-base w-full sm:w-auto',
+  btnGhost:
+    'inline-flex items-center justify-center px-4 sm:px-6 py-2.5 text-sm font-bold text-[#5A6F78] bg-[#EEF2F5] rounded-xl hover:bg-[#e2e8ec] transition-all w-full sm:w-auto',
 
-  tableWrap: 'overflow-x-auto',
-  table: 'min-w-full divide-y divide-[#FBF676]/15',
-  tableHead: 'bg-[rgba(5,12,32,0.9)]',
+  tableWrap:
+    'overflow-x-auto -mx-1 sm:mx-0 rounded-xl sm:rounded-2xl border border-[#d8e6ec] bg-white shadow-sm',
+  table: 'min-w-[640px] w-full divide-y divide-[#e8f0f3]',
+  tableHead: 'bg-[#F7FBFC]',
   tableHeadCell:
-    'px-6 py-5 text-left text-xs font-bold text-[#FBF676] uppercase tracking-wider',
-  tableBody: 'bg-[rgba(5,12,32,0.45)] divide-y divide-[#FBF676]/10',
-  tableRow: 'hover:bg-[rgba(251,246,118,0.08)] transition-all duration-300 group',
+    'px-3 sm:px-4 md:px-6 py-3 md:py-4 text-left text-[10px] sm:text-[11px] font-extrabold text-[#5A6F78] uppercase tracking-wider whitespace-nowrap',
+  tableBody: 'bg-white divide-y divide-[#eef4f7]',
+  tableRow: 'hover:bg-[#F7FBFC] transition-colors',
 
-  badgeActive:
-    'bg-[rgba(251,246,118,0.15)] text-[#FBF676] border-[#FBF676]/40',
-  badgePending: 'bg-white/10 text-white/70 border-white/20',
-  badgeError: 'bg-red-900/40 text-red-400 border-red-500/40',
+  badgeActive: 'bg-emerald-100 text-emerald-800 border border-emerald-200',
+  badgePending: 'bg-amber-100 text-amber-800 border border-amber-200',
+  badgeError: 'bg-red-100 text-red-700 border border-red-200',
+  badgeNeutral: 'bg-slate-100 text-slate-600 border border-slate-200',
 
   error:
-    'mb-6 bg-red-900/30 border border-red-500/50 text-red-400 px-4 py-3 rounded-lg backdrop-blur-sm',
-  sectionTitle: 'text-2xl font-extrabold text-[#FBF676]',
+    'mb-4 sm:mb-6 bg-red-50 border border-red-200 text-red-700 px-3 sm:px-4 py-3 rounded-xl text-sm font-medium break-words',
+  sectionTitle: 'text-base sm:text-lg md:text-xl font-extrabold text-[#0B1F2A]',
   accentBar: 'w-1 h-6 rounded',
-  accentBarStyle: { background: 'linear-gradient(180deg, #FBF676, #05627C)' } as const,
+  accentBarStyle: { background: 'linear-gradient(180deg, #F5CF0B, #05627C)' } as const,
+
+  modalOverlay:
+    'fixed inset-0 z-50 overflow-y-auto overscroll-contain bg-[#0B1F2A]/45 backdrop-blur-sm p-3 sm:p-4',
+  modalPanel:
+    'relative my-6 sm:my-10 mx-auto w-full max-w-md rounded-2xl border border-[#d8e6ec] bg-white p-4 sm:p-6 shadow-xl max-h-[min(90vh,900px)] overflow-y-auto',
 } as const;

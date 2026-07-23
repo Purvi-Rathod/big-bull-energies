@@ -25,7 +25,7 @@ const GOLD = "#F5CF0B";
 const MINT = "#E8F5F0";
 
 export default function OurPlanPage() {
-  const [investmentAmount, setInvestmentAmount] = useState<string>("435");
+  const [investmentAmount, setInvestmentAmount] = useState<string>("1000");
   const [calculatedResults, setCalculatedResults] = useState<any>(null);
   const [activeTab, setActiveTab] = useState<string>("roi");
   const [roadmapRevealed, setRoadmapRevealed] = useState(false);
@@ -50,63 +50,101 @@ export default function OurPlanPage() {
   const investmentPlans = [
     {
       id: 1,
-      name: "Solar Starter",
-      minAmount: "$25",
-      maxAmount: "$4,999",
-      roi: "1.5%",
+      name: "Package 1",
+      minAmount: "$10",
+      maxAmount: "$9,999",
+      minNum: 10,
+      maxNum: 9999,
+      roi: "1.0%",
       bondDays: "200 Days",
-      referral: "8%",
-      binary: "10%",
-      binaryCapping: "$1,000",
-      principalReturn: "60%",
-      totalROIReturns: "300%",
-      totalReturns: "360%",
+      referral: "10%",
+      binary: "12%",
+      binaryCapping: "$2,000",
+      principalReturn: "70%",
+      totalROIReturns: "200%",
+      totalReturns: "270%",
     },
     {
       id: 2,
-      name: "Power Growth",
-      minAmount: "$5,000",
-      maxAmount: "$49,999",
-      roi: "1.75%",
-      bondDays: "190 Days",
-      referral: "9%",
-      binary: "10%",
-      binaryCapping: "$5,000",
+      name: "Package 2",
+      minAmount: "$10,000",
+      maxAmount: "$24,999",
+      minNum: 10000,
+      maxNum: 24999,
+      roi: "1.4%",
+      bondDays: "180 Days",
+      referral: "11%",
+      binary: "12%",
+      binaryCapping: "$4,000",
       principalReturn: "80%",
-      totalROIReturns: "332.5%",
-      totalReturns: "412.5%",
+      totalROIReturns: "252%",
+      totalReturns: "332%",
     },
     {
       id: 3,
-      name: "Elite Energy",
-      minAmount: "$50,000",
-      maxAmount: "and above",
-      roi: "2%",
-      bondDays: "180 Days",
-      referral: "10%",
-      binary: "10%",
-      binaryCapping: "$10,000",
+      name: "Package 3",
+      minAmount: "$25,000",
+      maxAmount: "$44,999",
+      minNum: 25000,
+      maxNum: 44999,
+      roi: "1.8%",
+      bondDays: "160 Days",
+      referral: "12%",
+      binary: "12%",
+      binaryCapping: "$8,000",
+      principalReturn: "90%",
+      totalROIReturns: "288%",
+      totalReturns: "378%",
+    },
+    {
+      id: 4,
+      name: "Package 4",
+      minAmount: "$45,000",
+      maxAmount: "$74,999",
+      minNum: 45000,
+      maxNum: 74999,
+      roi: "2.2%",
+      bondDays: "140 Days",
+      referral: "13%",
+      binary: "12%",
+      binaryCapping: "$12,000",
       principalReturn: "100%",
-      totalROIReturns: "360%",
-      totalReturns: "460%",
+      totalROIReturns: "308%",
+      totalReturns: "408%",
+    },
+    {
+      id: 5,
+      name: "Package 5",
+      minAmount: "$75,000",
+      maxAmount: "$150,000",
+      minNum: 75000,
+      maxNum: 150000,
+      roi: "2.6%",
+      bondDays: "120 Days",
+      referral: "13%",
+      binary: "12%",
+      binaryCapping: "$25,000",
+      principalReturn: "100%",
+      totalROIReturns: "312%",
+      totalReturns: "412%",
     },
   ];
 
   const calculateReturns = () => {
     const amount = parseFloat(investmentAmount);
-    if (isNaN(amount) || amount < 25) {
-      alert("Minimum investment amount is $25");
+    if (isNaN(amount) || amount < 10) {
+      alert("Minimum investment amount is $10");
+      return;
+    }
+    if (amount > 150000) {
+      alert("Maximum investment amount is $150,000");
       return;
     }
 
-    let selectedPlan;
-    if (amount >= 50000) {
-      selectedPlan = investmentPlans[2]; // Elite Energy
-    } else if (amount >= 5000) {
-      selectedPlan = investmentPlans[1]; // Power Growth
-    } else {
-      selectedPlan = investmentPlans[0]; // Solar Starter
-    }
+    const selectedPlan =
+      investmentPlans.find(
+        (plan) => amount >= plan.minNum && amount <= plan.maxNum,
+      ) || investmentPlans[investmentPlans.length - 1];
 
     const dailyROI = parseFloat(selectedPlan.roi);
     const bondDays = parseInt(selectedPlan.bondDays);
@@ -142,46 +180,34 @@ export default function OurPlanPage() {
 
   const roadmap = [
     {
-      year: "2022",
-      icon: Award,
-      title: "A Dream Takes Shape",
-      desc: "Conceptualized Big Bull Energies as a bridge between renewable energy and financial solutions.",
-    },
-    {
-      year: "2023",
-      icon: Zap,
-      title: "Laying the Foundation",
-      desc: "Registered our website domain. Broke ground on our first solar plant.",
-    },
-    {
       year: "2024",
-      icon: TrendingUp,
-      title: "A Year of Transformation",
-      desc: "Completed first solar plant. Registered in New Zealand and the UK.",
+      icon: Award,
+      title: "A Vision Takes Shape",
+      desc: "Big Bull Energies formed around wind energy production and asset-backed investor returns.",
     },
     {
       year: "2025",
-      icon: Network,
-      title: "Global Expansion",
-      desc: "Opened second plant in Groningen, Netherlands. Hosting global events.",
+      icon: Zap,
+      title: "Platform Launch",
+      desc: "Investment platform goes live with structured packages, daily ROI, and dual earning streams.",
     },
     {
       year: "2026",
-      icon: ShieldCheck,
-      title: "Pioneering the Future",
-      desc: "Begin manufacturing EV and solar components. Expansion to 30+ countries.",
+      icon: TrendingUp,
+      title: "Wind Portfolio Growth",
+      desc: "Expand turbine capacity and strengthen real-estate-backed growth for long-term yield.",
     },
     {
       year: "2027",
-      icon: Wallet,
-      title: "Smart Tech & Clean Mobility",
-      desc: "Deploy AI-powered energy tracking. Launch EV Charging Stations.",
+      icon: Network,
+      title: "Global Network",
+      desc: "Scale partner networks and career rewards for leaders activating consistent monthly business.",
     },
     {
       year: "2028",
-      icon: Award,
-      title: "Global Leader",
-      desc: "Operate 100+ solar plants worldwide. Fully integrated smart grids.",
+      icon: ShieldCheck,
+      title: "Integrated Ecosystem",
+      desc: "Deliver a mature wind + development ecosystem with transparent, scalable investor income.",
     },
   ];
 
@@ -195,7 +221,7 @@ export default function OurPlanPage() {
         {/* Background image - place your local image at /public/images/plan-hero.png */}
         <Image
           src="/images/plan-hero.png"
-          alt="Solar panels and wind turbines landscape"
+          alt="Wind turbines landscape"
           fill
           priority
           className="object-cover"
@@ -232,17 +258,54 @@ export default function OurPlanPage() {
                 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold leading-tight mb-3 sm:mb-4"
                 style={{ color: PRIMARY }}
               >
-                Investment Packages <br className="hidden sm:block" />
-                and <span style={{ color: ACCENT }}>Return</span>
+                Our Investment <br className="hidden sm:block" />
+                <span style={{ color: ACCENT }}>Philosophy</span>
               </h1>
               <p
                 className="text-xs sm:text-sm md:text-base lg:text-lg leading-relaxed"
                 style={{ color: PRIMARY, opacity: 0.75 }}
               >
-                Explore our flexible investment packages designed for
-                sustainable growth and maximum returns.
+                A structured platform combining wind energy production and real
+                estate development to deliver consistent, scalable, high-yield
+                returns.
               </p>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Investment philosophy benefits */}
+      <section className="relative w-full bg-white pt-10 sm:pt-12 md:pt-14">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="max-w-7xl mx-auto">
+            <p
+              className="text-sm sm:text-base md:text-lg leading-relaxed max-w-3xl mb-6"
+              style={{ color: PRIMARY, opacity: 0.8 }}
+            >
+              We have developed a structured investment platform combining wind
+              energy production and real estate development to deliver
+              consistent, scalable, and high-yield returns. Our goal is to
+              provide investors with:
+            </p>
+            <ul className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 mb-2">
+              {[
+                "Reliable daily income",
+                "Long-term asset-backed growth",
+                "Multiple earning streams within one ecosystem",
+              ].map((item) => (
+                <li
+                  key={item}
+                  className="flex items-start gap-2 rounded-xl border px-4 py-3 text-sm font-semibold"
+                  style={{
+                    borderColor: "rgba(5,98,124,0.18)",
+                    color: PRIMARY,
+                  }}
+                >
+                  <span style={{ color: ACCENT }}>✓</span>
+                  {item}
+                </li>
+              ))}
+            </ul>
           </div>
         </div>
       </section>
@@ -251,11 +314,17 @@ export default function OurPlanPage() {
       <section className="relative w-full bg-white py-10 sm:py-12 md:py-16 lg:py-20">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-7xl mx-auto">
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5 sm:gap-6 lg:gap-8">
+            <h2
+              className="text-xl sm:text-2xl md:text-3xl font-bold mb-6 sm:mb-8 text-center"
+              style={{ color: PRIMARY }}
+            >
+              Investment Packages
+            </h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-5 sm:gap-6 lg:gap-5">
               {investmentPlans.map((plan) => (
                 <div
                   key={plan.id}
-                  className="bg-white rounded-2xl p-5 sm:p-6 md:p-7 border transition-all hover:shadow-xl"
+                  className="bg-white rounded-2xl p-5 sm:p-6 border transition-all hover:shadow-xl"
                   style={{ borderColor: "rgba(5,98,124,0.18)" }}
                 >
                   <div className="flex items-center gap-3 mb-4">
@@ -267,7 +336,7 @@ export default function OurPlanPage() {
                     </div>
                     <div className="min-w-0">
                       <h3
-                        className="text-base sm:text-lg md:text-xl font-bold truncate"
+                        className="text-base sm:text-lg font-bold truncate"
                         style={{ color: PRIMARY }}
                       >
                         {plan.name}
@@ -290,8 +359,8 @@ export default function OurPlanPage() {
                       ["Duration:", plan.bondDays],
                       ["Referral Income:", plan.referral],
                       ["Binary Income:", plan.binary],
-                      ["Binary Cap (Pair):", plan.binaryCapping],
-                      ["Payout (Wallet):", plan.principalReturn],
+                      ["Capping:", plan.binaryCapping],
+                      ["Principal Return:", plan.principalReturn],
                       ["Total ROI Return:", plan.totalROIReturns],
                       ["Total Rebate:", plan.totalReturns],
                     ].map(([label, value], i) => (
@@ -312,7 +381,9 @@ export default function OurPlanPage() {
                         </span>
                         <span
                           className="text-xs sm:text-sm font-bold whitespace-nowrap"
-                          style={{ color: PRIMARY }}
+                          style={{
+                            color: label === "Daily ROI:" ? ACCENT : PRIMARY,
+                          }}
                         >
                           {value}
                         </span>
@@ -321,7 +392,7 @@ export default function OurPlanPage() {
                   </div>
 
                   <Link
-                    href="/contact"
+                    href="/plans"
                     className="block w-full text-center font-bold px-6 py-3.5 text-xs sm:text-sm rounded-lg uppercase tracking-wide transition hover:opacity-90"
                     style={{ backgroundColor: GOLD, color: "#1a1a1a" }}
                   >
@@ -538,10 +609,10 @@ export default function OurPlanPage() {
                         </h4>
                         <ul className="space-y-2 text-xs sm:text-sm" style={{ color: PRIMARY }}>
                           {[
-                            "Each package has a specific daily ROI percentage (1.5% - 2%)",
+                            "Each package has a specific daily ROI percentage (1.0% – 2.6%)",
                             "ROI is calculated daily and credited to your account",
-                            "Example: Invest $1,000 at 1.5% daily ROI = $15 per day",
-                            "ROI accumulates over the bond period (180-200 days)",
+                            "Example: Invest $1,000 at 1.0% daily ROI = $10 per day",
+                            "ROI accumulates over the bond period (120–200 days)",
                           ].map((line) => (
                             <li key={line} className="flex items-start gap-2">
                               <span style={{ color: ACCENT }} className="font-bold">✓</span>
@@ -570,9 +641,9 @@ export default function OurPlanPage() {
                         <ul className="space-y-2 text-xs sm:text-sm" style={{ color: PRIMARY }}>
                           {[
                             "Share your unique referral link with others",
-                            "When they sign up and invest, you earn 8% - 10% commission",
+                            "When they sign up and invest, you earn 10% – 13% commission",
                             "Commission rate depends on your investment package tier",
-                            "Example: Refer someone who invests $5,000 = $400 - $500 referral bonus",
+                            "Example: Refer someone who invests $10,000 at 10% = $1,000 referral bonus",
                             "No limit on the number of people you can refer",
                           ].map((line) => (
                             <li key={line} className="flex items-start gap-2">
@@ -604,9 +675,9 @@ export default function OurPlanPage() {
                           {[
                             "Your referrals are placed in a binary tree (left and right legs)",
                             "Binary bonus is calculated on the smaller leg's total volume",
-                            "Standard binary rate is 10% of the smaller leg",
-                            "Example: Left leg = $2,800, Right leg = $4,650 → Bonus = $280",
-                            "Daily capping limits apply based on your package ($1,000 - $10,000)",
+                            "Standard binary rate is 12% of the smaller leg",
+                            "Example: Left leg = $2,800, Right leg = $4,650 → Bonus = $336",
+                            "Daily capping limits apply based on your package ($2,000 – $25,000)",
                           ].map((line) => (
                             <li key={line} className="flex items-start gap-2">
                               <span style={{ color: ACCENT }} className="font-bold">✓</span>
@@ -634,11 +705,12 @@ export default function OurPlanPage() {
                         </h4>
                         <ul className="space-y-2 text-xs sm:text-sm" style={{ color: PRIMARY }}>
                           {[
-                            "Solar Starter: 60% of principal returned",
-                            "Power Growth: 80% of principal returned",
-                            "Elite Energy: 100% of principal returned",
-                            "Example: Invest $10,000 in Power Growth → Receive $8,000 back at maturity",
-                            "Principal return is paid at the end of the bond period (180-200 days)",
+                            "Package 1: 70% of principal returned",
+                            "Package 2: 80% of principal returned",
+                            "Package 3: 90% of principal returned",
+                            "Package 4 & 5: 100% of principal returned",
+                            "Example: Invest $10,000 in Package 2 → Receive $8,000 back at maturity",
+                            "Principal return is paid at the end of the bond period (120–200 days)",
                           ].map((line) => (
                             <li key={line} className="flex items-start gap-2">
                               <span style={{ color: ACCENT }} className="font-bold">✓</span>
@@ -655,7 +727,7 @@ export default function OurPlanPage() {
                   {/* Background image - place your local image at /public/images/plan-tab-side.png */}
                   <Image
                     src="/images/plan-tab-side.png"
-                    alt="Solar plant at sunset"
+                    alt="Wind energy infrastructure"
                     fill
                     className="object-cover"
                   />
@@ -728,7 +800,7 @@ export default function OurPlanPage() {
                 </p>
                 <p className="text-xs sm:text-sm md:text-base leading-relaxed mt-3" style={{ color: PRIMARY, opacity: 0.8 }}>
                   By referring others, you help them unlock financial growth
-                  and earn a bonus of 8% to 10% as a thank-you for growing our
+                  and earn a bonus of 10% to 13% as a thank-you for growing our
                   investment family.
                 </p>
               </div>
@@ -755,7 +827,7 @@ export default function OurPlanPage() {
                   {[
                     ["Left business volume:", "$2,800"],
                     ["Right business volume:", "$4,650"],
-                    ["Binary bonus (10%):", "$280"],
+                    ["Binary bonus (12%):", "$336"],
                   ].map(([label, value], i) => (
                     <div
                       key={label}
@@ -775,7 +847,7 @@ export default function OurPlanPage() {
                 </div>
                 <p className="text-[11px] sm:text-xs md:text-sm mt-3 italic" style={{ color: PRIMARY, opacity: 0.6 }}>
                   The binary bonus is calculated based on the lesser leg
-                  ($2,800). At a 10% rate, the bonus earned is $280.
+                  ($2,800). At a 12% rate, the bonus earned is $336.
                 </p>
               </div>
             </div>
@@ -791,17 +863,17 @@ export default function OurPlanPage() {
               className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold mb-8 sm:mb-10 md:mb-14 text-center"
               style={{ color: PRIMARY }}
             >
-              Big Bull Energies Roadmap (2022 – 2028)
+              Big Bull Energies Roadmap (2024 – 2028)
             </h2>
 
             <div ref={roadmapRef} className="relative overflow-x-auto pb-4">
-              <div className="relative min-w-[720px] sm:min-w-[820px] lg:min-w-0">
+              <div className="relative min-w-[640px] sm:min-w-[720px] lg:min-w-0">
                 {/* connecting line */}
                 <div
                   className="absolute left-0 right-0 top-6 sm:top-7 h-0.5"
                   style={{ backgroundColor: "rgba(5,98,124,0.2)" }}
                 />
-                <div className="relative grid grid-cols-7 gap-2 sm:gap-3">
+                <div className="relative grid grid-cols-5 gap-2 sm:gap-3">
                   {roadmap.map((step, i) => {
                     const Icon = step.icon;
                     const isLast = i === roadmap.length - 1;

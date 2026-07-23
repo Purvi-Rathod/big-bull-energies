@@ -6,6 +6,7 @@ import { api } from '@/lib/api';
 import { countries } from '@/lib/countries';
 import toast from 'react-hot-toast';
 import BigBullLoader from '@/components/BigBullLoader';
+import { dashboardTheme as t } from '@/lib/dashboardTheme';
 
 export default function ProfilePage() {
   const { user, refreshAuth } = useAuth();
@@ -20,6 +21,8 @@ export default function ProfilePage() {
     walletAddress: '',
     userId: '',
   });
+  const [walletDraft, setWalletDraft] = useState('');
+  const [savingWallet, setSavingWallet] = useState(false);
   const hasFetchedRef = useRef(false);
 
   useEffect(() => {
@@ -57,6 +60,7 @@ export default function ProfilePage() {
           walletAddress: userData.walletAddress || '',
           userId: userData.userId || user?.userId || '',
         });
+        setWalletDraft('');
       }
     } catch (err: any) {
       toast.error(err.message || 'Failed to load profile');
@@ -90,289 +94,198 @@ export default function ProfilePage() {
     }
   };
 
+  const handleSaveWallet = async () => {
+    const address = walletDraft.trim();
+    if (!address) {
+      toast.error('Please enter a USDT TRC20 wallet address');
+      return;
+    }
+    if (address.length < 20) {
+      toast.error('Wallet address seems too short. Please enter a valid USDT TRC20 address.');
+      return;
+    }
+    if (!address.startsWith('T')) {
+      toast.error('Invalid USDT TRC20 address. Addresses must start with "T".');
+      return;
+    }
+
+    setSavingWallet(true);
+    try {
+      await api.updateWalletAddress({ walletAddress: address });
+      setFormData((prev) => ({ ...prev, walletAddress: address }));
+      setWalletDraft('');
+      toast.success('Crypto wallet saved successfully');
+      await refreshAuth();
+    } catch (err: any) {
+      toast.error(err.message || 'Failed to save wallet address');
+    } finally {
+      setSavingWallet(false);
+    }
+  };
+
   if (loading) {
-    return <BigBullLoader fullScreen />;
+    return <BigBullLoader text="Loading profile…" />;
   }
 
   return (
-    <div className="w-full min-h-screen py-4 md:py-8 px-2 sm:px-4 md:px-6 lg:px-8 relative overflow-hidden">
-      {/* Decorative background elements */}
-      <div className="fixed inset-0 pointer-events-none opacity-20">
-        <div className="absolute top-0 left-1/4 w-96 h-96 bg-[#FBF676]/10 rounded-full blur-3xl"></div>
-        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-[#FBF676]/10 rounded-full blur-3xl"></div>
+    <div className={t.page}>
+      <div>
+        <h1 className={t.title}>My Profile</h1>
+        <p className={t.subtitle}>Manage your account information and settings</p>
       </div>
 
-      <div className="relative z-10">
-      <div className="mb-8">
-        <h1 className="text-3xl font-extrabold mb-2 text-white">
-        <span className="bg-gradient-to-r from-yellow-300 via-yellow-400 to-yellow-600 bg-clip-text text-transparent drop-shadow-lg">My Profile</span>
-        </h1>
-        <p className="mt-1 text-sm text-white/55">Manage your account information and settings</p>
-      </div>
-
-      <div className="rounded-2xl shadow-2xl border border-[#FBF676]/25 backdrop-blur-md bg-[rgba(8,16,40,0.75)] p-8">
+      <div className={t.card}>
         <form onSubmit={handleSubmit} className="space-y-8">
-          {/* Basic Information */}
           <div>
-            <h2 className="text-xl font-extrabold text-white mb-6 flex items-center gap-2">
-              <span className="w-1 h-6 bg-gradient-to-b from-[#FBF676] to-[#e8e04a] rounded"></span>
+            <h2 className={`${t.sectionTitle} mb-6 flex items-center gap-2`}>
+              <span className={t.accentBar} style={t.accentBarStyle} />
               Basic Information
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <label htmlFor="name" className="block text-sm font-bold text-[#FBF676] mb-3">
-                  Full Name <span className="text-[#FBF676]">*</span>
+                <label htmlFor="name" className={t.label}>
+                  Full Name <span style={{ color: t.gold }}>*</span>
                 </label>
-                <input
-                  type="text"
-                  id="name"
-                  name="name"
-                  required
-                  value={formData.name}
-                  onChange={handleChange}
-                  className="w-full px-4 py-3 border border-[#FBF676]/40 rounded-xl bg-[rgba(5,12,32,0.9)] text-white focus:ring-2 focus:ring-[#FBF676]/40 focus:border-[#FBF676]/70 font-semibold"
-                />
+                <input type="text" id="name" name="name" required value={formData.name} onChange={handleChange} className={t.input} />
               </div>
-
               <div>
-                <label htmlFor="email" className="block text-sm font-bold text-[#FBF676] mb-3">
-                  Email Address
-                </label>
-                <div className="p-4 bg-[rgba(5,12,32,0.9)] border border-[#FBF676]/30 rounded-xl">
-                  <p className="text-sm text-white font-semibold">{formData.email}</p>
-                  <p className="text-xs text-[#FBF676] mt-2 font-semibold">
+                <label htmlFor="email" className={t.label}>Email Address</label>
+                <div className={t.cardInner}>
+                  <p className="text-sm font-semibold" style={{ color: t.ink }}>{formData.email}</p>
+                  <p className="text-xs mt-2 font-medium" style={{ color: t.muted }}>
                     Email address cannot be changed. Contact admin support if you need to update it.
                   </p>
                 </div>
               </div>
-
               <div>
-                <label htmlFor="phone" className="block text-sm font-bold text-[#FBF676] mb-3">
-                  Phone Number
-                </label>
-                <input
-                  type="tel"
-                  id="phone"
-                  name="phone"
-                  value={formData.phone}
-                  onChange={handleChange}
-                  className="w-full px-4 py-3 border border-[#FBF676]/40 rounded-xl bg-[rgba(5,12,32,0.9)] text-white focus:ring-2 focus:ring-[#FBF676]/40 focus:border-[#FBF676]/70 font-semibold"
-                />
+                <label htmlFor="phone" className={t.label}>Phone Number</label>
+                <input type="tel" id="phone" name="phone" value={formData.phone} onChange={handleChange} className={t.input} />
               </div>
-
               <div>
-                <label htmlFor="country" className="block text-sm font-bold text-[#FBF676] mb-3">
-                  Country <span className="text-yellow-300">*</span>
+                <label htmlFor="country" className={t.label}>
+                  Country <span style={{ color: t.gold }}>*</span>
                 </label>
-                <select
-                  id="country"
-                  name="country"
-                  required
-                  value={formData.country}
-                  onChange={handleChange}
-                  className="w-full px-4 py-3 border border-[#FBF676]/40 rounded-xl bg-[rgba(5,12,32,0.9)] text-white focus:ring-2 focus:ring-[#FBF676]/40 focus:border-[#FBF676]/70 font-semibold"
-                >
+                <select id="country" name="country" required value={formData.country} onChange={handleChange} className={t.select}>
                   <option value="">Select your country</option>
                   {countries.map((country) => (
-                    <option key={country.code} value={country.name}>
-                      {country.name}
-                    </option>
+                    <option key={country.code} value={country.name}>{country.name}</option>
                   ))}
                 </select>
               </div>
             </div>
           </div>
 
-          {/* Account Information - Read Only */}
           <div>
-            <h2 className="text-xl font-extrabold text-white mb-6 flex items-center gap-2">
-              <span className="w-1 h-6 bg-gradient-to-b from-[#FBF676] to-[#e8e04a] rounded"></span>
+            <h2 className={`${t.sectionTitle} mb-6 flex items-center gap-2`}>
+              <span className={t.accentBar} style={t.accentBarStyle} />
               Account Information
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <label className="block text-sm font-bold text-[#FBF676] mb-3">
-                  User ID
-                </label>
-                <div className="p-4 bg-[rgba(5,12,32,0.9)] border border-[#FBF676]/30 rounded-xl">
-                  <p className="text-sm font-mono text-[#FBF676] break-all font-extrabold">{formData.userId || user?.userId || 'N/A'}</p>
-                  <p className="text-xs text-[#FBF676] mt-2 font-semibold">
-                    Your unique user identifier
-                  </p>
+                <label className={t.label}>User ID</label>
+                <div className={t.cardInner}>
+                  <p className="text-sm font-mono font-extrabold break-all" style={{ color: t.primary }}>{formData.userId || user?.userId || 'N/A'}</p>
+                  <p className="text-xs mt-2 font-medium" style={{ color: t.muted }}>Your unique user identifier</p>
                 </div>
               </div>
             </div>
 
-            {/* Referral Links Section */}
             {referralLinks && (
               <div className="mt-6">
-                <label className="block text-sm font-bold text-[#FBF676] mb-4">
-                  Referral Links
-                </label>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="group relative p-6 bg-[rgba(251,246,118,0.08)] rounded-2xl border-2 border-[#FBF676]/40 hover:border-[#FBF676]/60 hover:shadow-[#FBF676]/25 hover:shadow-2xl transition-all duration-300 overflow-hidden">
-                    <div className="absolute inset-0 bg-gradient-to-br from-yellow-500/0 to-yellow-500/0 group-hover:from-yellow-500/10 group-hover:to-transparent transition-all duration-300"></div>
-                    <div className="relative z-10">
-                      <h3 className="font-bold text-[#FBF676] mb-4 flex items-center gap-3 text-lg">
-                        <span className="w-3 h-3 bg-gradient-to-r from-[#FBF676] to-[#e8e04a] rounded-full shadow-lg shadow-[#FBF676]/30"></span>
-                        Left Referral Link
-                      </h3>
-                      <div className="flex items-center space-x-3">
-                        <input
-                          type="text"
-                          value={referralLinks.leftLink}
-                          readOnly
-                          className="flex-1 px-4 py-3 border border-[#FBF676]/40 rounded-xl bg-gray-900/80 text-white text-sm focus:outline-none focus:border-[#FBF676]/70 focus:ring-2 focus:ring-[#FBF676]/40/30 font-mono backdrop-blur-sm"
-                        />
+                <label className={t.label}>Referral Links</label>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {[
+                    { label: 'Left Referral Link', link: referralLinks.leftLink, toastMsg: 'Left referral link copied!' },
+                    { label: 'Right Referral Link', link: referralLinks.rightLink, toastMsg: 'Right referral link copied!' },
+                  ].map((item) => (
+                    <div key={item.label} className={t.cardHighlight}>
+                      <h3 className="font-bold mb-3 flex items-center gap-2" style={{ color: t.primary }}>{item.label}</h3>
+                      <div className="flex items-center gap-2">
+                        <input type="text" value={item.link} readOnly className={`${t.input} flex-1 font-mono text-sm`} />
                         <button
                           type="button"
                           onClick={async () => {
                             try {
-                              // Try modern clipboard API first
                               if (navigator.clipboard && window.isSecureContext) {
-                                await navigator.clipboard.writeText(referralLinks.leftLink);
-                                toast.success('Left referral link copied!');
+                                await navigator.clipboard.writeText(item.link);
+                                toast.success(item.toastMsg);
                               } else {
-                                // Fallback for older browsers or non-secure contexts
                                 const textArea = document.createElement('textarea');
-                                textArea.value = referralLinks.leftLink;
+                                textArea.value = item.link;
                                 textArea.style.position = 'fixed';
                                 textArea.style.left = '-999999px';
-                                textArea.style.top = '-999999px';
                                 document.body.appendChild(textArea);
                                 textArea.focus();
                                 textArea.select();
                                 try {
-                                  const successful = document.execCommand('copy');
-                                  if (successful) {
-                                    toast.success('Left referral link copied!');
-                                  } else {
-                                    throw new Error('Copy command failed');
-                                  }
-                                } catch (err) {
-                                  toast.error('Failed to copy link. Please copy manually.');
+                                  if (document.execCommand('copy')) toast.success(item.toastMsg);
+                                  else throw new Error('Copy failed');
                                 } finally {
                                   document.body.removeChild(textArea);
                                 }
                               }
-                            } catch (err) {
-                              console.error('Failed to copy:', err);
+                            } catch {
                               toast.error('Failed to copy link. Please copy manually.');
                             }
                           }}
-                          className="px-6 py-3 bg-gradient-to-r from-yellow-400 to-yellow-600 text-black rounded-xl hover:bg-[#e8e04a] text-sm font-bold transition-all shadow-lg shadow-[#FBF676]/25 hover:shadow-[#FBF676]/30 hover:scale-105 active:scale-95"
+                          className={t.btnPrimary}
                         >
                           Copy
                         </button>
                       </div>
                     </div>
-                  </div>
-                  <div className="group relative p-6 bg-[rgba(251,246,118,0.08)] rounded-2xl border-2 border-[#FBF676]/40 hover:border-[#FBF676]/60 hover:shadow-[#FBF676]/25 hover:shadow-2xl transition-all duration-300 overflow-hidden">
-                    <div className="absolute inset-0 bg-gradient-to-br from-yellow-500/0 to-yellow-500/0 group-hover:from-yellow-500/10 group-hover:to-transparent transition-all duration-300"></div>
-                    <div className="relative z-10">
-                      <h3 className="font-bold text-[#FBF676] mb-4 flex items-center gap-3 text-lg">
-                        <span className="w-3 h-3 bg-gradient-to-r from-[#FBF676] to-[#e8e04a] rounded-full shadow-lg shadow-[#FBF676]/30"></span>
-                        Right Referral Link
-                      </h3>
-                      <div className="flex items-center space-x-3">
-                        <input
-                          type="text"
-                          value={referralLinks.rightLink}
-                          readOnly
-                          className="flex-1 px-4 py-3 border border-[#FBF676]/40 rounded-xl bg-gray-900/80 text-white text-sm focus:outline-none focus:border-[#FBF676]/70 focus:ring-2 focus:ring-[#FBF676]/40/30 font-mono backdrop-blur-sm"
-                        />
-                        <button
-                          type="button"
-                          onClick={async () => {
-                            try {
-                              // Try modern clipboard API first
-                              if (navigator.clipboard && window.isSecureContext) {
-                                await navigator.clipboard.writeText(referralLinks.rightLink);
-                                toast.success('Right referral link copied!');
-                              } else {
-                                // Fallback for older browsers or non-secure contexts
-                                const textArea = document.createElement('textarea');
-                                textArea.value = referralLinks.rightLink;
-                                textArea.style.position = 'fixed';
-                                textArea.style.left = '-999999px';
-                                textArea.style.top = '-999999px';
-                                document.body.appendChild(textArea);
-                                textArea.focus();
-                                textArea.select();
-                                try {
-                                  const successful = document.execCommand('copy');
-                                  if (successful) {
-                                    toast.success('Right referral link copied!');
-                                  } else {
-                                    throw new Error('Copy command failed');
-                                  }
-                                } catch (err) {
-                                  toast.error('Failed to copy link. Please copy manually.');
-                                } finally {
-                                  document.body.removeChild(textArea);
-                                }
-                              }
-                            } catch (err) {
-                              console.error('Failed to copy:', err);
-                              toast.error('Failed to copy link. Please copy manually.');
-                            }
-                          }}
-                          className="px-6 py-3 bg-gradient-to-r from-yellow-400 to-yellow-600 text-black rounded-xl hover:bg-[#e8e04a] text-sm font-bold transition-all shadow-lg shadow-[#FBF676]/25 hover:shadow-[#FBF676]/30 hover:scale-105 active:scale-95"
-                        >
-                          Copy
-                        </button>
-                      </div>
-                    </div>
-                  </div>
+                  ))}
                 </div>
               </div>
             )}
           </div>
 
-          {/* Wallet Information - Read Only */}
-          <div>
-            <h2 className="text-xl font-extrabold text-white mb-6 flex items-center gap-2">
-              <span className="w-1 h-6 bg-gradient-to-b from-[#FBF676] to-[#e8e04a] rounded"></span>
-              Wallet Information
+          <div id="crypto-wallet">
+            <h2 className={`${t.sectionTitle} mb-2 flex items-center gap-2`}>
+              <span className={t.accentBar} style={t.accentBarStyle} />
+              Crypto Wallet Setup
             </h2>
+            <p className={`${t.subtitle} mb-6`}>
+              USDT TRC20 address used for withdrawals. Set once — contact support to change later.
+            </p>
             <div>
-              <label className="block text-sm font-bold text-[#FBF676] mb-3">
-                USDT TRC20 Wallet Address
-              </label>
-              <div className="p-4 bg-[rgba(5,12,32,0.9)] border border-[#FBF676]/30 rounded-xl">
-                {formData.walletAddress ? (
-                  <>
-                    <p className="text-sm font-mono text-white break-all font-semibold">{formData.walletAddress}</p>
-                    <p className="text-xs text-[#FBF676] mt-2 font-semibold">
-                      Wallet address cannot be changed. Contact admin support if you need to update it.
-                    </p>
-                  </>
-                ) : (
-                  <>
-                    <p className="text-sm text-[#FBF676] font-semibold">No wallet address set</p>
-                    <p className="text-xs text-[#FBF676] mt-2 font-semibold">
-                      Required for withdrawals. Set up your wallet address in the Withdraw page.
-                    </p>
-                  </>
-                )}
-              </div>
+              <label className={t.label}>USDT TRC20 Wallet Address</label>
+              {formData.walletAddress ? (
+                <div className={t.cardInner}>
+                  <p className="text-sm font-mono break-all font-semibold" style={{ color: t.ink }}>{formData.walletAddress}</p>
+                  <p className="text-xs text-emerald-700 mt-2 font-semibold">✓ Wallet configured for withdrawals</p>
+                  <p className="text-xs mt-2 font-medium" style={{ color: t.muted }}>
+                    Wallet address cannot be changed here. Contact admin support if you need an update.
+                  </p>
+                </div>
+              ) : (
+                <div className={`${t.cardHighlight} space-y-3`}>
+                  <p className="text-sm font-medium" style={{ color: t.muted }}>
+                    Required before you can request withdrawals. Only USDT TRC20 (starts with T).
+                  </p>
+                  <input
+                    type="text"
+                    value={walletDraft}
+                    onChange={(e) => setWalletDraft(e.target.value)}
+                    placeholder="Txxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+                    className={`${t.input} font-mono text-sm`}
+                  />
+                  <button type="button" onClick={handleSaveWallet} disabled={savingWallet} className={t.btnPrimary}>
+                    {savingWallet ? 'Saving…' : 'Save wallet address'}
+                  </button>
+                </div>
+              )}
             </div>
           </div>
 
-          {/* Submit Button */}
-          <div className="flex justify-end pt-6 border-t border-[#FBF676]/20">
-            <button
-              type="submit"
-              disabled={saving}
-              className="px-8 py-3 bg-gradient-to-r bg-[#FBF676] text-[#0C1A6B] rounded-xl hover:bg-[#e8e04a] font-bold transition-all shadow-lg shadow-[#FBF676]/25 hover:shadow-[#FBF676]/30 hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {saving ? 'Saving...' : 'Save Changes'}
+          <div className="flex justify-end pt-6 border-t border-[#d8e6ec]">
+            <button type="submit" disabled={saving} className={t.btnPrimary}>
+              {saving ? 'Saving…' : 'Save Changes'}
             </button>
           </div>
         </form>
       </div>
-          </div>
-        </div>
+    </div>
   );
 }
 

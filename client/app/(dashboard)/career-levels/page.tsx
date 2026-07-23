@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { api } from '@/lib/api';
 import BigBullLoader from '@/components/BigBullLoader';
+import { dashboardTheme as t } from '@/lib/dashboardTheme';
 
 interface CareerProgress {
   currentLevel: {
@@ -57,7 +58,6 @@ export default function CareerLevelsPage() {
       setLoading(true);
       setError('');
 
-      // Fetch user's career progress + binary tree in parallel
       const [progressRes, binaryTreeRes] = await Promise.all([
         api.getUserCareerProgress(),
         api.getUserBinaryTree().catch(() => ({ data: null })),
@@ -74,17 +74,13 @@ export default function CareerLevelsPage() {
         });
       }
 
-      // Fetch all career levels (to show what's available)
-      // Note: This is an admin-only endpoint, so it will fail for regular users
-      // That's okay - we'll just show the user's progress without all levels
       try {
         const levelsRes = await api.getAllCareerLevels();
         if (levelsRes.data) {
           setAllLevels(levelsRes.data.levels || []);
         }
-      } catch (err) {
-        // If user doesn't have access to admin endpoint, that's okay
-        // We'll just show their progress without the full list of levels
+      } catch {
+        // Regular users may not have access to admin endpoint
       }
     } catch (err: any) {
       setError(err.message || 'Failed to load career progress');
@@ -115,220 +111,161 @@ export default function CareerLevelsPage() {
   };
 
   if (loading) {
-    return <BigBullLoader fullScreen />;
+    return <BigBullLoader text="Loading career levels…" />;
   }
 
   return (
-    <div className="w-full min-h-screen py-4 md:py-8 px-2 sm:px-4 md:px-6 lg:px-8 relative overflow-hidden">
-      {/* Decorative background elements */}
-      <div className="fixed inset-0 pointer-events-none opacity-20">
-        <div className="absolute top-0 left-1/4 w-96 h-96 bg-[#FBF676]/10 rounded-full blur-3xl"></div>
-        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-[#FBF676]/10 rounded-full blur-3xl"></div>
+    <div className={t.page}>
+      <div>
+        <h1 className={t.title}>Career Levels</h1>
+        <p className={t.subtitle}>Track your career level progress and rewards</p>
       </div>
 
-      <div className="relative z-10">
-      <div className="mb-8">
-        <h1 className="text-3xl font-extrabold mb-2 text-white">
-          <span className="bg-gradient-to-r from-yellow-300 via-yellow-400 to-yellow-600 bg-clip-text text-transparent drop-shadow-lg">Career Levels</span>
-        </h1>
-        <p className="mt-1 text-sm text-white/55">Track your career level progress and rewards</p>
-      </div>
-
-      {error && (
-        <div className="mb-6 bg-red-900/30 border border-red-400/50 text-[#FBF676] px-4 py-3 rounded-lg backdrop-blur-sm">
-          {error}
-        </div>
-      )}
+      {error && <div className={t.error}>{error}</div>}
 
       {progress && (
         <>
-          {/* Current Level Card */}
-          <div className="rounded-2xl shadow-2xl border border-[#FBF676]/25 backdrop-blur-md bg-[rgba(8,16,40,0.75)] p-8 mb-8">
-            <h2 className="text-2xl font-extrabold text-white mb-6 flex items-center gap-2">
-              <span className="w-1 h-6 bg-gradient-to-b from-[#FBF676] to-[#e8e04a] rounded"></span>
+          <div className={t.card}>
+            <h2 className={`${t.sectionTitle} mb-6 flex items-center gap-2`}>
+              <span className={t.accentBar} style={t.accentBarStyle} />
               Current Level
             </h2>
             {progress.currentLevel ? (
               <div className="space-y-6">
-                <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between flex-wrap gap-4">
                   <div>
-                    <h3 className="text-3xl font-extrabold text-[#FBF676]">{progress.currentLevel.name}</h3>
-                    <p className="text-sm text-white/55 font-semibold mt-1">Level {progress.currentLevel.level}</p>
+                    <h3 className="text-2xl font-extrabold" style={{ color: t.primary }}>{progress.currentLevel.name}</h3>
+                    <p className="text-sm font-semibold mt-1" style={{ color: t.muted }}>Level {progress.currentLevel.level}</p>
                   </div>
                   <div className="text-right">
-                    <p className="text-sm text-white/55 font-semibold">Reward</p>
-                    <p className="text-2xl font-extrabold text-[#FBF676]">
+                    <p className="text-sm font-semibold" style={{ color: t.muted }}>Reward</p>
+                    <p className="text-2xl font-extrabold" style={{ color: t.primary }}>
                       ${progress.currentLevel.rewardAmount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                     </p>
                   </div>
                 </div>
 
-                {/* Progress Bar */}
                 <div>
-                  <div className="flex justify-between text-sm text-white/75 mb-3 font-semibold">
-                    <span>Progress: <span className="text-white font-bold">${progress.levelInvestment.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span></span>
-                    <span>Target: <span className="text-[#FBF676] font-bold">${(progress.currentLevel.investmentThreshold * 2).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span></span>
+                  <div className="flex justify-between text-sm mb-2 font-semibold" style={{ color: t.muted }}>
+                    <span>
+                      Progress:{' '}
+                      <span style={{ color: t.ink }}>
+                        ${progress.levelInvestment.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                      </span>
+                    </span>
+                    <span>
+                      Target:{' '}
+                      <span style={{ color: t.primary }}>
+                        ${(progress.currentLevel.investmentThreshold * 2).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                      </span>
+                    </span>
                   </div>
-                  <div className="w-full bg-gray-700/50 rounded-full h-4">
+                  <div className="w-full bg-[#e8f0f3] rounded-full h-3">
                     <div
-                      className="bg-[#FBF676] h-4 rounded-full transition-all duration-300 shadow-lg shadow-[#FBF676]/25"
+                      className="h-3 rounded-full transition-all duration-300"
                       style={{
                         width: `${getProgressPercentage(progress.levelInvestment, progress.currentLevel.investmentThreshold * 2)}%`,
+                        backgroundColor: t.gold,
                       }}
-                    ></div>
+                    />
                   </div>
-                  <p className="text-xs text-white/55 mt-2 font-semibold">
+                  <p className="text-xs mt-2 font-semibold" style={{ color: t.muted }}>
                     {getProgressPercentage(progress.levelInvestment, progress.currentLevel.investmentThreshold * 2).toFixed(1)}% complete
                   </p>
                 </div>
 
-                {/* Left & Right Business Targets (Per Side) */}
                 {binaryTree && (
-                  <div className="mt-6 p-5 bg-[rgba(5,12,32,0.9)] rounded-xl border border-[#FBF676]/50">
-                    <h3 className="text-base font-extrabold text-[#FBF676] mb-4">
+                  <div className={`${t.cardInner} mt-4 p-5`}>
+                    <h3 className="text-base font-extrabold mb-4" style={{ color: t.primary }}>
                       Left & Right Business Targets (per side)
                     </h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {/* Left Side */}
-                      <div className="p-5 bg-[rgba(251,246,118,0.12)] rounded-xl border border-[#FBF676]/25">
-                        <div className="flex justify-between text-xs text-yellow-300 mb-2 font-semibold">
-                          <span>Left Business</span>
-                          <span className="text-[#FBF676]">
-                            $
-                            {binaryTree.leftBusiness.toLocaleString('en-US', {
-                              minimumFractionDigits: 2,
-                              maximumFractionDigits: 2,
-                            })}{' '}
-                            / $
-                            {progress.currentLevel.investmentThreshold.toLocaleString('en-US', {
-                              minimumFractionDigits: 2,
-                              maximumFractionDigits: 2,
-                            })}
-                          </span>
+                      {[
+                        { label: 'Left Business', value: binaryTree.leftBusiness },
+                        { label: 'Right Business', value: binaryTree.rightBusiness },
+                      ].map((side) => (
+                        <div key={side.label} className={t.cardHighlight}>
+                          <div className="flex justify-between text-xs mb-2 font-semibold" style={{ color: t.muted }}>
+                            <span>{side.label}</span>
+                            <span style={{ color: t.primary }}>
+                              ${side.value.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} / $
+                              {progress.currentLevel!.investmentThreshold.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                            </span>
+                          </div>
+                          <div className="w-full bg-[#e8f0f3] rounded-full h-2.5">
+                            <div
+                              className="h-2.5 rounded-full"
+                              style={{
+                                width: `${getSideProgressPercentage(side.value, progress.currentLevel!.investmentThreshold)}%`,
+                                backgroundColor: t.primary,
+                              }}
+                            />
+                          </div>
+                          <p className="mt-2 text-xs font-semibold" style={{ color: t.muted }}>
+                            {getSideProgressPercentage(side.value, progress.currentLevel!.investmentThreshold).toFixed(1)}% of {side.label.toLowerCase()} target
+                          </p>
                         </div>
-                        <div className="w-full bg-[rgba(5,12,32,0.9)] rounded-full h-3">
-                          <div
-                            className="bg-[#FBF676] h-3 rounded-full transition-all duration-300 shadow-lg shadow-[#FBF676]/25"
-                            style={{
-                              width: `${getSideProgressPercentage(
-                                binaryTree.leftBusiness,
-                                progress.currentLevel.investmentThreshold
-                              )}%`,
-                            }}
-                          ></div>
-                        </div>
-                        <p className="mt-2 text-xs text-[#FBF676] font-semibold">
-                          {getSideProgressPercentage(
-                            binaryTree.leftBusiness,
-                            progress.currentLevel.investmentThreshold
-                          ).toFixed(1)}
-                          % of left-side target achieved
-                        </p>
-                      </div>
-
-                      {/* Right Side */}
-                      <div className="p-5 bg-[rgba(251,246,118,0.12)] rounded-xl border border-[#FBF676]/25">
-                        <div className="flex justify-between text-xs text-yellow-300 mb-2 font-semibold">
-                          <span>Right Business</span>
-                          <span className="text-[#FBF676]">
-                            $
-                            {binaryTree.rightBusiness.toLocaleString('en-US', {
-                              minimumFractionDigits: 2,
-                              maximumFractionDigits: 2,
-                            })}{' '}
-                            / $
-                            {progress.currentLevel.investmentThreshold.toLocaleString('en-US', {
-                              minimumFractionDigits: 2,
-                              maximumFractionDigits: 2,
-                            })}
-                          </span>
-                        </div>
-                        <div className="w-full bg-[rgba(5,12,32,0.9)] rounded-full h-3">
-                          <div
-                            className="bg-[#FBF676] h-3 rounded-full transition-all duration-300 shadow-lg shadow-[#FBF676]/25"
-                            style={{
-                              width: `${getSideProgressPercentage(
-                                binaryTree.rightBusiness,
-                                progress.currentLevel.investmentThreshold
-                              )}%`,
-                            }}
-                          ></div>
-                        </div>
-                        <p className="mt-2 text-xs text-[#FBF676] font-semibold">
-                          {getSideProgressPercentage(
-                            binaryTree.rightBusiness,
-                            progress.currentLevel.investmentThreshold
-                          ).toFixed(1)}
-                          % of right-side target achieved
-                        </p>
-                      </div>
+                      ))}
                     </div>
-                    <p className="mt-4 text-xs text-[#FBF676] font-semibold">
+                    <p className="mt-4 text-xs font-semibold" style={{ color: t.muted }}>
                       Career level reward unlocks when{' '}
-                      <span className="font-extrabold text-[#FBF676]">both</span> left and right business reach the
-                      full target amount.
+                      <span className="font-extrabold" style={{ color: t.primary }}>both</span> left and right business reach the full target amount.
                     </p>
                   </div>
                 )}
               </div>
             ) : (
-              <div className="text-center py-12">
-                <p className="text-white/75 text-lg font-bold">Congratulations! You've completed all career levels! 🎉</p>
+              <div className="text-center py-8">
+                <p className="text-lg font-bold" style={{ color: t.ink }}>
+                  Congratulations! You&apos;ve completed all career levels! 🎉
+                </p>
               </div>
             )}
           </div>
 
-          {/* Statistics Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            <div className="group rounded-2xl shadow-2xl border border-[#FBF676]/25 backdrop-blur-md bg-[rgba(8,16,40,0.75)] p-6 hover:border-[#FBF676]/60 hover:shadow-[#FBF676]/20 transition-all duration-300">
-              <h3 className="text-sm font-bold text-[#FBF676] mb-3">Total Business Volume</h3>
-              <p className="text-3xl font-extrabold text-[#FBF676]">
-                ${progress.totalBusinessVolume.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-              </p>
-            </div>
-            <div className="group rounded-2xl shadow-2xl border border-[#FBF676]/25 backdrop-blur-md bg-[rgba(8,16,40,0.75)] p-6 hover:border-[#FBF676]/60 hover:shadow-[#FBF676]/20 transition-all duration-300">
-              <h3 className="text-sm font-bold text-[#FBF676] mb-3">Total Rewards Earned</h3>
-              <p className="text-3xl font-extrabold text-[#FBF676]">
-                ${progress.totalRewardsEarned.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-              </p>
-            </div>
-            <div className="group rounded-2xl shadow-2xl border border-[#FBF676]/25 backdrop-blur-md bg-[rgba(8,16,40,0.75)] p-6 hover:border-[#FBF676]/60 hover:shadow-[#FBF676]/20 transition-all duration-300">
-              <h3 className="text-sm font-bold text-[#FBF676] mb-3">Levels Completed</h3>
-              <p className="text-3xl font-extrabold text-[#FBF676]">
-                {progress.completedLevels.length}
-              </p>
-            </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {[
+              { label: 'Total Business Volume', value: progress.totalBusinessVolume },
+              { label: 'Total Rewards Earned', value: progress.totalRewardsEarned },
+              { label: 'Levels Completed', value: progress.completedLevels.length, isCount: true },
+            ].map((stat) => (
+              <div key={stat.label} className={t.card}>
+                <h3 className="text-sm font-bold mb-2" style={{ color: t.muted }}>{stat.label}</h3>
+                <p className="text-2xl font-extrabold" style={{ color: t.primary }}>
+                  {stat.isCount
+                    ? stat.value
+                    : `$${Number(stat.value).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
+                </p>
+              </div>
+            ))}
           </div>
 
-          {/* Completed Levels */}
           {progress.completedLevels.length > 0 && (
-            <div className="rounded-2xl shadow-2xl border border-[#FBF676]/25 backdrop-blur-md bg-[rgba(8,16,40,0.75)] p-8 mb-8">
-              <h2 className="text-2xl font-extrabold text-white mb-6 flex items-center gap-2">
-                <span className="w-1 h-6 bg-gradient-to-b from-[#FBF676] to-[#e8e04a] rounded"></span>
+            <div className={t.card}>
+              <h2 className={`${t.sectionTitle} mb-6 flex items-center gap-2`}>
+                <span className={t.accentBar} style={t.accentBarStyle} />
                 Completed Levels
               </h2>
-              <div className="space-y-4">
+              <div className="space-y-3">
                 {progress.completedLevels
                   .sort((a, b) => new Date(b.completedAt).getTime() - new Date(a.completedAt).getTime())
-                  .map((completed, index) => (
+                  .map((completed) => (
                     <div
                       key={completed.levelId}
-                      className="flex items-center justify-between p-5 bg-[rgba(251,246,118,0.12)] border-2 border-[#FBF676]/35 rounded-xl hover:border-[#FBF676]/60 transition-all"
+                      className={`flex items-center justify-between p-4 rounded-xl ${t.cardHighlight}`}
                     >
-                      <div className="flex items-center space-x-4">
-                        <div className="flex-shrink-0">
-                          <div className="w-12 h-12 bg-gradient-to-r from-yellow-500 to-yellow-600 rounded-full flex items-center justify-center text-black font-extrabold shadow-lg shadow-[#FBF676]/25">
-                            ✓
-                          </div>
+                      <div className="flex items-center gap-4">
+                        <div className="w-10 h-10 rounded-full flex items-center justify-center font-extrabold text-sm" style={{ backgroundColor: t.gold, color: t.ink }}>
+                          ✓
                         </div>
                         <div>
-                          <h3 className="font-extrabold text-white text-lg">{completed.levelName}</h3>
-                          <p className="text-sm text-white/55 font-semibold">Completed: {formatDate(completed.completedAt)}</p>
+                          <h3 className="font-extrabold" style={{ color: t.ink }}>{completed.levelName}</h3>
+                          <p className="text-sm font-semibold" style={{ color: t.muted }}>Completed: {formatDate(completed.completedAt)}</p>
                         </div>
                       </div>
                       <div className="text-right">
-                        <p className="text-sm text-white/55 font-semibold">Reward Received</p>
-                        <p className="text-xl font-extrabold text-[#FBF676]">
+                        <p className="text-sm font-semibold" style={{ color: t.muted }}>Reward Received</p>
+                        <p className="text-lg font-extrabold" style={{ color: t.primary }}>
                           ${completed.rewardAmount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                         </p>
                       </div>
@@ -338,64 +275,60 @@ export default function CareerLevelsPage() {
             </div>
           )}
 
-          {/* All Available Levels */}
           {allLevels.length > 0 && (
-            <div className="rounded-2xl shadow-2xl border border-[#FBF676]/25 backdrop-blur-md bg-[rgba(8,16,40,0.75)] p-8">
-              <h2 className="text-2xl font-extrabold text-white mb-6 flex items-center gap-2">
-                <span className="w-1 h-6 bg-gradient-to-b from-[#FBF676] to-[#e8e04a] rounded"></span>
+            <div className={t.card}>
+              <h2 className={`${t.sectionTitle} mb-6 flex items-center gap-2`}>
+                <span className={t.accentBar} style={t.accentBarStyle} />
                 All Career Levels
               </h2>
-              <div className="space-y-4">
+              <div className="space-y-3">
                 {allLevels
                   .filter((level) => level.status === 'Active')
                   .sort((a, b) => a.level - b.level)
                   .map((level) => {
-                    const isCompleted = progress.completedLevels.some(
-                      (cl) => cl.levelId === level.id
-                    );
+                    const isCompleted = progress.completedLevels.some((cl) => cl.levelId === level.id);
                     const isCurrent = progress.currentLevel?.id === level.id;
 
                     return (
                       <div
                         key={level.id}
-                        className={`p-5 border-2 rounded-xl transition-all ${
-                          isCompleted
-                            ? 'bg-gradient-to-r from-yellow-500/30 via-yellow-600/20 to-yellow-500/30 border-[#FBF676]/60'
-                            : isCurrent
-                            ? 'bg-[rgba(251,246,118,0.12)] border-[#FBF676]/50'
-                            : 'bg-gray-800/80 border-gray-700/50'
+                        className={`p-4 rounded-xl border-2 ${
+                          isCompleted || isCurrent
+                            ? 'border-[rgba(245,207,11,0.45)] bg-[#FFF9E6]'
+                            : 'border-[#d8e6ec] bg-[#F7FBFC]'
                         }`}
                       >
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center space-x-4">
+                        <div className="flex items-center justify-between flex-wrap gap-3">
+                          <div className="flex items-center gap-4">
                             <div
-                              className={`w-12 h-12 rounded-full flex items-center justify-center font-extrabold text-white shadow-lg ${
-                                isCompleted
-                                  ? 'bg-gradient-to-r from-yellow-500 to-yellow-600 shadow-[#FBF676]/25'
-                                  : isCurrent
-                                  ? 'bg-gradient-to-r from-yellow-500 to-yellow-600 shadow-[#FBF676]/25'
-                                  : 'bg-gray-700'
-                              }`}
+                              className="w-10 h-10 rounded-full flex items-center justify-center font-extrabold text-sm"
+                              style={{
+                                backgroundColor: isCompleted || isCurrent ? t.gold : '#e2e8ec',
+                                color: t.ink,
+                              }}
                             >
                               {isCompleted ? '✓' : level.level}
                             </div>
                             <div>
-                              <h3 className="font-extrabold text-white text-lg">{level.name}</h3>
-                              <p className="text-sm text-white/55 font-semibold">
-                                Investment Threshold: <span className="text-[#FBF676]">${level.investmentThreshold.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                              <h3 className="font-extrabold" style={{ color: t.ink }}>{level.name}</h3>
+                              <p className="text-sm font-semibold" style={{ color: t.muted }}>
+                                Investment Threshold:{' '}
+                                <span style={{ color: t.primary }}>
+                                  ${level.investmentThreshold.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                </span>
                               </p>
                             </div>
                           </div>
                           <div className="text-right">
-                            <p className="text-sm text-white/55 font-semibold">Reward</p>
-                            <p className="text-xl font-extrabold text-[#FBF676]">
+                            <p className="text-sm font-semibold" style={{ color: t.muted }}>Reward</p>
+                            <p className="text-lg font-extrabold" style={{ color: t.primary }}>
                               ${level.rewardAmount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                             </p>
                             {isCurrent && (
-                              <p className="text-xs text-[#FBF676] mt-1 font-bold">Current Level</p>
+                              <p className="text-xs font-bold mt-1" style={{ color: t.primary }}>Current Level</p>
                             )}
                             {isCompleted && (
-                              <p className="text-xs text-[#FBF676] mt-1 font-bold">Completed</p>
+                              <p className="text-xs font-bold mt-1" style={{ color: t.primary }}>Completed</p>
                             )}
                           </div>
                         </div>
@@ -409,12 +342,12 @@ export default function CareerLevelsPage() {
       )}
 
       {!progress && !loading && (
-        <div className="rounded-2xl shadow-2xl border border-[#FBF676]/25 backdrop-blur-md bg-[rgba(8,16,40,0.75)] p-12 text-center">
-          <p className="text-white/75 text-lg font-bold">No career progress found. Start investing to begin your career journey!</p>
+        <div className={t.cardEmpty}>
+          <p className="text-lg font-bold" style={{ color: t.ink }}>
+            No career progress found. Start investing to begin your career journey!
+          </p>
         </div>
       )}
-          </div>
-        </div>
+    </div>
   );
 }
-

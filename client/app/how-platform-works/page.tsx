@@ -37,7 +37,7 @@ export default function HowPlatformWorksPage() {
       icon: <DollarSign className="w-8 h-8" />,
       details: [
         "Use USDT TRC20 for secure transactions",
-        "Minimum deposit: $25",
+        "Minimum deposit: $10",
         "Instant wallet funding",
         "Secure blockchain technology",
       ],
@@ -46,13 +46,13 @@ export default function HowPlatformWorksPage() {
       number: 3,
       title: "Choose Your Investment Package",
       description:
-        "Select from three investment tiers: Solar Starter, Power Growth, or Elite Energy. Each offers different returns and benefits.",
+        "Select from five Big Bull Energies investment packages. Each offers different daily ROI, duration, referral, binary, and principal return terms.",
       icon: <TrendingUp className="w-8 h-8" />,
       details: [
-        "Solar Starter: $25 - $4,999 (1.5% daily ROI)",
-        "Power Growth: $5,000 - $49,999 (1.75% daily ROI)",
-        "Elite Energy: $50,000+ (2% daily ROI)",
-        "Compare packages and choose your fit",
+        "Package 1: $10 – $9,999 (1.0% daily ROI, 200 days)",
+        "Package 2: $10,000 – $24,999 (1.4% daily ROI, 180 days)",
+        "Package 3: $25,000 – $44,999 (1.8% daily ROI, 160 days)",
+        "Package 4 & 5: up to $150,000 (2.2%–2.6% daily ROI)",
       ],
     },
     {
@@ -64,7 +64,7 @@ export default function HowPlatformWorksPage() {
       details: [
         "Investment activates instantly",
         "Daily ROI credited automatically",
-        "Bond period: 180-200 days",
+        "Bond period: 120–200 days",
         "Track progress in real-time",
       ],
     },
@@ -76,7 +76,7 @@ export default function HowPlatformWorksPage() {
       icon: <Network className="w-8 h-8" />,
       details: [
         "Share your unique referral link",
-        "Earn 8-10% referral commission",
+        "Earn 10–13% referral commission",
         "Build left and right binary legs",
         "Earn binary bonuses daily",
       ],

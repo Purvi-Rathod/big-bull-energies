@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Fraunces, Inter } from "next/font/google";
 import localFont from "next/font/local";
 import "./globals.css";
@@ -80,6 +80,13 @@ const baseUrl =
   process.env.NEXT_PUBLIC_BASE_URL ||
   process.env.NEXT_PUBLIC_API_URL?.replace("/api", "") ||
   "https://crownbanker.com";
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
+  themeColor: "#05627C",
+};
 
 export const metadata: Metadata = {
   metadataBase: new URL(baseUrl),

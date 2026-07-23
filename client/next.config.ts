@@ -29,6 +29,25 @@ const nextConfig: NextConfig = {
   async headers() {
     return [
       {
+        source: "/big-bull-energies-brochure.pdf",
+        headers: [
+          {
+            key: "Content-Type",
+            value: "application/pdf",
+          },
+          {
+            // Inline so browsers open the PDF instead of forcing a download
+            // (forced downloads are blocked by Chrome on plain HTTP)
+            key: "Content-Disposition",
+            value: 'inline; filename="Big-Bull-Energies-Brochure.pdf"',
+          },
+          {
+            key: "Cache-Control",
+            value: "public, max-age=86400",
+          },
+        ],
+      },
+      {
         source: '/:path*',
         headers: [
           {

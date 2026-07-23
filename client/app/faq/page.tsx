@@ -40,13 +40,13 @@ const FAQS = [
   {
     question: "What investment packages are available?",
     answer:
-      "We offer three main investment packages: Solar Starter ($25–$4,999), Power Growth ($5,000–$49,999), and Elite Energy ($50,000 and above). Each package has different ROI rates and benefits.",
+      "We offer five investment packages from $10 to $150,000. Daily ROI ranges from 1.0% to 2.6%, with referral income of 10%–13%, binary income of 12%, and principal return of 70%–100% depending on the package.",
     icon: Package,
   },
   {
     question: "How are returns calculated?",
     answer:
-      "Returns are calculated daily based on your investment package. ROI percentages range from 1.65% to 2.7% daily, depending on your chosen package. Returns are credited to your wallet daily.",
+      "Returns are calculated daily based on your investment package. Daily ROI ranges from 1.0% to 2.6%, depending on your chosen package. Returns are credited to your wallet daily.",
     icon: Calculator,
   },
   {
@@ -58,13 +58,13 @@ const FAQS = [
   {
     question: "What is the referral bonus?",
     answer:
-      "Our referral bonus program rewards you for bringing new investors to the platform. You can earn 7% to 9% as a referral bonus when someone you refer invests in our packages.",
+      "Our referral bonus program rewards you for bringing new investors to the platform. You can earn 10% to 13% as a referral bonus when someone you refer invests in our packages.",
     icon: Users,
   },
   {
     question: "Is my investment secure?",
     answer:
-      "Yes, we take security seriously. All transactions are encrypted, and we follow industry best practices to protect your data and investments. We also provide 100% principal return on all packages.",
+      "Yes, we take security seriously. All transactions are encrypted, and we follow industry best practices to protect your data and investments. Principal return at maturity ranges from 70% to 100% depending on your package.",
     icon: Lock,
   },
   {

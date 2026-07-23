@@ -1,13 +1,26 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
+import Link from 'next/link';
 import { useAuth } from '@/contexts/AuthContext';
 import { api } from '@/lib/api';
 import toast from 'react-hot-toast';
 import BigBullLoader from '@/components/BigBullLoader';
 import { formatDate } from '@/lib/utils';
+import {
+  Wallet,
+  Wind,
+  TrendingUp,
+  Users,
+  Network,
+  Copy,
+  ArrowRight,
+  Package,
+  Shield,
+  Zap,
+} from 'lucide-react';
 
-interface Wallet {
+interface WalletBalance {
   type: string;
   balance: number;
   reserved: number;
@@ -31,26 +44,10 @@ interface Investment {
 }
 
 interface BinaryTreeInfo {
-  parent: {
-    id: string;
-    userId: string;
-    name: string;
-  } | null;
-  treeParent?: {
-    id: string;
-    userId: string;
-    name: string;
-  } | null; // Optional: actual binary tree placement parent (may differ from referrer)
-  leftChild: {
-    id: string;
-    userId: string;
-    name: string;
-  } | null;
-  rightChild: {
-    id: string;
-    userId: string;
-    name: string;
-  } | null;
+  parent: { id: string; userId: string; name: string } | null;
+  treeParent?: { id: string; userId: string; name: string } | null;
+  leftChild: { id: string; userId: string; name: string } | null;
+  rightChild: { id: string; userId: string; name: string } | null;
   leftBusiness: number;
   rightBusiness: number;
   leftCarry: number;
@@ -59,88 +56,102 @@ interface BinaryTreeInfo {
   rightDownlines: number;
 }
 
-export default function DashboardPage() {
-  const { user } = useAuth();
-  const [wallets, setWallets] = useState<Wallet[]>([]);
-  const [investments, setInvestments] = useState<Investment[]>([]);
-  const [binaryTree, setBinaryTree] = useState<BinaryTreeInfo | null>(null);
-  const [referralLinks, setReferralLinks] = useState<{ leftLink: string; rightLink: string; userId: string } | null>(null);
-  const [walletAddress, setWalletAddress] = useState(''); // Saved wallet address from profile
-  const [modalWalletAddress, setModalWalletAddress] = useState(''); // Temporary input value in modal
-  const [showWalletModal, setShowWalletModal] = useState(false);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
-  const [voucherCount, setVoucherCount] = useState<{ total: number; active: number; used: number; expired: number }>({ total: 0, active: 0, used: 0, expired: 0 });
-  const [directReferrals, setDirectReferrals] = useState<any[]>([]);
-  const [isMobile, setIsMobile] = useState(false);
-  const hasFetchedRef = useRef(false);
+const PRIMARY = '#05627C';
+const ACCENT = '#3FA9C8';
+const GOLD = '#F5CF0B';
+const INK = '#0B1F2A';
+const MUTED = '#5A6F78';
+const BINARY_RATE = 0.12;
 
-  // Check if mobile on mount and resize
-  useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth < 768);
-    };
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
-  }, []);
+const WALLET_ORDER = [
+  'roi',
+  'referral',
+  'binary',
+  'career_level',
+  'interest',
+  'token',
+  'investment',
+  'withdrawal',
+  'main',
+  'fixed',
+];
 
-  useEffect(() => {
-    // Prevent duplicate calls (React StrictMode in development)
-    if (hasFetchedRef.current) {
+const WALLET_META: Record<
+  string,
+  { label: string; tint: string; bar: string }
+> = {
+  roi: { label: 'Daily ROI', tint: '#E6F7FB', bar: '#3FA9C8' },
+  referral: { label: 'Referral', tint: '#E8F5F0', bar: '#05627C' },
+  binary: { label: 'Binary', tint: '#FFF8DB', bar: '#F5CF0B' },
+  career_level: { label: 'Career', tint: '#F0E8FF', bar: '#7C6BCF' },
+  interest: { label: 'Interest', tint: '#E8F5F0', bar: '#2A9D8F' },
+  token: { label: 'Token', tint: '#E6F7FB', bar: '#3FA9C8' },
+  investment: { label: 'Investment', tint: '#E8F5F0', bar: '#05627C' },
+  withdrawal: { label: 'Withdrawal', tint: '#FFF1E8', bar: '#E07A3D' },
+  main: { label: 'Main', tint: '#E8F5F0', bar: '#05627C' },
+  fixed: { label: 'Fixed', tint: '#EEF2F5', bar: '#6b7c85' },
+};
+
+async function copyText(text: string, successMsg: string) {
+  try {
+    if (navigator.clipboard && window.isSecureContext) {
+      await navigator.clipboard.writeText(text);
+      toast.success(successMsg);
       return;
     }
+    const textArea = document.createElement('textarea');
+    textArea.value = text;
+    textArea.style.position = 'fixed';
+    textArea.style.left = '-999999px';
+    document.body.appendChild(textArea);
+    textArea.select();
+    document.execCommand('copy');
+    document.body.removeChild(textArea);
+    toast.success(successMsg);
+  } catch {
+    toast.error('Failed to copy. Please copy manually.');
+  }
+}
+
+export default function DashboardPage() {
+  const { user } = useAuth();
+  const [wallets, setWallets] = useState<WalletBalance[]>([]);
+  const [investments, setInvestments] = useState<Investment[]>([]);
+  const [binaryTree, setBinaryTree] = useState<BinaryTreeInfo | null>(null);
+  const [referralLinks, setReferralLinks] = useState<{
+    leftLink: string;
+    rightLink: string;
+    userId: string;
+  } | null>(null);
+  const [hasWalletAddress, setHasWalletAddress] = useState(true);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [directReferrals, setDirectReferrals] = useState<any[]>([]);
+  const hasFetchedRef = useRef(false);
+
+  useEffect(() => {
+    if (hasFetchedRef.current) return;
     hasFetchedRef.current = true;
-    
     fetchDashboardData();
-    fetchVoucherCount();
-
-    // No cleanup - we want to prevent duplicate calls even on remount
   }, []);
-
-  const fetchVoucherCount = async () => {
-    try {
-      const response = await api.getUserVouchers();
-      if (response.data?.vouchers) {
-        const vouchers = response.data.vouchers;
-        const now = new Date();
-        const active = vouchers.filter((v: any) => {
-          if (v.status !== 'active') return false;
-          if (v.expiry) {
-            return new Date(v.expiry) > now;
-          }
-          return true;
-        }).length;
-        const used = vouchers.filter((v: any) => v.status === 'used').length;
-        const expired = vouchers.filter((v: any) => {
-          if (v.expiry) {
-            return new Date(v.expiry) <= now;
-          }
-          return false;
-        }).length;
-        
-        setVoucherCount({
-          total: vouchers.length,
-          active,
-          used,
-          expired,
-        });
-      }
-    } catch (err: any) {
-      console.error('Failed to fetch voucher count:', err);
-    }
-  };
 
   const fetchDashboardData = async () => {
     try {
       setLoading(true);
-      const [walletsRes, investmentsRes, binaryTreeRes, referralLinksRes, userProfileRes, directReferralsRes] = await Promise.all([
+      const [
+        walletsRes,
+        investmentsRes,
+        binaryTreeRes,
+        referralLinksRes,
+        userProfileRes,
+        directReferralsRes,
+      ] = await Promise.all([
         api.getUserWallets(),
         api.getUserInvestments(),
-        api.getUserBinaryTree().catch(() => ({ data: null })), // Don't fail if binary tree not found
-        api.getUserReferralLinks().catch(() => ({ data: null })), // Don't fail if referral links not found
-        api.getUserProfile().catch(() => ({ data: null })), // Get user profile for wallet address
-        api.getUserDirectReferrals().catch(() => ({ data: { referrals: [], count: 0 } })), // Don't fail if no referrals
+        api.getUserBinaryTree().catch(() => ({ data: null })),
+        api.getUserReferralLinks().catch(() => ({ data: null })),
+        api.getUserProfile().catch(() => ({ data: null })),
+        api.getUserDirectReferrals().catch(() => ({ data: { referrals: [], count: 0 } })),
       ]);
 
       if (walletsRes.data) setWallets(walletsRes.data.wallets);
@@ -148,9 +159,7 @@ export default function DashboardPage() {
       if (binaryTreeRes.data) setBinaryTree(binaryTreeRes.data.binaryTree);
       if (referralLinksRes.data) setReferralLinks(referralLinksRes.data);
       if (userProfileRes.data?.user) {
-        if (userProfileRes.data.user.walletAddress) {
-          setWalletAddress(userProfileRes.data.user.walletAddress);
-        }
+        setHasWalletAddress(Boolean(userProfileRes.data.user.walletAddress));
       }
       if (directReferralsRes.data) {
         setDirectReferrals(directReferralsRes.data.referrals || []);
@@ -164,670 +173,522 @@ export default function DashboardPage() {
     }
   };
 
-  const getWalletDisplayName = (type: string) => {
-    const names: { [key: string]: string } = {
-      withdrawal: 'Withdrawal',
-      roi: 'ROI',
-      interest: 'Interest',
-      referral: 'Referral',
-      binary: 'Binary Bonus',
-      token: 'Token',
-      investment: 'Investment',
-      career_level: 'Career Level',
-      main: 'Main Wallet',
-      fixed: 'Fixed Wallet',
-    };
-    return names[type] || type;
-  };
+  const sortedWallets = [...wallets].sort((a, b) => {
+    const ia = WALLET_ORDER.indexOf(a.type);
+    const ib = WALLET_ORDER.indexOf(b.type);
+    if (ia === -1 && ib === -1) return 0;
+    if (ia === -1) return 1;
+    if (ib === -1) return -1;
+    return ia - ib;
+  });
 
-  // Calculate responsive font size based on number length
-  const getAmountFontSize = (amount: number, isMobile: boolean) => {
-    const amountStr = amount.toFixed(2);
-    const length = amountStr.length;
-    
-    if (isMobile) {
-      // Mobile: base 1.5rem, shrink by 0.1rem per digit over 6
-      const baseSize = 1.5;
-      const shrinkRate = 0.1;
-      const minSize = 0.75;
-      const calculatedSize = Math.max(baseSize - (length - 6) * shrinkRate, minSize);
-      return `${calculatedSize}rem`;
-    } else {
-      // Desktop: base 3rem, shrink by 0.25rem per digit over 6
-      const baseSize = 3;
-      const shrinkRate = 0.25;
-      const minSize = 1.5;
-      const calculatedSize = Math.max(baseSize - (length - 6) * shrinkRate, minSize);
-      return `${calculatedSize}rem`;
-    }
-  };
-
-  // Wallet order: ROI, Referral, Binary Bonus, Career Level, Interest, Token, Investment, Withdrawal
-  const walletOrder = ['roi', 'referral', 'binary', 'career_level', 'interest', 'token', 'investment', 'withdrawal', 'fixed'];
-  
-  const sortWallets = (wallets: Wallet[]): Wallet[] => {
-    return [...wallets].sort((a, b) => {
-      const indexA = walletOrder.indexOf(a.type);
-      const indexB = walletOrder.indexOf(b.type);
-      // If type not found in order, put it at the end
-      if (indexA === -1 && indexB === -1) return 0;
-      if (indexA === -1) return 1;
-      if (indexB === -1) return -1;
-      return indexA - indexB;
-    });
-  };
+  const totalBalance = wallets.reduce((sum, w) => sum + (w.balance || 0), 0);
+  const activeInvestments = investments.filter((i) => i.isBinaryUpdated).length;
+  const totalInvested = investments.reduce((sum, i) => sum + (i.investedAmount || 0), 0);
+  const teamSize =
+    (binaryTree?.leftDownlines || 0) + (binaryTree?.rightDownlines || 0);
+  const matchedBusiness = binaryTree
+    ? Math.min(binaryTree.leftBusiness, binaryTree.rightBusiness)
+    : 0;
+  const estimatedBinary = matchedBusiness * BINARY_RATE;
 
   if (loading) {
-    return <BigBullLoader fullScreen />;
+    return <BigBullLoader text="Loading your dashboard…" />;
   }
 
   return (
-        <div className="w-full min-h-screen py-4 md:py-8 px-2 sm:px-4 md:px-6 lg:px-8 relative overflow-hidden">
-          <div className="relative z-10">
-          {error && (
-            <div className="mb-6 bg-red-900/30 border border-red-500/50 text-red-400 px-4 py-3 rounded-lg backdrop-blur-sm animate-fade-in-up animation-delay-100">
-              {error}
-            </div>
-          )}
+    <div className="mx-auto max-w-7xl space-y-6 md:space-y-8">
+      {error && (
+        <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700">
+          {error}
+        </div>
+      )}
 
-          {/* Statistics Cards */}
-         
-          {/* Wallets Section */}
-          <div className="mb-6 md:mb-10 animate-fade-in-up animation-delay-100">
-            <h2 className="text-xl md:text-3xl font-extrabold mb-4 md:mb-8 text-white flex items-center gap-2 md:gap-3">
-              <span className="bg-gradient-to-r from-yellow-300 via-yellow-400 to-yellow-600 bg-clip-text text-transparent drop-shadow-lg">My Wallets</span>
-              <div className="h-px flex-1 bg-gradient-to-r from-[#FBF676]/50 via-[#FBF676]/30 to-transparent hidden sm:block"></div>
+      {/* Hero */}
+      <section
+        className="relative overflow-hidden rounded-2xl px-5 py-6 shadow-sm md:px-8 md:py-8"
+        style={{
+          background: `linear-gradient(125deg, ${PRIMARY} 0%, #0A7A96 55%, ${ACCENT} 100%)`,
+        }}
+      >
+        <div className="pointer-events-none absolute -right-6 top-0 opacity-20">
+          <Wind className="h-40 w-40 text-white" />
+        </div>
+        <div className="relative flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+          <div className="max-w-xl min-w-0">
+            <p className="mb-2 inline-flex items-center gap-1.5 rounded-full bg-white/15 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.14em] text-white sm:text-[11px]">
+              <Zap className="h-3.5 w-3.5 flex-shrink-0" style={{ color: GOLD }} />
+              Wind-powered portfolio
+            </p>
+            <h1 className="text-xl font-extrabold tracking-tight text-white sm:text-2xl md:text-3xl">
+              Hello, {user?.name?.split(' ')[0] || 'Investor'}
+            </h1>
+            <p className="mt-2 text-sm leading-relaxed text-white/85 md:text-base">
+              Monitor ROI streams, binary growth, and referrals in your Big Bull
+              Energies member workspace.
+            </p>
+            {user?.userId && (
+              <p className="mt-3 break-all font-mono text-xs font-semibold text-white/75">
+                {user.userId}
+              </p>
+            )}
+          </div>
+          <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:flex-wrap">
+            <Link
+              href="/plans"
+              className="inline-flex w-full items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-extrabold shadow-md transition hover:opacity-95 sm:w-auto"
+              style={{ backgroundColor: GOLD, color: INK }}
+            >
+              <Package className="h-4 w-4" />
+              Invest now
+            </Link>
+            <Link
+              href="/binary"
+              className="inline-flex w-full items-center justify-center gap-2 rounded-xl border-2 border-white/40 bg-white/10 px-4 py-2.5 text-sm font-bold text-white backdrop-blur-sm transition hover:bg-white/20 sm:w-auto"
+            >
+              <Network className="h-4 w-4" />
+              Binary
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* KPI strip */}
+      <section className="grid grid-cols-2 gap-3 lg:grid-cols-4 lg:gap-4">
+        {[
+          {
+            label: 'Total balance',
+            value: `$${totalBalance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
+            icon: Wallet,
+            hint: 'All wallets combined',
+          },
+          {
+            label: 'Active packages',
+            value: String(activeInvestments),
+            icon: TrendingUp,
+            hint: `$${totalInvested.toLocaleString()} invested`,
+          },
+          {
+            label: 'Team size',
+            value: String(teamSize),
+            icon: Users,
+            hint: `${directReferrals.length} direct referrals`,
+          },
+          {
+            label: 'Binary match',
+            value: `$${matchedBusiness.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
+            icon: Network,
+            hint: `${(BINARY_RATE * 100).toFixed(0)}% · $${estimatedBinary.toFixed(2)} est.`,
+          },
+        ].map(({ label, value, icon: Icon, hint }) => (
+          <div
+            key={label}
+            className="rounded-2xl border border-white bg-white p-4 shadow-sm"
+          >
+            <div className="mb-3 flex items-center justify-between">
+              <span
+                className="text-[11px] font-bold uppercase tracking-wider"
+                style={{ color: MUTED }}
+              >
+                {label}
+              </span>
+              <span
+                className="flex h-9 w-9 items-center justify-center rounded-xl"
+                style={{ backgroundColor: '#E8F5F0' }}
+              >
+                <Icon className="h-4 w-4" style={{ color: PRIMARY }} />
+              </span>
+            </div>
+            <p className="break-words text-lg font-extrabold leading-tight sm:text-xl md:text-2xl" style={{ color: INK }}>
+              {value}
+            </p>
+            <p className="mt-1 text-xs font-medium" style={{ color: MUTED }}>
+              {hint}
+            </p>
+          </div>
+        ))}
+      </section>
+
+      {!hasWalletAddress && (
+        <div
+          className="flex flex-col gap-3 rounded-2xl border px-4 py-3 sm:flex-row sm:items-center sm:justify-between"
+          style={{
+            borderColor: 'rgba(245,207,11,0.55)',
+            backgroundColor: '#FFF9E6',
+          }}
+        >
+          <div className="flex min-w-0 items-start gap-3">
+            <Shield className="mt-0.5 h-5 w-5 flex-shrink-0" style={{ color: PRIMARY }} />
+            <div className="min-w-0">
+              <p className="text-sm font-bold" style={{ color: INK }}>
+                Add your USDT TRC20 wallet in Profile
+              </p>
+              <p className="text-xs font-medium" style={{ color: MUTED }}>
+                Needed before withdrawals — managed under account settings.
+              </p>
+            </div>
+          </div>
+          <Link
+            href="/profile#crypto-wallet"
+            className="inline-flex w-full items-center justify-center gap-1 rounded-xl px-4 py-2 text-sm font-extrabold sm:w-auto"
+            style={{ backgroundColor: GOLD, color: INK }}
+          >
+            Open Profile
+            <ArrowRight className="h-4 w-4" />
+          </Link>
+        </div>
+      )}
+
+      {/* Wallets — high contrast */}
+      <section>
+        <div className="mb-4 flex items-end justify-between gap-3">
+          <div>
+            <h2 className="text-lg font-extrabold md:text-xl" style={{ color: INK }}>
+              Wallets
             </h2>
-            <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-6">
-              {sortWallets(wallets).map((wallet, index) => (
-                <div 
-                  key={wallet.type} 
-                  className="group relative bg-gradient-to-br from-[#081028] via-[#0C1A6B]/90 to-[#05627C]/85 backdrop-blur-sm rounded-xl md:rounded-2xl shadow-2xl border border-[#FBF676]/30 p-3 md:p-6 hover:border-[#FBF676]/60 hover:shadow-[#FBF676]/20 transition-all duration-300 overflow-hidden animate-scale-in"
-                  style={{ 
-                    animationDelay: `${0.2 + index * 0.1}s`,
-                    opacity: 0
-                  }}
-                >
-                  {/* Animated gradient overlay on hover */}
-                  <div className="absolute inset-0 bg-gradient-to-br from-yellow-500/0 via-yellow-500/0 to-yellow-500/0 group-hover:from-yellow-500/5 group-hover:via-yellow-500/10 group-hover:to-yellow-500/5 transition-all duration-500"></div>
-                  <div className="relative z-10">
-                    <h3 className="text-xs md:text-lg font-bold text--200 mb-2 md:mb-3 group-hover:text-white transition-colors truncate">
-                      {getWalletDisplayName(wallet.type)}
-                    </h3>
-                    <p 
-                      className="font-extrabold bg-gradient-to-r from-[#FBF66] via-[#FBF66] to-[#FBF66] bg-clip-text text-transparent mt-1 md:mt-2 drop-shadow-lg whitespace-nowrap overflow-hidden"
-                      style={{
-                        fontSize: getAmountFontSize(wallet.balance, isMobile),
-                        lineHeight: '1.1'
-                      }}
-                    >
-                      ${wallet.balance.toFixed(2)}
+            <p className="text-xs font-medium" style={{ color: MUTED }}>
+              Income streams at a glance
+            </p>
+          </div>
+          <Link
+            href="/withdraw"
+            className="text-xs font-bold hover:underline"
+            style={{ color: PRIMARY }}
+          >
+            Withdraw →
+          </Link>
+        </div>
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+          {sortedWallets.map((wallet) => {
+            const meta = WALLET_META[wallet.type] || {
+              label: wallet.type,
+              tint: '#E8F5F0',
+              bar: PRIMARY,
+            };
+            return (
+              <div
+                key={wallet.type}
+                className="overflow-hidden rounded-2xl border border-[#d8e6ec] bg-white shadow-sm transition hover:shadow-md"
+              >
+                <div className="h-1.5 w-full" style={{ backgroundColor: meta.bar }} />
+                <div className="px-3 py-4" style={{ backgroundColor: meta.tint }}>
+                  <p
+                    className="truncate text-[11px] font-extrabold uppercase tracking-wide"
+                    style={{ color: INK }}
+                  >
+                    {meta.label}
+                  </p>
+                  <p
+                    className="mt-2 text-xl font-extrabold tracking-tight"
+                    style={{ color: PRIMARY }}
+                  >
+                    ${wallet.balance.toFixed(2)}
+                  </p>
+                  <p className="mt-1 text-[10px] font-bold uppercase" style={{ color: MUTED }}>
+                    {wallet.currency || 'USD'}
+                  </p>
+                  {wallet.reserved > 0 && (
+                    <p className="mt-1 text-[10px] font-semibold" style={{ color: MUTED }}>
+                      Reserved ${wallet.reserved.toFixed(2)}
                     </p>
-                    {wallet.reserved > 0 && (
-                      <p className="text-[10px] md:text-sm text-[#FBF676] mt-2 md:mt-3 flex items-center gap-1 md:gap-2">
-                        <span className="w-1 h-1 md:w-1.5 md:h-1.5 bg-[#FBF676] rounded-full flex-shrink-0"></span>
-                        <span className="truncate">Reserved: <span className="text-[#FBF676] font-semibold">${wallet.reserved.toFixed(2)}</span></span>
+                  )}
+                </div>
+              </div>
+            );
+          })}
+          {sortedWallets.length === 0 && (
+            <p
+              className="col-span-full rounded-2xl border border-dashed border-[#c5d8e0] bg-white px-4 py-10 text-center text-sm font-medium"
+              style={{ color: MUTED }}
+            >
+              No wallets found yet.
+            </p>
+          )}
+        </div>
+      </section>
+
+      {/* Investments + Binary */}
+      <section className="grid grid-cols-1 gap-6 lg:grid-cols-5">
+        <div className="lg:col-span-3">
+          <div className="mb-4 flex items-end justify-between">
+            <div>
+              <h2 className="text-lg font-extrabold md:text-xl" style={{ color: INK }}>
+                Investments
+              </h2>
+              <p className="text-xs font-medium" style={{ color: MUTED }}>
+                Packages powering your returns
+              </p>
+            </div>
+            <Link
+              href="/investments"
+              className="text-xs font-bold hover:underline"
+              style={{ color: PRIMARY }}
+            >
+              View all →
+            </Link>
+          </div>
+          <div className="overflow-hidden rounded-2xl border border-[#d8e6ec] bg-white shadow-sm">
+            {investments.length === 0 ? (
+              <div className="px-5 py-12 text-center">
+                <p className="text-sm font-medium" style={{ color: MUTED }}>
+                  No investments yet.
+                </p>
+                <Link
+                  href="/plans"
+                  className="mt-4 inline-flex items-center gap-2 text-sm font-extrabold"
+                  style={{ color: PRIMARY }}
+                >
+                  Choose a package <ArrowRight className="h-4 w-4" />
+                </Link>
+              </div>
+            ) : (
+              <ul className="divide-y divide-[#e8f0f3]">
+                {investments.slice(0, 6).map((inv) => (
+                  <li
+                    key={inv.id}
+                    className="flex flex-wrap items-center justify-between gap-3 px-4 py-3.5 sm:px-5"
+                  >
+                    <div className="min-w-0">
+                      <p className="truncate font-bold" style={{ color: INK }}>
+                        {inv.package?.name || 'Package'}
                       </p>
-                    )}
-                    <p className="text-[9px] md:text-xs text-[#FBF676] mt-2 md:mt-3 uppercase tracking-wider font-medium truncate">{wallet.currency}</p>
-                  </div>
-                  {/* Shine effect */}
-                  <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 bg-gradient-to-r from-transparent via-white/5 to-transparent"></div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Investments Section */}
-          <div className="mb-6 md:mb-10 animate-fade-in-up animation-delay-300">
-            <h2 className="text-xl md:text-3xl font-extrabold mb-4 md:mb-8 text-white flex items-center gap-2 md:gap-3">
-              <span className="bg-gradient-to-r from-yellow-300 via-yellow-400 to-yellow-600 bg-clip-text text-transparent drop-shadow-lg">My Investments</span>
-              <div className="h-px flex-1 bg-gradient-to-r from-[#FBF676]/50 via-[#FBF676]/30 to-transparent hidden sm:block"></div>
-            </h2>
-            <div className="bg-gradient-to-br from-[#08152F]/95 via-[#0C1A6B]/90 to-[#05627C]/85 backdrop-blur-sm rounded-xl md:rounded-2xl shadow-2xl border border-[#FBF676]/30 overflow-hidden animate-scale-in animation-delay-400">
-              <div className="overflow-x-auto -mx-4 sm:mx-0">
-                <div className="inline-block min-w-full align-middle">
-                  <div className="overflow-hidden">
-                    <table className="min-w-full divide-y divide-[#FBF676]/15">
-                      <thead className="bg-gradient-to-r from-[#08152F]/80 via-[#0C1A6B]/80 to-[#05627C]/75">
-                        <tr>
-                          <th className="px-3 md:px-6 py-3 md:py-5 text-left text-[10px] md:text-xs font-bold text-[#FBF676] uppercase tracking-wider">Package</th>
-                          <th className="px-3 md:px-6 py-3 md:py-5 text-left text-[10px] md:text-xs font-bold text-[#FBF676] uppercase tracking-wider">Amount</th>
-                          <th className="px-3 md:px-6 py-3 md:py-5 text-left text-[10px] md:text-xs font-bold text-[#FBF676] uppercase tracking-wider">ROI</th>
-                          <th className="px-3 md:px-6 py-3 md:py-5 text-left text-[10px] md:text-xs font-bold text-[#FBF676] uppercase tracking-wider">Date</th>
-                          <th className="px-3 md:px-6 py-3 md:py-5 text-left text-[10px] md:text-xs font-bold text-[#FBF676] uppercase tracking-wider">Status</th>
-                        </tr>
-                      </thead>
-                      <tbody className="bg-[rgba(5,12,32,0.45)] divide-y divide-[#FBF676]/10">
-                        {investments.length === 0 ? (
-                          <tr>
-                            <td colSpan={5} className="px-3 md:px-6 py-8 md:py-12 text-center text-[#FBF676] text-sm md:text-lg">
-                              No investments yet
-                            </td>
-                          </tr>
-                        ) : (
-                          investments.map((inv, index) => (
-                            <tr 
-                              key={inv.id} 
-                              className="hover:bg-[rgba(251,246,118,0.08)] transition-all duration-300 group animate-fade-in"
-                              style={{ 
-                                animationDelay: `${0.5 + index * 0.05}s`,
-                                opacity: 0
-                              }}
-                            >
-                              <td className="px-3 md:px-6 py-3 md:py-5 whitespace-nowrap text-xs md:text-sm font-bold text-white group-hover:text-white transition-colors">
-                                {inv.package?.name || 'N/A'}
-                              </td>
-                              <td className="px-3 md:px-6 py-3 md:py-5 whitespace-nowrap text-xs md:text-sm text-[#FBF676] font-extrabold group-hover:text-[#FBF676] transition-colors">
-                                ${inv.investedAmount.toFixed(2)}
-                              </td>
-                              <td className="px-3 md:px-6 py-3 md:py-5 whitespace-nowrap text-xs md:text-sm text-yellow-200 font-semibold">
-                                {inv.package?.roi || 0}%
-                              </td>
-                              <td className="px-3 md:px-6 py-3 md:py-5 whitespace-nowrap text-xs md:text-sm text-[#FBF676]">
-                                {formatDate(inv.createdAt)}
-                              </td>
-                              <td className="px-3 md:px-6 py-3 md:py-5 whitespace-nowrap">
-                                <span
-                                  className={`px-2 md:px-4 py-1 md:py-1.5 inline-flex text-[10px] md:text-xs leading-5 font-bold rounded-full shadow-lg ${
-                                    inv.isBinaryUpdated
-                                      ? 'bg-[rgba(251,246,118,0.15)] text-[#FBF676] border border-[#FBF676]/40'
-                                      : 'bg-[#08152F]/70 text-yellow-200 border border-[#FBF676]/25'
-                                  }`}
-                                >
-                                  {inv.isBinaryUpdated ? 'Active' : 'Processing'}
-                                </span>
-                              </td>
-                            </tr>
-                          ))
-                        )}
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Referral Links Section */}
-          {referralLinks && (
-            <div className="mb-6 md:mb-10 animate-fade-in-up animation-delay-500">
-              <h2 className="text-xl md:text-3xl font-extrabold mb-4 md:mb-8 text-white flex items-center gap-2 md:gap-3">
-                <span className="bg-gradient-to-r from-yellow-300 via-yellow-400 to-yellow-600 bg-clip-text text-transparent drop-shadow-lg">Referral Links</span>
-                <div className="h-px flex-1 bg-gradient-to-r from-[#FBF676]/50 via-[#FBF676]/30 to-transparent hidden sm:block"></div>
-              </h2>
-              <div className="bg-gradient-to-br from-[#08152F]/95 via-[#0C1A6B]/90 to-[#05627C]/85 backdrop-blur-sm rounded-xl md:rounded-2xl shadow-2xl border border-[#FBF676]/30 p-4 md:p-8 animate-scale-in animation-delay-600">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
-                  <div className="group relative p-4 md:p-6 bg-gradient-to-br from-[#08152F]/10 via-[#0C1A6B]/5 to-transparent rounded-xl md:rounded-2xl border-2 border-[#FBF66]/40 hover:border-[#FBF66]/70 hover:shadow-[#FBF66]/30 hover:shadow-2xl transition-all duration-300 overflow-hidden animate-slide-in-left animation-delay-700">
-                    <div className="absolute inset-0 bg-gradient-to-br from-[#08152F]/0 to-[#0C1A6B]/0 group-hover:from-[#08152F]/10 group-hover:to-transparent transition-all duration-300"></div>
-                    <div className="relative z-10">
-                      <h3 className="font-bold text-[#FBF66] mb-3 md:mb-4 flex items-center gap-2 md:gap-3 text-sm md:text-lg">
-                        <span className="w-2 h-2 md:w-3 md:h-3 bg-gradient-to-r from-[#FBF66] to-[#FBF66] rounded-full shadow-lg shadow-[#FBF66]/50"></span>
-                        Left Referral Link
-                      </h3>
-                      <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:space-x-3">
-                        <input
-                          type="text"
-                          value={referralLinks.leftLink}
-                          readOnly
-                          className="flex-1 px-3 md:px-4 py-2 md:py-3 border border-[#FBF676]/40 rounded-lg md:rounded-xl bg-[#081028] text-white text-xs md:text-sm focus:outline-none focus:border-[#FBF676]/70 focus:ring-2 focus:ring-[#FBF676]/40/30 font-mono backdrop-blur-sm break-all"
-                        />
-                        <button
-                          onClick={async () => {
-                            try {
-                              // Try modern clipboard API first
-                              if (navigator.clipboard && window.isSecureContext) {
-                                await navigator.clipboard.writeText(referralLinks.leftLink);
-                                toast.success('Left referral link copied!');
-                              } else {
-                                // Fallback for older browsers or non-secure contexts
-                                const textArea = document.createElement('textarea');
-                                textArea.value = referralLinks.leftLink;
-                                textArea.style.position = 'fixed';
-                                textArea.style.left = '-999999px';
-                                textArea.style.top = '-999999px';
-                                document.body.appendChild(textArea);
-                                textArea.focus();
-                                textArea.select();
-                                try {
-                                  const successful = document.execCommand('copy');
-                                  if (successful) {
-                                    toast.success('Left referral link copied!');
-                                  } else {
-                                    throw new Error('Copy command failed');
-                                  }
-                                } catch (err) {
-                                  toast.error('Failed to copy link. Please copy manually.');
-                                } finally {
-                                  document.body.removeChild(textArea);
-                                }
-                              }
-                            } catch (err) {
-                              console.error('Failed to copy:', err);
-                              toast.error('Failed to copy link. Please copy manually.');
-                            }
-                          }}
-                          className="px-4 md:px-6 py-2 md:py-3 bg-[#FBF676] text-[#0C1A6B] rounded-lg md:rounded-xl hover:bg-[#e8e04a] text-xs md:text-sm font-bold transition-all shadow-lg shadow-[#FBF676]/25 hover:shadow-[#FBF676]/30 hover:scale-105 active:scale-95 whitespace-nowrap"
-                        >
-                          Copy
-                        </button>
-                      </div>
+                      <p className="text-xs font-medium" style={{ color: MUTED }}>
+                        {formatDate(inv.createdAt)} · {inv.package?.roi ?? 0}% daily
+                      </p>
                     </div>
-                  </div>
-                  <div className="group relative p-4 md:p-6 bg-[rgba(251,246,118,0.08)] rounded-xl md:rounded-2xl border-2 border-[#FBF676]/40 hover:border-[#FBF676]/60 hover:shadow-[#FBF676]/25 hover:shadow-2xl transition-all duration-300 overflow-hidden animate-slide-in-right animation-delay-700">
-                    <div className="absolute inset-0 bg-gradient-to-br from-yellow-500/0 to-yellow-500/0 group-hover:from-yellow-500/10 group-hover:to-transparent transition-all duration-300"></div>
-                    <div className="relative z-10">
-                      <h3 className="font-bold text-[#FBF676] mb-3 md:mb-4 flex items-center gap-2 md:gap-3 text-sm md:text-lg">
-                        <span className="w-2 h-2 md:w-3 md:h-3 bg-gradient-to-r from-[#FBF676] to-[#e8e04a] rounded-full shadow-lg shadow-[#FBF676]/30"></span>
-                        Right Referral Link
-                      </h3>
-                      <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:space-x-3">
-                        <input
-                          type="text"
-                          value={referralLinks.rightLink}
-                          readOnly
-                          className="flex-1 px-3 md:px-4 py-2 md:py-3 border border-[#FBF676]/40 rounded-lg md:rounded-xl bg-[#081028] text-white text-xs md:text-sm focus:outline-none focus:border-[#FBF676]/70 focus:ring-2 focus:ring-[#FBF676]/40/30 font-mono backdrop-blur-sm break-all"
-                        />
-                        <button
-                          onClick={async () => {
-                            try {
-                              // Try modern clipboard API first
-                              if (navigator.clipboard && window.isSecureContext) {
-                                await navigator.clipboard.writeText(referralLinks.rightLink);
-                                toast.success('Right referral link copied!');
-                              } else {
-                                // Fallback for older browsers or non-secure contexts
-                                const textArea = document.createElement('textarea');
-                                textArea.value = referralLinks.rightLink;
-                                textArea.style.position = 'fixed';
-                                textArea.style.left = '-999999px';
-                                textArea.style.top = '-999999px';
-                                document.body.appendChild(textArea);
-                                textArea.focus();
-                                textArea.select();
-                                try {
-                                  const successful = document.execCommand('copy');
-                                  if (successful) {
-                                    toast.success('Right referral link copied!');
-                                  } else {
-                                    throw new Error('Copy command failed');
-                                  }
-                                } catch (err) {
-                                  toast.error('Failed to copy link. Please copy manually.');
-                                } finally {
-                                  document.body.removeChild(textArea);
-                                }
-                              }
-                            } catch (err) {
-                              console.error('Failed to copy:', err);
-                              toast.error('Failed to copy link. Please copy manually.');
-                            }
-                          }}
-                          className="px-4 md:px-6 py-2 md:py-3 bg-[#FBF676] text-[#0C1A6B] rounded-lg md:rounded-xl hover:bg-[#e8e04a] text-xs md:text-sm font-bold transition-all shadow-lg shadow-[#FBF676]/25 hover:shadow-[#FBF676]/30 hover:scale-105 active:scale-95 whitespace-nowrap"
-                        >
-                          Copy
-                        </button>
-                      </div>
+                    <div className="flex items-center gap-3">
+                      <span className="font-extrabold" style={{ color: PRIMARY }}>
+                        ${inv.investedAmount.toFixed(2)}
+                      </span>
+                      <span
+                        className={`rounded-full px-2.5 py-0.5 text-[10px] font-extrabold uppercase tracking-wide ${
+                          inv.isBinaryUpdated
+                            ? 'bg-emerald-100 text-emerald-800'
+                            : 'bg-amber-100 text-amber-800'
+                        }`}
+                      >
+                        {inv.isBinaryUpdated ? 'Active' : 'Processing'}
+                      </span>
                     </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Direct Referrals Section */}
-          <div className="mb-6 md:mb-10 animate-fade-in-up animation-delay-600">
-            <h2 className="text-xl md:text-3xl font-extrabold mb-4 md:mb-8 text-white flex items-center gap-2 md:gap-3">
-              <span className="bg-gradient-to-r from-yellow-300 via-yellow-400 to-yellow-600 bg-clip-text text-transparent drop-shadow-lg">My Direct Referrals</span>
-              <div className="h-px flex-1 bg-gradient-to-r from-[#FBF66]/50 via-[#FBF66]/30 to-transparent hidden sm:block"></div>
-            </h2>
-            <div className="bg-gradient-to-br from-[#08152F]/95 via-[#0C1A6B]/90 to-[#05627C]/85 backdrop-blur-sm rounded-xl md:rounded-2xl shadow-2xl border border-[#FBF676]/30 overflow-hidden animate-scale-in animation-delay-700">
-              {directReferrals.length === 0 ? (
-                <div className="p-6 md:p-12 text-center text-[#FBF676] text-sm md:text-base">
-                  You don't have any direct referrals yet. Share your referral links to start building your team.
-                </div>
-              ) : (
-                <div className="overflow-x-auto -mx-4 sm:mx-0">
-                  <div className="inline-block min-w-full align-middle">
-                    <div className="overflow-hidden">
-                      <table className="min-w-full divide-y divide-[#FBF676]/15">
-                        <thead className="bg-gradient-to-r from-[#08152F]/80 via-[#0C1A6B]/80 to-[#05627C]/75">
-                          <tr>
-                            <th className="px-3 md:px-6 py-3 md:py-5 text-left text-[10px] md:text-xs font-bold text-[#FBF676] uppercase tracking-wider">User ID</th>
-                            <th className="px-3 md:px-6 py-3 md:py-5 text-left text-[10px] md:text-xs font-bold text-[#FBF676] uppercase tracking-wider">Name</th>
-                            <th className="px-3 md:px-6 py-3 md:py-5 text-left text-[10px] md:text-xs font-bold text-[#FBF676] uppercase tracking-wider">Email</th>
-                            <th className="px-3 md:px-6 py-3 md:py-5 text-left text-[10px] md:text-xs font-bold text-[#FBF676] uppercase tracking-wider">Phone</th>
-                            <th className="px-3 md:px-6 py-3 md:py-5 text-left text-[10px] md:text-xs font-bold text-[#FBF676] uppercase tracking-wider">Position</th>
-                            <th className="px-3 md:px-6 py-3 md:py-5 text-left text-[10px] md:text-xs font-bold text-[#FBF676] uppercase tracking-wider">Country</th>
-                            <th className="px-3 md:px-6 py-3 md:py-5 text-left text-[10px] md:text-xs font-bold text-[#FBF676] uppercase tracking-wider">Joined At</th>
-                            <th className="px-3 md:px-6 py-3 md:py-5 text-left text-[10px] md:text-xs font-bold text-[#FBF676] uppercase tracking-wider">Status</th>
-                          </tr>
-                        </thead>
-                        <tbody className="bg-[rgba(5,12,32,0.45)] divide-y divide-[#FBF676]/10">
-                          {directReferrals.map((ref, index) => (
-                            <tr 
-                              key={ref.id} 
-                              className="hover:bg-[rgba(251,246,118,0.08)] transition-all duration-300 group animate-fade-in"
-                              style={{ 
-                                animationDelay: `${0.8 + index * 0.05}s`,
-                                opacity: 0
-                              }}
-                            >
-                              <td className="px-3 md:px-6 py-3 md:py-5 whitespace-nowrap text-xs md:text-sm font-mono font-bold text-[#FBF676] group-hover:text-[#FBF676] transition-colors">
-                                {ref.userId || 'N/A'}
-                              </td>
-                              <td className="px-3 md:px-6 py-3 md:py-5 whitespace-nowrap text-xs md:text-sm text-white font-bold group-hover:text-white transition-colors">
-                                {ref.name || 'N/A'}
-                              </td>
-                              <td className="px-3 md:px-6 py-3 md:py-5 whitespace-nowrap text-xs md:text-sm text-[#FBF676]">
-                                {ref.email || '—'}
-                              </td>
-                              <td className="px-3 md:px-6 py-3 md:py-5 whitespace-nowrap text-xs md:text-sm text-[#FBF676]">
-                                {ref.phone || '—'}
-                              </td>
-                              <td className="px-3 md:px-6 py-3 md:py-5 whitespace-nowrap text-xs md:text-sm text-[#FBF676] capitalize font-semibold">
-                                {ref.position || '—'}
-                              </td>
-                              <td className="px-3 md:px-6 py-3 md:py-5 whitespace-nowrap text-xs md:text-sm text-[#FBF676]">
-                                {ref.country || '—'}
-                              </td>
-                              <td className="px-3 md:px-6 py-3 md:py-5 whitespace-nowrap text-xs md:text-sm text-[#FBF676]">
-                                {ref.joinedAt ? formatDate(ref.joinedAt) : '—'}
-                              </td>
-                              <td className="px-3 md:px-6 py-3 md:py-5 whitespace-nowrap text-xs md:text-sm">
-                                <span
-                                  className={`px-2 md:px-4 py-1 md:py-1.5 inline-flex text-[10px] md:text-xs leading-5 font-bold rounded-full shadow-lg ${
-                                    ref.status === 'active'
-                                      ? 'bg-[rgba(251,246,118,0.15)] text-[#FBF676] border border-[#FBF676]/40'
-                                      : ref.status === 'blocked' || ref.status === 'suspended'
-                                      ? 'bg-red-900/40 text-red-400 border border-red-500/40'
-                                      : 'bg-[#08152F]/70 text-[#FBF676] border border-[#FBF676]/60'
-                                  }`}
-                                >
-                                  {ref.status || 'unknown'}
-                                </span>
-                              </td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Binary Tree Info Section */}
-          {binaryTree && (
-            <div className="mb-6 md:mb-10 animate-fade-in-up animation-delay-700">
-              <h2 className="text-xl md:text-3xl font-extrabold mb-4 md:mb-8 text-white flex items-center gap-2 md:gap-3">
-                <span className="bg-gradient-to-r from-yellow-300 via-yellow-400 to-yellow-600 bg-clip-text text-transparent drop-shadow-lg">Binary Tree Information</span>
-                <div className="h-px flex-1 bg-gradient-to-r from-[#FBF676]/50 via-[#FBF676]/30 to-transparent hidden sm:block"></div>
-              </h2>
-              <div className="bg-gradient-to-br from-[#08152F]/95 via-[#0C1A6B]/95 to-[#05627C]/85 backdrop-blur-sm rounded-xl md:rounded-2xl shadow-2xl border border-[#FBF676]/25 p-4 md:p-8 animate-scale-in animation-delay-800">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8">
-                  <div>
-                    <h3 className="text-lg md:text-xl font-extrabold text-[#FBF676] mb-4 md:mb-6 flex items-center gap-2">
-                      <span className="w-1 h-4 md:h-6 bg-gradient-to-b from-[#FBF66] to-[#FBF66] rounded"></span>
-                      Business Values
-                    </h3>
-                    <div className="space-y-3 md:space-y-4">
-                      <div className="group flex justify-between items-center p-3 md:p-5 bg-gradient-to-r from-[#08152F]/10 to-[#0C1A6B]/5 rounded-xl md:rounded-2xl border border-[#FBF676]/40 hover:border-[#FBF676]/60 hover:shadow-lg hover:shadow-[#FBF676]/20 transition-all duration-300 animate-fade-in animation-delay-900">
-                        <span className="font-bold text-[#FBF676] text-sm md:text-base">Left Business:</span>
-                        <span className="text-lg md:text-2xl font-extrabold bg-gradient-to-r from-[#FBF66] to-[#FBF66] bg-clip-text text-transparent">${binaryTree.leftBusiness.toFixed(2)}</span>
-                      </div>
-                      <div className="group flex justify-between items-center p-3 md:p-5 bg-gradient-to-r from-[#08152F]/10 to-[#0C1A6B]/5 rounded-xl md:rounded-2xl border border-[#FBF676]/40 hover:border-[#FBF676]/60 hover:shadow-lg hover:shadow-[#FBF676]/20 transition-all duration-300 animate-fade-in animation-delay-1000">
-                        <span className="font-bold text-[#FBF676] text-sm md:text-base">Right Business:</span>
-                        <span className="text-lg md:text-2xl font-extrabold bg-gradient-to-r from-yellow-400 to-yellow-500 bg-clip-text text-transparent">${binaryTree.rightBusiness.toFixed(2)}</span>
-                      </div>
-                      <div className="group flex justify-between items-center p-3 md:p-5 bg-[rgba(251,246,118,0.12)] rounded-xl md:rounded-2xl border-2 border-[#FBF676]/50 hover:border-[#FBF676]/60 hover:shadow-xl hover:shadow-[#FBF676]/25 transition-all duration-300 animate-fade-in animation-delay-1100">
-                        <span className="font-bold text-white text-sm md:text-base">Min Business:</span>
-                        <span className="text-lg md:text-2xl font-extrabold text-[#FBF676]">
-                          ${Math.min(binaryTree.leftBusiness, binaryTree.rightBusiness).toFixed(2)}
-                        </span>
-                      </div>
-                      <div className="group flex justify-between items-center p-4 md:p-6 bg-gradient-to-r from-yellow-500/30 via-yellow-600/20 to-yellow-500/30 rounded-xl md:rounded-2xl border-2 border-[#FBF676]/60 shadow-xl shadow-[#FBF676]/25 hover:shadow-[#FBF676]/30 transition-all duration-300 animate-scale-in animation-delay-1200">
-                        <span className="font-extrabold text-white text-sm md:text-lg">Binary Bonus (10%):</span>
-                        <span className="text-xl md:text-3xl font-extrabold bg-gradient-to-r from-yellow-300 to-yellow-500 bg-clip-text text-transparent">
-                          ${(Math.min(binaryTree.leftBusiness, binaryTree.rightBusiness) * 0.1).toFixed(2)}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                  <div>
-                    <h3 className="text-lg md:text-xl font-extrabold text-[#FBF676] mb-4 md:mb-6 flex items-center gap-2">
-                      <span className="w-1 h-4 md:h-6 bg-gradient-to-b from-[#FBF676] to-[#e8e04a] rounded"></span>
-                      Carry Forward
-                    </h3>
-                    <div className="space-y-3 md:space-y-4">
-                      <div className="group flex justify-between items-center p-3 md:p-5 bg-gradient-to-br from-[#08152F]/80 to-[#0C1A6B]/80 rounded-xl md:rounded-2xl border border-[#FBF676]/50 hover:border-[#FBF676]/25 hover:shadow-lg transition-all duration-300 animate-fade-in animation-delay-900">
-                        <span className="font-bold text-[#FBF676] text-sm md:text-base">Left Carry:</span>
-                        <span className="text-lg md:text-2xl font-extrabold text-[#FBF676]">${binaryTree.leftCarry.toFixed(2)}</span>
-                      </div>
-                      <div className="group flex justify-between items-center p-3 md:p-5 bg-gradient-to-br from-[#08152F]/80 to-[#0C1A6B]/80 rounded-xl md:rounded-2xl border border-[#FBF676]/50 hover:border-[#FBF676]/25 hover:shadow-lg transition-all duration-300 animate-fade-in animation-delay-1000">
-                        <span className="font-bold text-[#FBF676] text-sm md:text-base">Right Carry:</span>
-                        <span className="text-lg md:text-2xl font-extrabold text-[#FBF676]">${binaryTree.rightCarry.toFixed(2)}</span>
-                      </div>
-                      <div className="mt-4 md:mt-6 pt-4 md:pt-6 border-t border-[#FBF676]/25">
-                        <h4 className="font-bold text-[#FBF676] mb-3 md:mb-4 text-base md:text-lg">Downlines</h4>
-                        <div className="flex justify-between text-xs md:text-sm p-3 md:p-4 bg-gradient-to-r from-[#08152F]/80 to-[#0C1A6B]/80 rounded-lg md:rounded-xl border border-[#FBF676]/50">
-                          <span className="text-[#FBF676] font-semibold">Left Downlines:</span>
-                          <span className="font-extrabold text-[#FBF676] text-base md:text-lg">{binaryTree.leftDownlines}</span>
-                        </div>
-                        <div className="flex justify-between text-xs md:text-sm mt-2 md:mt-3 p-3 md:p-4 bg-gradient-to-r from-[#08152F]/80 to-[#0C1A6B]/80 rounded-lg md:rounded-xl border border-[#FBF676]/50">
-                          <span className="text-[#FBF676] font-semibold">Right Downlines:</span>
-                          <span className="font-extrabold text-[#FBF676] text-base md:text-lg">{binaryTree.rightDownlines}</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                {(binaryTree.parent || binaryTree.leftChild || binaryTree.rightChild) && (
-                  <div className="mt-6 md:mt-8 pt-6 md:pt-8 border-t border-[#FBF676]/25">
-                    <h3 className="text-lg md:text-xl font-extrabold text-[#FBF676] mb-4 md:mb-6 flex items-center gap-2">
-                      <span className="w-1 h-4 md:h-6 bg-gradient-to-b from-[#FBF676] to-[#e8e04a] rounded"></span>
-                      Tree Connections
-                    </h3>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
-                      {binaryTree.parent && (
-                        <div className="group p-4 md:p-5 bg-gradient-to-br from-yellow-500/15 to-yellow-600/10 rounded-xl md:rounded-2xl border border-[#FBF676]/40 hover:border-[#FBF676]/60 hover:shadow-xl hover:shadow-[#FBF676]/20 transition-all duration-300 animate-scale-in animation-delay-1300">
-                          <p className="text-[10px] md:text-xs text-[#FBF676] mb-2 uppercase tracking-wider font-bold">Parent</p>
-                          <p className="font-extrabold text-white text-base md:text-lg mb-1 truncate">{binaryTree.parent.name}</p>
-                          <p className="text-[10px] md:text-xs text-[#FBF676] font-mono font-semibold truncate">{binaryTree.parent.userId}</p>
-                        </div>
-                      )}
-                      {binaryTree.leftChild && (
-                        <div className="group p-4 md:p-5 bg-gradient-to-br from-yellow-500/15 to-yellow-600/10 rounded-xl md:rounded-2xl border border-[#FBF676]/40 hover:border-[#FBF676]/60 hover:shadow-xl hover:shadow-[#FBF676]/20 transition-all duration-300 animate-scale-in animation-delay-1400">
-                          <p className="text-[10px] md:text-xs text-[#FBF676] mb-2 uppercase tracking-wider font-bold">Left Child</p>
-                          <p className="font-extrabold text-white text-base md:text-lg mb-1 truncate">{binaryTree.leftChild.name}</p>
-                          <p className="text-[10px] md:text-xs text-[#FBF676] font-mono font-semibold truncate">{binaryTree.leftChild.userId}</p>
-                        </div>
-                      )}
-                      {binaryTree.rightChild && (
-                        <div className="group p-4 md:p-5 bg-gradient-to-br from-yellow-500/15 to-yellow-600/10 rounded-xl md:rounded-2xl border border-[#FBF676]/40 hover:border-[#FBF676]/60 hover:shadow-xl hover:shadow-[#FBF676]/20 transition-all duration-300 animate-scale-in animation-delay-1500">
-                          <p className="text-[10px] md:text-xs text-[#FBF676] mb-2 uppercase tracking-wider font-bold">Right Child</p>
-                          <p className="font-extrabold text-white text-base md:text-lg mb-1 truncate">{binaryTree.rightChild.name}</p>
-                          <p className="text-[10px] md:text-xs text-[#FBF676] font-mono font-semibold truncate">{binaryTree.rightChild.userId}</p>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
-          )}
-
-        {/* Wallet Address Section */}
-        <div className="mb-6 md:mb-10 animate-fade-in-up animation-delay-800">
-          <div className="bg-gradient-to-br from-[#08152F]/95 via-[#0C1A6B]/95 to-[#05627C]/85 backdrop-blur-sm rounded-xl md:rounded-2xl shadow-2xl border border-[#FBF676]/25 p-4 md:p-8 animate-scale-in animation-delay-800">
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 md:mb-8">
-              <h2 className="text-xl md:text-3xl font-extrabold text-[#FBF676] flex items-center gap-2 md:gap-3">
-                <span className="bg-gradient-to-r from-yellow-300 via-yellow-400 to-yellow-600 bg-clip-text text-transparent drop-shadow-lg">Payment Information</span>
-                <div className="h-px flex-1 bg-gradient-to-r from-[#FBF66]/50 via-[#FBF66]/30 to-transparent hidden sm:block"></div>
-              </h2>
-              {!walletAddress && (
-                <button
-                  onClick={() => {
-                    setModalWalletAddress(''); // Reset modal input when opening modal
-                    setShowWalletModal(true);
-                  }}
-                  className="px-6 md:px-8 py-2 md:py-3 text-xs md:text-sm font-bold text-black bg-gradient-to-r from-yellow-500 to-yellow-600 rounded-lg md:rounded-xl hover:bg-[#e8e04a] transition-all shadow-lg shadow-[#FBF676]/25 hover:shadow-[#FBF676]/30 hover:scale-105 active:scale-95 w-full sm:w-auto"
-                >
-                  Setup Payment Info
-                </button>
-              )}
-            </div>
-              <div>
-                <h3 className="text-sm md:text-base font-bold text-[#FBF676] mb-3 md:mb-4">USDT TRC20 Wallet Address</h3>
-                {walletAddress ? (
-                  <div className="p-4 md:p-6 bg-gradient-to-br from-yellow-500/15 to-yellow-600/10 border-2 border-[#FBF676]/40 rounded-xl md:rounded-2xl shadow-lg shadow-[#FBF676]/15">
-                    <p className="text-xs md:text-sm font-mono text-[#FBF676] break-all font-semibold">{walletAddress}</p>
-                    <p className="text-[10px] md:text-xs text-[#FBF676] mt-2 md:mt-3 flex items-center gap-2 font-semibold">
-                      <span className="text-green-400 text-base md:text-lg">✓</span> Wallet address configured
-                    </p>
-                    <p className="text-[10px] md:text-xs text-[#FBF676] mt-2">
-                      Wallet address cannot be changed. Contact admin support if you need to update it.
-                    </p>
-                  </div>
-                ) : (
-                  <div className="p-4 md:p-6 bg-gradient-to-br from-yellow-500/15 to-yellow-600/10 border-2 border-[#FBF676]/40 rounded-xl md:rounded-2xl">
-                    <p className="text-sm md:text-base text-[#FBF676] font-bold">No wallet address set</p>
-                    <p className="text-xs md:text-sm text-yellow-300 mt-2 font-semibold">Required for withdrawals</p>
-                    <p className="text-[10px] md:text-xs text-[#FBF676] mt-2 md:mt-3">
-                      Supported: USDT TRC20 only
-                    </p>
-                  </div>
-                )}
-              </div>
-            {!walletAddress && (
-              <div className="mt-4 md:mt-6 p-4 md:p-5 bg-gradient-to-r from-red-900/40 to-red-800/30 border-2 border-red-500/50 rounded-xl md:rounded-2xl shadow-lg shadow-red-500/10">
-                <p className="text-sm md:text-base font-extrabold text-red-400 mb-2 flex items-center gap-2">
-                  <span className="text-lg md:text-xl">⚠️</span> Payment Information Required
-                </p>
-                <p className="text-xs md:text-sm text-red-300">
-                  You need to set a USDT TRC20 wallet address to request withdrawals.
-                </p>
-              </div>
+                  </li>
+                ))}
+              </ul>
             )}
           </div>
         </div>
 
-        {/* Wallet Address Modal */}
-        {showWalletModal && (
-          <div className="fixed inset-0 bg-black/80 backdrop-blur-sm overflow-y-auto h-full w-full z-50 p-4">
-            <div className="relative top-4 md:top-10 mx-auto p-4 md:p-6 border border-[#FBF676]/25 w-full max-w-2xl shadow-2xl rounded-xl bg-[#081028]">
-              <div className="mt-3">
-                <h3 className="text-2xl font-bold text-white mb-2">Setup Payment Information</h3>
-                <p className="text-sm text-[#FBF676] mb-6">
-                  Set your USDT TRC20 wallet address to enable withdrawals.
-                </p>
-                <div className="mb-6 p-4 bg-[#FBF676]/10 border border-[#FBF676]/25 rounded-xl">
-                  <p className="text-sm font-medium text-[#FBF676] mb-1">Payment Method:</p>
-                  <p className="text-xs text-yellow-300">
-                    Only <strong className="text-[#FBF676]">USDT TRC20</strong> wallet addresses are accepted for withdrawals.
-                  </p>
-                </div>
-                
-                <div className="space-y-6">
-                  {/* USDT TRC20 Wallet Address Section */}
-                  <div>
-                    <h4 className="text-md font-medium text-white mb-3">USDT TRC20 Wallet Address</h4>
-                    <div className="mb-4">
-                      <label className="block text-sm font-medium text-[#FBF676] mb-2">
-                        Wallet Address {walletAddress && <span className="text-[#FBF676]">(Cannot be changed)</span>}
-                      </label>
-                      {walletAddress ? (
-                        <div className="p-4 bg-[#081028] border border-[#FBF676]/70 rounded-xl">
-                          <p className="text-sm font-mono text-white break-all">{walletAddress}</p>
-                          <p className="mt-2 text-xs text-red-400">
-                            ⚠️ Wallet address cannot be changed once set. Contact admin support if you need to update it.
-                          </p>
-                        </div>
-                      ) : (
-                        <>
-                          <input
-                            type="text"
-                            value={modalWalletAddress}
-                            onChange={(e) => setModalWalletAddress(e.target.value)}
-                            onKeyDown={(e) => {
-                              // Prevent Enter key from submitting
-                              if (e.key === 'Enter') {
-                                e.preventDefault();
-                              }
-                            }}
-                            className="w-full px-4 py-3 border border-[#FBF676]/25 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FBF676]/40 focus:border-[#FBF676]/70 bg-[#081028] text-white font-mono text-sm"
-                            placeholder="Enter your USDT TRC20 wallet address (starts with T)"
-                            autoComplete="off"
-                          />
-                          <p className="mt-2 text-xs text-[#FBF676]">
-                            Enter your USDT TRC20 wallet address for withdrawals. This can only be set once.
-                          </p>
-                          <p className="mt-1 text-xs text-[#FBF676] font-medium">
-                            💡 USDT TRC20 wallet addresses start with "T" (e.g., Txxxxxxxxxxxxxxxxxxxxxxxxxxxxx).
-                          </p>
-                        </>
-                      )}
-                    </div>
+        <div className="lg:col-span-2">
+          <div className="mb-4">
+            <h2 className="text-lg font-extrabold md:text-xl" style={{ color: INK }}>
+              Binary legs
+            </h2>
+            <p className="text-xs font-medium" style={{ color: MUTED }}>
+              Volume, carry & match
+            </p>
+          </div>
+          <div className="space-y-3 rounded-2xl border border-[#d8e6ec] bg-white p-4 shadow-sm sm:p-5">
+            {binaryTree ? (
+              <>
+                <div className="grid grid-cols-2 gap-3">
+                  <div
+                    className="rounded-xl p-3"
+                    style={{ backgroundColor: '#E8F5F0' }}
+                  >
+                    <p
+                      className="text-[10px] font-extrabold uppercase tracking-wider"
+                      style={{ color: PRIMARY }}
+                    >
+                      Left
+                    </p>
+                    <p className="mt-1 text-lg font-extrabold" style={{ color: INK }}>
+                      ${binaryTree.leftBusiness.toFixed(2)}
+                    </p>
+                    <p className="mt-2 text-[11px] font-semibold" style={{ color: MUTED }}>
+                      Carry ${binaryTree.leftCarry.toFixed(2)}
+                    </p>
+                    <p className="text-[11px] font-semibold" style={{ color: MUTED }}>
+                      {binaryTree.leftDownlines} downlines
+                    </p>
+                  </div>
+                  <div
+                    className="rounded-xl p-3"
+                    style={{ backgroundColor: '#E6F7FB' }}
+                  >
+                    <p
+                      className="text-[10px] font-extrabold uppercase tracking-wider"
+                      style={{ color: ACCENT }}
+                    >
+                      Right
+                    </p>
+                    <p className="mt-1 text-lg font-extrabold" style={{ color: INK }}>
+                      ${binaryTree.rightBusiness.toFixed(2)}
+                    </p>
+                    <p className="mt-2 text-[11px] font-semibold" style={{ color: MUTED }}>
+                      Carry ${binaryTree.rightCarry.toFixed(2)}
+                    </p>
+                    <p className="text-[11px] font-semibold" style={{ color: MUTED }}>
+                      {binaryTree.rightDownlines} downlines
+                    </p>
                   </div>
                 </div>
+                <div
+                  className="rounded-xl border px-3 py-3"
+                  style={{
+                    borderColor: 'rgba(245,207,11,0.55)',
+                    backgroundColor: '#FFF9E6',
+                  }}
+                >
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="text-xs font-bold" style={{ color: MUTED }}>
+                      Matched · {(BINARY_RATE * 100).toFixed(0)}% binary
+                    </span>
+                    <span className="text-base font-extrabold" style={{ color: INK }}>
+                      ${estimatedBinary.toFixed(2)}
+                    </span>
+                  </div>
+                </div>
+                <Link
+                  href="/binary"
+                  className="inline-flex items-center gap-1 text-xs font-extrabold hover:underline"
+                  style={{ color: PRIMARY }}
+                >
+                  Full binary details <ArrowRight className="h-3.5 w-3.5" />
+                </Link>
+              </>
+            ) : (
+              <p className="py-8 text-center text-sm font-medium" style={{ color: MUTED }}>
+                Binary tree data not available yet.
+              </p>
+            )}
+          </div>
+        </div>
+      </section>
 
-                <div className="flex justify-end space-x-3 mt-8">
+      {/* Referral links */}
+      {referralLinks && (
+        <section>
+          <div className="mb-4">
+            <h2 className="text-lg font-extrabold md:text-xl" style={{ color: INK }}>
+              Referral links
+            </h2>
+            <p className="text-xs font-medium" style={{ color: MUTED }}>
+              Invite partners to left or right placement
+            </p>
+          </div>
+          <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+            {(
+              [
+                { key: 'left', label: 'Left leg', href: referralLinks.leftLink },
+                { key: 'right', label: 'Right leg', href: referralLinks.rightLink },
+              ] as const
+            ).map((link) => (
+              <div
+                key={link.key}
+                className="rounded-2xl border border-[#d8e6ec] bg-white p-4 shadow-sm"
+              >
+                <p
+                  className="mb-2 text-xs font-extrabold uppercase tracking-wider"
+                  style={{ color: PRIMARY }}
+                >
+                  {link.label}
+                </p>
+                <div className="flex gap-2">
+                  <input
+                    readOnly
+                    value={link.href}
+                    className="min-w-0 flex-1 truncate rounded-xl border border-[#d8e6ec] bg-[#F7FBFC] px-3 py-2 font-mono text-[11px] font-semibold"
+                    style={{ color: INK }}
+                  />
                   <button
                     type="button"
-                    onClick={() => {
-                      setShowWalletModal(false);
-                      setModalWalletAddress(''); // Reset modal input on cancel
-                    }}
-                    className="px-6 py-2 text-sm font-medium text-[#FBF676] bg-[#081028] rounded-lg hover:bg-[#08152F]/60 transition-colors"
+                    onClick={() => copyText(link.href, `${link.label} link copied`)}
+                    className="inline-flex flex-shrink-0 items-center gap-1.5 rounded-xl px-3 py-2 text-xs font-extrabold"
+                    style={{ backgroundColor: GOLD, color: INK }}
                   >
-                    Cancel
-                  </button>
-                  <button
-                    type="button"
-                    onClick={async () => {
-                      if (!modalWalletAddress || modalWalletAddress.trim().length === 0) {
-                        const errorMsg = 'Please enter a USDT TRC20 wallet address';
-                        setError(errorMsg);
-                        toast.error(errorMsg);
-                        return;
-                      }
-                      
-                      const trimmedAddress = modalWalletAddress.trim();
-                      // Validate USDT TRC20 address format (should start with T)
-                      if (!trimmedAddress.startsWith('T')) {
-                        const errorMsg = 'Invalid USDT TRC20 address. USDT TRC20 addresses must start with "T".';
-                        setError(errorMsg);
-                        toast.error(errorMsg);
-                        return;
-                      }
-                      
-                      try {
-                        await api.updateWalletAddress({ 
-                          walletAddress: trimmedAddress
-                        });
-                        setShowWalletModal(false);
-                        setModalWalletAddress(''); // Clear modal input after successful save
-                        toast.success('Payment information updated successfully!');
-                        await fetchDashboardData();
-                      } catch (err: any) {
-                        const errorMsg = err.message || 'Failed to update payment information';
-                        setError(errorMsg);
-                        toast.error(errorMsg);
-                      }
-                    }}
-                    disabled={!modalWalletAddress || modalWalletAddress.trim().length === 0}
-                    className="px-8 py-3 text-sm font-bold text-black bg-[#FBF676] rounded-xl hover:bg-[#e8e04a] disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg shadow-[#FBF676]/25 hover:shadow-[#FBF676]/30 hover:scale-105 active:scale-95"
-                  >
-                    Save
+                    <Copy className="h-3.5 w-3.5" />
+                    Copy
                   </button>
                 </div>
               </div>
-            </div>
+            ))}
           </div>
-        )}
+        </section>
+      )}
+
+      {/* Direct referrals */}
+      <section>
+        <div className="mb-4 flex items-end justify-between">
+          <div>
+            <h2 className="text-lg font-extrabold md:text-xl" style={{ color: INK }}>
+              Direct referrals
+            </h2>
+            <p className="text-xs font-medium" style={{ color: MUTED }}>
+              People you invited personally
+            </p>
           </div>
+          <Link
+            href="/referrals"
+            className="text-xs font-bold hover:underline"
+            style={{ color: PRIMARY }}
+          >
+            Referrals →
+          </Link>
         </div>
+        <div className="overflow-hidden rounded-2xl border border-[#d8e6ec] bg-white shadow-sm">
+          {directReferrals.length === 0 ? (
+            <p className="px-5 py-10 text-center text-sm font-medium" style={{ color: MUTED }}>
+              No direct referrals yet. Share your links to grow your wind network.
+            </p>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="min-w-full text-left text-sm">
+                <thead>
+                  <tr
+                    className="border-b border-[#e8f0f3] text-[11px] font-extrabold uppercase tracking-wider"
+                    style={{ color: MUTED, backgroundColor: '#F7FBFC' }}
+                  >
+                    <th className="px-4 py-3">Member</th>
+                    <th className="px-4 py-3">Position</th>
+                    <th className="px-4 py-3">Joined</th>
+                    <th className="px-4 py-3">Status</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-[#eef4f7]">
+                  {directReferrals.slice(0, 8).map((ref) => (
+                    <tr key={ref.id}>
+                      <td className="px-4 py-3">
+                        <p className="font-bold" style={{ color: INK }}>
+                          {ref.name || '—'}
+                        </p>
+                        <p className="font-mono text-[11px] font-semibold" style={{ color: MUTED }}>
+                          {ref.userId || '—'}
+                        </p>
+                      </td>
+                      <td className="px-4 py-3 font-semibold capitalize" style={{ color: MUTED }}>
+                        {ref.position || '—'}
+                      </td>
+                      <td className="px-4 py-3 font-semibold" style={{ color: MUTED }}>
+                        {ref.joinedAt ? formatDate(ref.joinedAt) : '—'}
+                      </td>
+                      <td className="px-4 py-3">
+                        <span
+                          className={`rounded-full px-2 py-0.5 text-[10px] font-extrabold uppercase ${
+                            ref.status === 'active'
+                              ? 'bg-emerald-100 text-emerald-800'
+                              : 'bg-slate-100 text-slate-600'
+                          }`}
+                        >
+                          {ref.status || 'unknown'}
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+      </section>
+    </div>
   );
 }
-

@@ -5,6 +5,7 @@ import { api } from '@/lib/api';
 import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
 import BigBullLoader from '@/components/BigBullLoader';
+import { dashboardTheme as t } from '@/lib/dashboardTheme';
 
 interface Investment {
   id: string;
@@ -37,15 +38,11 @@ export default function InvestmentsPage() {
   const hasFetchedRef = useRef(false);
 
   useEffect(() => {
-    // Prevent duplicate calls (React StrictMode in development)
     if (hasFetchedRef.current) {
       return;
     }
     hasFetchedRef.current = true;
-    
     fetchInvestments();
-
-    // No cleanup - we want to prevent duplicate calls even on remount
   }, []);
 
   const fetchInvestments = async () => {
@@ -104,378 +101,248 @@ export default function InvestmentsPage() {
     setSelectedInvestment(null);
   };
 
+  const statusBadge = (active: boolean) =>
+    active ? t.badgeActive : `${t.badgePending} bg-slate-100 text-slate-600 border-slate-200`;
+
   if (loading) {
-    return <BigBullLoader fullScreen />;
+    return <BigBullLoader text="Loading investments…" />;
   }
 
   return (
-    <div className="w-full min-h-screen py-4 md:py-8 px-2 sm:px-4 md:px-6 lg:px-8 relative overflow-hidden">
-      {/* Decorative background elements */}
-      <div className="fixed inset-0 pointer-events-none opacity-20">
-        <div className="absolute top-0 left-1/4 w-96 h-96 bg-[#FBF676]/10 rounded-full blur-3xl"></div>
-        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-[#FBF676]/10 rounded-full blur-3xl"></div>
+    <div className={t.page}>
+      <div>
+        <h1 className={t.title}>My Investments</h1>
+        <p className={t.subtitle}>View and manage your investment portfolio</p>
       </div>
 
-      <div className="relative z-10">
-      <div className="mb-4 md:mb-8">
-        <h1 className="text-xl md:text-3xl font-extrabold mb-2 text-white flex items-center gap-2 md:gap-3">
-          <span className="bg-gradient-to-r from-yellow-300 via-yellow-400 to-yellow-600 bg-clip-text text-transparent drop-shadow-lg">My Investments</span>
-        </h1>
-        <p className="mt-1 text-xs md:text-sm text-white/55">View and manage your investment portfolio</p>
+      {error && <div className={t.error}>{error}</div>}
+
+      {investments.length === 0 ? (
+        <div className={t.cardEmpty}>
+          <p className="text-lg font-medium mb-4" style={{ color: t.muted }}>No investments yet</p>
+          <button type="button" onClick={() => router.push('/plans')} className={t.btnPrimary}>
+            Browse Plans
+          </button>
+        </div>
+      ) : (
+        <>
+          <div className="md:hidden space-y-3">
+            {investments.map((inv) => {
+              const daysRemaining = calculateDaysRemaining(inv.expiresOn);
+              return (
+                <div key={inv.id} className={t.card}>
+                  <div className="flex justify-between items-start mb-3">
+                    <div className="flex-1">
+                      <h3 className="text-sm font-bold" style={{ color: t.ink }}>
+                        {inv.package?.name || 'Unknown Package'}
+                      </h3>
+                      <p className="text-xs capitalize font-medium" style={{ color: t.muted }}>{inv.type}</p>
+                    </div>
+                    <span className={`px-2 py-1 text-[10px] font-extrabold rounded-full ${statusBadge(inv.isBinaryUpdated)}`}>
+                      {inv.isBinaryUpdated ? 'Active' : 'Processing'}
+                    </span>
+                  </div>
+                  <div className="space-y-2 mb-3 text-sm">
+                    <div className="flex justify-between">
+                      <span style={{ color: t.muted }}>Invested Amount</span>
+                      <span className="font-extrabold" style={{ color: t.primary }}>{formatCurrency(inv.investedAmount)}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span style={{ color: t.muted }}>ROI</span>
+                      <span className="font-semibold" style={{ color: t.ink }}>{inv.package?.roi || '-'}%</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span style={{ color: t.muted }}>Duration</span>
+                      <span className="font-semibold" style={{ color: t.ink }}>{inv.package?.duration || '-'} days</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span style={{ color: t.muted }}>Days Remaining</span>
+                      <span className={`font-bold ${daysRemaining !== null && daysRemaining < 7 ? 'text-red-700' : ''}`} style={daysRemaining === null || daysRemaining >= 7 ? { color: t.primary } : undefined}>
+                        {daysRemaining !== null ? `${daysRemaining} days` : 'Expired'}
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span style={{ color: t.muted }}>Created</span>
+                      <span className="text-xs" style={{ color: t.muted }}>{formatDate(inv.createdAt)}</span>
+                    </div>
+                  </div>
+                  <button type="button" onClick={() => handleViewDetails(inv)} className={`${t.btnSecondary} w-full text-sm`}>
+                    View Details
+                  </button>
+                </div>
+              );
+            })}
           </div>
 
-          {error && (
-            <div className="mb-4 md:mb-6 bg-red-900/30 border border-red-500/50 text-red-400 px-3 md:px-4 py-2 md:py-3 rounded-lg backdrop-blur-sm text-xs md:text-sm">
-              {error}
-            </div>
-          )}
-
-            {investments.length === 0 ? (
-              <div className="backdrop-blur-md bg-[rgba(8,16,40,0.95)] rounded-xl md:rounded-2xl shadow-2xl border border-[#FBF676]/25 p-6 md:p-12 text-center">
-                <p className="text-white/55 text-base md:text-lg mb-4 md:mb-6">No investments yet</p>
-                <button
-                  onClick={() => router.push('/plans')}
-                  className="px-6 md:px-8 py-2 md:py-3 bg-[#FBF676] text-[#0C1A6B] rounded-lg md:rounded-xl hover:bg-[#e8e04a] text-xs md:text-sm font-bold transition-all shadow-lg shadow-[#FBF676]/25 hover:shadow-[#FBF676]/30 hover:scale-105 active:scale-95"
-                >
-                  Browse Plans
-                </button>
-              </div>
-            ) : (
-              <>
-                {/* Mobile Card View */}
-                <div className="md:hidden space-y-3">
+          <div className={`hidden md:block ${t.tableWrap}`}>
+            <div className="overflow-x-auto">
+              <table className={t.table}>
+                <thead className={t.tableHead}>
+                  <tr>
+                    <th className={t.tableHeadCell}>Package</th>
+                    <th className={t.tableHeadCell}>Invested Amount</th>
+                    <th className={t.tableHeadCell}>ROI</th>
+                    <th className={t.tableHeadCell}>Duration</th>
+                    <th className={t.tableHeadCell}>Days Remaining</th>
+                    <th className={t.tableHeadCell}>Status</th>
+                    <th className={t.tableHeadCell}>Created Date</th>
+                    <th className={t.tableHeadCell}>Actions</th>
+                  </tr>
+                </thead>
+                <tbody className={t.tableBody}>
                   {investments.map((inv) => {
                     const daysRemaining = calculateDaysRemaining(inv.expiresOn);
                     return (
-                      <div
-                        key={inv.id}
-                        className="backdrop-blur-md bg-[rgba(8,16,40,0.95)] rounded-xl shadow-xl border border-[#FBF676]/25 p-4 hover:border-[#FBF676]/60 transition-all"
-                      >
-                        <div className="flex justify-between items-start mb-3">
-                          <div className="flex-1">
-                            <h3 className="text-sm font-bold text-white mb-1">
-                              {inv.package?.name || 'Unknown Package'}
-                            </h3>
-                            <p className="text-xs text-white/55 capitalize">{inv.type}</p>
+                      <tr key={inv.id} className={t.tableRow}>
+                        <td className="px-4 md:px-6 py-4 whitespace-nowrap">
+                          <div className="text-sm font-bold" style={{ color: t.ink }}>{inv.package?.name || 'Unknown Package'}</div>
+                          <div className="text-xs capitalize mt-0.5" style={{ color: t.muted }}>{inv.type}</div>
+                        </td>
+                        <td className="px-4 md:px-6 py-4 whitespace-nowrap">
+                          <div className="text-sm font-extrabold" style={{ color: t.primary }}>{formatCurrency(inv.investedAmount)}</div>
+                        </td>
+                        <td className="px-4 md:px-6 py-4 whitespace-nowrap text-sm font-semibold" style={{ color: t.ink }}>
+                          {inv.package?.roi || '-'}%
+                        </td>
+                        <td className="px-4 md:px-6 py-4 whitespace-nowrap text-sm font-semibold" style={{ color: t.ink }}>
+                          {inv.package?.duration || '-'} days
+                        </td>
+                        <td className="px-4 md:px-6 py-4 whitespace-nowrap">
+                          <div className={`text-sm font-bold ${daysRemaining !== null && daysRemaining < 7 ? 'text-red-700' : ''}`} style={daysRemaining === null || daysRemaining >= 7 ? { color: t.primary } : undefined}>
+                            {daysRemaining !== null ? `${daysRemaining} days` : 'Expired'}
                           </div>
-                          <span
-                            className={`px-2 py-1 text-[10px] font-bold rounded-full ${
-                              inv.isBinaryUpdated
-                                ? 'bg-[rgba(251,246,118,0.15)] text-[#FBF676] border border-[#FBF676]/50'
-                                : 'bg-white/10 text-white/70 border border-white/20'
-                            }`}
-                          >
+                        </td>
+                        <td className="px-4 md:px-6 py-4 whitespace-nowrap">
+                          <span className={`px-3 py-1 text-xs font-extrabold rounded-full ${statusBadge(inv.isBinaryUpdated)}`}>
                             {inv.isBinaryUpdated ? 'Active' : 'Processing'}
                           </span>
-                        </div>
-                        
-                        <div className="space-y-2 mb-3">
-                          <div className="flex justify-between items-center">
-                            <span className="text-xs text-white/55">Invested Amount</span>
-                            <span className="text-sm font-extrabold text-[#FBF676]">
-                              {formatCurrency(inv.investedAmount)}
-                            </span>
-                          </div>
-                          <div className="flex justify-between items-center">
-                            <span className="text-xs text-white/55">ROI</span>
-                            <span className="text-sm font-semibold text-white/85">
-                              {inv.package?.roi || '-'}%
-                            </span>
-                          </div>
-                          <div className="flex justify-between items-center">
-                            <span className="text-xs text-white/55">Duration</span>
-                            <span className="text-sm font-semibold text-white/85">
-                              {inv.package?.duration || '-'} days
-                            </span>
-                          </div>
-                          <div className="flex justify-between items-center">
-                            <span className="text-xs text-white/55">Days Remaining</span>
-                            <span className={`text-sm font-bold ${
-                              daysRemaining !== null && daysRemaining < 7 
-                                ? 'text-red-400' 
-                                : daysRemaining !== null 
-                                ? 'text-[#FBF676]' 
-                                : 'text-gray-500'
-                            }`}>
-                              {daysRemaining !== null ? `${daysRemaining} days` : 'Expired'}
-                            </span>
-                          </div>
-                          <div className="flex justify-between items-center">
-                            <span className="text-xs text-white/55">Created</span>
-                            <span className="text-xs text-white/55">
-                              {formatDate(inv.createdAt)}
-                            </span>
-                          </div>
-                        </div>
-                        
-                        <button
-                          onClick={() => handleViewDetails(inv)}
-                          className="w-full mt-3 px-4 py-2 bg-[rgba(251,246,118,0.12)] text-[#FBF676] rounded-lg hover:bg-[rgba(251,246,118,0.18)] font-bold text-xs transition-all border border-[#FBF676]/25"
-                        >
-                          View Details
-                        </button>
-                      </div>
+                        </td>
+                        <td className="px-4 md:px-6 py-4 whitespace-nowrap text-sm" style={{ color: t.muted }}>
+                          {formatDate(inv.createdAt)}
+                        </td>
+                        <td className="px-4 md:px-6 py-4 whitespace-nowrap">
+                          <button type="button" onClick={() => handleViewDetails(inv)} className="text-sm font-bold hover:underline" style={{ color: t.primary }}>
+                            View Details
+                          </button>
+                        </td>
+                      </tr>
                     );
                   })}
-                </div>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </>
+      )}
 
-                {/* Desktop Table View */}
-                <div className="hidden md:block backdrop-blur-md bg-[rgba(8,16,40,0.95)] rounded-xl md:rounded-2xl shadow-2xl border border-[#FBF676]/25 overflow-hidden">
-                  <div className="overflow-x-auto">
-                    <div className="inline-block min-w-full align-middle">
-                      <div className="overflow-hidden">
-                        <table className="min-w-full divide-y divide-[#FBF676]/15">
-                          <thead className="bg-gradient-to-r from-gray-800 via-gray-800/90 to-gray-800">
-                            <tr>
-                              <th className="px-6 py-5 text-left text-xs font-bold text-[#FBF676] uppercase tracking-wider">Package</th>
-                              <th className="px-6 py-5 text-left text-xs font-bold text-[#FBF676] uppercase tracking-wider">Invested Amount</th>
-                              <th className="px-6 py-5 text-left text-xs font-bold text-[#FBF676] uppercase tracking-wider">ROI</th>
-                              <th className="px-6 py-5 text-left text-xs font-bold text-[#FBF676] uppercase tracking-wider">Duration</th>
-                              <th className="px-6 py-5 text-left text-xs font-bold text-[#FBF676] uppercase tracking-wider">Days Remaining</th>
-                              <th className="px-6 py-5 text-left text-xs font-bold text-[#FBF676] uppercase tracking-wider">Status</th>
-                              <th className="px-6 py-5 text-left text-xs font-bold text-[#FBF676] uppercase tracking-wider">Created Date</th>
-                              <th className="px-6 py-5 text-left text-xs font-bold text-[#FBF676] uppercase tracking-wider">Actions</th>
-                            </tr>
-                          </thead>
-                          <tbody className="bg-[rgba(5,12,32,0.45)] divide-y divide-[#FBF676]/15">
-                            {investments.map((inv) => {
-                              const daysRemaining = calculateDaysRemaining(inv.expiresOn);
-                              return (
-                                <tr key={inv.id} className="hover:bg-[rgba(251,246,118,0.08)] transition-all duration-300 group">
-                                  <td className="px-6 py-5 whitespace-nowrap">
-                                    <div className="text-sm font-bold text-white group-hover:text-white transition-colors">
-                                        {inv.package?.name || 'Unknown Package'}
-                                    </div>
-                                    <div className="text-xs text-white/55 capitalize mt-1">{inv.type}</div>
-                                  </td>
-                                  <td className="px-6 py-5 whitespace-nowrap">
-                                    <div className="text-sm font-extrabold text-[#FBF676] group-hover:text-[#FBF676] transition-colors">
-                                      {formatCurrency(inv.investedAmount)}
-                                    </div>
-                                  </td>
-                                  <td className="px-6 py-5 whitespace-nowrap">
-                                    <div className="text-sm font-semibold text-white/85">
-                                      {inv.package?.roi || '-'}%
-                                    </div>
-                                  </td>
-                                  <td className="px-6 py-5 whitespace-nowrap">
-                                    <div className="text-sm font-semibold text-white/85">
-                                      {inv.package?.duration || '-'} days
-                                    </div>
-                                  </td>
-                                  <td className="px-6 py-5 whitespace-nowrap">
-                                    <div className={`text-sm font-bold ${
-                                      daysRemaining !== null && daysRemaining < 7 
-                                        ? 'text-red-400' 
-                                        : daysRemaining !== null 
-                                        ? 'text-[#FBF676]' 
-                                        : 'text-gray-500'
-                                    }`}>
-                                      {daysRemaining !== null ? `${daysRemaining} days` : 'Expired'}
-                                    </div>
-                                  </td>
-                                  <td className="px-6 py-5 whitespace-nowrap">
-                                    <span
-                                      className={`px-4 py-1.5 inline-flex text-xs leading-5 font-bold rounded-full shadow-lg ${
-                                        inv.isBinaryUpdated
-                                          ? 'bg-[rgba(251,246,118,0.15)] text-[#FBF676] border border-[#FBF676]/40'
-                                          : 'bg-white/10 text-white/70 border border-white/20'
-                                      }`}
-                                    >
-                                      {inv.isBinaryUpdated ? 'Active' : 'Processing'}
-                                    </span>
-                                  </td>
-                                  <td className="px-6 py-5 whitespace-nowrap">
-                                    <div className="text-sm text-white/55">
-                                      {formatDate(inv.createdAt)}
-                                    </div>
-                                  </td>
-                                  <td className="px-6 py-5 whitespace-nowrap text-sm font-semibold">
-                                    <button
-                                      onClick={() => handleViewDetails(inv)}
-                                      className="text-[#FBF676] hover:text-[#FBF676] transition-colors font-bold text-sm"
-                                    >
-                                      View Details
-                                    </button>
-                                  </td>
-                                </tr>
-                              );
-                            })}
-                          </tbody>
-                        </table>
-                      </div>
-                    </div>
+      {showModal && selectedInvestment && (
+        <div className={t.modalOverlay}>
+          <div className={`${t.modalPanel} max-w-2xl`}>
+            <div className="flex justify-between items-center mb-6">
+              <h3 className="text-xl font-extrabold" style={{ color: t.ink }}>Investment Details</h3>
+              <button type="button" onClick={handleCloseModal} className="text-[#5A6F78] hover:text-[#05627C]">
+                <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            <div className="space-y-4 max-h-[70vh] overflow-y-auto">
+              <div className={t.cardInner}>
+                <h4 className="text-base font-extrabold mb-3" style={{ color: t.primary }}>Package Information</h4>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
+                  <div>
+                    <p className="font-semibold" style={{ color: t.muted }}>Package Name</p>
+                    <p className="font-bold mt-0.5" style={{ color: t.ink }}>{selectedInvestment.package?.name || 'Unknown Package'}</p>
+                  </div>
+                  <div>
+                    <p className="font-semibold" style={{ color: t.muted }}>Investment Type</p>
+                    <p className="font-bold capitalize mt-0.5" style={{ color: t.ink }}>{selectedInvestment.type}</p>
+                  </div>
+                  <div>
+                    <p className="font-semibold" style={{ color: t.muted }}>ROI Percentage</p>
+                    <p className="font-bold mt-0.5" style={{ color: t.primary }}>{selectedInvestment.package?.roi || '-'}%</p>
+                  </div>
+                  <div>
+                    <p className="font-semibold" style={{ color: t.muted }}>Duration</p>
+                    <p className="font-bold mt-0.5" style={{ color: t.ink }}>{selectedInvestment.package?.duration || '-'} days</p>
                   </div>
                 </div>
-              </>
-            )}
-
-      {/* Investment Details Modal */}
-      {showModal && selectedInvestment && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm overflow-y-auto h-full w-full z-50 p-4">
-          <div className="relative top-4 md:top-10 mx-auto p-4 md:p-6 border border-[#FBF676]/25 w-full max-w-2xl shadow-2xl rounded-xl md:rounded-2xl backdrop-blur-md bg-[rgba(8,16,40,0.95)]">
-            <div className="mt-0 md:mt-3">
-              <div className="flex justify-between items-center mb-4 md:mb-6">
-                <h3 className="text-lg md:text-2xl font-extrabold text-white flex items-center gap-2">
-                  <span className="bg-gradient-to-r from-yellow-300 via-yellow-400 to-yellow-600 bg-clip-text text-transparent">Investment Details</span>
-                </h3>
-                <button
-                  onClick={handleCloseModal}
-                  className="text-white/55 hover:text-[#FBF676] transition-colors flex-shrink-0"
-                >
-                  <svg className="h-5 w-5 md:h-6 md:w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </button>
               </div>
 
-              <div className="space-y-4 md:space-y-6">
-                {/* Package Information */}
-                <div className="bg-gradient-to-br from-gray-800 to-gray-800/80 rounded-lg md:rounded-xl p-4 md:p-5 border border-[#FBF676]/20">
-                  <h4 className="text-base md:text-lg font-extrabold text-[#FBF676] mb-3 md:mb-4">Package Information</h4>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4">
-                    <div>
-                      <p className="text-xs md:text-sm text-white/55 font-semibold">Package Name</p>
-                      <p className="text-sm md:text-base font-bold text-white mt-1">
-                        {selectedInvestment.package?.name || 'Unknown Package'}
-                      </p>
-                    </div>
-                    <div>
-                      <p className="text-xs md:text-sm text-white/55 font-semibold">Investment Type</p>
-                      <p className="text-sm md:text-base font-bold text-white capitalize mt-1">
-                        {selectedInvestment.type}
-                      </p>
-                    </div>
-                    <div>
-                      <p className="text-xs md:text-sm text-white/55 font-semibold">ROI Percentage</p>
-                      <p className="text-sm md:text-base font-bold text-[#FBF676] mt-1">
-                        {selectedInvestment.package?.roi || '-'}%
-                      </p>
-                    </div>
-                    <div>
-                      <p className="text-xs md:text-sm text-white/55 font-semibold">Duration</p>
-                      <p className="text-sm md:text-base font-bold text-white mt-1">
-                        {selectedInvestment.package?.duration || '-'} days
-                      </p>
-                    </div>
+              <div className={t.cardHighlight}>
+                <h4 className="text-base font-extrabold mb-3" style={{ color: t.ink }}>Financial Information</h4>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <p className="text-sm font-semibold" style={{ color: t.muted }}>Invested Amount</p>
+                    <p className="text-xl font-extrabold mt-0.5" style={{ color: t.primary }}>{formatCurrency(selectedInvestment.investedAmount)}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm font-semibold" style={{ color: t.muted }}>Deposit Amount</p>
+                    <p className="text-xl font-extrabold mt-0.5" style={{ color: t.primary }}>{formatCurrency(selectedInvestment.depositAmount)}</p>
                   </div>
                 </div>
-
-                {/* Financial Information */}
-                <div className="bg-[rgba(251,246,118,0.12)] rounded-lg md:rounded-xl p-4 md:p-5 border-2 border-[#FBF676]/40 shadow-lg shadow-[#FBF676]/15">
-                  <h4 className="text-base md:text-lg font-extrabold text-white mb-3 md:mb-4">Financial Information</h4>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4">
-                    <div>
-                      <p className="text-xs md:text-sm text-white/75 font-semibold">Invested Amount</p>
-                      <p className="text-xl md:text-2xl font-extrabold text-[#FBF676] mt-1">
-                        {formatCurrency(selectedInvestment.investedAmount)}
-                      </p>
-                    </div>
-                    <div>
-                      <p className="text-xs md:text-sm text-white/75 font-semibold">Deposit Amount</p>
-                      <p className="text-xl md:text-2xl font-extrabold text-[#FBF676] mt-1">
-                        {formatCurrency(selectedInvestment.depositAmount)}
-                      </p>
+                {selectedInvestment.voucher && (
+                  <div className="mt-4 pt-4 border-t border-[rgba(245,207,11,0.35)]">
+                    <p className="text-sm font-bold mb-2" style={{ color: t.primary }}>Activated Using Voucher</p>
+                    <div className={t.cardInner}>
+                      <div className="flex justify-between text-sm mb-1">
+                        <span style={{ color: t.muted }}>Voucher ID</span>
+                        <span className="font-mono font-bold" style={{ color: t.primary }}>{selectedInvestment.voucher.voucherId}</span>
+                      </div>
+                      <div className="flex justify-between text-sm">
+                        <span style={{ color: t.muted }}>Voucher Amount</span>
+                        <span className="font-extrabold" style={{ color: t.primary }}>{formatCurrency(selectedInvestment.voucher.amount)}</span>
+                      </div>
                     </div>
                   </div>
-                  {/* Voucher Information */}
-                  {selectedInvestment.voucher && (
-                    <div className="mt-4 md:mt-5 pt-4 md:pt-5 border-t border-[#FBF676]/25">
-                      <div className="flex items-center gap-2 mb-3">
-                        <svg className="w-4 h-4 md:w-5 md:h-5 text-[#FBF676] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                        <p className="text-xs md:text-sm font-bold text-yellow-300">Activated Using Voucher</p>
+                )}
+              </div>
+
+              <div className={t.cardInner}>
+                <h4 className="text-base font-extrabold mb-3" style={{ color: t.primary }}>Status & Timeline</h4>
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between items-center p-2 rounded-lg bg-white">
+                    <span className="font-semibold" style={{ color: t.muted }}>Status</span>
+                    <span className={`px-3 py-1 text-xs font-extrabold rounded-full ${statusBadge(selectedInvestment.isBinaryUpdated)}`}>
+                      {selectedInvestment.isBinaryUpdated ? 'Active' : 'Processing'}
+                    </span>
+                  </div>
+                  <div className="flex justify-between p-2 rounded-lg bg-white">
+                    <span className="font-semibold" style={{ color: t.muted }}>Created Date</span>
+                    <span className="font-bold" style={{ color: t.ink }}>{formatDate(selectedInvestment.createdAt)}</span>
+                  </div>
+                  {selectedInvestment.expiresOn && (
+                    <>
+                      <div className="flex justify-between p-2 rounded-lg bg-white">
+                        <span className="font-semibold" style={{ color: t.muted }}>Expiry Date</span>
+                        <span className="font-bold" style={{ color: t.ink }}>{formatDate(selectedInvestment.expiresOn)}</span>
                       </div>
-                      <div className="bg-gray-800/80 rounded-lg md:rounded-xl p-3 md:p-4 border border-[#FBF676]/25">
-                        <div className="flex justify-between items-center mb-2">
-                          <span className="text-xs md:text-sm text-white/55 font-semibold">Voucher ID:</span>
-                          <span className="text-xs md:text-sm font-mono font-bold text-[#FBF676] break-all ml-2">
-                            {selectedInvestment.voucher.voucherId}
-                          </span>
-                        </div>
-                        <div className="flex justify-between items-center">
-                          <span className="text-xs md:text-sm text-white/55 font-semibold">Voucher Amount:</span>
-                          <span className="text-base md:text-lg font-extrabold text-[#FBF676]">
-                            {formatCurrency(selectedInvestment.voucher.amount)}
-                          </span>
-                        </div>
+                      <div className="flex justify-between p-2 rounded-lg bg-white">
+                        <span className="font-semibold" style={{ color: t.muted }}>Days Remaining</span>
+                        <span className="font-bold" style={{ color: t.primary }}>
+                          {calculateDaysRemaining(selectedInvestment.expiresOn) !== null
+                            ? `${calculateDaysRemaining(selectedInvestment.expiresOn)} days`
+                            : 'Expired'}
+                        </span>
                       </div>
-                    </div>
+                    </>
                   )}
                 </div>
-
-                {/* Status & Timeline */}
-                <div className="bg-gradient-to-br from-gray-800 to-gray-800/80 rounded-lg md:rounded-xl p-4 md:p-5 border border-[#FBF676]/20">
-                  <h4 className="text-base md:text-lg font-extrabold text-[#FBF676] mb-3 md:mb-4">Status & Timeline</h4>
-                  <div className="space-y-3 md:space-y-4">
-                    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 p-3 bg-[rgba(5,12,32,0.45)] rounded-lg">
-                      <span className="text-xs md:text-sm text-white/75 font-semibold">Status</span>
-                      <span
-                        className={`px-3 md:px-4 py-1 md:py-1.5 text-[10px] md:text-xs font-bold rounded-full shadow-lg ${
-                          selectedInvestment.isBinaryUpdated
-                            ? 'bg-[rgba(251,246,118,0.15)] text-[#FBF676] border border-[#FBF676]/40'
-                            : 'bg-white/10 text-white/70 border border-white/20'
-                        }`}
-                      >
-                        {selectedInvestment.isBinaryUpdated ? 'Active' : 'Processing'}
-                      </span>
-                    </div>
-                    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 p-3 bg-[rgba(5,12,32,0.45)] rounded-lg">
-                      <span className="text-xs md:text-sm text-white/75 font-semibold">Created Date</span>
-                      <span className="text-xs md:text-sm font-bold text-white break-all">
-                        {formatDate(selectedInvestment.createdAt)}
-                      </span>
-                    </div>
-                    {selectedInvestment.expiresOn && (
-                      <>
-                        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 p-3 bg-[rgba(5,12,32,0.45)] rounded-lg">
-                          <span className="text-xs md:text-sm text-white/75 font-semibold">Expiry Date</span>
-                          <span className="text-xs md:text-sm font-bold text-white break-all">
-                            {formatDate(selectedInvestment.expiresOn)}
-                          </span>
-                        </div>
-                        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 p-3 bg-[rgba(5,12,32,0.45)] rounded-lg">
-                          <span className="text-xs md:text-sm text-white/75 font-semibold">Days Remaining</span>
-                          <span className={`text-xs md:text-sm font-bold ${
-                            calculateDaysRemaining(selectedInvestment.expiresOn) !== null && 
-                            calculateDaysRemaining(selectedInvestment.expiresOn)! < 7 
-                              ? 'text-red-400' 
-                              : 'text-[#FBF676]'
-                          }`}>
-                            {calculateDaysRemaining(selectedInvestment.expiresOn) !== null 
-                              ? `${calculateDaysRemaining(selectedInvestment.expiresOn)} days` 
-                              : 'Expired'}
-                          </span>
-                        </div>
-                      </>
-                    )}
-                  </div>
-                </div>
-
-                {/* Investment ID */}
-                <div className="bg-gradient-to-br from-gray-800 to-gray-800/80 rounded-lg md:rounded-xl p-4 md:p-5 border border-[#FBF676]/20">
-                  <p className="text-xs md:text-sm text-white/55 font-semibold mb-2">Investment ID</p>
-                  <p className="text-xs md:text-sm font-mono text-[#FBF676] break-all font-bold">
-                    {selectedInvestment.id}
-                  </p>
-                </div>
               </div>
 
-              <div className="mt-6 md:mt-8 flex justify-end">
-                <button
-                  onClick={handleCloseModal}
-                  className="px-6 md:px-8 py-2 md:py-3 bg-[#FBF676] text-[#0C1A6B] rounded-lg md:rounded-xl hover:bg-[#e8e04a] text-xs md:text-sm font-bold transition-all shadow-lg shadow-[#FBF676]/25 hover:shadow-[#FBF676]/30 hover:scale-105 active:scale-95 w-full sm:w-auto"
-                >
-                  Close
-                </button>
+              <div className={t.cardInner}>
+                <p className="text-sm font-semibold mb-1" style={{ color: t.muted }}>Investment ID</p>
+                <p className="text-sm font-mono font-bold break-all" style={{ color: t.primary }}>{selectedInvestment.id}</p>
               </div>
+            </div>
+
+            <div className="mt-6 flex justify-end">
+              <button type="button" onClick={handleCloseModal} className={t.btnPrimary}>Close</button>
             </div>
           </div>
         </div>
       )}
-          </div>
-        </div>
+    </div>
   );
 }
-

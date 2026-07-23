@@ -4,6 +4,8 @@ import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { api } from '@/lib/api';
 import toast from 'react-hot-toast';
+import BigBullLoader from '@/components/BigBullLoader';
+import { dashboardTheme as t } from '@/lib/dashboardTheme';
 
 interface TreeNode {
   id: string;
@@ -191,9 +193,9 @@ export default function UserGenealogyPage() {
       return (
         <div
           key={`empty-${level}-${position}`}
-          className="flex flex-col items-center justify-center w-[4.5rem] md:w-28 h-[4.5rem] md:h-24 rounded-xl border border-dashed border-[#FBF676]/25 bg-[rgba(8,16,40,0.45)] backdrop-blur-sm"
+          className="flex flex-col items-center justify-center w-[4.5rem] md:w-28 h-[4.5rem] md:h-24 rounded-xl border border-dashed border-[#d8e6ec] bg-[#F7FBFC]"
         >
-          <div className="text-[#FBF676]/50 text-[9px] md:text-[10px] font-medium tracking-wide">Empty</div>
+          <div className="text-[9px] md:text-[10px] font-medium tracking-wide" style={{ color: t.muted }}>Empty</div>
         </div>
       );
     }
@@ -209,50 +211,49 @@ export default function UserGenealogyPage() {
         }`}
       >
         <div
-          className={`w-[5.25rem] md:w-32 p-2 md:p-2.5 rounded-xl border cursor-pointer transition-all duration-300 backdrop-blur-md ${
+          className={`w-[5.25rem] md:w-32 p-2 md:p-2.5 rounded-xl border cursor-pointer transition-all duration-300 ${
             isRoot
-              ? 'bg-[rgba(251,246,118,0.18)] border-[#FBF676]/60 shadow-[0_0_24px_rgba(251,246,118,0.25)]'
-              : 'bg-[rgba(8,16,40,0.7)] border-[#FBF676]/25 hover:border-[#FBF676]/55 hover:shadow-[0_0_16px_rgba(251,246,118,0.15)]'
+              ? 'bg-[#FFF9E6] border-[rgba(245,207,11,0.55)] shadow-sm'
+              : 'bg-white border-[#d8e6ec] hover:border-[#05627C]/40 hover:shadow-sm'
           }`}
           onClick={() => !isRoot && handleNodeClick(node.userId)}
         >
           <div className="text-center">
-            <div className="font-bold text-[10px] md:text-xs mb-0.5 truncate w-full text-[#FBF676]">
+            <div className="font-bold text-[10px] md:text-xs mb-0.5 truncate w-full" style={{ color: t.primary }}>
               {node.name || 'Unknown'}
             </div>
-            <div className="text-[8px] md:text-[10px] mb-1.5 font-mono text-white/55 truncate">
+            <div className="text-[8px] md:text-[10px] mb-1.5 font-mono truncate" style={{ color: t.muted }}>
               {node.userId}
             </div>
             <div
               className={`text-[8px] md:text-[9px] px-1.5 py-0.5 rounded-full inline-block mb-1.5 font-semibold capitalize border ${
-                isActive
-                  ? 'bg-[rgba(251,246,118,0.2)] text-[#FBF676] border-[#FBF676]/40'
-                  : 'bg-white/10 text-white/60 border-white/15'
+                isActive ? t.badgeActive : t.badgeNeutral
               }`}
             >
               {node.status}
             </div>
             <div className="flex gap-1 mt-1">
-              <div className="flex-1 text-center p-1 rounded-lg bg-[rgba(0,212,232,0.12)] border border-[rgba(0,212,232,0.25)]">
-                <div className="text-[8px] font-semibold text-[#00D4E8]">L</div>
-                <div className="text-[9px] md:text-[10px] font-bold text-white">
+              <div className="flex-1 text-center p-1 rounded-lg bg-[#E6F7FB] border border-[#d8e6ec]">
+                <div className="text-[8px] font-semibold" style={{ color: t.accent }}>L</div>
+                <div className="text-[9px] md:text-[10px] font-bold" style={{ color: t.ink }}>
                   {node.leftDownlines || 0}
                 </div>
               </div>
-              <div className="flex-1 text-center p-1 rounded-lg bg-[rgba(251,246,118,0.12)] border border-[#FBF676]/25">
-                <div className="text-[8px] font-semibold text-[#FBF676]">R</div>
-                <div className="text-[9px] md:text-[10px] font-bold text-white">
+              <div className="flex-1 text-center p-1 rounded-lg bg-[#FFF9E6] border border-[#d8e6ec]">
+                <div className="text-[8px] font-semibold" style={{ color: t.primary }}>R</div>
+                <div className="text-[9px] md:text-[10px] font-bold" style={{ color: t.ink }}>
                   {node.rightDownlines || 0}
                 </div>
               </div>
             </div>
             <button
+              type="button"
               onClick={(e) => {
                 e.stopPropagation();
                 setSelectedBusinessNode(node);
                 setShowBusinessModal(true);
               }}
-              className="mt-1.5 w-full py-1 px-1 rounded-lg text-[9px] md:text-[10px] font-bold transition-all duration-200 bg-[#FBF676] text-[#0C1A6B] hover:bg-[#e8e04a] hover:scale-[1.02]"
+              className={`${t.btnPrimary} mt-1.5 w-full py-1 px-1 text-[9px] md:text-[10px]`}
             >
               View
             </button>
@@ -345,25 +346,19 @@ export default function UserGenealogyPage() {
   const treeStructure = buildTreeStructure();
 
   return (
-    <div className="w-full h-full px-2 sm:px-0">
-      {/* Header Section */}
-      <div className="mb-4 md:mb-6">
-        <h1 className="text-2xl md:text-4xl font-bold bg-gradient-to-r from-yellow-300 via-yellow-400 to-yellow-600 bg-clip-text text-transparent">
-          My Genealogy
-        </h1>
-        <p className="mt-1 md:mt-2 text-xs md:text-sm text-[#FBF676]">Explore your binary referral tree and downlines</p>
+    <div className={t.page}>
+      <div>
+        <h1 className={t.title}>My Genealogy</h1>
+        <p className={t.subtitle}>Explore your binary referral tree and downlines</p>
       </div>
 
-      {/* Navigation Controls */}
       {treeData && (
-        <div
-          className="rounded-xl shadow-lg border p-3 md:p-4 mb-4 md:mb-6 flex flex-col sm:flex-row gap-3 items-stretch sm:items-center backdrop-blur-md"
-          style={{ background: 'rgba(8, 16, 40, 0.55)', borderColor: 'rgba(251,246,118,0.22)' }}
-        >
+        <div className={`${t.card} flex flex-col sm:flex-row gap-3 items-stretch sm:items-center`}>
           <button
+            type="button"
             onClick={handleReset}
             disabled={!originalRootUserId || treeData.rootUserId === originalRootUserId}
-            className="px-3 md:px-4 py-2 bg-[#FBF676] text-[#0C1A6B] rounded-lg hover:bg-[#e8e04a] disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-md flex items-center justify-center gap-2 text-xs md:text-sm font-bold"
+            className={t.btnPrimary}
           >
             <svg className="w-3 h-3 md:w-4 md:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
@@ -377,21 +372,15 @@ export default function UserGenealogyPage() {
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               placeholder="Search downline (Name / ID / Email)"
-              className="flex-1 px-4 py-2 border border-[#FBF676]/30 rounded-lg text-sm bg-[rgba(8,16,40,0.85)] text-white placeholder-white/40 focus:ring-2 focus:ring-[#FBF676]/35 outline-none"
-              style={{ colorScheme: 'dark' }}
+              className={`${t.input} flex-1 text-sm`}
             />
 
-            <button
-              onClick={handleSearch}
-              disabled={searchLoading}
-              className="px-4 py-2 bg-[#FBF676] text-[#0C1A6B] rounded-lg hover:bg-[#e8e04a] text-sm font-bold disabled:opacity-50"
-            >
-              {searchLoading ? 'Searching...' : 'Search'}
+            <button type="button" onClick={handleSearch} disabled={searchLoading} className={t.btnPrimary}>
+              {searchLoading ? 'Searching…' : 'Search'}
             </button>
 
-            {/* Result Dropdown */}
             {searchResults.length > 0 && (
-              <div className="absolute top-full left-0 z-50 bg-[rgba(5,12,32,0.9)] w-full mt-1 rounded-lg shadow-lg max-h-60 overflow-y-auto border border-[#FBF676]/30">
+              <div className="absolute top-full left-0 z-50 w-full mt-1 rounded-xl shadow-lg max-h-60 overflow-y-auto border border-[#d8e6ec] bg-white">
                 {searchResults.map((node) => (
                   <div
                     key={node.userId}
@@ -400,58 +389,35 @@ export default function UserGenealogyPage() {
                       setSearchTerm('');
                       setSearchResults([]);
                     }}
-                    className="px-4 py-2 hover:bg-[#08152F]/70 text-[#FBF676] cursor-pointer"
+                    className="px-4 py-2 hover:bg-[#F7FBFC] cursor-pointer border-b border-[#eef4f7] last:border-0"
                   >
-                    <p className="text-sm font-medium">{node.name}</p>
-                    <p className="text-xs text-[#FBF676]">{node.userId}</p>
+                    <p className="text-sm font-medium" style={{ color: t.ink }}>{node.name}</p>
+                    <p className="text-xs font-mono" style={{ color: t.primary }}>{node.userId}</p>
                   </div>
                 ))}
               </div>
             )}
           </div>
 
-          <div className="hidden sm:block flex-1"></div>
-          <div className="text-xs md:text-sm text-[#FBF676] flex flex-col sm:flex-row items-start sm:items-center gap-1 sm:gap-2 bg-[rgba(5,12,32,0.9)] px-3 md:px-4 py-2 rounded-lg border border-[#FBF676]/30">
-            <span className="font-medium text-[#FBF676]">Current Root:</span>
-            <span className="font-bold text-[#FBF676] truncate">{treeData.rootName}</span>
-            <span className="text-[#FBF676] font-mono text-[10px] md:text-xs truncate">({treeData.rootUserId})</span>
+          <div className="hidden sm:block flex-1" />
+          <div className={`text-xs md:text-sm flex flex-col sm:flex-row items-start sm:items-center gap-1 sm:gap-2 px-3 md:px-4 py-2 rounded-xl ${t.cardInner}`}>
+            <span className="font-medium" style={{ color: t.muted }}>Current Root:</span>
+            <span className="font-bold truncate" style={{ color: t.ink }}>{treeData.rootName}</span>
+            <span className="font-mono text-[10px] md:text-xs truncate" style={{ color: t.primary }}>({treeData.rootUserId})</span>
           </div>
         </div>
       )}
 
-      {/* Error Display */}
-      {error && (
-        <div className="bg-[rgba(8,16,40,0.75)] rounded-xl p-4 mb-6 shadow-lg border border-[#FBF676]/25">
-          <div className="flex items-center gap-3">
-            <svg className="w-5 h-5 text-[#FBF676]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            <div className="text-[#FBF676] font-medium">{error}</div>
-          </div>
-        </div>
-      )}
+      {error && <div className={t.error}>{error}</div>}
 
-      {/* Loading State */}
       {loading && (
         <div className="flex flex-col items-center justify-center py-16">
-          <div className="relative">
-            <div className="animate-spin rounded-full h-16 w-16 border-4 border-[#FBF676]/40"></div>
-            <div className="animate-spin rounded-full h-16 w-16 border-4 border-[#FBF676] border-t-transparent absolute top-0 left-0"></div>
-          </div>
-          <p className="mt-4 text-[#FBF676] font-medium">Loading your genealogy tree...</p>
+          <BigBullLoader text="Loading your genealogy tree…" />
         </div>
       )}
 
-      {/* Tree Visualization */}
       {treeStructure && !loading && (
-        <div
-          className="rounded-xl md:rounded-2xl shadow-2xl p-4 md:p-8 overflow-x-auto transition-all duration-300 border backdrop-blur-md"
-          style={{
-            background: 'rgba(8, 16, 40, 0.45)',
-            borderColor: 'rgba(251,246,118,0.22)',
-            boxShadow: '0 8px 40px rgba(0,0,0,0.35)',
-          }}
-        >
+        <div className={`${t.card} overflow-x-auto`}>
           <div className="tree-container mx-auto" style={{ maxWidth: '1000px', position: 'relative', minHeight: '400px' }}>
             {/* Level 0: Root */}
             <div className="flex justify-center mb-6 md:mb-12 relative">
@@ -460,26 +426,26 @@ export default function UserGenealogyPage() {
               </div>
               <div
                 className="absolute top-full left-1/2 transform -translate-x-1/2 w-0.5 md:w-1 h-4 md:h-6 rounded-full"
-                style={{ zIndex: 1, background: 'linear-gradient(180deg, #FBF676, rgba(5,98,124,0.6))' }}
+                style={{ zIndex: 1, background: 'linear-gradient(180deg, #F5CF0B, rgba(5,98,124,0.6))' }}
               />
             </div>
 
             {/* Level 1: Direct Children */}
-            <div className="flex justify-center gap-8 md:gap-24 mb-6 md:mb-10 relative">
+            <div className="relative mb-6 flex justify-center gap-4 sm:gap-8 md:mb-10 md:gap-24">
               <div
-                className="absolute top-0 left-1/2 transform -translate-x-1/2 w-full h-0.5 md:h-[2px] rounded-full hidden sm:block"
+                className="absolute top-0 left-1/2 hidden h-0.5 w-full -translate-x-1/2 transform rounded-full sm:block md:h-[2px]"
                 style={{
-                  width: 'clamp(200px, 320px, 100%)',
-                  background: 'linear-gradient(90deg, transparent, rgba(251,246,118,0.55), transparent)',
+                  width: 'clamp(160px, 320px, 100%)',
+                  background: 'linear-gradient(90deg, transparent, rgba(245,207,11,0.55), transparent)',
                 }}
               />
               <div
-                className="absolute top-0 left-1/2 transform -translate-x-1/2 w-0.5 md:w-1 h-4 md:h-6 rounded-full hidden sm:block"
-                style={{ marginLeft: 'clamp(-100px, -160px, -80px)', background: 'linear-gradient(180deg, rgba(251,246,118,0.55), rgba(0,212,232,0.4))' }}
+                className="absolute top-0 left-1/2 hidden h-4 w-0.5 -translate-x-1/2 transform rounded-full sm:block md:h-6 md:w-1"
+                style={{ marginLeft: 'clamp(-80px, -160px, -80px)', background: 'linear-gradient(180deg, rgba(245,207,11,0.55), rgba(63,169,200,0.4))' }}
               />
               <div
-                className="absolute top-0 left-1/2 transform -translate-x-1/2 w-0.5 md:w-1 h-4 md:h-6 rounded-full hidden sm:block"
-                style={{ marginLeft: 'clamp(100px, 160px, 80px)', background: 'linear-gradient(180deg, rgba(251,246,118,0.55), rgba(0,212,232,0.4))' }}
+                className="absolute top-0 left-1/2 hidden h-4 w-0.5 -translate-x-1/2 transform rounded-full sm:block md:h-6 md:w-1"
+                style={{ marginLeft: 'clamp(80px, 160px, 80px)', background: 'linear-gradient(180deg, rgba(245,207,11,0.55), rgba(63,169,200,0.4))' }}
               />
 
               <div className="relative z-20">
@@ -491,21 +457,21 @@ export default function UserGenealogyPage() {
             </div>
 
             {/* Level 2: Grandchildren */}
-            <div className="flex justify-center gap-4 md:gap-12 relative flex-wrap sm:flex-nowrap">
+            <div className="relative mb-6 flex min-w-[20rem] justify-center gap-4 sm:min-w-0 sm:flex-nowrap sm:gap-4 md:gap-12 flex-wrap">
               <div
                 className="absolute top-0 left-1/2 transform -translate-x-1/2 w-full h-0.5 rounded-full hidden md:block"
                 style={{
                   width: 'clamp(300px, 600px, 100%)',
-                  background: 'linear-gradient(90deg, transparent, rgba(0,212,232,0.4), transparent)',
+                  background: 'linear-gradient(90deg, transparent, rgba(63,169,200,0.45), transparent)',
                 }}
               />
               {[-225, -75, 75, 225].map((offset) => (
                 <div
                   key={offset}
-                  className="absolute top-0 left-1/2 transform -translate-x-1/2 w-0.5 h-4 md:h-5 rounded-full hidden md:block"
+                  className="absolute top-0 left-1/2 hidden h-4 w-0.5 -translate-x-1/2 transform rounded-full md:block md:h-5"
                   style={{
                     marginLeft: `${offset}px`,
-                    background: 'linear-gradient(180deg, rgba(0,212,232,0.45), rgba(251,246,118,0.25))',
+                    background: 'linear-gradient(180deg, rgba(63,169,200,0.45), rgba(245,207,11,0.3))',
                   }}
                 />
               ))}
@@ -529,59 +495,43 @@ export default function UserGenealogyPage() {
 
       {/* Empty State */}
       {!treeData && !loading && (
-        <div className="bg-[rgba(5,12,32,0.9)] rounded-lg shadow p-12 text-center border border-[#FBF676]/30">
-          <svg className="mx-auto h-12 w-12 text-[#FBF676]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-          </svg>
-          <h3 className="mt-4 text-lg font-medium text-[#FBF676]">No Tree Loaded</h3>
-          <p className="mt-2 text-sm text-[#FBF676]">Loading your genealogy tree...</p>
+        <div className={t.cardEmpty}>
+          <h3 className="text-lg font-medium" style={{ color: t.ink }}>No Tree Loaded</h3>
+          <p className="mt-2 text-sm" style={{ color: t.muted }}>Loading your genealogy tree...</p>
         </div>
       )}
 
-      {/* View Business Modal */}
       {showBusinessModal && selectedBusinessNode && (
-        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-2 md:p-4">
-          <div
-            className="rounded-xl md:rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto border backdrop-blur-md"
-            style={{ background: 'rgba(8, 16, 40, 0.92)', borderColor: 'rgba(251,246,118,0.25)' }}
-          >
-            <div
-              className="sticky top-0 border-b px-4 md:px-6 py-3 md:py-4 flex items-center justify-between"
-              style={{ background: 'rgba(8, 16, 40, 0.95)', borderColor: 'rgba(251,246,118,0.2)' }}
-            >
-              <h2 className="text-lg md:text-2xl font-bold text-[#FBF676]">User Business Details</h2>
-              <button
-                onClick={() => {
-                  setShowBusinessModal(false);
-                  setSelectedBusinessNode(null);
-                }}
-                className="text-[#FBF676]/70 hover:text-[#FBF676] transition-colors flex-shrink-0"
-              >
+        <div className={t.modalOverlay}>
+          <div className={`${t.modalPanel} max-w-2xl max-h-[90vh] overflow-y-auto`}>
+              <div className="sticky top-0 border-b border-[#d8e6ec] pb-4 mb-4 flex items-center justify-between bg-white">
+                <h2 className="text-lg md:text-xl font-extrabold" style={{ color: t.ink }}>User Business Details</h2>
+                <button type="button" onClick={() => { setShowBusinessModal(false); setSelectedBusinessNode(null); }} className="text-[#5A6F78] hover:text-[#05627C]">
                 <svg className="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                 </svg>
               </button>
             </div>
 
-            <div className="p-4 md:p-6 space-y-4 md:space-y-6">
+            <div className="space-y-4 p-1 sm:space-y-6 sm:p-2">
               <div>
-                <h3 className="text-base md:text-lg font-semibold text-[#FBF676] mb-3 md:mb-4">User Profile</h3>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4">
-                  <div>
-                    <label className="text-sm font-medium text-white/50">User ID</label>
-                    <p className="mt-1 text-sm text-white font-mono">{selectedBusinessNode.userId}</p>
+                <h3 className="mb-3 text-base font-semibold md:mb-4 md:text-lg" style={{ color: t.primary }}>User Profile</h3>
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:gap-4">
+                  <div className="min-w-0">
+                    <label className="text-sm font-medium" style={{ color: t.muted }}>User ID</label>
+                    <p className="mt-1 break-all font-mono text-sm" style={{ color: t.ink }}>{selectedBusinessNode.userId}</p>
+                  </div>
+                  <div className="min-w-0">
+                    <label className="text-sm font-medium" style={{ color: t.muted }}>Name</label>
+                    <p className="mt-1 truncate text-sm" style={{ color: t.ink }}>{selectedBusinessNode.name || 'N/A'}</p>
                   </div>
                   <div>
-                    <label className="text-sm font-medium text-white/50">Name</label>
-                    <p className="mt-1 text-sm text-white">{selectedBusinessNode.name || 'N/A'}</p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-white/50">Status</label>
+                    <label className="text-sm font-medium" style={{ color: t.muted }}>Status</label>
                     <span
-                      className={`mt-1 inline-block px-2 py-1 rounded-full text-xs font-medium border capitalize ${
+                      className={`mt-1 inline-block rounded-full border px-2 py-1 text-xs font-medium capitalize ${
                         selectedBusinessNode.status === 'active'
-                          ? 'bg-[rgba(251,246,118,0.15)] text-[#FBF676] border-[#FBF676]/40'
-                          : 'bg-white/10 text-white/60 border-white/20'
+                          ? t.badgeActive
+                          : t.badgeNeutral
                       }`}
                     >
                       {selectedBusinessNode.status}
@@ -589,8 +539,8 @@ export default function UserGenealogyPage() {
                   </div>
                   {selectedBusinessNode.totalInvestment && (
                     <div>
-                      <label className="text-sm font-medium text-white/50">Total Investment</label>
-                      <p className="mt-1 text-sm text-[#FBF676] font-bold">
+                      <label className="text-sm font-medium" style={{ color: t.muted }}>Total Investment</label>
+                      <p className="mt-1 text-sm font-bold" style={{ color: t.primary }}>
                         ${parseFloat(selectedBusinessNode.totalInvestment).toFixed(2)}
                       </p>
                     </div>
@@ -599,10 +549,10 @@ export default function UserGenealogyPage() {
               </div>
 
               <div>
-                <h3 className="text-lg font-semibold text-[#FBF676] mb-4">Parent Information</h3>
+                <h3 className="mb-4 text-lg font-semibold" style={{ color: t.primary }}>Parent Information</h3>
                 {selectedBusinessNode.parent || selectedBusinessNode.parentUserId ? (
-                  <div className="rounded-lg p-4 border border-[#FBF676]/20 bg-[rgba(5,12,32,0.7)]">
-                    <p className="text-sm text-white">
+                  <div className="rounded-lg border border-[#d8e6ec] bg-[#F7FBFC] p-4">
+                    <p className="break-words text-sm" style={{ color: t.ink }}>
                       {selectedBusinessNode.parentName && selectedBusinessNode.parentUserId
                         ? `${selectedBusinessNode.parentName} (${selectedBusinessNode.parentUserId})`
                         : (() => {
@@ -614,53 +564,53 @@ export default function UserGenealogyPage() {
                     </p>
                   </div>
                 ) : (
-                  <p className="text-sm text-white/50">No parent (Root user)</p>
+                  <p className="text-sm" style={{ color: t.muted }}>No parent (Root user)</p>
                 )}
               </div>
 
               <div>
-                <h3 className="text-base md:text-lg font-semibold text-[#FBF676] mb-3 md:mb-4">Binary Business</h3>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4">
-                  <div className="rounded-lg p-4 border border-[rgba(0,212,232,0.3)] bg-[rgba(0,212,232,0.1)]">
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-sm font-medium text-[#00D4E8]">Left Business</span>
-                      <span className="text-lg font-bold text-white">
+                <h3 className="mb-3 text-base font-semibold md:mb-4 md:text-lg" style={{ color: t.primary }}>Binary Business</h3>
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:gap-4">
+                  <div className="rounded-lg border border-[#d8e6ec] bg-[#E6F7FB] p-4">
+                    <div className="mb-2 flex items-center justify-between gap-2">
+                      <span className="text-sm font-medium" style={{ color: t.accent }}>Left Business</span>
+                      <span className="text-lg font-bold" style={{ color: t.ink }}>
                         ${parseFloat(selectedBusinessNode.leftBusiness || '0').toFixed(2)}
                       </span>
                     </div>
-                    <div className="text-xs text-white/60">
-                      Left Downlines: <span className="font-semibold text-white">{selectedBusinessNode.leftDownlines || 0}</span>
+                    <div className="text-xs" style={{ color: t.muted }}>
+                      Left Downlines: <span className="font-semibold" style={{ color: t.ink }}>{selectedBusinessNode.leftDownlines || 0}</span>
                     </div>
                   </div>
-                  <div className="rounded-lg p-4 border border-[#FBF676]/30 bg-[rgba(251,246,118,0.1)]">
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-sm font-medium text-[#FBF676]">Right Business</span>
-                      <span className="text-lg font-bold text-white">
+                  <div className="rounded-lg border border-[#d8e6ec] bg-[#FFF9E6] p-4">
+                    <div className="mb-2 flex items-center justify-between gap-2">
+                      <span className="text-sm font-medium" style={{ color: t.primary }}>Right Business</span>
+                      <span className="text-lg font-bold" style={{ color: t.ink }}>
                         ${parseFloat(selectedBusinessNode.rightBusiness || '0').toFixed(2)}
                       </span>
                     </div>
-                    <div className="text-xs text-white/60">
-                      Right Downlines: <span className="font-semibold text-white">{selectedBusinessNode.rightDownlines || 0}</span>
+                    <div className="text-xs" style={{ color: t.muted }}>
+                      Right Downlines: <span className="font-semibold" style={{ color: t.ink }}>{selectedBusinessNode.rightDownlines || 0}</span>
                     </div>
                   </div>
                 </div>
               </div>
 
               <div>
-                <h3 className="text-base md:text-lg font-semibold text-[#FBF676] mb-3 md:mb-4">Carry Forward</h3>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4">
-                  <div className="rounded-lg p-4 border border-white/10 bg-[rgba(5,12,32,0.7)]">
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm font-medium text-white/70">Left Carry</span>
-                      <span className="text-lg font-bold text-[#00D4E8]">
+                <h3 className="mb-3 text-base font-semibold md:mb-4 md:text-lg" style={{ color: t.primary }}>Carry Forward</h3>
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:gap-4">
+                  <div className="rounded-lg border border-[#d8e6ec] bg-[#F7FBFC] p-4">
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="text-sm font-medium" style={{ color: t.muted }}>Left Carry</span>
+                      <span className="text-lg font-bold" style={{ color: t.accent }}>
                         ${parseFloat(selectedBusinessNode.leftCarry || '0').toFixed(2)}
                       </span>
                     </div>
                   </div>
-                  <div className="rounded-lg p-4 border border-white/10 bg-[rgba(5,12,32,0.7)]">
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm font-medium text-white/70">Right Carry</span>
-                      <span className="text-lg font-bold text-[#FBF676]">
+                  <div className="rounded-lg border border-[#d8e6ec] bg-[#F7FBFC] p-4">
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="text-sm font-medium" style={{ color: t.muted }}>Right Carry</span>
+                      <span className="text-lg font-bold" style={{ color: t.primary }}>
                         ${parseFloat(selectedBusinessNode.rightCarry || '0').toFixed(2)}
                       </span>
                     </div>
@@ -669,20 +619,20 @@ export default function UserGenealogyPage() {
               </div>
 
               <div>
-                <h3 className="text-base md:text-lg font-semibold text-[#FBF676] mb-3 md:mb-4">Downline Summary</h3>
-                <div className="rounded-lg p-3 md:p-4 border border-[#FBF676]/20 bg-[rgba(5,12,32,0.7)]">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4">
+                <h3 className="mb-3 text-base font-semibold md:mb-4 md:text-lg" style={{ color: t.primary }}>Downline Summary</h3>
+                <div className="rounded-lg border border-[#d8e6ec] bg-[#F7FBFC] p-3 md:p-4">
+                  <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:gap-4">
                     <div>
-                      <span className="text-sm text-white/60">Total Left Downlines:</span>
-                      <span className="ml-2 text-lg font-bold text-[#00D4E8]">{selectedBusinessNode.leftDownlines || 0}</span>
+                      <span className="text-sm" style={{ color: t.muted }}>Total Left Downlines:</span>
+                      <span className="ml-2 text-lg font-bold" style={{ color: t.accent }}>{selectedBusinessNode.leftDownlines || 0}</span>
                     </div>
                     <div>
-                      <span className="text-sm text-white/60">Total Right Downlines:</span>
-                      <span className="ml-2 text-lg font-bold text-[#FBF676]">{selectedBusinessNode.rightDownlines || 0}</span>
+                      <span className="text-sm" style={{ color: t.muted }}>Total Right Downlines:</span>
+                      <span className="ml-2 text-lg font-bold" style={{ color: t.primary }}>{selectedBusinessNode.rightDownlines || 0}</span>
                     </div>
-                    <div className="col-span-2 pt-2 border-t border-[#FBF676]/15">
-                      <span className="text-sm text-white/60">Total Downlines:</span>
-                      <span className="ml-2 text-xl font-bold text-white">
+                    <div className="col-span-1 border-t border-[#d8e6ec] pt-2 sm:col-span-2">
+                      <span className="text-sm" style={{ color: t.muted }}>Total Downlines:</span>
+                      <span className="ml-2 text-xl font-bold" style={{ color: t.ink }}>
                         {(selectedBusinessNode.leftDownlines || 0) + (selectedBusinessNode.rightDownlines || 0)}
                       </span>
                     </div>
@@ -691,17 +641,8 @@ export default function UserGenealogyPage() {
               </div>
             </div>
 
-            <div
-              className="sticky bottom-0 border-t px-4 md:px-6 py-3 md:py-4 flex justify-end"
-              style={{ background: 'rgba(8, 16, 40, 0.95)', borderColor: 'rgba(251,246,118,0.2)' }}
-            >
-              <button
-                onClick={() => {
-                  setShowBusinessModal(false);
-                  setSelectedBusinessNode(null);
-                }}
-                className="px-4 md:px-6 py-2 bg-[#FBF676] text-[#0C1A6B] font-bold rounded-lg hover:bg-[#e8e04a] transition-colors text-sm md:text-base w-full sm:w-auto"
-              >
+            <div className="sticky bottom-0 border-t border-[#d8e6ec] pt-4 mt-4 flex justify-end bg-white">
+              <button type="button" onClick={() => { setShowBusinessModal(false); setSelectedBusinessNode(null); }} className={t.btnPrimary}>
                 Close
               </button>
             </div>

@@ -16,6 +16,7 @@ import ReactFlow, {
 import 'reactflow/dist/style.css';
 import { api } from '@/lib/api';
 import BigBullLoader from '@/components/BigBullLoader';
+import { dashboardTheme as t } from '@/lib/dashboardTheme';
 
 interface TreeUser {
   id: string;
@@ -586,57 +587,47 @@ export default function MyTreePage() {
   }, []);
 
   if (loading) {
-    return <BigBullLoader fullScreen />;
+    return <BigBullLoader text="Loading tree…" />;
   }
 
   if (error) {
     return (
-      <div className="flex items-center justify-center py-12">
-          <div className="text-xl text-red-500">Error: {error}</div>
-        </div>
+      <div className={t.page}>
+        <div className={t.error}>Error: {error}</div>
+      </div>
     );
   }
 
   return (
-      <div className="w-full h-[calc(100vh-8rem)] flex flex-col bg-[rgba(8,16,40,0.9)] rounded-lg overflow-hidden border border-[#FBF676]/20">
-        <div className="bg-[rgba(5,12,32,0.95)] border-b border-[#FBF676]/25 shadow-lg p-4 z-10">
-          <div className="flex flex-col gap-4">
-            <div className="flex justify-between items-center">
-              <div>
-                <h1 className="text-3xl font-bold text-center text-white">My Genealogy</h1>
+      <div className="flex h-[calc(100dvh-11.5rem)] w-full min-w-0 flex-col overflow-hidden rounded-xl border border-[#d8e6ec] bg-white shadow-sm sm:rounded-2xl md:h-[calc(100dvh-8rem)]">
+        <div className="z-10 border-b border-[#d8e6ec] bg-[#F7FBFC] p-3 sm:p-4">
+          <div className="flex flex-col gap-3 sm:gap-4">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div className="min-w-0">
+                <h1 className={t.title}>My Genealogy</h1>
                 {treeData && (
-                  <p className="text-center text-white/70 mt-1">
-                    Root: {treeData.rootName} ({treeData.rootUserId}) - {treeData.tree.length} total nodes
+                  <p className={t.subtitle}>
+                    Root: {treeData.rootName} ({treeData.rootUserId}) — {treeData.tree.length} total nodes
                   </p>
                 )}
               </div>
-              <button
-                onClick={() => window.history.back()}
-                className="px-4 py-2 bg-[#FBF676] text-[#0C1A6B] rounded-lg hover:bg-[#e8e04a] transition-all font-semibold shadow-lg hover:shadow-[#FBF676]/30"
-              >
+              <button type="button" onClick={() => window.history.back()} className={t.btnSecondary}>
                 ← Back
               </button>
             </div>
-            {/* Search Bar */}
-            <div className="flex gap-2 items-center">
-              <div className="flex-1 relative">
+            <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center">
+              <div className="relative min-w-0 flex-1 sm:min-w-[200px]">
                 <input
                   type="text"
                   value={searchTerm}
-                  onChange={(e) => {
-                    setSearchTerm(e.target.value);
-                    setSearchError(null);
-                  }}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') {
-                      handleSearch(searchTerm);
-                    }
-                  }}
+                  onChange={(e) => { setSearchTerm(e.target.value); setSearchError(null); }}
+                  onKeyDown={(e) => { if (e.key === 'Enter') handleSearch(searchTerm); }}
                   placeholder="Search by User ID, Name, or Email..."
-                  className="w-full px-4 py-2 pl-10 bg-[#081028] border border-[#FBF676]/25 rounded-lg focus:ring-2 focus:ring-[#FBF676]/40 focus:border-[#FBF676]/70 text-white placeholder:text-white/55"
+                  className={`${t.input} pl-10`}
                 />
                 <svg
-                  className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-[#FBF676]"
+                  className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 transform"
+                  style={{ color: t.primary }}
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -644,30 +635,14 @@ export default function MyTreePage() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                 </svg>
               </div>
-              <button
-                onClick={() => handleSearch(searchTerm)}
-                className="px-6 py-2 bg-[#FBF676] text-[#0C1A6B] rounded-lg hover:bg-[#e8e04a] transition-all font-semibold shadow-lg hover:shadow-[#FBF676]/30"
-              >
-                Search
-              </button>
+              <button type="button" onClick={() => handleSearch(searchTerm)} className={t.btnPrimary}>Search</button>
               {searchTerm && (
-                <button
-                  onClick={() => {
-                    setSearchTerm('');
-                    setSearchError(null);
-                    setHighlightedNodeId(null);
-                  }}
-                  className="px-4 py-2 bg-gray-700/50 text-white rounded-lg hover:bg-gray-700 border border-gray-600 transition-colors"
-                >
+                <button type="button" onClick={() => { setSearchTerm(''); setSearchError(null); setHighlightedNodeId(null); }} className={t.btnGhost}>
                   Clear
                 </button>
               )}
             </div>
-            {searchError && (
-              <div className="text-red-400 text-sm bg-red-900/30 border border-red-500/50 p-2 rounded">
-                {searchError}
-              </div>
-            )}
+            {searchError && <div className={t.error}>{searchError}</div>}
           </div>
         </div>
         <div className="flex-1" style={{ position: 'relative', overflow: 'visible', zIndex: 1 }}>
@@ -686,7 +661,7 @@ export default function MyTreePage() {
             nodeTypes={nodeTypes}
             onInit={onInit}
             fitView
-            className="bg-gray-50"
+            className="bg-[#F7FBFC]"
             minZoom={0.1}
             maxZoom={2}
             defaultViewport={{ x: 0, y: 0, zoom: 0.5 }}
@@ -696,46 +671,45 @@ export default function MyTreePage() {
             selectNodesOnDrag={true}
             onlyRenderVisibleElements={true}
           >
-            <Background color="#374151" gap={16} />
+            <Background color="#d8e6ec" gap={16} />
             <Controls />
             <MiniMap 
               style={{
-                background: '#1f2937',
-                border: '1px solid #eab308',
+                background: '#F7FBFC',
+                border: '1px solid #d8e6ec',
               }}
-              nodeColor="#eab308"
-              maskColor="rgba(0, 0, 0, 0.6)"
+              nodeColor="#05627C"
+              maskColor="rgba(11, 31, 42, 0.08)"
             />
           </ReactFlow>
         </div>
         <style jsx global>{`
           .custom-node {
-            background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
-            border: 3px solid #eab308;
+            background: linear-gradient(135deg, #ffffff 0%, #F7FBFC 100%);
+            border: 2px solid #05627C;
             border-radius: 12px;
             padding: 18px 24px;
             min-width: 280px;
             max-width: 320px;
-            box-shadow: 0 6px 16px rgba(234, 179, 8, 0.3);
+            box-shadow: 0 4px 12px rgba(5, 98, 124, 0.12);
             transition: all 0.3s ease;
             position: relative;
             font-size: 14px;
-            color: white;
+            color: #0B1F2A;
             cursor: move;
           }
           .custom-node:hover {
-            transform: scale(1.05);
-            box-shadow: 0 8px 24px rgba(234, 179, 8, 0.5);
-            border-color: #fbbf24;
+            transform: scale(1.03);
+            box-shadow: 0 8px 20px rgba(5, 98, 124, 0.18);
+            border-color: #3FA9C8;
             z-index: 100;
           }
           .custom-node.root-node {
-            background: linear-gradient(135deg, #eab308 0%, #fbbf24 100%);
-            border-color: #fbbf24;
-            color: #000;
+            background: linear-gradient(135deg, #FFF9E6 0%, #ffffff 100%);
+            border-color: #F5CF0B;
             min-width: 320px;
             max-width: 360px;
-            box-shadow: 0 8px 24px rgba(234, 179, 8, 0.6);
+            box-shadow: 0 6px 16px rgba(245, 207, 11, 0.25);
           }
           .custom-node.root-node:hover {
             box-shadow: 0 10px 30px rgba(234, 179, 8, 0.8);
@@ -767,18 +741,18 @@ export default function MyTreePage() {
             top: 50%;
             right: calc(100% + 16px);
             transform: translateY(-50%);
-            background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
-            border: 2px solid #eab308;
+            background: #ffffff;
+            border: 2px solid #05627C;
             border-radius: 12px;
             padding: 16px;
             min-width: 250px;
             max-width: 300px;
-            box-shadow: 0 8px 24px rgba(234, 179, 8, 0.4);
+            box-shadow: 0 8px 24px rgba(5, 98, 124, 0.15);
             z-index: 99999 !important;
             pointer-events: none !important;
             font-size: 0.85em;
             white-space: normal;
-            color: white;
+            color: #0B1F2A;
             opacity: 1 !important;
             visibility: visible !important;
             display: block !important;
@@ -791,7 +765,7 @@ export default function MyTreePage() {
             top: 50%;
             transform: translateY(-50%);
             border: 8px solid transparent;
-            border-left-color: #eab308;
+            border-left-color: #05627C;
             z-index: 99999;
           }
           .custom-node.root-node .node-popup {
@@ -814,8 +788,8 @@ export default function MyTreePage() {
             font-weight: bold;
             margin-bottom: 8px;
             padding-bottom: 4px;
-            border-bottom: 1px solid #eab308;
-            color: #fbbf24;
+            border-bottom: 1px solid #05627C;
+            color: #05627C;
           }
           .popup-content {
             display: flex;
@@ -824,10 +798,10 @@ export default function MyTreePage() {
           }
           .popup-item {
             font-size: 0.85em;
-            color: #e5e7eb;
+            color: #5A6F78;
           }
           .popup-item strong {
-            color: #fbbf24;
+            color: #05627C;
           }
           .node-header {
             font-weight: bold;
@@ -929,20 +903,20 @@ export default function MyTreePage() {
             z-index: 10;
           }
           .react-flow__controls {
-            background: #1f2937 !important;
-            border: 1px solid #eab308 !important;
+            background: #ffffff !important;
+            border: 1px solid #d8e6ec !important;
           }
           .react-flow__controls-button {
-            background: #111827 !important;
-            border: 1px solid #eab308 !important;
-            color: #fbbf24 !important;
+            background: #F7FBFC !important;
+            border: 1px solid #d8e6ec !important;
+            color: #05627C !important;
           }
           .react-flow__controls-button:hover {
-            background: #374151 !important;
-            color: #fcd34d !important;
+            background: #E8F5F0 !important;
+            color: #05627C !important;
           }
           .react-flow__background {
-            background-color: #000000 !important;
+            background-color: #F7FBFC !important;
           }
         `}</style>
       </div>

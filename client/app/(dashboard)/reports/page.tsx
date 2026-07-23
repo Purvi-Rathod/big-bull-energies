@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { api } from '@/lib/api';
 import BigBullLoader from '@/components/BigBullLoader';
+import { dashboardTheme as t } from '@/lib/dashboardTheme';
 import { formatDateTimeUK, formatDateTimeForExportUK } from '@/lib/utils';
 
 interface Transaction {
@@ -167,364 +168,237 @@ export default function ReportsPage() {
   const formatDateTimeForExport = (dateString: string) => formatDateTimeForExportUK(dateString);
 
   const renderTransactionTable = (transactions: Transaction[], title: string, showExport: boolean = true, isReferral: boolean = false) => (
-    <div className="rounded-2xl shadow-2xl border border-[#FBF676]/25 backdrop-blur-md bg-[rgba(8,16,40,0.75)] overflow-hidden">
-      <div className="px-4 md:px-6 py-4 md:py-5 border-b border-[#FBF676]/20 bg-[rgba(5,12,32,0.9)] flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
-        <h3 className="text-lg md:text-xl font-extrabold text-white">{title}</h3>
+    <div className={t.tableWrap}>
+      <div className="px-4 md:px-6 py-4 border-b border-[#d8e6ec] bg-[#F7FBFC] flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+        <h3 className={t.sectionTitle}>{title}</h3>
         {showExport && transactions.length > 0 && (
-          <button
-            onClick={() => exportTransactions(transactions, title)}
-            className="px-4 md:px-6 py-2 md:py-2.5 bg-[#FBF676] text-[#0C1A6B] text-xs md:text-sm font-bold rounded-xl hover:bg-[#e8e04a] focus:outline-none focus:ring-2 focus:ring-[#FBF676]/40 transition-all shadow-lg shadow-[#FBF676]/25 hover:shadow-[#FBF676]/30 hover:scale-105 active:scale-95 w-full sm:w-auto"
-          >
+          <button type="button" onClick={() => exportTransactions(transactions, title)} className={t.btnPrimary}>
             Export CSV
           </button>
         )}
       </div>
-      <div className="overflow-x-auto -mx-4 sm:mx-0">
-        <div className="inline-block min-w-full align-middle">
-          <div className="overflow-hidden">
-            <table className="min-w-full divide-y divide-[#FBF676]/15">
-              <thead className="bg-[rgba(5,12,32,0.9)]">
-                <tr>
-                  <th className="px-3 md:px-6 py-3 md:py-5 text-left text-xs font-bold text-[#FBF676] uppercase tracking-wider">Date & Time</th>
-                  <th className="px-3 md:px-6 py-3 md:py-5 text-left text-xs font-bold text-[#FBF676] uppercase tracking-wider">Type</th>
-                  <th className="px-3 md:px-6 py-3 md:py-5 text-left text-xs font-bold text-[#FBF676] uppercase tracking-wider">Amount</th>
-                  {isReferral && (
-                    <th className="px-3 md:px-6 py-3 md:py-5 text-left text-xs font-bold text-[#FBF676] uppercase tracking-wider">Source</th>
-                  )}
-                  <th className="px-3 md:px-6 py-3 md:py-5 text-left text-xs font-bold text-[#FBF676] uppercase tracking-wider">Status</th>
-                  <th className="px-3 md:px-6 py-3 md:py-5 text-left text-xs font-bold text-[#FBF676] uppercase tracking-wider">Transaction ID</th>
-                </tr>
-              </thead>
-              <tbody className="bg-[rgba(5,12,32,0.45)] divide-y divide-[#FBF676]/15">
-                {transactions.length === 0 ? (
-                  <tr>
-                    <td colSpan={isReferral ? 6 : 5} className="px-3 md:px-6 py-8 md:py-12 text-center text-white/55 text-base md:text-lg">
-                      No transactions found
+      <div className="overflow-x-auto">
+        <table className={t.table}>
+          <thead className={t.tableHead}>
+            <tr>
+              <th className={t.tableHeadCell}>Date & Time</th>
+              <th className={t.tableHeadCell}>Type</th>
+              <th className={t.tableHeadCell}>Amount</th>
+              {isReferral && <th className={t.tableHeadCell}>Source</th>}
+              <th className={t.tableHeadCell}>Status</th>
+              <th className={t.tableHeadCell}>Transaction ID</th>
+            </tr>
+          </thead>
+          <tbody className={t.tableBody}>
+            {transactions.length === 0 ? (
+              <tr>
+                <td colSpan={isReferral ? 6 : 5} className="px-4 md:px-6 py-10 text-center text-base font-medium" style={{ color: t.muted }}>
+                  No transactions found
+                </td>
+              </tr>
+            ) : (
+              transactions.map((tx) => {
+                const { date, time } = formatDateTime(tx.createdAt);
+                return (
+                  <tr key={tx.id} className={t.tableRow}>
+                    <td className="px-4 md:px-6 py-4 whitespace-nowrap text-sm">
+                      <div className="font-bold" style={{ color: t.ink }}>{date}</div>
+                      <div className="text-xs mt-0.5" style={{ color: t.muted }}>{time}</div>
+                    </td>
+                    <td className="px-4 md:px-6 py-4 whitespace-nowrap">
+                      <span className={`px-3 py-1 text-xs font-extrabold rounded-full ${tx.type === 'credit' ? t.badgeActive : t.badgeError}`}>
+                        {tx.type.toUpperCase()}
+                      </span>
+                    </td>
+                    <td className="px-4 md:px-6 py-4 whitespace-nowrap text-sm font-extrabold" style={{ color: t.primary }}>
+                      ${tx.amount.toFixed(2)}
+                    </td>
+                    {isReferral && (
+                      <td className="px-4 md:px-6 py-4 text-sm">
+                        {tx.referralSource && tx.packageInfo ? (
+                          <div className="space-y-1">
+                            <div className="font-bold" style={{ color: t.ink }}>
+                              {tx.referralSource.name}{' '}
+                              <span className="font-mono text-xs" style={{ color: t.primary }}>({tx.referralSource.userId})</span>
+                            </div>
+                            <div className="text-xs" style={{ color: t.muted }}>
+                              activated <span className="font-semibold" style={{ color: t.primary }}>${tx.packageInfo.investedAmount.toFixed(2)}</span> package
+                            </div>
+                            <div className="text-xs" style={{ color: t.muted }}>
+                              You got <span className="font-bold" style={{ color: t.primary }}>${tx.amount.toFixed(2)}</span> referral income ({tx.referralPercentage?.toFixed(1) || tx.packageInfo.referralPct?.toFixed(1) || 'N/A'}%)
+                            </div>
+                          </div>
+                        ) : (
+                          <span className="italic text-xs" style={{ color: t.muted }}>Source information unavailable</span>
+                        )}
+                      </td>
+                    )}
+                    <td className="px-4 md:px-6 py-4 whitespace-nowrap">
+                      <span className={`px-3 py-1 text-xs font-extrabold rounded-full ${
+                        tx.status === 'completed' ? t.badgeActive : tx.status === 'pending' ? t.badgePending : t.badgeError
+                      }`}>
+                        {tx.status}
+                      </span>
+                    </td>
+                    <td className="px-4 md:px-6 py-4 whitespace-nowrap text-sm font-mono font-semibold" style={{ color: t.primary }}>
+                      {tx.txRef || tx.id.substring(0, 8) || 'N/A'}
                     </td>
                   </tr>
-                ) : (
-                  transactions.map((tx) => {
-                    const { date, time } = formatDateTime(tx.createdAt);
-                    return (
-                      <tr key={tx.id} className="hover:bg-[rgba(251,246,118,0.08)] transition-all duration-300 group">
-                        <td className="px-3 md:px-6 py-3 md:py-5 whitespace-nowrap text-xs md:text-sm">
-                          <div className="text-white font-bold group-hover:text-white transition-colors">{date}</div>
-                          <div className="text-white/55 text-[10px] md:text-xs mt-1">{time}</div>
-                        </td>
-                        <td className="px-3 md:px-6 py-3 md:py-5 whitespace-nowrap text-xs md:text-sm">
-                          <span className={`px-2 md:px-4 py-1 md:py-1.5 inline-flex text-[10px] md:text-xs leading-5 font-bold rounded-full shadow-lg ${
-                            tx.type === 'credit' 
-                              ? 'bg-[rgba(251,246,118,0.15)] text-[#FBF676] border border-[#FBF676]/40' 
-                              : 'bg-red-900/40 text-red-400 border border-red-500/40'
-                          }`}>
-                            {tx.type.toUpperCase()}
-                          </span>
-                        </td>
-                        <td className="px-3 md:px-6 py-3 md:py-5 whitespace-nowrap text-xs md:text-sm font-extrabold text-[#FBF676] group-hover:text-[#FBF676] transition-colors">
-                          ${tx.amount.toFixed(2)}
-                        </td>
-                        {isReferral && (
-                          <td className="px-3 md:px-6 py-3 md:py-5 text-xs md:text-sm">
-                            {tx.referralSource && tx.packageInfo ? (
-                              <div className="space-y-1 md:space-y-2">
-                                <div className="font-bold text-white text-xs md:text-sm">
-                                  {tx.referralSource.name} <span className="text-[#FBF676] font-mono text-[10px] md:text-xs">({tx.referralSource.userId})</span>
-                                </div>
-                                <div className="text-[10px] md:text-xs text-white/55">
-                                  activated <span className="text-[#FBF676] font-semibold">${tx.packageInfo.investedAmount.toFixed(2)}</span> package
-                                </div>
-                                <div className="text-[10px] md:text-xs text-white/75">
-                                  You got <span className="text-[#FBF676] font-bold">${tx.amount.toFixed(2)}</span> referral income <span className="text-yellow-300">({tx.referralPercentage?.toFixed(1) || tx.packageInfo.referralPct?.toFixed(1) || 'N/A'}%)</span>
-                                </div>
-                              </div>
-                            ) : (
-                              <span className="text-gray-500 italic text-xs">Source information unavailable</span>
-                            )}
-                          </td>
-                        )}
-                        <td className="px-3 md:px-6 py-3 md:py-5 whitespace-nowrap text-xs md:text-sm">
-                          <span className={`px-2 md:px-4 py-1 md:py-1.5 inline-flex text-[10px] md:text-xs leading-5 font-bold rounded-full shadow-lg ${
-                            tx.status === 'completed' 
-                              ? 'bg-[rgba(251,246,118,0.15)] text-[#FBF676] border border-[#FBF676]/40'
-                              : tx.status === 'pending' 
-                              ? 'bg-white/10 text-white/70 border border-white/20'
-                              : 'bg-red-900/40 text-red-400 border border-red-500/40'
-                          }`}>
-                            {tx.status}
-                          </span>
-                        </td>
-                        <td className="px-3 md:px-6 py-3 md:py-5 whitespace-nowrap text-xs md:text-sm font-mono text-[#FBF676] font-semibold">
-                          {tx.txRef || tx.id.substring(0, 8) || 'N/A'}
-                        </td>
-                      </tr>
-                    );
-                  })
-                )}
-              </tbody>
-            </table>
-          </div>
-        </div>
+                );
+              })
+            )}
+          </tbody>
+        </table>
       </div>
     </div>
   );
 
   const renderInvestmentTable = () => (
-    <div className="rounded-2xl shadow-2xl border border-[#FBF676]/25 backdrop-blur-md bg-[rgba(8,16,40,0.75)] overflow-hidden">
-      <div className="px-4 md:px-6 py-4 md:py-5 border-b border-[#FBF676]/20 bg-[rgba(5,12,32,0.9)] flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
-        <h3 className="text-lg md:text-xl font-extrabold text-white">Investment Transactions</h3>
+    <div className={t.tableWrap}>
+      <div className="px-4 md:px-6 py-4 border-b border-[#d8e6ec] bg-[#F7FBFC] flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+        <h3 className={t.sectionTitle}>Investment Transactions</h3>
         {investmentTransactions.length > 0 && (
-          <button
-            onClick={() => exportInvestmentTransactions(investmentTransactions)}
-            className="px-4 md:px-6 py-2 md:py-2.5 bg-[#FBF676] text-[#0C1A6B] text-xs md:text-sm font-bold rounded-xl hover:bg-[#e8e04a] focus:outline-none focus:ring-2 focus:ring-[#FBF676]/40 transition-all shadow-lg shadow-[#FBF676]/25 hover:shadow-[#FBF676]/30 hover:scale-105 active:scale-95 w-full sm:w-auto"
-          >
+          <button type="button" onClick={() => exportInvestmentTransactions(investmentTransactions)} className={t.btnPrimary}>
             Export CSV
           </button>
         )}
       </div>
-      <div className="overflow-x-auto -mx-4 sm:mx-0">
-        <div className="inline-block min-w-full align-middle">
-          <div className="overflow-hidden">
-            <table className="min-w-full divide-y divide-[#FBF676]/15">
-              <thead className="bg-[rgba(5,12,32,0.9)]">
-                <tr>
-                  <th className="px-3 md:px-6 py-3 md:py-5 text-left text-xs font-bold text-[#FBF676] uppercase tracking-wider">Date & Time</th>
-                  <th className="px-3 md:px-6 py-3 md:py-5 text-left text-xs font-bold text-[#FBF676] uppercase tracking-wider">Type</th>
-                  <th className="px-3 md:px-6 py-3 md:py-5 text-left text-xs font-bold text-[#FBF676] uppercase tracking-wider">Amount</th>
-                  <th className="px-3 md:px-6 py-3 md:py-5 text-left text-xs font-bold text-[#FBF676] uppercase tracking-wider">Package</th>
-                  <th className="px-3 md:px-6 py-3 md:py-5 text-left text-xs font-bold text-[#FBF676] uppercase tracking-wider">ROI %</th>
-                  <th className="px-3 md:px-6 py-3 md:py-5 text-left text-xs font-bold text-[#FBF676] uppercase tracking-wider">Invested Amount</th>
-                  <th className="px-3 md:px-6 py-3 md:py-5 text-left text-xs font-bold text-[#FBF676] uppercase tracking-wider">Duration</th>
-                  <th className="px-3 md:px-6 py-3 md:py-5 text-left text-xs font-bold text-[#FBF676] uppercase tracking-wider">Status</th>
-                  <th className="px-3 md:px-6 py-3 md:py-5 text-left text-xs font-bold text-[#FBF676] uppercase tracking-wider">Transaction ID</th>
-                </tr>
-              </thead>
-              <tbody className="bg-[rgba(5,12,32,0.45)] divide-y divide-[#FBF676]/15">
-                {investmentTransactions.length === 0 ? (
-                  <tr>
-                    <td colSpan={9} className="px-3 md:px-6 py-8 md:py-12 text-center text-white/55 text-base md:text-lg">
-                      No investment transactions found
+      <div className="overflow-x-auto">
+        <table className={t.table}>
+          <thead className={t.tableHead}>
+            <tr>
+              {['Date & Time', 'Type', 'Amount', 'Package', 'ROI %', 'Invested Amount', 'Duration', 'Status', 'Transaction ID'].map((h) => (
+                <th key={h} className={t.tableHeadCell}>{h}</th>
+              ))}
+            </tr>
+          </thead>
+          <tbody className={t.tableBody}>
+            {investmentTransactions.length === 0 ? (
+              <tr><td colSpan={9} className="px-4 py-10 text-center font-medium" style={{ color: t.muted }}>No investment transactions found</td></tr>
+            ) : (
+              investmentTransactions.map((tx) => {
+                const { date, time } = formatDateTime(tx.createdAt);
+                return (
+                  <tr key={tx.id} className={t.tableRow}>
+                    <td className="px-4 md:px-6 py-4 whitespace-nowrap text-sm">
+                      <div className="font-bold" style={{ color: t.ink }}>{date}</div>
+                      <div className="text-xs" style={{ color: t.muted }}>{time}</div>
                     </td>
+                    <td className="px-4 md:px-6 py-4 whitespace-nowrap">
+                      <span className={`px-3 py-1 text-xs font-extrabold rounded-full ${tx.type === 'credit' ? t.badgeActive : t.badgeError}`}>{tx.type.toUpperCase()}</span>
+                    </td>
+                    <td className="px-4 md:px-6 py-4 whitespace-nowrap text-sm font-extrabold" style={{ color: t.primary }}>${tx.amount.toFixed(2)}</td>
+                    <td className="px-4 md:px-6 py-4 whitespace-nowrap text-sm font-bold" style={{ color: t.ink }}>{tx.investment?.packageName || 'N/A'}</td>
+                    <td className="px-4 md:px-6 py-4 whitespace-nowrap text-sm font-semibold" style={{ color: t.muted }}>{tx.investment?.roi || 0}%</td>
+                    <td className="px-4 md:px-6 py-4 whitespace-nowrap text-sm font-bold" style={{ color: t.ink }}>${tx.investment?.investedAmount.toFixed(2) || '0.00'}</td>
+                    <td className="px-4 md:px-6 py-4 whitespace-nowrap text-sm font-semibold" style={{ color: t.muted }}>{tx.investment?.duration || 0} days</td>
+                    <td className="px-4 md:px-6 py-4 whitespace-nowrap">
+                      <span className={`px-3 py-1 text-xs font-extrabold rounded-full ${tx.status === 'completed' ? t.badgeActive : tx.status === 'pending' ? t.badgePending : t.badgeError}`}>{tx.status}</span>
+                    </td>
+                    <td className="px-4 md:px-6 py-4 whitespace-nowrap text-sm font-mono font-semibold" style={{ color: t.primary }}>{tx.txRef || tx.id.substring(0, 8) || 'N/A'}</td>
                   </tr>
-                ) : (
-                  investmentTransactions.map((tx) => {
-                    const { date, time } = formatDateTime(tx.createdAt);
-                    return (
-                      <tr key={tx.id} className="hover:bg-[rgba(251,246,118,0.08)] transition-all duration-300 group">
-                        <td className="px-3 md:px-6 py-3 md:py-5 whitespace-nowrap text-xs md:text-sm">
-                          <div className="text-white font-bold group-hover:text-white transition-colors">{date}</div>
-                          <div className="text-white/55 text-[10px] md:text-xs mt-1">{time}</div>
-                        </td>
-                        <td className="px-3 md:px-6 py-3 md:py-5 whitespace-nowrap text-xs md:text-sm">
-                          <span className={`px-2 md:px-4 py-1 md:py-1.5 inline-flex text-[10px] md:text-xs leading-5 font-bold rounded-full shadow-lg ${
-                            tx.type === 'credit' 
-                              ? 'bg-[rgba(251,246,118,0.15)] text-[#FBF676] border border-[#FBF676]/40' 
-                              : 'bg-red-900/40 text-red-400 border border-red-500/40'
-                          }`}>
-                            {tx.type.toUpperCase()}
-                          </span>
-                        </td>
-                        <td className="px-3 md:px-6 py-3 md:py-5 whitespace-nowrap text-xs md:text-sm font-extrabold text-[#FBF676] group-hover:text-[#FBF676] transition-colors">
-                          ${tx.amount.toFixed(2)}
-                        </td>
-                        <td className="px-3 md:px-6 py-3 md:py-5 whitespace-nowrap text-xs md:text-sm text-white font-bold group-hover:text-white transition-colors">
-                          {tx.investment?.packageName || 'N/A'}
-                        </td>
-                        <td className="px-3 md:px-6 py-3 md:py-5 whitespace-nowrap text-xs md:text-sm text-white/75 font-semibold">
-                          {tx.investment?.roi || 0}%
-                        </td>
-                        <td className="px-3 md:px-6 py-3 md:py-5 whitespace-nowrap text-xs md:text-sm font-bold text-white">
-                          ${tx.investment?.investedAmount.toFixed(2) || '0.00'}
-                        </td>
-                        <td className="px-3 md:px-6 py-3 md:py-5 whitespace-nowrap text-xs md:text-sm text-white/75 font-semibold">
-                          {tx.investment?.duration || 0} days
-                        </td>
-                        <td className="px-3 md:px-6 py-3 md:py-5 whitespace-nowrap text-xs md:text-sm">
-                          <span className={`px-2 md:px-4 py-1 md:py-1.5 inline-flex text-[10px] md:text-xs leading-5 font-bold rounded-full shadow-lg ${
-                            tx.status === 'completed' 
-                              ? 'bg-[rgba(251,246,118,0.15)] text-[#FBF676] border border-[#FBF676]/40'
-                              : tx.status === 'pending' 
-                              ? 'bg-white/10 text-white/70 border border-white/20'
-                              : 'bg-red-900/40 text-red-400 border border-red-500/40'
-                          }`}>
-                            {tx.status}
-                          </span>
-                        </td>
-                        <td className="px-3 md:px-6 py-3 md:py-5 whitespace-nowrap text-xs md:text-sm font-mono text-[#FBF676] font-semibold">
-                          {tx.txRef || tx.id.substring(0, 8) || 'N/A'}
-                        </td>
-                      </tr>
-                    );
-                  })
-                )}
-              </tbody>
-            </table>
-          </div>
-        </div>
+                );
+              })
+            )}
+          </tbody>
+        </table>
       </div>
     </div>
   );
 
   const renderWithdrawalTable = () => (
-    <div className="rounded-2xl shadow-2xl border border-[#FBF676]/25 backdrop-blur-md bg-[rgba(8,16,40,0.75)] overflow-hidden">
-      <div className="px-4 md:px-6 py-4 md:py-5 border-b border-[#FBF676]/20 bg-[rgba(5,12,32,0.9)] flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
-        <h3 className="text-lg md:text-xl font-extrabold text-white">Withdrawal History</h3>
+    <div className={t.tableWrap}>
+      <div className="px-4 md:px-6 py-4 border-b border-[#d8e6ec] bg-[#F7FBFC] flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+        <h3 className={t.sectionTitle}>Withdrawal History</h3>
         {withdrawals.length > 0 && (
-          <button
-            onClick={() => exportWithdrawals(withdrawals)}
-            className="px-4 md:px-6 py-2 md:py-2.5 bg-[#FBF676] text-[#0C1A6B] text-xs md:text-sm font-bold rounded-xl hover:bg-[#e8e04a] focus:outline-none focus:ring-2 focus:ring-[#FBF676]/40 transition-all shadow-lg shadow-[#FBF676]/25 hover:shadow-[#FBF676]/30 hover:scale-105 active:scale-95 w-full sm:w-auto"
-          >
-            Export CSV
-          </button>
+          <button type="button" onClick={() => exportWithdrawals(withdrawals)} className={t.btnPrimary}>Export CSV</button>
         )}
       </div>
-      <div className="overflow-x-auto -mx-4 sm:mx-0">
-        <div className="inline-block min-w-full align-middle">
-          <div className="overflow-hidden">
-            <table className="min-w-full divide-y divide-[#FBF676]/15">
-              <thead className="bg-[rgba(5,12,32,0.9)]">
-                <tr>
-                  <th className="px-3 md:px-6 py-3 md:py-5 text-left text-xs font-bold text-[#FBF676] uppercase tracking-wider">Date & Time</th>
-                  <th className="px-3 md:px-6 py-3 md:py-5 text-left text-xs font-bold text-[#FBF676] uppercase tracking-wider">Withdrawal ID</th>
-                  <th className="px-3 md:px-6 py-3 md:py-5 text-left text-xs font-bold text-[#FBF676] uppercase tracking-wider">Amount</th>
-                  <th className="px-3 md:px-6 py-3 md:py-5 text-left text-xs font-bold text-[#FBF676] uppercase tracking-wider">Charges</th>
-                  <th className="px-3 md:px-6 py-3 md:py-5 text-left text-xs font-bold text-[#FBF676] uppercase tracking-wider">Final Amount</th>
-                  <th className="px-3 md:px-6 py-3 md:py-5 text-left text-xs font-bold text-[#FBF676] uppercase tracking-wider">Wallet Type</th>
-                  <th className="px-3 md:px-6 py-3 md:py-5 text-left text-xs font-bold text-[#FBF676] uppercase tracking-wider">Method</th>
-                  <th className="px-3 md:px-6 py-3 md:py-5 text-left text-xs font-bold text-[#FBF676] uppercase tracking-wider">Status</th>
-                </tr>
-              </thead>
-              <tbody className="bg-[rgba(5,12,32,0.45)] divide-y divide-[#FBF676]/15">
-                {withdrawals.length === 0 ? (
-                  <tr>
-                    <td colSpan={8} className="px-3 md:px-6 py-8 md:py-12 text-center text-white/55 text-base md:text-lg">
-                      No withdrawals found
+      <div className="overflow-x-auto">
+        <table className={t.table}>
+          <thead className={t.tableHead}>
+            <tr>
+              {['Date & Time', 'Withdrawal ID', 'Amount', 'Charges', 'Final Amount', 'Wallet Type', 'Method', 'Status'].map((h) => (
+                <th key={h} className={t.tableHeadCell}>{h}</th>
+              ))}
+            </tr>
+          </thead>
+          <tbody className={t.tableBody}>
+            {withdrawals.length === 0 ? (
+              <tr><td colSpan={8} className="px-4 py-10 text-center font-medium" style={{ color: t.muted }}>No withdrawals found</td></tr>
+            ) : (
+              withdrawals.map((wd) => {
+                const { date, time } = formatDateTime(wd.createdAt);
+                return (
+                  <tr key={wd.id} className={t.tableRow}>
+                    <td className="px-4 md:px-6 py-4 whitespace-nowrap text-sm">
+                      <div className="font-bold" style={{ color: t.ink }}>{date}</div>
+                      <div className="text-xs" style={{ color: t.muted }}>{time}</div>
+                    </td>
+                    <td className="px-4 md:px-6 py-4 whitespace-nowrap text-sm font-mono font-semibold" style={{ color: t.primary }}>{wd.withdrawalId || wd.id.substring(0, 8)}</td>
+                    <td className="px-4 md:px-6 py-4 whitespace-nowrap text-sm font-bold" style={{ color: t.ink }}>${wd.amount.toFixed(2)}</td>
+                    <td className="px-4 md:px-6 py-4 whitespace-nowrap text-sm font-semibold" style={{ color: t.muted }}>${wd.charges.toFixed(2)}</td>
+                    <td className="px-4 md:px-6 py-4 whitespace-nowrap text-sm font-extrabold" style={{ color: t.primary }}>${wd.finalAmount.toFixed(2)}</td>
+                    <td className="px-4 md:px-6 py-4 whitespace-nowrap text-sm capitalize font-semibold" style={{ color: t.muted }}>{wd.walletType}</td>
+                    <td className="px-4 md:px-6 py-4 whitespace-nowrap text-sm capitalize font-semibold" style={{ color: t.muted }}>{wd.method || 'crypto'}</td>
+                    <td className="px-4 md:px-6 py-4 whitespace-nowrap">
+                      <span className={`px-3 py-1 text-xs font-extrabold rounded-full ${wd.status === 'approved' ? t.badgeActive : wd.status === 'pending' ? t.badgePending : t.badgeError}`}>{wd.status}</span>
                     </td>
                   </tr>
-                ) : (
-                  withdrawals.map((wd) => {
-                    const { date, time } = formatDateTime(wd.createdAt);
-                    return (
-                      <tr key={wd.id} className="hover:bg-[rgba(251,246,118,0.08)] transition-all duration-300 group">
-                        <td className="px-3 md:px-6 py-3 md:py-5 whitespace-nowrap text-xs md:text-sm">
-                          <div className="text-white font-bold group-hover:text-white transition-colors">{date}</div>
-                          <div className="text-white/55 text-[10px] md:text-xs mt-1">{time}</div>
-                        </td>
-                        <td className="px-3 md:px-6 py-3 md:py-5 whitespace-nowrap text-xs md:text-sm font-mono text-[#FBF676] font-semibold">
-                          {wd.withdrawalId || wd.id.substring(0, 8)}
-                        </td>
-                        <td className="px-3 md:px-6 py-3 md:py-5 whitespace-nowrap text-xs md:text-sm font-bold text-white">
-                          ${wd.amount.toFixed(2)}
-                        </td>
-                        <td className="px-3 md:px-6 py-3 md:py-5 whitespace-nowrap text-xs md:text-sm text-white/55 font-semibold">
-                          ${wd.charges.toFixed(2)}
-                        </td>
-                        <td className="px-3 md:px-6 py-3 md:py-5 whitespace-nowrap text-xs md:text-sm font-extrabold text-[#FBF676] group-hover:text-[#FBF676] transition-colors">
-                          ${wd.finalAmount.toFixed(2)}
-                        </td>
-                        <td className="px-3 md:px-6 py-3 md:py-5 whitespace-nowrap text-xs md:text-sm text-white/75 capitalize font-semibold">
-                          {wd.walletType}
-                        </td>
-                        <td className="px-3 md:px-6 py-3 md:py-5 whitespace-nowrap text-xs md:text-sm text-white/75 capitalize font-semibold">
-                          {wd.method || 'crypto'}
-                        </td>
-                        <td className="px-3 md:px-6 py-3 md:py-5 whitespace-nowrap text-xs md:text-sm">
-                          <span className={`px-2 md:px-4 py-1 md:py-1.5 inline-flex text-[10px] md:text-xs leading-5 font-bold rounded-full shadow-lg ${
-                            wd.status === 'approved' 
-                              ? 'bg-[rgba(251,246,118,0.15)] text-[#FBF676] border border-[#FBF676]/40'
-                              : wd.status === 'pending' 
-                              ? 'bg-white/10 text-white/70 border border-white/20'
-                              : 'bg-red-900/40 text-red-400 border border-red-500/40'
-                          }`}>
-                            {wd.status}
-                          </span>
-                        </td>
-                      </tr>
-                    );
-                  })
-                )}
-              </tbody>
-            </table>
-          </div>
-        </div>
+                );
+              })
+            )}
+          </tbody>
+        </table>
       </div>
     </div>
   );
 
   if (loading) {
-    return <BigBullLoader fullScreen />;
+    return <BigBullLoader text="Loading reports…" />;
   }
 
   return (
-    <div className="w-full  min-h-screen py-8 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
-      {/* Decorative background elements */}
-      <div className="fixed inset-0 pointer-events-none opacity-20">
-        <div className="absolute top-0 right-1/4 w-96 h-96 bg-[#FBF676]/10 rounded-full blur-3xl"></div>
-        <div className="absolute bottom-0 left-1/4 w-96 h-96 bg-[#FBF676]/10 rounded-full blur-3xl"></div>
+    <div className={t.page}>
+      <div>
+        <h1 className={t.title}>Reports</h1>
+        <p className={t.subtitle}>Transaction history across ROI, binary, referral, and more</p>
       </div>
 
-      <div className="relative z-10">
-      <div className="mb-8">
-        <h1 className="text-3xl font-extrabold mb-2 text-white flex items-center gap-3">
-          <span className="bg-gradient-to-r from-yellow-300 via-yellow-400 to-yellow-600 bg-clip-text text-transparent drop-shadow-lg">Reports</span>
-        </h1>
-          </div>
-          {error && (
-            <div className="mb-6 bg-red-900/30 border border-red-500/50 text-red-400 px-4 py-3 rounded-lg backdrop-blur-sm">
-              {error}
-            </div>
-          )}
+      {error && <div className={t.error}>{error}</div>}
 
-      <div>
-          {/* Tabs */}
-          <div className="mb-6 md:mb-8">
-            <div className="border-b border-[#FBF676]/20">
-              <nav className="-mb-px flex space-x-2 md:space-x-8 overflow-x-auto scrollbar-hide pb-1">
-                {/* Add scroll padding for mobile */}
-                <style jsx>{`
-                  .scrollbar-hide::-webkit-scrollbar {
-                    display: none;
-                  }
-                  .scrollbar-hide {
-                    -ms-overflow-style: none;
-                    scrollbar-width: none;
-                  }
-                `}</style>
-                  {(['roi', 'binary', 'referral', 'careerLevel', 'investment', 'withdrawal'] as const).map((tab) => (
-                  <button
-                    key={tab}
-                      onClick={() => setActiveTab(tab)}
-                    className={`${
-                      activeTab === tab
-                        ? 'border-[#FBF676] text-[#FBF676] bg-[#FBF676]/10'
-                        : 'border-transparent text-white/55 hover:text-[#FBF676] hover:border-[#FBF676]/50'
-                    } whitespace-nowrap py-3 md:py-4 px-2 md:px-1 border-b-2 font-bold text-xs md:text-sm capitalize transition-all duration-200 rounded-t-lg flex-shrink-0 min-w-fit`}
-                  >
-                      <span className="block md:inline">
-                        {tab === 'careerLevel' ? 'Career Level' : tab.charAt(0).toUpperCase() + tab.slice(1)}
-                      </span>
-                      <span className="ml-1 md:ml-0">
-                        {tab === 'roi' && `(${roiTransactions.length})`}
-                        {tab === 'binary' && `(${binaryTransactions.length})`}
-                        {tab === 'referral' && `(${referralTransactions.length})`}
-                        {tab === 'careerLevel' && `(${careerLevelTransactions.length})`}
-                        {tab === 'investment' && `(${investmentTransactions.length})`}
-                        {tab === 'withdrawal' && `(${withdrawals.length})`}
-                      </span>
-                  </button>
-                ))}
-              </nav>
-            </div>
-          </div>
+      <div className="border-b border-[#d8e6ec]">
+        <nav className="-mb-px flex space-x-2 md:space-x-6 overflow-x-auto pb-1">
+          {(['roi', 'binary', 'referral', 'careerLevel', 'investment', 'withdrawal'] as const).map((tab) => (
+            <button
+              key={tab}
+              type="button"
+              onClick={() => setActiveTab(tab)}
+              className={`whitespace-nowrap py-3 px-2 border-b-2 font-bold text-xs md:text-sm capitalize transition-all ${
+                activeTab === tab
+                  ? 'border-[#05627C] text-[#05627C]'
+                  : 'border-transparent text-[#5A6F78] hover:text-[#05627C] hover:border-[#d8e6ec]'
+              }`}
+            >
+              {tab === 'careerLevel' ? 'Career Level' : tab.charAt(0).toUpperCase() + tab.slice(1)}
+              {' '}
+              ({tab === 'roi' && roiTransactions.length}
+              {tab === 'binary' && binaryTransactions.length}
+              {tab === 'referral' && referralTransactions.length}
+              {tab === 'careerLevel' && careerLevelTransactions.length}
+              {tab === 'investment' && investmentTransactions.length}
+              {tab === 'withdrawal' && withdrawals.length})
+            </button>
+          ))}
+        </nav>
+      </div>
 
-            {/* Content */}
-            {activeTab === 'roi' && renderTransactionTable(roiTransactions, 'ROI Transactions')}
-            {activeTab === 'binary' && renderTransactionTable(binaryTransactions, 'Binary Bonus Transactions')}
-            {activeTab === 'referral' && renderTransactionTable(referralTransactions, 'Referral Bonus Transactions', true, true)}
-            {activeTab === 'careerLevel' && renderTransactionTable(careerLevelTransactions, 'Career Level Transactions')}
-            {activeTab === 'investment' && renderInvestmentTable()}
-            {activeTab === 'withdrawal' && renderWithdrawalTable()}
-          </div>
-          </div>
-        </div>
+      {activeTab === 'roi' && renderTransactionTable(roiTransactions, 'ROI Transactions')}
+      {activeTab === 'binary' && renderTransactionTable(binaryTransactions, 'Binary Bonus Transactions')}
+      {activeTab === 'referral' && renderTransactionTable(referralTransactions, 'Referral Bonus Transactions', true, true)}
+      {activeTab === 'careerLevel' && renderTransactionTable(careerLevelTransactions, 'Career Level Transactions')}
+      {activeTab === 'investment' && renderInvestmentTable()}
+      {activeTab === 'withdrawal' && renderWithdrawalTable()}
+    </div>
   );
 }

@@ -128,7 +128,9 @@ export async function createNOWPaymentsInvoice(
   request: NOWPaymentsInvoiceRequest
 ): Promise<NOWPaymentsInvoiceResponse> {
   if (!NOWPAYMENTS_API_KEY) {
-    throw new Error('NOWPayments API key is not configured');
+    throw new Error(
+      "NOWPayments API key is not configured. Add NOWPAYMENTS_API_KEY to server/.env (from https://account.nowpayments.io), or disable NOWPayments in Admin Settings and invest via main wallet for testing.",
+    );
   }
 
   try {
@@ -184,7 +186,9 @@ export async function createNOWPaymentsPayment(
   request: NOWPaymentsPaymentRequest
 ): Promise<NOWPaymentsPaymentResponse> {
   if (!NOWPAYMENTS_API_KEY) {
-    throw new Error('NOWPayments API key is not configured');
+    throw new Error(
+      "NOWPayments API key is not configured. Add NOWPAYMENTS_API_KEY to server/.env (from https://account.nowpayments.io), or disable NOWPayments in Admin Settings and invest via main wallet for testing.",
+    );
   }
 
   // Validate required fields
@@ -248,7 +252,9 @@ export async function getNOWPaymentsPaymentStatus(
   paymentId: string
 ): Promise<NOWPaymentsPaymentStatus> {
   if (!NOWPAYMENTS_API_KEY) {
-    throw new Error('NOWPayments API key is not configured');
+    throw new Error(
+      "NOWPayments API key is not configured. Add NOWPAYMENTS_API_KEY to server/.env (from https://account.nowpayments.io), or disable NOWPayments in Admin Settings and invest via main wallet for testing.",
+    );
   }
 
   try {

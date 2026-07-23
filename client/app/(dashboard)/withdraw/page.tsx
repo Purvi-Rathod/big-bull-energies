@@ -6,6 +6,7 @@ import { api } from '@/lib/api';
 import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
 import BigBullLoader from '@/components/BigBullLoader';
+import { dashboardTheme as t } from '@/lib/dashboardTheme';
 import { formatDateTimeLongUK } from '@/lib/utils';
 interface Wallet {
   type: string;
@@ -290,65 +291,54 @@ export default function WithdrawPage() {
     : 0;
 
   if (loading) {
-    return <BigBullLoader fullScreen />;
+    return <BigBullLoader text="Loading withdraw…" />;
   }
 
   return (
-    <div className="w-full min-h-screen py-4 md:py-8 px-2 sm:px-4 md:px-6 lg:px-8 relative overflow-hidden">
-      {/* Decorative background elements */}
-      <div className="fixed inset-0 pointer-events-none opacity-20">
-        <div className="absolute top-0 left-1/4 w-96 h-96 bg-[#FBF676]/10 rounded-full blur-3xl"></div>
-        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-[#FBF676]/10 rounded-full blur-3xl"></div>
+    <div className={t.page}>
+      <div>
+        <h1 className={t.title}>Withdraw Funds</h1>
+        <p className={t.subtitle}>Request payouts from your eligible wallets</p>
       </div>
 
-      <div className="relative z-10">
-      <div className="mb-8">
-        <h1 className="text-3xl font-extrabold mb-2 text-white">
-          <span className="bg-gradient-to-r from-yellow-300 via-yellow-400 to-yellow-600 bg-clip-text text-transparent drop-shadow-lg">Withdraw Funds</span>
-        </h1>
-          </div>
-          {error && (
-            <div className="mb-6 bg-red-900/30 border border-red-500/50 text-red-400 px-4 py-3 rounded-lg backdrop-blur-sm">
-              {error}
-            </div>
-          )}
+      {error && <div className={t.error}>{error}</div>}
 
           {/* Target Completion Lock Message (non-free: full lock; free: ROI locked, Binary/Referral allowed) */}
           {targetStatus && (targetStatus.binaryTargetAmount ?? 0) > 0 && !targetStatus.isCompleted && (
-            <div className="mb-6 bg-amber-900/30 border-2 border-amber-400/50 text-amber-300 px-6 py-4 rounded-xl backdrop-blur-sm">
+            <div className="mb-6 rounded-xl border-2 border-amber-200 bg-amber-50 px-4 py-4 text-amber-950 sm:px-6">
               <div className="flex items-start gap-3">
-                <svg className="w-6 h-6 text-amber-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="mt-0.5 h-6 w-6 flex-shrink-0 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
-                <div className="flex-1">
-                  <h3 className="text-lg font-bold text-amber-400 mb-2">
+                <div className="min-w-0 flex-1">
+                  <h3 className="mb-2 text-base font-bold text-amber-800 sm:text-lg">
                     {userProfile?.accountType === 'free' ? 'ROI Withdrawal Locked' : 'Withdrawal Locked'}
                   </h3>
-                  <p className="text-amber-300 mb-2">
+                  <p className="mb-2 text-sm text-amber-900/80 sm:text-base">
                     {userProfile?.accountType === 'free'
                       ? "Before target: ROI withdrawal locked. Only Referral + Binary unlocked (can withdraw)."
                       : "Your target is not completed. Complete your binary target to unlock withdrawal."
                     }
                   </p>
                   <div className="mt-3 space-y-1 text-sm">
-                    <div className="flex justify-between">
-                      <span className={userProfile?.accountType === 'free' ? 'text-amber-200' : 'text-red-200'}>Target Amount:</span>
-                      <span className="text-white font-semibold">${(targetStatus.binaryTargetAmount ?? 0).toFixed(2)}</span>
+                    <div className="flex justify-between gap-2">
+                      <span className="text-amber-800/80">Target Amount:</span>
+                      <span className="font-semibold text-amber-950">${(targetStatus.binaryTargetAmount ?? 0).toFixed(2)}</span>
                     </div>
-                    <div className="flex justify-between">
-                      <span className={userProfile?.accountType === 'free' ? 'text-amber-200' : 'text-red-200'}>Left Leg Business:</span>
-                      <span className="text-white">${targetStatus.leftBusiness.toFixed(2)}</span>
+                    <div className="flex justify-between gap-2">
+                      <span className="text-amber-800/80">Left Leg Business:</span>
+                      <span className="text-amber-950">${targetStatus.leftBusiness.toFixed(2)}</span>
                     </div>
-                    <div className="flex justify-between">
-                      <span className={userProfile?.accountType === 'free' ? 'text-amber-200' : 'text-red-200'}>Right Leg Business:</span>
-                      <span className="text-white">${targetStatus.rightBusiness.toFixed(2)}</span>
+                    <div className="flex justify-between gap-2">
+                      <span className="text-amber-800/80">Right Leg Business:</span>
+                      <span className="text-amber-950">${targetStatus.rightBusiness.toFixed(2)}</span>
                     </div>
-                    <div className={`flex justify-between border-t pt-1 mt-1 ${userProfile?.accountType === 'free' ? 'border-amber-500/30' : 'border-red-500/30'}`}>
-                      <span className={`font-semibold ${userProfile?.accountType === 'free' ? 'text-amber-200' : 'text-red-200'}`}>Total Business:</span>
-                      <span className="text-white font-bold">${targetStatus.totalBusiness.toFixed(2)}</span>
+                    <div className="mt-1 flex justify-between gap-2 border-t border-amber-200 pt-1">
+                      <span className="font-semibold text-amber-800">Total Business:</span>
+                      <span className="font-bold text-amber-950">${targetStatus.totalBusiness.toFixed(2)}</span>
                     </div>
                     {targetStatus.message && (
-                      <p className={`text-xs mt-2 italic ${userProfile?.accountType === 'free' ? 'text-amber-200' : 'text-red-200'}`}>{targetStatus.message}</p>
+                      <p className="mt-2 text-xs italic text-amber-800/70">{targetStatus.message}</p>
                     )}
                   </div>
                 </div>
@@ -358,19 +348,19 @@ export default function WithdrawPage() {
 
           {/* Free Account Info: official rules (before/after target) */}
           {userProfile?.accountType === 'free' && targetStatus && (
-            <div className="mb-6 bg-blue-900/30 border-2 border-blue-400/50 text-blue-300 px-6 py-4 rounded-xl backdrop-blur-sm">
+            <div className="mb-6 rounded-xl border-2 border-blue-200 bg-blue-50 px-4 py-4 text-blue-950 sm:px-6">
               <div className="flex items-start gap-3">
-                <svg className="w-6 h-6 text-blue-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="mt-0.5 h-6 w-6 flex-shrink-0 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
-                <div className="flex-1">
-                  <h3 className="text-lg font-bold text-blue-400 mb-2">Free Account Withdrawal Rules</h3>
+                <div className="min-w-0 flex-1">
+                  <h3 className="mb-2 text-base font-bold text-blue-800 sm:text-lg">Free Account Withdrawal Rules</h3>
                   {(targetStatus.binaryTargetAmount ?? 0) > 0 && !targetStatus.isCompleted ? (
-                    <p className="text-blue-300 mb-2">
+                    <p className="mb-2 text-sm text-blue-900/80 sm:text-base">
                       Before target: <strong>ROI withdrawal locked</strong>. Only <strong>Referral + Binary unlocked</strong> (can withdraw). Limited to your binary/referral income (wallet balance).
                     </p>
                   ) : (
-                    <p className="text-blue-300 mb-2">
+                    <p className="mb-2 text-sm text-blue-900/80 sm:text-base">
                       Target completed. You can withdraw from ROI, Binary, Referral, and other eligible wallets as per system rules.
                     </p>
                   )}
@@ -379,30 +369,25 @@ export default function WithdrawPage() {
             </div>
           )}
 
-          <div className="px-4 py-6 sm:px-0">
-            <div className="rounded-2xl shadow-2xl border border-[#FBF676]/25 p-8 backdrop-blur-md bg-[rgba(8,16,40,0.75)]">
+          <div className={t.card}>
               {binaryTree && binaryTree.cappingLimit > 0 && (
-                <div className="mb-6 p-4 bg-[rgba(251,246,118,0.12)] border-2 border-[#FBF676]/35 rounded-xl">
-                  <p className="text-sm text-[#FBF676] font-bold">
-                    <strong>Capping Limit:</strong> <span className="text-white">${binaryTree.cappingLimit.toFixed(2)}</span> per withdrawal
+                <div className={`mb-6 p-4 rounded-xl ${t.cardHighlight}`}>
+                  <p className="text-sm font-bold" style={{ color: t.primary }}>
+                    <strong>Capping Limit:</strong>{' '}
+                    <span style={{ color: t.ink }}>${binaryTree.cappingLimit.toFixed(2)}</span> per withdrawal
                   </p>
                 </div>
               )}
 
               <div className="space-y-6">
                 <div>
-                  <label className="block text-sm font-bold text-yellow-300 mb-3">
-                    Select Wallet
-                  </label>
+                  <label className={t.label}>Select Wallet</label>
                   <select
                     value={selectedWalletType}
                     onChange={(e) => setSelectedWalletType(e.target.value)}
-                    className="w-full px-4 py-3 border border-[#FBF676]/40 rounded-xl bg-[#081028] text-white focus:outline-none focus:ring-2 focus:ring-[#FBF676]/40 focus:border-[#FBF676]/70 font-semibold appearance-none"
-                    style={{ colorScheme: 'dark' }}
+                    className={t.select}
                   >
-                    <option value="" className="bg-[#081028] text-white">
-                      Select a wallet
-                    </option>
+                    <option value="">Select a wallet</option>
                     {sortWallets(wallets
                       .filter((w) => {
                         // Free: before target = binary + referral only; after target = all
@@ -428,18 +413,14 @@ export default function WithdrawPage() {
                             ? 'Interest Wallet'
                             : wallet.type;
                         return (
-                          <option
-                            key={wallet.type}
-                            value={wallet.type}
-                            className="bg-[#081028] text-white"
-                          >
+                          <option key={wallet.type} value={wallet.type}>
                             {label} - Available: ${(wallet.balance - wallet.reserved).toFixed(2)}
                           </option>
                         );
                       })}
                   </select>
                   {userProfile?.accountType === 'free' && (targetStatus?.binaryTargetAmount ?? 0) > 0 && !targetStatus?.isCompleted && (
-                    <p className="mt-2 text-sm text-blue-400 font-semibold">
+                    <p className="mt-2 text-sm font-semibold text-blue-700">
                       Before target: ROI locked; only Referral + Binary unlocked.
                     </p>
                   )}
@@ -447,27 +428,25 @@ export default function WithdrawPage() {
 
                 {selectedWallet && (
                   <>
-                    <div className="p-5 bg-[rgba(5,12,32,0.9)] border border-[#FBF676]/30 rounded-xl">
+                    <div className={`p-5 rounded-xl ${t.cardInner}`}>
                       <div className="flex justify-between items-center mb-3">
-                        <span className="text-sm text-[#FBF676]/80 font-semibold">Total Balance:</span>
+                        <span className="text-sm text-[#5A6F78] font-semibold">Total Balance:</span>
                         <span className="font-extrabold text-white">${selectedWallet.balance.toFixed(2)}</span>
                       </div>
                       <div className="flex justify-between items-center mb-3">
-                        <span className="text-sm text-[#FBF676]/80 font-semibold">Reserved:</span>
-                        <span className="font-extrabold text-[#FBF676]">${selectedWallet.reserved.toFixed(2)}</span>
+                        <span className="text-sm text-[#5A6F78] font-semibold">Reserved:</span>
+                        <span className="font-extrabold text-[#05627C]">${selectedWallet.reserved.toFixed(2)}</span>
                       </div>
-                      <div className="flex justify-between items-center pt-3 border-t border-[#FBF676]/20">
-                        <span className="text-sm font-bold text-[#FBF676]">Available:</span>
-                        <span className="text-xl font-extrabold text-[#FBF676]">
+                      <div className="flex justify-between items-center pt-3 border-t border-[#d8e6ec]">
+                        <span className="text-sm font-bold text-[#05627C]">Available:</span>
+                        <span className="text-xl font-extrabold text-[#05627C]">
                           ${availableBalance.toFixed(2)}
                         </span>
                       </div>
                     </div>
 
                     <div>
-                      <label className="block text-sm font-bold text-[#FBF676] mb-3">
-                        Withdrawal Amount (USD)
-                      </label>
+                      <label className={t.label}>Withdrawal Amount (USD)</label>
                       <input
                         type="number"
                         value={withdrawAmount}
@@ -475,37 +454,36 @@ export default function WithdrawPage() {
                         min={MIN_WITHDRAWAL_AMOUNT}
                         max={availableBalance}
                         step="0.01"
-                        className="w-full px-4 py-3 border border-[#FBF676]/40 rounded-xl bg-[#081028] text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-[#FBF676]/40 focus:border-[#FBF676]/70 font-semibold"
-                        style={{ colorScheme: 'dark' }}
+                        className={t.input}
                         placeholder={`Min $${MIN_WITHDRAWAL_AMOUNT}`}
                       />
-                      <p className="mt-2 text-xs text-[#FBF676]/80 font-semibold">
-                        Minimum: <span className="text-[#FBF676]">${MIN_WITHDRAWAL_AMOUNT}</span>
+                      <p className="mt-2 text-xs font-semibold" style={{ color: t.muted }}>
+                        Minimum: <span style={{ color: t.primary }}>${MIN_WITHDRAWAL_AMOUNT}</span>
                         {' | '}
-                        Maximum: <span className="text-[#FBF676]">${availableBalance.toFixed(2)}</span>
+                        Maximum: <span style={{ color: t.primary }}>${availableBalance.toFixed(2)}</span>
                         {binaryTree && binaryTree.cappingLimit > 0 && (
-                          <> | Capping Limit: <span className="text-[#FBF676]">${binaryTree.cappingLimit.toFixed(2)}</span></>
+                          <> | Capping Limit: <span className="text-[#05627C]">${binaryTree.cappingLimit.toFixed(2)}</span></>
                         )}
                       </p>
                     </div>
 
                     {withdrawAmount && parseFloat(withdrawAmount) > 0 && (
-                      <div className="p-5 bg-[rgba(5,12,32,0.9)] border-2 border-[#FBF676]/35 rounded-xl">
-                        <h4 className="font-extrabold text-white mb-4">Withdrawal Summary</h4>
+                      <div className={`p-5 rounded-xl ${t.cardHighlight}`}>
+                        <h4 className="font-extrabold mb-4" style={{ color: t.ink }}>Withdrawal Summary</h4>
                         <div className="space-y-2 text-sm">
                           <div className="flex justify-between">
-                            <span className="text-[#FBF676]/80 font-semibold">Amount:</span>
+                            <span className="text-[#5A6F78] font-semibold">Amount:</span>
                             <span className="font-extrabold text-white">${parseFloat(withdrawAmount).toFixed(2)}</span>
                           </div>
                           <div className="flex justify-between">
-                            <span className="text-[#FBF676]/80 font-semibold">Charges (5%):</span>
-                            <span className="font-extrabold text-[#FBF676]">
+                            <span className="text-[#5A6F78] font-semibold">Charges (5%):</span>
+                            <span className="font-extrabold text-[#05627C]">
                               -${(parseFloat(withdrawAmount) * 0.05).toFixed(2)}
                             </span>
                           </div>
-                          <div className="flex justify-between pt-3 border-t border-[#FBF676]/30">
-                            <span className="font-bold text-[#FBF676]">Final Amount:</span>
-                            <span className="text-xl font-extrabold text-[#FBF676]">
+                          <div className="flex justify-between pt-3 border-t border-[#d8e6ec]">
+                            <span className="font-bold text-[#05627C]">Final Amount:</span>
+                            <span className="text-xl font-extrabold text-[#05627C]">
                               ${(parseFloat(withdrawAmount) * 0.95).toFixed(2)}
                             </span>
                           </div>
@@ -523,171 +501,131 @@ export default function WithdrawPage() {
                         // Non-free accounts: require target completed to withdraw
                         (userProfile?.accountType !== 'free' && targetStatus && (targetStatus.binaryTargetAmount ?? 0) > 0 && !targetStatus.isCompleted)
                       )}
-                      className="w-full px-6 py-4 bg-[#FBF676] text-[#0C1A6B] rounded-xl hover:bg-[#e8e04a] font-bold transition-all shadow-lg shadow-[#FBF676]/25 hover:scale-[1.01] active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+                      className={`${t.btnPrimary} w-full py-4`}
                     >
                       {withdrawing ? 'Processing...' : 'Submit Withdrawal Request'}
                     </button>
                     {!walletAddress && (
-                      <p className="mt-3 text-sm text-[#FBF676] text-center font-semibold">
+                      <p className="mt-3 text-sm text-center font-semibold" style={{ color: t.primary }}>
                         Please set your USDT TRC20 wallet address to proceed
                       </p>
                     )}
                     {userProfile?.accountType !== 'free' && targetStatus && (targetStatus.binaryTargetAmount ?? 0) > 0 && !targetStatus.isCompleted && (
-                      <p className="mt-3 text-sm text-[#FBF676] text-center font-semibold">
+                      <p className="mt-3 text-sm text-center font-semibold" style={{ color: t.primary }}>
                         Complete your binary target to unlock withdrawal
                       </p>
                     )}
                   </>
                 )}
               </div>
-            </div>
           </div>
 
-          {/* Wallet Address Section */}
-          <div className="mb-8">
-            <div className="rounded-2xl shadow-2xl border border-[#FBF676]/25 p-8 backdrop-blur-md bg-[rgba(8,16,40,0.75)]">
-              <div className="flex justify-between items-center mb-6">
-                <h2 className="text-2xl font-extrabold text-white flex items-center gap-2">
-                  <span className="w-1 h-6 rounded" style={{ background: 'linear-gradient(180deg, #FBF676, #05627C)' }}></span>
+          <div className={t.card}>
+              <div className="flex justify-between items-center mb-6 flex-wrap gap-3">
+                <h2 className={`${t.sectionTitle} flex items-center gap-2`}>
+                  <span className={t.accentBar} style={t.accentBarStyle} />
                   Payment Information
                 </h2>
                 {!userWalletAddress && (
-                  <button
-                    onClick={() => {
-                      setModalWalletAddress(''); // Reset modal input when opening modal
-                      setShowWalletModal(true);
-                    }}
-                    className="px-6 py-3 bg-[#FBF676] text-[#0C1A6B] rounded-xl hover:bg-[#e8e04a] font-bold transition-all shadow-lg shadow-[#FBF676]/25 hover:shadow-[#FBF676]/30 hover:scale-105 active:scale-95"
-                  >
+                  <button type="button" onClick={() => { setModalWalletAddress(''); setShowWalletModal(true); }} className={t.btnPrimary}>
                     Setup Payment Info
                   </button>
                 )}
               </div>
               <div>
-                <h3 className="text-sm font-bold text-[#FBF676] mb-3">USDT TRC20 Wallet Address</h3>
+                <h3 className={t.label}>USDT TRC20 Wallet Address</h3>
                 {walletAddress ? (
-                  <div className="p-4 bg-[rgba(5,12,32,0.9)] border-2 border-[#FBF676]/35 rounded-xl">
-                    <p className="text-sm font-mono text-white break-all font-semibold">{walletAddress}</p>
-                    <p className="text-xs text-[#FBF676] mt-2 font-bold">✓ Wallet address configured</p>
-                    <p className="text-xs text-white/50 mt-2 font-semibold">
+                  <div className={`p-4 rounded-xl ${t.cardInner}`}>
+                    <p className="text-sm font-mono break-all font-semibold" style={{ color: t.ink }}>{walletAddress}</p>
+                    <p className="text-xs text-emerald-700 mt-2 font-bold">✓ Wallet address configured</p>
+                    <p className="text-xs mt-2 font-medium" style={{ color: t.muted }}>
                       Wallet address cannot be changed. Contact admin support if you need to update it.
                     </p>
                   </div>
                 ) : (
-                  <div className="p-4 bg-[rgba(5,12,32,0.9)] border border-[#FBF676]/30 rounded-xl">
-                    <p className="text-sm text-white/80 font-semibold">No wallet address set</p>
-                    <p className="text-xs text-[#FBF676] mt-2 font-bold">Required for withdrawals</p>
-                    <p className="text-xs text-white/50 mt-2 font-semibold">
-                      Supported: USDT TRC20 only
-                    </p>
+                  <div className={`p-4 rounded-xl ${t.cardInner}`}>
+                    <p className="text-sm font-semibold" style={{ color: t.ink }}>No wallet address set</p>
+                    <p className="text-xs mt-2 font-bold" style={{ color: t.primary }}>Required for withdrawals</p>
+                    <p className="text-xs mt-2 font-medium" style={{ color: t.muted }}>Supported: USDT TRC20 only</p>
                   </div>
                 )}
               </div>
               {!walletAddress && (
-                <div className="mt-6 p-5 bg-red-900/30 border border-red-500/50 rounded-xl">
-                  <p className="text-sm font-extrabold text-red-400 mb-2">⚠️ Payment Information Required</p>
-                  <p className="text-xs text-red-300 font-semibold">
+                <div className="mt-6 p-4 bg-red-50 border border-red-200 rounded-xl">
+                  <p className="text-sm font-extrabold text-red-700 mb-2">⚠️ Payment Information Required</p>
+                  <p className="text-xs text-red-600 font-medium">
                     You need to set a USDT TRC20 wallet address to request withdrawals.
-                  </p>
-                  <p className="text-xs text-[#FBF676] mt-2 font-semibold">
-                    Only USDT TRC20 wallet addresses are accepted for withdrawals
                   </p>
                 </div>
               )}
-            </div>
           </div>
 
-          {/* Withdrawal History Section */}
-          <div className="mb-10">
-            <div className="rounded-2xl shadow-2xl border border-[#FBF676]/25 p-8 backdrop-blur-md bg-[rgba(8,16,40,0.75)]">
-              <h2 className="text-2xl font-extrabold mb-6 text-[#FBF676]">
-                Withdrawal History
-              </h2>
+          <div className={t.card}>
+              <h2 className={`${t.sectionTitle} mb-6`}>Withdrawal History</h2>
               {withdrawals.length === 0 ? (
-                <div className="text-center py-12 text-white/50 text-lg">
+                <div className="text-center py-10 font-medium" style={{ color: t.muted }}>
                   <p>No withdrawal history found</p>
                 </div>
               ) : (
-                <div className="overflow-x-auto">
-                  <table className="min-w-full divide-y divide-[#FBF676]/15">
-                    <thead className="bg-[rgba(5,12,32,0.9)]">
-                      <tr>
-                        <th className="px-6 py-5 text-left text-xs font-bold text-[#FBF676] uppercase tracking-wider">Date</th>
-                        <th className="px-6 py-5 text-left text-xs font-bold text-[#FBF676] uppercase tracking-wider">Withdrawal ID</th>
-                        <th className="px-6 py-5 text-left text-xs font-bold text-[#FBF676] uppercase tracking-wider">Amount</th>
-                        <th className="px-6 py-5 text-left text-xs font-bold text-[#FBF676] uppercase tracking-wider">Charges</th>
-                        <th className="px-6 py-5 text-left text-xs font-bold text-[#FBF676] uppercase tracking-wider">Final Amount</th>
-                        <th className="px-6 py-5 text-left text-xs font-bold text-[#FBF676] uppercase tracking-wider">Wallet Type</th>
-                        <th className="px-6 py-5 text-left text-xs font-bold text-[#FBF676] uppercase tracking-wider">Status</th>
-                      </tr>
-                    </thead>
-                    <tbody className="bg-[rgba(5,12,32,0.45)] divide-y divide-[#FBF676]/10">
-                      {withdrawals.map((wd) => (
-                        <tr key={wd.id} className="hover:bg-[rgba(251,246,118,0.08)] transition-all duration-300 group">
-                          <td className="px-6 py-5 whitespace-nowrap text-sm text-white/55">
-                            {formatDateTimeLongUK(wd.createdAt)}
-                          </td>
-                          <td className="px-6 py-5 whitespace-nowrap text-sm font-mono text-[#FBF676] font-semibold">
-                            {wd.withdrawalId || wd.id.substring(0, 8)}
-                          </td>
-                          <td className="px-6 py-5 whitespace-nowrap text-sm font-bold text-white">
-                            ${wd.amount.toFixed(2)}
-                          </td>
-                          <td className="px-6 py-5 whitespace-nowrap text-sm text-white/55 font-semibold">
-                            ${wd.charges.toFixed(2)}
-                          </td>
-                          <td className="px-6 py-5 whitespace-nowrap text-sm font-extrabold text-[#FBF676]">
-                            ${wd.finalAmount.toFixed(2)}
-                          </td>
-                          <td className="px-6 py-5 whitespace-nowrap text-sm text-white/75 capitalize font-semibold">
-                            {wd.walletType}
-                          </td>
-                          <td className="px-6 py-5 whitespace-nowrap text-sm">
-                            <span className={`px-4 py-1.5 inline-flex text-xs leading-5 font-bold rounded-full border ${
-                              wd.status === 'approved' 
-                                ? 'bg-[rgba(251,246,118,0.15)] text-[#FBF676] border-[#FBF676]/40'
-                                : wd.status === 'pending' 
-                                ? 'bg-white/10 text-white/70 border-white/20'
-                                : 'bg-red-900/40 text-red-400 border-red-500/40'
-                            }`}>
-                              {wd.status}
-                            </span>
-                          </td>
+                <div className={t.tableWrap}>
+                  <div className="overflow-x-auto">
+                    <table className={t.table}>
+                      <thead className={t.tableHead}>
+                        <tr>
+                          {['Date', 'Withdrawal ID', 'Amount', 'Charges', 'Final Amount', 'Wallet Type', 'Status'].map((h) => (
+                            <th key={h} className={t.tableHeadCell}>{h}</th>
+                          ))}
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                      </thead>
+                      <tbody className={t.tableBody}>
+                        {withdrawals.map((wd) => (
+                          <tr key={wd.id} className={t.tableRow}>
+                            <td className="px-4 md:px-6 py-4 whitespace-nowrap text-sm" style={{ color: t.muted }}>
+                              {formatDateTimeLongUK(wd.createdAt)}
+                            </td>
+                            <td className="px-4 md:px-6 py-4 whitespace-nowrap text-sm font-mono font-semibold" style={{ color: t.primary }}>
+                              {wd.withdrawalId || wd.id.substring(0, 8)}
+                            </td>
+                            <td className="px-4 md:px-6 py-4 whitespace-nowrap text-sm font-bold" style={{ color: t.ink }}>${wd.amount.toFixed(2)}</td>
+                            <td className="px-4 md:px-6 py-4 whitespace-nowrap text-sm font-semibold" style={{ color: t.muted }}>${wd.charges.toFixed(2)}</td>
+                            <td className="px-4 md:px-6 py-4 whitespace-nowrap text-sm font-extrabold" style={{ color: t.primary }}>${wd.finalAmount.toFixed(2)}</td>
+                            <td className="px-4 md:px-6 py-4 whitespace-nowrap text-sm capitalize font-semibold" style={{ color: t.muted }}>{wd.walletType}</td>
+                            <td className="px-4 md:px-6 py-4 whitespace-nowrap">
+                              <span className={`px-3 py-1 text-xs font-extrabold rounded-full ${wd.status === 'approved' ? t.badgeActive : wd.status === 'pending' ? t.badgePending : t.badgeError}`}>
+                                {wd.status}
+                              </span>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
                 </div>
               )}
-            </div>
           </div>
 
-          {/* Wallet Address Modal */}
           {showWalletModal && (
-            <div className="fixed inset-0 bg-black/80 backdrop-blur-sm overflow-y-auto h-full w-full z-50">
-              <div className="relative top-10 mx-auto p-6 border border-[#FBF676]/25 w-full max-w-2xl shadow-2xl rounded-2xl backdrop-blur-md bg-[rgba(8,16,40,0.95)]">
-                <div className="mt-3">
-                  <h3 className="text-xl font-extrabold text-white mb-6 flex items-center gap-2">
-                    <span className="bg-gradient-to-r from-yellow-300 via-yellow-400 to-yellow-600 bg-clip-text text-transparent">Setup Payment Information</span>
-                  </h3>
-                  <p className="text-sm text-yellow-300 mb-6 font-semibold">
+            <div className={t.modalOverlay}>
+              <div className={`${t.modalPanel} max-w-2xl`}>
+                  <h3 className="text-xl font-extrabold mb-2" style={{ color: t.ink }}>Setup Payment Information</h3>
+                  <p className="text-sm mb-6 font-medium" style={{ color: t.muted }}>
                     Set your USDT TRC20 wallet address to enable withdrawals.
                   </p>
-                  <div className="mb-6 p-4 bg-[rgba(251,246,118,0.12)] border-2 border-[#FBF676]/35 rounded-xl">
-                    <p className="text-sm font-bold text-[#FBF676] mb-2">Payment Method:</p>
-                    <p className="text-xs text-white font-semibold">
-                      Only <strong className="text-[#FBF676]">USDT TRC20</strong> wallet addresses are accepted for withdrawals.
+                  <div className={`mb-6 p-4 rounded-xl ${t.cardHighlight}`}>
+                    <p className="text-sm font-bold mb-2" style={{ color: t.primary }}>Payment Method:</p>
+                    <p className="text-xs font-medium" style={{ color: t.ink }}>
+                      Only <strong>USDT TRC20</strong> wallet addresses are accepted for withdrawals.
                     </p>
                   </div>
                   
                   <div>
-                    <label className="block text-sm font-bold text-[#FBF676] mb-3">
-                      USDT TRC20 Wallet Address {userWalletAddress && <span className="text-[#FBF676]">(Cannot be changed)</span>}
+                    <label className={t.label}>
+                      USDT TRC20 Wallet Address {userWalletAddress && <span style={{ color: t.muted }}>(Cannot be changed)</span>}
                     </label>
                     {userWalletAddress ? (
-                      <div className="p-4 bg-yellow-900/80 border border-[#FBF676]/25 rounded-xl">
-                        <p className="text-sm font-mono text-white break-all font-semibold">{userWalletAddress}</p>
-                        <p className="mt-2 text-xs text-red-400 font-bold">
+                      <div className="p-4 bg-amber-50 border border-amber-200 rounded-xl">
+                        <p className="text-sm font-mono break-all font-semibold" style={{ color: t.ink }}>{userWalletAddress}</p>
+                        <p className="mt-2 text-xs text-red-700 font-bold">
                           ⚠️ Wallet address cannot be changed once set. Contact admin support if you need to update it.
                         </p>
                       </div>
@@ -697,52 +635,29 @@ export default function WithdrawPage() {
                           type="text"
                           value={modalWalletAddress}
                           onChange={(e) => setModalWalletAddress(e.target.value)}
-                          onKeyDown={(e) => {
-                            // Prevent Enter key from submitting
-                            if (e.key === 'Enter') {
-                              e.preventDefault();
-                            }
-                          }}
-                          className="w-full px-4 py-3 border border-[#FBF676]/40 rounded-xl bg-[#081028] text-white focus:outline-none focus:ring-2 focus:ring-[#FBF676]/40 focus:border-[#FBF676]/70 font-mono text-sm font-semibold"
-                          style={{ colorScheme: 'dark' }}
+                          onKeyDown={(e) => { if (e.key === 'Enter') e.preventDefault(); }}
+                          className={`${t.input} font-mono text-sm`}
                           placeholder="Enter your USDT TRC20 wallet address (starts with T)"
                           autoComplete="off"
                         />
-                        <p className="mt-2 text-xs text-[#FBF676] font-semibold">
+                        <p className="mt-2 text-xs font-medium" style={{ color: t.muted }}>
                           Enter your USDT TRC20 wallet address for withdrawals. This can only be set once.
-                        </p>
-                        <p className="mt-2 text-xs text-[#FBF676] font-bold">
-                          💡 USDT TRC20 wallet addresses start with "T" (e.g., Txxxxxxxxxxxxxxxxxxxxxxxxxxxxx).
                         </p>
                       </>
                     )}
                   </div>
 
-                  <div className="flex justify-end space-x-3 mt-8">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setShowWalletModal(false);
-                        setModalWalletAddress(''); // Reset modal input on cancel
-                      }}
-                      className="px-6 py-2.5 text-sm font-bold text-[#FBF676] bg-yellow-900 rounded-xl hover:bg-yellow-800 transition-all"
-                    >
+                  <div className="flex justify-end gap-2 mt-6">
+                    <button type="button" onClick={() => { setShowWalletModal(false); setModalWalletAddress(''); }} className={t.btnGhost}>
                       Cancel
                     </button>
-                    <button
-                      type="button"
-                      onClick={handleUpdatePaymentInfo}
-                      disabled={!modalWalletAddress || modalWalletAddress.trim().length === 0}
-                      className="px-6 py-2.5 text-sm font-bold text-black bg-[#FBF676] rounded-xl hover:bg-[#e8e04a] disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg shadow-[#FBF676]/25 hover:shadow-[#FBF676]/30 hover:scale-105 active:scale-95"
-                    >
+                    <button type="button" onClick={handleUpdatePaymentInfo} disabled={!modalWalletAddress || modalWalletAddress.trim().length === 0} className={t.btnPrimary}>
                       Save
                     </button>
                   </div>
-                </div>
               </div>
             </div>
           )}
-          </div>
-        </div>
+    </div>
   );
 }

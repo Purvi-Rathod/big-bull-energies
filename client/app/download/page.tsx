@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import Footer from "@/components/Footer";
@@ -12,7 +13,19 @@ const PRIMARY = "#05627C";
 
 const GOLD = "#F5B300";
 
+/** Served from client/public (copied from "BigBull Energies new design.pdf") */
+const BROCHURE_HREF = "/big-bull-energies-brochure.pdf";
+const BROCHURE_DOWNLOAD_NAME = "Big-Bull-Energies-Brochure.pdf";
+
 export default function DownloadPage() {
+  // Chrome blocks the HTML `download` attribute on plain HTTP ("Insecure download blocked").
+  // Localhost and HTTPS are secure contexts — only then force a file download.
+  const [canForceDownload, setCanForceDownload] = useState(false);
+
+  useEffect(() => {
+    setCanForceDownload(window.isSecureContext);
+  }, []);
+
   return (
     <div
       className="min-h-screen w-full overflow-x-hidden"
@@ -117,8 +130,12 @@ export default function DownloadPage() {
                   </div>
 
                   <a
-                    href="/crown-bankers-brochure.pdf"
-                    download="Big-Bull-Energies-Brochure.pdf"
+                    href={BROCHURE_HREF}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    {...(canForceDownload
+                      ? { download: BROCHURE_DOWNLOAD_NAME }
+                      : {})}
                     className="inline-flex items-center gap-3 px-8 py-4 rounded-lg font-bold text-white transition hover:opacity-90 shadow-lg hover:shadow-xl"
                     style={{ backgroundColor: PRIMARY }}
                   >
@@ -127,7 +144,10 @@ export default function DownloadPage() {
                   </a>
 
                   <p className="text-sm mt-4" style={{ color: PRIMARY, opacity: 0.55 }}>
-                    PDF file &nbsp;•&nbsp; Opens in new tab
+                    PDF file &nbsp;•&nbsp;{" "}
+                    {canForceDownload
+                      ? "Downloads to your device"
+                      : "Opens in a new tab — use Save to download"}
                   </p>
                 </div>
               </div>

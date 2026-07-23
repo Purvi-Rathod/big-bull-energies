@@ -1,10 +1,11 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { useAuth } from '@/contexts/AuthContext';
 import { api } from '@/lib/api';
 import toast from 'react-hot-toast';
 import BigBullLoader from '@/components/BigBullLoader';
+import { dashboardTheme as t } from '@/lib/dashboardTheme';
+import { Ticket } from 'lucide-react';
 
 interface Voucher {
   id: string;
@@ -23,7 +24,6 @@ interface Voucher {
 }
 
 export default function VouchersPage() {
-  const { user } = useAuth();
   const [vouchers, setVouchers] = useState<Voucher[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -32,29 +32,19 @@ export default function VouchersPage() {
   const [fromWalletType, setFromWalletType] = useState('');
   const [creating, setCreating] = useState(false);
   const [wallets, setWallets] = useState<any[]>([]);
-  const [minVoucherAmount, setMinVoucherAmount] = useState<number>(12.5); // Default fallback
+  const [minVoucherAmount, setMinVoucherAmount] = useState<number>(12.5);
   const hasFetchedRef = useRef(false);
 
   useEffect(() => {
-    // Prevent duplicate calls (React StrictMode in development)
-    if (hasFetchedRef.current) {
-      return;
-    }
+    if (hasFetchedRef.current) return;
     hasFetchedRef.current = true;
-    
     fetchVouchers();
     fetchWallets();
-    // Always fetch minimum voucher amount to get latest packages
     fetchMinimumVoucherAmount();
-
-    // No cleanup - we want to prevent duplicate calls even on remount
   }, []);
 
-  // Also fetch minimum when modal opens to ensure latest value
   useEffect(() => {
-    if (showCreateModal) {
-      fetchMinimumVoucherAmount();
-    }
+    if (showCreateModal) fetchMinimumVoucherAmount();
   }, [showCreateModal]);
 
   const fetchMinimumVoucherAmount = async () => {
@@ -65,16 +55,13 @@ export default function VouchersPage() {
       }
     } catch (err: any) {
       console.error('Failed to load minimum voucher amount:', err);
-      // Keep default fallback value (12.5)
     }
   };
 
   const fetchWallets = async () => {
     try {
       const response = await api.getUserWallets();
-      if (response.data) {
-        setWallets(response.data.wallets || []);
-      }
+      if (response.data) setWallets(response.data.wallets || []);
     } catch (err: any) {
       console.error('Failed to load wallets:', err);
     }
@@ -84,9 +71,7 @@ export default function VouchersPage() {
     try {
       setLoading(true);
       const response = await api.getUserVouchers();
-      if (response.data) {
-        setVouchers(response.data.vouchers || []);
-      }
+      if (response.data) setVouchers(response.data.vouchers || []);
     } catch (err: any) {
       const errorMsg = err.message || 'Failed to load vouchers';
       setError(errorMsg);
@@ -106,7 +91,7 @@ export default function VouchersPage() {
 
     const requestedAmount = parseFloat(createAmount);
     if (requestedAmount < minVoucherAmount) {
-      const errorMsg = `Minimum voucher amount is $${minVoucherAmount.toFixed(2)}. You cannot create a voucher below this amount.`;
+      const errorMsg = `Minimum voucher amount is $${minVoucherAmount.toFixed(2)}.`;
       setError(errorMsg);
       toast.error(errorMsg);
       return;
@@ -119,10 +104,11 @@ export default function VouchersPage() {
       return;
     }
 
-    // Check if selected wallet has sufficient balance
-    const selectedWallet = wallets.find(w => w.type === fromWalletType);
+    const selectedWallet = wallets.find((w) => w.type === fromWalletType);
     if (selectedWallet) {
-      const availableBalance = parseFloat(selectedWallet.balance) - parseFloat(selectedWallet.reserved || '0');
+      const availableBalance =
+        parseFloat(selectedWallet.balance) -
+        parseFloat(selectedWallet.reserved || '0');
       if (requestedAmount > availableBalance) {
         const errorMsg = `Insufficient balance. Available: $${availableBalance.toFixed(2)}`;
         setError(errorMsg);
@@ -164,277 +150,313 @@ export default function VouchersPage() {
 
   const getDaysRemaining = (expiry: string | null) => {
     if (!expiry) return null;
-    const expiryDate = new Date(expiry);
-    const now = new Date();
-    const diffTime = expiryDate.getTime() - now.getTime();
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    return diffDays;
+    const diffTime = new Date(expiry).getTime() - Date.now();
+    return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
   };
 
   const getDaysSinceCreation = (createdAt: string) => {
-    const createdDate = new Date(createdAt);
-    const now = new Date();
-    const diffTime = now.getTime() - createdDate.getTime();
-    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-    return diffDays;
+    const diffTime = Date.now() - new Date(createdAt).getTime();
+    return Math.floor(diffTime / (1000 * 60 * 60 * 24));
   };
 
   if (loading) {
-    return <BigBullLoader fullScreen />;
+    return <BigBullLoader text="Loading vouchers…" />;
   }
 
   return (
-    <div className="w-full min-h-screen py-4 md:py-8 px-2 sm:px-4 md:px-6 lg:px-8 relative overflow-hidden">
-      {/* Decorative background elements */}
-      <div className="fixed inset-0 pointer-events-none opacity-20">
-        <div className="absolute top-0 left-1/4 w-96 h-96 bg-[#FBF676]/10 rounded-full blur-3xl"></div>
-        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-[#FBF676]/10 rounded-full blur-3xl"></div>
-      </div>
-
-      <div className="relative z-10">
-      <div className="mb-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <h1 className="text-3xl font-extrabold mb-2 text-white flex items-center gap-3">
-          <span className="bg-gradient-to-r from-yellow-300 via-yellow-400 to-yellow-600 bg-clip-text text-transparent drop-shadow-lg">Vouchers</span>
-        </h1>
+    <div className={t.page}>
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h1 className={t.title}>Vouchers</h1>
+          <p className={t.subtitle}>
+            Create and manage investment vouchers from your earning wallets
+          </p>
+        </div>
         <button
+          type="button"
           onClick={() => setShowCreateModal(true)}
-          className="px-6 py-3 bg-[#FBF676] text-[#0C1A6B] rounded-xl hover:bg-[#e8e04a] font-bold transition-all shadow-lg shadow-[#FBF676]/25 hover:shadow-[#FBF676]/30 hover:scale-105 active:scale-95"
+          className={t.btnPrimary}
         >
           + Create Voucher
         </button>
       </div>
-          {error && (
-            <div className="mb-6 bg-red-900/30 border border-red-500/50 text-red-400 px-4 py-3 rounded-lg backdrop-blur-sm">
-              {error}
-            </div>
-          )}
 
-      <div>
-            {vouchers.length === 0 ? (
-              <div className="rounded-2xl shadow-2xl border border-[#FBF676]/25 backdrop-blur-md bg-[rgba(8,16,40,0.75)] p-12 text-center">
-                <p className="text-white/55 text-lg mb-6">No vouchers found</p>
-                <button
-                  onClick={() => setShowCreateModal(true)}
-                  className="px-8 py-3 bg-[#FBF676] text-[#0C1A6B] rounded-xl hover:bg-[#e8e04a] font-bold transition-all shadow-lg shadow-[#FBF676]/25 hover:shadow-[#FBF676]/30 hover:scale-105 active:scale-95"
-                >
-                  Create Your First Voucher
-                </button>
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {vouchers.map((voucher) => {
-                  const expired = isExpired(voucher.expiry);
-                  const daysRemaining = getDaysRemaining(voucher.expiry);
-                  const daysSinceCreation = getDaysSinceCreation(voucher.createdAt);
-                  const investmentValue = voucher.investmentValue || voucher.amount * (voucher.multiplier || 2);
-                  
-                  return (
-                    <div key={voucher.id} className="group backdrop-blur-md bg-[rgba(8,16,40,0.95)] rounded-2xl shadow-2xl border border-[#FBF676]/30 p-6 hover:border-[#FBF676]/60 hover:shadow-[#FBF676]/20 transition-all duration-300">
-                      <div className="flex justify-between items-start mb-4">
-                        <div className="flex-1">
-                          <h3 className="text-lg font-extrabold text-[#FBF676] font-mono text-sm mb-1">{voucher.voucherId}</h3>
-                          <p className="text-xs text-white/55">
-                            Created: {new Date(voucher.createdOn || voucher.createdAt).toLocaleString()}
-                          </p>
-                          {daysSinceCreation !== null && (
-                            <p className="text-xs text-gray-500">
-                              {daysSinceCreation} day{daysSinceCreation !== 1 ? 's' : ''} ago
-                            </p>
-                          )}
-                        </div>
-                        <span
-                          className={`px-4 py-1.5 text-xs font-bold rounded-full shadow-lg whitespace-nowrap ${
-                            voucher.status === 'active' && !expired
-                              ? 'bg-[rgba(251,246,118,0.15)] text-[#FBF676] border border-[#FBF676]/40'
-                              : voucher.status === 'used'
-                              ? 'bg-gray-700/50 text-white/75 border border-gray-600'
-                              : expired
-                              ? 'bg-red-900/40 text-red-400 border border-red-500/40'
-                              : 'bg-gray-700/50 text-white/75 border border-gray-600'
-                          }`}
-                        >
-                          {expired ? 'Expired' : voucher.status}
-                        </span>
-                      </div>
+      {error && <div className={t.error}>{error}</div>}
 
-                      <div className="space-y-3 mb-4">
-                        <div className="p-4 bg-[rgba(251,246,118,0.12)] rounded-xl border-2 border-[#FBF676]/40 shadow-lg shadow-[#FBF676]/15">
-                          <div className="flex justify-between items-center mb-2">
-                            <span className="font-bold text-white/85">Purchase Amount:</span>
-                            <span className="text-xl font-extrabold text-[#FBF676]">
-                              ${voucher.amount.toFixed(2)}
-                            </span>
-                          </div>
-                          <div className="flex justify-between items-center">
-                            <span className="text-sm text-white/75 font-semibold">Investment Value:</span>
-                            <span className="text-lg font-extrabold text-[#FBF676]">
-                              ${investmentValue.toFixed(2)}
-                            </span>
-                          </div>
-                          <div className="text-xs text-white/55 mt-2 font-semibold">
-                            Multiplier: {voucher.multiplier || 2}x
-                          </div>
-                        </div>
-
-                        <div className="grid grid-cols-2 gap-3 text-sm">
-                          <div className="p-3 bg-[rgba(5,12,32,0.9)] rounded-xl border border-[#FBF676]/50">
-                            <div className="text-white/55 text-xs mb-1 font-semibold">Created At</div>
-                            <div className="font-bold text-white">
-                              {new Date(voucher.createdOn || voucher.createdAt).toLocaleDateString()}
-                            </div>
-                            <div className="text-xs text-gray-500">
-                              {new Date(voucher.createdOn || voucher.createdAt).toLocaleTimeString()}
-                            </div>
-                          </div>
-
-                          {voucher.expiry && (
-                            <div className={`p-3 rounded-xl border ${expired ? 'bg-red-900/30 border-red-500/40' : 'bg-gray-800/80 border-gray-700/50'}`}>
-                              <div className="text-white/55 text-xs mb-1 font-semibold">Expiry Date</div>
-                              <div className={`font-bold ${expired ? 'text-red-400' : 'text-white'}`}>
-                                {new Date(voucher.expiry).toLocaleDateString()}
-                              </div>
-                              <div className={`text-xs ${expired ? 'text-red-500' : 'text-gray-500'}`}>
-                                {new Date(voucher.expiry).toLocaleTimeString()}
-                              </div>
-                            </div>
-                          )}
-                        </div>
-
-                        {voucher.expiry && daysRemaining !== null && (
-                          <div className={`p-4 rounded-xl border-2 ${expired ? 'bg-red-900/30 border-red-500/50' : daysRemaining <= 7 ? 'bg-[rgba(251,246,118,0.12)] border-[#FBF676]/50' : 'bg-[rgba(5,12,32,0.9)] border-[#FBF676]/25'}`}>
-                            <div className="flex justify-between items-center">
-                              <span className={`font-bold ${expired ? 'text-red-400' : daysRemaining <= 7 ? 'text-yellow-300' : 'text-white/85'}`}>
-                                Days Remaining:
-                              </span>
-                              <span className={`text-lg font-extrabold ${expired ? 'text-red-400' : daysRemaining <= 7 ? 'text-[#FBF676]' : 'text-[#FBF676]'}`}>
-                                {expired ? 'Expired' : daysRemaining <= 0 ? '0' : `${daysRemaining} day${daysRemaining !== 1 ? 's' : ''}`}
-                              </span>
-                            </div>
-                            {!expired && daysRemaining > 0 && (
-                              <div className="mt-3 w-full bg-gray-700/50 rounded-full h-2">
-                                <div
-                                  className={`h-2 rounded-full ${daysRemaining <= 7 ? 'bg-[#FBF676]' : 'bg-[#FBF676]'}`}
-                                  style={{ width: `${Math.min(100, (daysRemaining / 120) * 100)}%` }}
-                                ></div>
-                              </div>
-                            )}
-                          </div>
-                        )}
-
-                        {voucher.usedAt && (
-                          <div className="p-3 bg-gray-800/80 rounded-xl border border-[#FBF676]/25">
-                            <div className="flex justify-between items-center text-sm">
-                              <span className="text-white/55">Used On:</span>
-                              <span className="font-bold text-[#FBF676]">
-                                {new Date(voucher.usedAt).toLocaleString()}
-                              </span>
-                            </div>
-                          </div>
-                        )}
-
-                        {voucher.fromWalletType && (
-                          <div className="flex justify-between items-center text-sm p-3 bg-gray-800/80 rounded-xl border border-gray-700/50">
-                            <span className="text-white/55">Created From:</span>
-                            <span className="font-bold text-white">{voucher.fromWalletType} Wallet</span>
-                          </div>
-                        )}
-
-                        {voucher.createdBy && (
-                          <div className="flex justify-between items-center text-xs p-3 bg-gray-800/80 rounded-xl border border-gray-700/50">
-                            <span className="text-gray-500">Created By:</span>
-                            <span className="text-white/75">{voucher.createdBy.name} ({voucher.createdBy.userId})</span>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            )}
+      {vouchers.length === 0 ? (
+        <div className={t.cardEmpty}>
+          <div
+            className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl"
+            style={{ backgroundColor: t.soft }}
+          >
+            <Ticket className="h-7 w-7" style={{ color: t.primary }} />
+          </div>
+          <p className="text-lg font-bold" style={{ color: t.ink }}>
+            No vouchers found
+          </p>
+          <p className="mt-1 text-sm font-medium" style={{ color: t.muted }}>
+            Create a voucher from ROI, referral, or binary earnings to reinvest.
+          </p>
+          <button
+            type="button"
+            onClick={() => setShowCreateModal(true)}
+            className={`${t.btnPrimary} mt-6`}
+          >
+            Create Your First Voucher
+          </button>
         </div>
+      ) : (
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+          {vouchers.map((voucher) => {
+            const expired = isExpired(voucher.expiry);
+            const daysRemaining = getDaysRemaining(voucher.expiry);
+            const daysSinceCreation = getDaysSinceCreation(voucher.createdAt);
+            const investmentValue =
+              voucher.investmentValue ||
+              voucher.amount * (voucher.multiplier || 2);
 
-        {/* Create Voucher Modal */}
-        {showCreateModal && (
-          <div className="fixed inset-0 bg-[rgba(5,12,32,0.9)] backdrop-blur-sm overflow-y-auto h-full w-full z-50">
-            <div className="relative top-20 mx-auto p-6 border border-[#FBF676]/25 w-96 shadow-2xl rounded-2xl backdrop-blur-md bg-[rgba(8,16,40,0.95)]">
-              <div className="mt-3">
-                <h3 className="text-xl font-extrabold text-white mb-6 flex items-center gap-2">
-                  <span className="bg-gradient-to-r from-yellow-300 via-yellow-400 to-yellow-600 bg-clip-text text-transparent">Create Voucher</span>
-                </h3>
-                <div className="mb-5">
-                  <label className="block text-sm font-bold text-[#FBF676] mb-3">
-                    Amount (USD)
-                  </label>
-                  <input
-                    type="number"
-                    value={createAmount}
-                    onChange={(e) => setCreateAmount(e.target.value)}
-                    min={minVoucherAmount}
-                    step="0.01"
-                    className="w-full px-4 py-3 border border-[#FBF676]/40 rounded-xl bg-[#081028] text-white focus:outline-none focus:ring-2 focus:ring-[#FBF676]/40 focus:border-[#FBF676]/70 font-semibold"
-                    placeholder={`Enter amount (minimum $${minVoucherAmount.toFixed(2)})`}
-                  />
-                  <p className="mt-2 text-xs text-white/55 font-semibold">
-                    Minimum voucher amount: <span className="text-[#FBF676]">${minVoucherAmount.toFixed(2)}</span>
+            return (
+              <div key={voucher.id} className={t.card}>
+                <div className="mb-4 flex items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <h3
+                      className="truncate font-mono text-sm font-extrabold"
+                      style={{ color: t.primary }}
+                    >
+                      {voucher.voucherId}
+                    </h3>
+                    <p className="mt-1 text-xs font-medium" style={{ color: t.muted }}>
+                      Created:{' '}
+                      {new Date(
+                        voucher.createdOn || voucher.createdAt,
+                      ).toLocaleString()}
+                    </p>
+                    {daysSinceCreation !== null && (
+                      <p className="text-xs font-medium" style={{ color: t.muted }}>
+                        {daysSinceCreation} day
+                        {daysSinceCreation !== 1 ? 's' : ''} ago
+                      </p>
+                    )}
+                  </div>
+                  <span
+                    className={`whitespace-nowrap rounded-full px-3 py-1 text-[10px] font-extrabold uppercase ${
+                      voucher.status === 'active' && !expired
+                        ? t.badgeActive
+                        : voucher.status === 'used'
+                          ? t.badgeNeutral
+                          : expired
+                            ? t.badgeError
+                            : t.badgeNeutral
+                    }`}
+                  >
+                    {expired ? 'Expired' : voucher.status}
+                  </span>
+                </div>
+
+                <div className={`${t.cardHighlight} mb-3`}>
+                  <div className="mb-2 flex items-center justify-between">
+                    <span className="font-bold" style={{ color: t.ink }}>
+                      Purchase Amount
+                    </span>
+                    <span className="text-xl font-extrabold" style={{ color: t.primary }}>
+                      ${voucher.amount.toFixed(2)}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-semibold" style={{ color: t.muted }}>
+                      Investment Value
+                    </span>
+                    <span className="text-lg font-extrabold" style={{ color: t.ink }}>
+                      ${investmentValue.toFixed(2)}
+                    </span>
+                  </div>
+                  <p className="mt-2 text-xs font-semibold" style={{ color: t.muted }}>
+                    Multiplier: {voucher.multiplier || 2}x
                   </p>
                 </div>
-                <div className="mb-6">
-                  <label className="block text-sm font-bold text-[#FBF676] mb-3">
-                    From Wallet (Required)
-                  </label>
-                  <select
-                    value={fromWalletType}
-                    onChange={(e) => setFromWalletType(e.target.value)}
-                    required
-                    className="w-full px-4 py-3 border border-[#FBF676]/40 rounded-xl bg-[#081028] text-white focus:outline-none focus:ring-2 focus:ring-[#FBF676]/40 focus:border-[#FBF676]/70 font-semibold"
-                  >
-                    <option value="">Select a wallet</option>
-                    {wallets
-                      .filter((wallet) => {
-                        const allowedTypes = ['roi', 'interest', 'referral', 'binary', 'career_level'];
-                        return allowedTypes.includes(wallet.type);
-                      })
-                      .map((wallet) => {
-                        const walletNames: { [key: string]: string } = {
-                          roi: 'ROI Wallet',
-                          interest: 'Interest Wallet',
-                          referral: 'Referral Wallet',
-                          binary: 'Binary Wallet',
-                          career_level: 'Career Level Wallet',
-                        };
-                        return (
-                          <option key={wallet.type} value={wallet.type}>
-                            {walletNames[wallet.type] || wallet.type} - ${parseFloat(wallet.balance).toFixed(2)}
-                          </option>
-                        );
-                      })}
-                  </select>
+
+                <div className="mb-3 grid grid-cols-2 gap-2 text-sm">
+                  <div className={t.cardInner}>
+                    <div className="mb-1 text-xs font-semibold" style={{ color: t.muted }}>
+                      Created
+                    </div>
+                    <div className="font-bold" style={{ color: t.ink }}>
+                      {new Date(
+                        voucher.createdOn || voucher.createdAt,
+                      ).toLocaleDateString()}
+                    </div>
+                  </div>
+                  {voucher.expiry && (
+                    <div
+                      className={`rounded-xl border p-3 ${
+                        expired
+                          ? 'border-red-200 bg-red-50'
+                          : 'border-[#d8e6ec] bg-[#F7FBFC]'
+                      }`}
+                    >
+                      <div className="mb-1 text-xs font-semibold" style={{ color: t.muted }}>
+                        Expiry
+                      </div>
+                      <div
+                        className="font-bold"
+                        style={{ color: expired ? '#b91c1c' : t.ink }}
+                      >
+                        {new Date(voucher.expiry).toLocaleDateString()}
+                      </div>
+                    </div>
+                  )}
                 </div>
-                <div className="flex justify-end space-x-3">
-                  <button
-                    onClick={() => {
-                      setShowCreateModal(false);
-                      setCreateAmount('');
-                      setFromWalletType('');
-                      setError('');
-                    }}
-                    className="px-6 py-2.5 text-sm font-bold text-white/75 bg-gray-700 rounded-xl hover:bg-gray-600 transition-all"
+
+                {voucher.expiry && daysRemaining !== null && (
+                  <div
+                    className={`mb-3 rounded-xl border-2 p-3 ${
+                      expired
+                        ? 'border-red-200 bg-red-50'
+                        : daysRemaining <= 7
+                          ? 'border-amber-200 bg-amber-50'
+                          : 'border-[#d8e6ec] bg-[#F7FBFC]'
+                    }`}
                   >
-                    Cancel
-                  </button>
-                  <button
-                    onClick={handleCreateVoucher}
-                    disabled={creating}
-                    className="px-6 py-2.5 text-sm font-bold text-black bg-[#FBF676] rounded-xl hover:bg-[#e8e04a] disabled:opacity-50 transition-all shadow-lg shadow-[#FBF676]/25 hover:shadow-[#FBF676]/30 hover:scale-105 active:scale-95"
-                  >
-                    {creating ? 'Creating...' : 'Create Voucher'}
-                  </button>
-                </div>
+                    <div className="flex items-center justify-between">
+                      <span className="font-bold" style={{ color: t.ink }}>
+                        Days remaining
+                      </span>
+                      <span className="font-extrabold" style={{ color: t.primary }}>
+                        {expired
+                          ? 'Expired'
+                          : daysRemaining <= 0
+                            ? '0'
+                            : `${daysRemaining} day${daysRemaining !== 1 ? 's' : ''}`}
+                      </span>
+                    </div>
+                    {!expired && daysRemaining > 0 && (
+                      <div className="mt-3 h-2 w-full rounded-full bg-[#e8f0f3]">
+                        <div
+                          className="h-2 rounded-full"
+                          style={{
+                            width: `${Math.min(100, (daysRemaining / 120) * 100)}%`,
+                            backgroundColor: t.gold,
+                          }}
+                        />
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {voucher.usedAt && (
+                  <div className={`${t.cardInner} mb-2 text-sm`}>
+                    <div className="flex justify-between">
+                      <span style={{ color: t.muted }}>Used on</span>
+                      <span className="font-bold" style={{ color: t.ink }}>
+                        {new Date(voucher.usedAt).toLocaleString()}
+                      </span>
+                    </div>
+                  </div>
+                )}
+
+                {voucher.fromWalletType && (
+                  <div className={`${t.cardInner} text-sm`}>
+                    <div className="flex justify-between">
+                      <span style={{ color: t.muted }}>From</span>
+                      <span className="font-bold capitalize" style={{ color: t.ink }}>
+                        {voucher.fromWalletType} wallet
+                      </span>
+                    </div>
+                  </div>
+                )}
               </div>
+            );
+          })}
+        </div>
+      )}
+
+      {showCreateModal && (
+        <div className={t.modalOverlay}>
+          <div className={t.modalPanel}>
+            <h3 className="mb-1 text-xl font-extrabold" style={{ color: t.ink }}>
+              Create Voucher
+            </h3>
+            <p className="mb-5 text-sm font-medium" style={{ color: t.muted }}>
+              Convert wallet balance into an investment voucher
+            </p>
+
+            <div className="mb-4">
+              <label className={t.label}>Amount (USD)</label>
+              <input
+                type="number"
+                value={createAmount}
+                onChange={(e) => setCreateAmount(e.target.value)}
+                min={minVoucherAmount}
+                step="0.01"
+                className={t.input}
+                placeholder={`Minimum $${minVoucherAmount.toFixed(2)}`}
+              />
+              <p className="mt-2 text-xs font-semibold" style={{ color: t.muted }}>
+                Minimum:{' '}
+                <span style={{ color: t.primary }}>
+                  ${minVoucherAmount.toFixed(2)}
+                </span>
+              </p>
+            </div>
+
+            <div className="mb-6">
+              <label className={t.label}>From Wallet</label>
+              <select
+                value={fromWalletType}
+                onChange={(e) => setFromWalletType(e.target.value)}
+                required
+                className={t.select}
+              >
+                <option value="">Select a wallet</option>
+                {wallets
+                  .filter((wallet) =>
+                    ['roi', 'interest', 'referral', 'binary', 'career_level'].includes(
+                      wallet.type,
+                    ),
+                  )
+                  .map((wallet) => {
+                    const walletNames: Record<string, string> = {
+                      roi: 'ROI Wallet',
+                      interest: 'Interest Wallet',
+                      referral: 'Referral Wallet',
+                      binary: 'Binary Wallet',
+                      career_level: 'Career Level Wallet',
+                    };
+                    return (
+                      <option key={wallet.type} value={wallet.type}>
+                        {walletNames[wallet.type] || wallet.type} — $
+                        {parseFloat(wallet.balance).toFixed(2)}
+                      </option>
+                    );
+                  })}
+              </select>
+            </div>
+
+            <div className="flex justify-end gap-2">
+              <button
+                type="button"
+                onClick={() => {
+                  setShowCreateModal(false);
+                  setCreateAmount('');
+                  setFromWalletType('');
+                  setError('');
+                }}
+                className={t.btnGhost}
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleCreateVoucher}
+                disabled={creating}
+                className={t.btnPrimary}
+              >
+                {creating ? 'Creating…' : 'Create Voucher'}
+              </button>
             </div>
           </div>
-        )}
-          </div>
         </div>
+      )}
+    </div>
   );
 }

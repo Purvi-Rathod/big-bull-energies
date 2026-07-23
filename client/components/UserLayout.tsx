@@ -4,8 +4,94 @@ import { useState, useEffect } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import Link from "next/link";
-import Image from "next/image";
 import BigBullLoader from "./BigBullLoader";
+import {
+  LayoutDashboard,
+  Package,
+  LineChart,
+  Network,
+  GitBranch,
+  Users,
+  FileText,
+  Ticket,
+  Wallet,
+  Award,
+  UserCircle,
+  LifeBuoy,
+  LogOut,
+  Menu,
+  X,
+  Wind,
+  ChevronLeft,
+} from "lucide-react";
+
+type NavItem = {
+  name: string;
+  href: string;
+  icon: React.ComponentType<{ className?: string }>;
+};
+
+type NavGroup = {
+  label: string;
+  items: NavItem[];
+};
+
+const NAV_GROUPS: NavGroup[] = [
+  {
+    label: "Overview",
+    items: [{ name: "Dashboard", href: "/dashboard", icon: LayoutDashboard }],
+  },
+  {
+    label: "Invest",
+    items: [
+      { name: "Plans", href: "/plans", icon: Package },
+      { name: "Investments", href: "/investments", icon: LineChart },
+      { name: "Vouchers", href: "/vouchers", icon: Ticket },
+    ],
+  },
+  {
+    label: "Network",
+    items: [
+      { name: "Binary", href: "/binary", icon: Network },
+      { name: "Genealogy", href: "/genealogy", icon: GitBranch },
+      { name: "Referrals", href: "/referrals", icon: Users },
+      { name: "Career", href: "/career-levels", icon: Award },
+    ],
+  },
+  {
+    label: "Account",
+    items: [
+      { name: "Withdraw", href: "/withdraw", icon: Wallet },
+      { name: "Reports", href: "/reports", icon: FileText },
+      { name: "Profile", href: "/profile", icon: UserCircle },
+      { name: "Support", href: "/tickets", icon: LifeBuoy },
+    ],
+  },
+];
+
+const MOBILE_TABS: NavItem[] = [
+  { name: "Home", href: "/dashboard", icon: LayoutDashboard },
+  { name: "Plans", href: "/plans", icon: Package },
+  { name: "Network", href: "/binary", icon: Network },
+  { name: "Wallet", href: "/withdraw", icon: Wallet },
+  { name: "Profile", href: "/profile", icon: UserCircle },
+];
+
+const PAGE_TITLES: Record<string, string> = {
+  "/dashboard": "Dashboard",
+  "/plans": "Plans",
+  "/investments": "Investments",
+  "/vouchers": "Vouchers",
+  "/binary": "Binary",
+  "/genealogy": "Genealogy",
+  "/referrals": "Referrals",
+  "/career-levels": "Career",
+  "/withdraw": "Withdraw",
+  "/reports": "Reports",
+  "/profile": "Profile",
+  "/tickets": "Support",
+  "/my-tree": "Genealogy",
+};
 
 export default function UserLayout({
   children,
@@ -15,137 +101,38 @@ export default function UserLayout({
   const router = useRouter();
   const pathname = usePathname();
   const { user, loading: authLoading, logout } = useAuth();
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [isDesktop, setIsDesktop] = useState(false);
 
-  // Close sidebar on mobile by default
   useEffect(() => {
-    const handleResize = () => {
-      if (window.innerWidth < 768) {
-        setSidebarOpen(false);
-      } else {
-        setSidebarOpen(true);
-      }
+    const mq = window.matchMedia("(min-width: 768px)");
+    const apply = () => {
+      const desktop = mq.matches;
+      setIsDesktop(desktop);
+      setSidebarOpen(desktop);
     };
-
-    handleResize();
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
+    apply();
+    mq.addEventListener("change", apply);
+    return () => mq.removeEventListener("change", apply);
   }, []);
 
-  const navigation = [
-    {
-      name: "Dashboard",
-      href: "/dashboard",
-      icon: (
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-        </svg>
-      ),
-    },
-    {
-      name: "Plans",
-      href: "/plans",
-      icon: (
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-        </svg>
-      ),
-    },
-    {
-      name: "Investments",
-      href: "/investments",
-      icon: (
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-        </svg>
-      ),
-    },
-    {
-      name: "Binary Info",
-      href: "/binary",
-      icon: (
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-        </svg>
-      ),
-    },
-    {
-      name: "Genealogy",
-      href: "/genealogy",
-      icon: (
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-        </svg>
-      ),
-    },
-    {
-      name: "Referrals",
-      href: "/referrals",
-      icon: (
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-        </svg>
-      ),
-    },
-    {
-      name: "Reports",
-      href: "/reports",
-      icon: (
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-        </svg>
-      ),
-    },
-    {
-      name: "Vouchers",
-      href: "/vouchers",
-      icon: (
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z" />
-        </svg>
-      ),
-    },
-    {
-      name: "Withdraw",
-      href: "/withdraw",
-      icon: (
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
-        </svg>
-      ),
-    },
-    {
-      name: "Career Levels",
-      href: "/career-levels",
-      icon: (
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
-        </svg>
-      ),
-    },
-    {
-      name: "Profile",
-      href: "/profile",
-      icon: (
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-        </svg>
-      ),
-    },
-    {
-      name: "Support Tickets",
-      href: "/tickets",
-      icon: (
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-        </svg>
-      ),
-    },
-  ];
+  // Lock body scroll when mobile drawer is open
+  useEffect(() => {
+    if (!isDesktop && sidebarOpen) {
+      const prev = document.body.style.overflow;
+      document.body.style.overflow = "hidden";
+      return () => {
+        document.body.style.overflow = prev;
+      };
+    }
+  }, [sidebarOpen, isDesktop]);
 
-  const isActive = (href: string) => {
-    return pathname === href;
-  };
+  const isActive = (href: string) => pathname === href;
+  const mobileTitle =
+    PAGE_TITLES[pathname] ||
+    Object.entries(PAGE_TITLES).find(([path]) => pathname.startsWith(path))?.[1] ||
+    "Portal";
+  const navExpanded = !isDesktop || sidebarOpen;
 
   const handleLogout = async () => {
     await logout();
@@ -153,221 +140,323 @@ export default function UserLayout({
   };
 
   if (authLoading) {
-    return <BigBullLoader fullScreen />;
+    return <BigBullLoader fullScreen text="Preparing your portal…" />;
   }
 
   return (
-    <div className="min-h-screen flex relative">
-      {/* Shared background for all user pages */}
-      <div className="fixed inset-0 z-0">
-        <Image
-          src="/dash.png"
-          alt=""
-          fill
-          priority
-          className="object-cover object-center"
-          quality={90}
-          sizes="100vw"
+    <div
+      className="relative flex min-h-screen min-h-[100dvh] overflow-x-hidden"
+      style={{
+        background:
+          "linear-gradient(165deg, #E8F5F0 0%, #F5FBFC 40%, #D9EEF5 100%)",
+      }}
+    >
+      <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden">
+        <div
+          className="absolute -right-16 -top-24 h-72 w-72 rounded-full opacity-40 blur-3xl"
+          style={{ background: "#3FA9C8" }}
+        />
+        <div
+          className="absolute bottom-0 left-1/4 h-64 w-64 rounded-full opacity-30 blur-3xl"
+          style={{ background: "#F5CF0B" }}
+        />
+        <div
+          className="absolute left-0 top-1/3 h-48 w-48 rounded-full opacity-25 blur-3xl"
+          style={{ background: "#05627C" }}
         />
       </div>
 
-      {/* Mobile Overlay */}
-      {sidebarOpen && (
+      {/* Mobile overlay */}
+      {!isDesktop && sidebarOpen && (
         <div
-          className="fixed inset-0 bg-black/80 backdrop-blur-sm z-20 md:hidden"
+          className="fixed inset-0 z-20 bg-[#0B1F2A]/40 backdrop-blur-[2px] md:hidden"
           onClick={() => setSidebarOpen(false)}
+          aria-hidden
         />
       )}
 
       {/* Sidebar */}
       <aside
-        className={`${
-          sidebarOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
-        } ${
-          sidebarOpen ? "w-64" : "md:w-20"
-        } border-r shadow-2xl transition-all duration-300 ease-in-out flex flex-col fixed h-screen z-30`}
+        className={`fixed z-30 flex h-[100dvh] max-h-screen flex-col border-r transition-transform duration-300 ease-in-out ${
+          isDesktop
+            ? sidebarOpen
+              ? "w-[272px] translate-x-0"
+              : "w-[76px] translate-x-0"
+            : sidebarOpen
+              ? "w-[min(272px,88vw)] translate-x-0"
+              : "w-[min(272px,88vw)] -translate-x-full"
+        }`}
         style={{
-          background: "linear-gradient(180deg, #0C1A6B 0%, #06103a 55%,rgb(5, 18, 44) 100%)",
-          borderColor: "rgba(251,246,118,0.2)",
+          background: "rgba(255,255,255,0.96)",
+          borderColor: "rgba(5,98,124,0.12)",
+          boxShadow: "4px 0 24px rgba(5,98,124,0.06)",
+          backdropFilter: "blur(12px)",
+          paddingBottom: "env(safe-area-inset-bottom)",
         }}
+        aria-label="Main navigation"
       >
-        {/* Logo/Header */}
         <div
-          className="h-16 flex items-center justify-between px-4 border-b backdrop-blur-sm flex-shrink-0"
-          style={{ borderColor: "rgba(251,246,118,0.15)", background: "rgba(5,98,124,0.2)" }}
+          className="flex h-14 flex-shrink-0 items-center justify-between gap-2 border-b px-3 sm:h-[68px] sm:px-4"
+          style={{ borderColor: "rgba(5,98,124,0.1)" }}
         >
-          {sidebarOpen ? (
-            <Link href="/" className="flex items-center gap-2.5 min-w-0">
-              <Image
-                src="/image.png"
-                alt="Big Bull Energies Logo"
-                width={36}
-                height={36}
-                className="h-8 w-8 object-contain flex-shrink-0 drop-shadow-[0_0_6px_rgba(251,246,118,0.35)]"
-              />
-              <span className="flex flex-col leading-none min-w-0">
-                <span className="text-white font-extrabold text-sm tracking-wide truncate">
-                  BIG <span className="text-[#FBF676]">BULL</span>
+          {navExpanded ? (
+            <Link
+              href="/"
+              className="flex min-w-0 flex-1 items-center gap-2.5"
+              onClick={() => {
+                if (!isDesktop) setSidebarOpen(false);
+              }}
+            >
+              <span
+                className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl sm:h-10 sm:w-10"
+                style={{ backgroundColor: "#E8F5F0" }}
+                aria-hidden
+              >
+                <Wind className="h-5 w-5" style={{ color: "#05627C" }} />
+              </span>
+              <span className="min-w-0 leading-tight">
+                <span
+                  className="block truncate text-sm font-extrabold tracking-tight"
+                  style={{ color: "#05627C" }}
+                >
+                  Big Bull Energies
                 </span>
-                <span className="text-[9px] text-gray-400 font-medium tracking-[0.15em] truncate">
-                  ENERGIES
+                <span
+                  className="block text-[10px] font-semibold uppercase tracking-[0.12em]"
+                  style={{ color: "#3FA9C8" }}
+                >
+                  Member portal
                 </span>
               </span>
             </Link>
           ) : (
-            <Link href="/" className="flex items-center justify-center w-full">
-              <Image
-                src="/image.png"
-                alt="Big Bull Energies Logo"
-                width={40}
-                height={40}
-                className="h-8 w-8 object-contain drop-shadow-[0_0_6px_rgba(251,246,118,0.35)]"
-              />
+            <Link
+              href="/"
+              className="mx-auto flex h-10 w-10 items-center justify-center rounded-xl"
+              style={{ backgroundColor: "#E8F5F0" }}
+              title="Big Bull Energies"
+              aria-label="Big Bull Energies home"
+            >
+              <Wind className="h-5 w-5" style={{ color: "#05627C" }} />
             </Link>
           )}
-          <button
-            onClick={() => setSidebarOpen(!sidebarOpen)}
-            className="p-2 rounded-lg transition-all duration-200 border border-transparent hover:border-[#FBF676]/30 text-white/50 hover:text-[#FBF676] hover:bg-[#FBF676]/10 flex-shrink-0"
-            aria-label="Toggle sidebar"
-          >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+
+          {isDesktop ? (
+            <button
+              type="button"
+              onClick={() => setSidebarOpen(!sidebarOpen)}
+              className="hidden rounded-lg p-2 text-[#05627C]/70 transition hover:bg-[#E8F5F0] hover:text-[#05627C] md:inline-flex"
+              aria-label="Toggle sidebar"
+            >
               {sidebarOpen ? (
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                <ChevronLeft className="h-5 w-5" />
               ) : (
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                <Menu className="h-5 w-5" />
               )}
-            </svg>
-          </button>
+            </button>
+          ) : (
+            <button
+              type="button"
+              onClick={() => setSidebarOpen(false)}
+              className="inline-flex rounded-lg p-2 text-[#05627C]/70"
+              aria-label="Close menu"
+            >
+              <X className="h-5 w-5" />
+            </button>
+          )}
         </div>
 
-        {/* Navigation */}
-        <nav className="flex-1 px-3 py-2 space-y-1 overflow-y-auto overflow-x-hidden scrollbar-thin scrollbar-thumb-yellow-500/20 scrollbar-track-transparent">
-          {navigation.map((item) => {
-            const active = isActive(item.href);
-            return (
-              <Link
-                key={item.name}
-                href={item.href}
-                onClick={() => {
-                  // Close sidebar on mobile when navigating
-                  if (window.innerWidth < 768) {
-                    setSidebarOpen(false);
-                  }
-                }}
-                aria-current={active ? "page" : undefined}
-                className={`group flex items-center gap-2 px-2 py-1.5 rounded-lg text-sm font-semibold transition-all duration-200 relative ${
-                  active
-                    ? "bg-gradient-to-r from-yellow-500/30 via-yellow-500/20 to-yellow-500/10 text-yellow-400 border border-yellow-500/40 shadow-lg shadow-yellow-500/10"
-                    : "text-gray-400 hover:bg-yellow-500/10 hover:text-yellow-300 hover:border-yellow-500/20 border border-transparent hover:translate-x-0.5"
-                }`}
-                title={!sidebarOpen ? item.name : undefined}
-              >
-                {/* Active indicator */}
-                {active && (
-                  <span className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-gradient-to-b from-yellow-400 to-yellow-600 rounded-r-full shadow-[0_0_8px_rgba(251,246,118,0.6)]"></span>
-                )}
-                <span
-                  className={`flex-shrink-0 transition-colors ${active ? "text-yellow-400" : "text-gray-500 group-hover:text-yellow-400"}`}
+        <nav className="flex-1 space-y-4 overflow-y-auto overscroll-contain px-3 py-4">
+          {NAV_GROUPS.map((group) => (
+            <div key={group.label}>
+              {navExpanded && (
+                <p
+                  className="mb-1.5 px-2 text-[10px] font-bold uppercase tracking-[0.14em]"
+                  style={{ color: "#6b7c85" }}
                 >
-                  {item.icon}
-                </span>
-                {sidebarOpen && (
-                  <span className="transition-colors truncate">
-                    {item.name}
-                  </span>
-                )}
-              </Link>
-            );
-          })}
+                  {group.label}
+                </p>
+              )}
+              <ul className="space-y-0.5">
+                {group.items.map((item) => {
+                  const Icon = item.icon;
+                  const active = isActive(item.href);
+                  return (
+                    <li key={item.href}>
+                      <Link
+                        href={item.href}
+                        onClick={() => {
+                          if (!isDesktop) setSidebarOpen(false);
+                        }}
+                        title={!navExpanded ? item.name : undefined}
+                        aria-current={active ? "page" : undefined}
+                        className={`group flex items-center gap-2.5 rounded-xl px-2.5 py-2.5 text-sm font-semibold transition ${
+                          active
+                            ? "text-white shadow-md"
+                            : "text-[#0B1F2A]/70 hover:bg-[#E8F5F0] hover:text-[#05627C]"
+                        } ${!navExpanded ? "justify-center" : ""}`}
+                        style={
+                          active
+                            ? {
+                                background:
+                                  "linear-gradient(135deg, #05627C 0%, #0A7A96 100%)",
+                              }
+                            : undefined
+                        }
+                      >
+                        <Icon
+                          className={`h-[18px] w-[18px] flex-shrink-0 ${
+                            active ? "text-[#F5CF0B]" : "text-[#05627C]/80"
+                          }`}
+                        />
+                        {navExpanded && (
+                          <span className="truncate">{item.name}</span>
+                        )}
+                      </Link>
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+          ))}
         </nav>
 
-        {/* User Info & Logout */}
-        <div className="border-t border-yellow-500/20 p-3 bg-gray-900/30 backdrop-blur-sm flex-shrink-0">
-          {sidebarOpen && user && (
-            <div className="mb-2 px-3 py-2 bg-gradient-to-r from-yellow-500/10 to-yellow-600/5 rounded-lg border border-yellow-500/20">
-              <p className="text-xs text-gray-400 mb-0.5 font-medium">
-                Logged in as
+        <div
+          className="flex-shrink-0 border-t p-3"
+          style={{ borderColor: "rgba(5,98,124,0.1)" }}
+        >
+          {navExpanded && user && (
+            <div
+              className="mb-2 rounded-xl px-3 py-2.5"
+              style={{ background: "#E8F5F0" }}
+            >
+              <p className="text-[10px] font-semibold uppercase tracking-wide text-[#6b7c85]">
+                Signed in
               </p>
-              <p className="text-sm font-bold text-white truncate">
+              <p
+                className="truncate text-sm font-bold"
+                style={{ color: "#0B1F2A" }}
+              >
                 {user.name || user.email}
               </p>
-              <p className="text-xs text-yellow-400 font-mono truncate mt-0.5">
+              <p
+                className="mt-0.5 truncate font-mono text-[11px] font-semibold"
+                style={{ color: "#05627C" }}
+              >
                 {user.userId}
               </p>
             </div>
           )}
           <button
+            type="button"
             onClick={handleLogout}
-            className="w-full flex items-center gap-2 px-2 py-2 rounded-lg text-sm font-semibold text-gray-400 hover:bg-red-900/20 hover:text-red-400 hover:border-red-500/30 border border-transparent transition-all duration-200"
-            title={!sidebarOpen ? "Logout" : undefined}
+            title={!navExpanded ? "Logout" : undefined}
+            className={`flex w-full items-center gap-2.5 rounded-xl px-2.5 py-2.5 text-sm font-semibold text-red-600 transition hover:bg-red-50 ${
+              !navExpanded ? "justify-center" : ""
+            }`}
           >
-            <svg className="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-            </svg>
-            {sidebarOpen && <span>Logout</span>}
+            <LogOut className="h-[18px] w-[18px] flex-shrink-0" />
+            {navExpanded && <span>Logout</span>}
           </button>
         </div>
       </aside>
 
-      {/* Main Content */}
+      {/* Main column */}
       <div
-        className={`relative z-10 flex-1 transition-all duration-300 ${sidebarOpen ? "md:ml-64" : "md:ml-20"} pb-20 md:pb-0`}
+        className={`relative z-10 flex min-h-[100dvh] min-w-0 flex-1 flex-col transition-[margin] duration-300 pb-[calc(4.5rem+env(safe-area-inset-bottom,0px))] md:pb-0 ${
+          isDesktop ? (sidebarOpen ? "md:ml-[272px]" : "md:ml-[76px]") : "ml-0"
+        }`}
       >
-        {/* Mobile menu button */}
-        <div className="md:hidden fixed top-4 left-4 z-10">
-          <button
-            onClick={() => setSidebarOpen(!sidebarOpen)}
-            className="p-2 bg-gray-900 rounded-xl shadow-2xl border border-yellow-500/30 hover:bg-gray-800 hover:border-yellow-500/50 text-yellow-400 transition-all duration-200"
-            aria-label="Toggle sidebar"
+        <header
+          className="sticky top-0 z-10 flex h-14 items-center justify-between gap-2 border-b px-3 backdrop-blur-md sm:px-4 md:h-16 md:px-6"
+          style={{
+            background: "rgba(255,255,255,0.85)",
+            borderColor: "rgba(5,98,124,0.1)",
+            paddingTop: "env(safe-area-inset-top)",
+          }}
+        >
+          <div className="flex min-w-0 flex-1 items-center gap-2 sm:gap-3">
+            <button
+              type="button"
+              onClick={() => setSidebarOpen(true)}
+              className="inline-flex flex-shrink-0 rounded-lg p-2 text-[#05627C] md:hidden"
+              aria-label="Open menu"
+            >
+              <Menu className="h-6 w-6" />
+            </button>
+            <div className="min-w-0 md:hidden">
+              <p
+                className="truncate text-sm font-extrabold"
+                style={{ color: "#0B1F2A" }}
+              >
+                {mobileTitle}
+              </p>
+            </div>
+            <div className="hidden min-w-0 md:block">
+              <p
+                className="text-xs font-semibold uppercase tracking-[0.12em]"
+                style={{ color: "#3FA9C8" }}
+              >
+                Wind energy investing
+              </p>
+              <p
+                className="truncate text-sm font-bold"
+                style={{ color: "#0B1F2A" }}
+              >
+                Your Big Bull Energies workspace
+              </p>
+            </div>
+          </div>
+          <Link
+            href="/plans"
+            className="flex-shrink-0 rounded-lg px-3 py-2 text-xs font-bold text-[#0B1F2A] shadow-sm transition hover:opacity-90 sm:text-sm"
+            style={{ backgroundColor: "#F5CF0B" }}
           >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-            </svg>
-          </button>
-        </div>
-        <main className="flex-1 overflow-y-auto p-4 md:p-6">{children}</main>
+            Invest
+          </Link>
+        </header>
+
+        <main className="min-w-0 flex-1 overflow-x-hidden overflow-y-auto p-3 sm:p-4 md:p-6 lg:p-8">
+          {children}
+        </main>
       </div>
 
-      {/* Mobile Bottom Navigation */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-gradient-to-t from-gray-900 via-gray-900 to-black border-t border-yellow-500/30 shadow-2xl safe-area-inset-bottom">
-        <div className="flex items-center justify-around px-1 py-2 overflow-x-auto max-w-full">
-          {/* Show first 5 most important tabs on mobile */}
-          {navigation.slice(0, 5).map((item) => {
-            const active = isActive(item.href);
+      {/* Mobile bottom tabs */}
+      <nav
+        className="fixed bottom-0 left-0 right-0 z-40 border-t md:hidden"
+        style={{
+          background: "rgba(255,255,255,0.98)",
+          borderColor: "rgba(5,98,124,0.12)",
+          boxShadow: "0 -4px 20px rgba(5,98,124,0.08)",
+          paddingBottom: "env(safe-area-inset-bottom, 0px)",
+        }}
+        aria-label="Mobile navigation"
+      >
+        <div className="flex items-stretch justify-around px-0.5 py-1">
+          {MOBILE_TABS.map((item) => {
+            const Icon = item.icon;
+            const active =
+              isActive(item.href) ||
+              (item.href !== "/dashboard" && pathname.startsWith(item.href));
             return (
               <Link
-                key={item.name}
+                key={item.href}
                 href={item.href}
-                onClick={() => setSidebarOpen(false)}
-                aria-current={active ? "page" : undefined}
-                className={`flex flex-col items-center justify-center gap-0.5 px-2 py-2 rounded-lg min-w-[56px] max-w-[80px] flex-1 transition-all duration-200 ${
-                  active
-                    ? "bg-gradient-to-b from-yellow-500/30 to-yellow-500/10 text-yellow-400"
-                    : "text-gray-400 active:text-yellow-300"
-                }`}
+                className="flex min-w-0 flex-1 flex-col items-center gap-0.5 rounded-lg px-0.5 py-1.5"
+                style={{ color: active ? "#05627C" : "#6b7c85" }}
               >
-                <span className={`${active ? "text-yellow-400" : "text-gray-500"}`}>
-                  {item.icon}
+                <span
+                  className="rounded-lg p-1"
+                  style={active ? { background: "#E8F5F0" } : undefined}
+                >
+                  <Icon className="h-5 w-5" />
                 </span>
-                <span className="text-[9px] md:text-[10px] font-semibold truncate w-full text-center leading-tight">
+                <span className="max-w-full truncate text-[9px] font-bold leading-tight">
                   {item.name}
                 </span>
               </Link>
             );
           })}
-          {/* More button to open sidebar */}
-          <button
-            onClick={() => setSidebarOpen(true)}
-            className="flex flex-col items-center justify-center gap-0.5 px-2 py-2 rounded-lg min-w-[56px] max-w-[80px] flex-1 transition-all duration-200 text-gray-400 active:text-yellow-300"
-            aria-label="More menu"
-          >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
-            </svg>
-            <span className="text-[9px] md:text-[10px] font-semibold leading-tight">
-              More
-            </span>
-          </button>
         </div>
       </nav>
     </div>

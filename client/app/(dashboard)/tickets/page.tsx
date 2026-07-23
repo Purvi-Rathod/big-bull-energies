@@ -5,6 +5,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { api } from '@/lib/api';
 import toast from 'react-hot-toast';
 import BigBullLoader from '@/components/BigBullLoader';
+import { dashboardTheme as t } from '@/lib/dashboardTheme';
 
 interface Ticket {
   id: string;
@@ -57,7 +58,7 @@ export default function TicketsPage() {
 
   const handleCreateTicket = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!formData.subject) {
       toast.error('Subject is required');
       return;
@@ -87,101 +88,86 @@ export default function TicketsPage() {
     }
   };
 
-  const getStatusColor = (status: string) => {
+  const getStatusBadge = (status: string) => {
     switch (status) {
       case 'Open':
-        return 'bg-blue-100 text-blue-800';
+        return t.badgeActive;
       case 'In Progress':
-        return 'bg-yellow-100 text-yellow-800';
+        return t.badgePending;
       case 'Closed':
-        return 'bg-green-100 text-green-800';
+        return `${t.badgeNeutral} bg-emerald-100 text-emerald-800 border-emerald-200`;
       default:
-        return 'bg-gray-100 text-gray-800';
+        return t.badgeNeutral;
     }
   };
 
   if (loading) {
-    return <BigBullLoader fullScreen />;
+    return <BigBullLoader text="Loading tickets…" />;
   }
 
   return (
-    <div className="w-full min-h-screen py-4 md:py-8 px-2 sm:px-4 md:px-6 lg:px-8 relative overflow-hidden">
-      {/* Decorative background elements */}
-      <div className="fixed inset-0 pointer-events-none opacity-20">
-        <div className="absolute top-0 left-1/4 w-96 h-96 bg-[#FBF676]/10 rounded-full blur-3xl"></div>
-        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-[#FBF676]/10 rounded-full blur-3xl"></div>
-      </div>
-
-      <div className="relative z-10">
-      <div className="mb-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+    <div className={t.page}>
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-extrabold mb-2 text-white">
-            <span className="bg-gradient-to-r from-yellow-300 via-yellow-400 to-yellow-600 bg-clip-text text-transparent drop-shadow-lg">Support Tickets</span>
-          </h1>
-          <p className="mt-1 text-sm text-[#FBF676]">Create and track your support tickets</p>
+          <h1 className={t.title}>Support Tickets</h1>
+          <p className={t.subtitle}>Create and track your support tickets</p>
         </div>
-        <button
-          onClick={() => setShowCreateModal(true)}
-          className="px-6 py-3 bg-[#FBF676] text-[#0C1A6B] rounded-xl hover:bg-[#e8e04a] font-bold transition-all shadow-lg shadow-[#FBF676]/25 hover:shadow-[#FBF676]/30 hover:scale-105 active:scale-95"
-        >
+        <button type="button" onClick={() => setShowCreateModal(true)} className={t.btnPrimary}>
           Create Ticket
         </button>
       </div>
 
-      {/* Tickets List */}
-      <div className="space-y-6">
+      <div className="space-y-4">
         {tickets.length === 0 ? (
-          <div className="rounded-2xl shadow-2xl border border-[#FBF676]/25 backdrop-blur-md bg-[rgba(8,16,40,0.75)] p-12 text-center">
-            <p className="text-[#FBF676] text-lg">No tickets found. Create your first ticket to get started.</p>
+          <div className={t.cardEmpty}>
+            <p className="text-lg font-medium" style={{ color: t.muted }}>
+              No tickets found. Create your first ticket to get started.
+            </p>
           </div>
         ) : (
           tickets.map((ticket) => (
-            <div key={ticket.id} className="rounded-2xl shadow-2xl border border-[#FBF676]/25 backdrop-blur-md bg-[rgba(8,16,40,0.75)] p-6 hover:border-[#FBF676]/60 hover:shadow-[#FBF676]/20 transition-all duration-300">
-              <div className="flex justify-between items-start mb-4">
+            <div key={ticket.id} className={t.card}>
+              <div className="flex justify-between items-start mb-4 gap-3">
                 <div>
-                  <h3 className="text-lg font-extrabold text-white">{ticket.subject}</h3>
-                  <p className="text-sm text-[#FBF676] mt-1 font-semibold">
-                    Ticket ID: <span className="text-[#FBF676] font-mono">{ticket.id.substring(0, 8)}</span> | Created: {new Date(ticket.createdAt).toLocaleString()}
+                  <h3 className="text-lg font-extrabold" style={{ color: t.ink }}>{ticket.subject}</h3>
+                  <p className="text-sm mt-1 font-medium" style={{ color: t.muted }}>
+                    Ticket ID:{' '}
+                    <span className="font-mono font-bold" style={{ color: t.primary }}>
+                      {ticket.id.substring(0, 8)}
+                    </span>{' '}
+                    | Created: {new Date(ticket.createdAt).toLocaleString()}
                   </p>
                 </div>
-                <span className={`px-4 py-1.5 text-xs font-bold rounded-full shadow-lg ${
-                  ticket.status === 'Open'
-                    ? 'bg-[rgba(251,246,118,0.15)] text-[#FBF676] border border-[#FBF676]/40'
-                    : ticket.status === 'In Progress'
-                    ? 'bg-[rgba(5,12,32,0.9)] text-yellow-200 border border-[#FBF676]/25'
-                    : ticket.status === 'Closed'
-                    ? 'bg-[rgba(5,12,32,0.9)] text-yellow-300 border border-[#FBF676]/25'
-                    : 'bg-[rgba(5,12,32,0.9)] text-yellow-300 border border-[#FBF676]/25'
-                }`}>
+                <span className={`whitespace-nowrap rounded-full px-3 py-1 text-xs font-extrabold ${getStatusBadge(ticket.status)}`}>
                   {ticket.status}
                 </span>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                <div className="p-4 bg-[rgba(5,12,32,0.9)] rounded-xl border border-[#FBF676]/30">
-                  <p className="text-sm text-[#FBF676] font-semibold mb-2">Department</p>
-                  <p className="text-sm font-extrabold text-white">{ticket.department}</p>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
+                <div className={t.cardInner}>
+                  <p className="text-sm font-semibold mb-1" style={{ color: t.muted }}>Department</p>
+                  <p className="text-sm font-extrabold" style={{ color: t.ink }}>{ticket.department}</p>
                 </div>
                 {ticket.service && (
-                  <div className="p-4 bg-[rgba(5,12,32,0.9)] rounded-xl border border-[#FBF676]/30">
-                    <p className="text-sm text-[#FBF676] font-semibold mb-2">Service</p>
-                    <p className="text-sm font-extrabold text-white">{ticket.service}</p>
+                  <div className={t.cardInner}>
+                    <p className="text-sm font-semibold mb-1" style={{ color: t.muted }}>Service</p>
+                    <p className="text-sm font-extrabold" style={{ color: t.ink }}>{ticket.service}</p>
                   </div>
                 )}
               </div>
 
               {ticket.description && (
-                <div className="mb-4 p-4 bg-[rgba(5,12,32,0.9)] rounded-xl border border-[#FBF676]/30">
-                  <p className="text-sm text-[#FBF676] font-semibold mb-3">Description</p>
-                  <p className="text-sm text-[#FBF676] whitespace-pre-wrap">{ticket.description}</p>
+                <div className={`${t.cardInner} mb-4`}>
+                  <p className="text-sm font-semibold mb-2" style={{ color: t.muted }}>Description</p>
+                  <p className="text-sm whitespace-pre-wrap" style={{ color: t.ink }}>{ticket.description}</p>
                 </div>
               )}
 
               {ticket.reply && (
-                <div className="mt-4 p-5 bg-[rgba(251,246,118,0.12)] border-2 border-[#FBF676]/35 rounded-xl">
-                  <p className="text-sm font-extrabold text-[#FBF676] mb-3">Admin Reply:</p>
-                  <p className="text-sm text-[#FBF676] whitespace-pre-wrap">{ticket.reply}</p>
-                  <p className="text-xs text-[#FBF676] mt-3 font-semibold">
+                <div className={t.cardHighlight}>
+                  <p className="text-sm font-extrabold mb-2" style={{ color: t.primary }}>Admin Reply:</p>
+                  <p className="text-sm whitespace-pre-wrap" style={{ color: t.ink }}>{ticket.reply}</p>
+                  <p className="text-xs mt-3 font-semibold" style={{ color: t.muted }}>
                     Updated: {new Date(ticket.updatedAt).toLocaleString()}
                   </p>
                 </div>
@@ -191,16 +177,92 @@ export default function TicketsPage() {
         )}
       </div>
 
-      {/* Create Ticket Modal */}
       {showCreateModal && (
-        <div className="fixed inset-0 bg-[rgba(5,12,32,0.9)] backdrop-blur-sm overflow-y-auto h-full w-full z-50">
-          <div className="relative top-10 mx-auto p-6 border border-[#FBF676]/25 w-full max-w-2xl shadow-2xl rounded-2xl backdrop-blur-md bg-[rgba(8,16,40,0.95)]">
-            <div className="mt-3">
-              <div className="flex justify-between items-center mb-6">
-                <h3 className="text-xl font-extrabold text-white flex items-center gap-2">
-                  <span className="bg-gradient-to-r from-yellow-300 via-yellow-400 to-yellow-600 bg-clip-text text-transparent">Create Support Ticket</span>
-                </h3>
+        <div className={t.modalOverlay}>
+          <div className={`${t.modalPanel} max-w-2xl`}>
+            <div className="flex justify-between items-center mb-6">
+              <h3 className="text-xl font-extrabold" style={{ color: t.ink }}>Create Support Ticket</h3>
+              <button
+                type="button"
+                onClick={() => {
+                  setShowCreateModal(false);
+                  setFormData({
+                    department: 'Admin support',
+                    service: '',
+                    subject: '',
+                    description: '',
+                  });
+                }}
+                className="text-[#5A6F78] hover:text-[#05627C] transition-colors"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            <form onSubmit={handleCreateTicket} className="space-y-4">
+              <div>
+                <label htmlFor="department" className={t.label}>
+                  Department <span style={{ color: t.gold }}>*</span>
+                </label>
+                <select
+                  id="department"
+                  required
+                  value={formData.department}
+                  onChange={(e) => setFormData({ ...formData, department: e.target.value as 'Admin support' | 'Technical Support' })}
+                  className={t.select}
+                >
+                  <option value="Admin support">Admin support</option>
+                  <option value="Technical Support">Technical Support</option>
+                </select>
+              </div>
+
+              <div>
+                <label htmlFor="service" className={t.label}>Service (Optional)</label>
+                <select
+                  id="service"
+                  value={formData.service}
+                  onChange={(e) => setFormData({ ...formData, service: e.target.value as any })}
+                  className={t.select}
+                >
+                  <option value="">Select a service (optional)</option>
+                  <option value="Package Activation">Package Activation</option>
+                  <option value="Downline Activation">Downline Activation</option>
+                  <option value="Authentication">Authentication</option>
+                </select>
+              </div>
+
+              <div>
+                <label htmlFor="subject" className={t.label}>
+                  Subject <span style={{ color: t.gold }}>*</span>
+                </label>
+                <input
+                  type="text"
+                  id="subject"
+                  required
+                  value={formData.subject}
+                  onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
+                  placeholder="Enter ticket subject"
+                  className={t.input}
+                />
+              </div>
+
+              <div>
+                <label htmlFor="description" className={t.label}>Description</label>
+                <textarea
+                  id="description"
+                  rows={5}
+                  value={formData.description}
+                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                  placeholder="Describe your issue or request..."
+                  className={`${t.input} resize-y`}
+                />
+              </div>
+
+              <div className="flex justify-end gap-2 pt-4 border-t border-[#d8e6ec]">
                 <button
+                  type="button"
                   onClick={() => {
                     setShowCreateModal(false);
                     setFormData({
@@ -210,108 +272,18 @@ export default function TicketsPage() {
                       description: '',
                     });
                   }}
-                  className="text-[#FBF676] hover:text-[#FBF676] transition-colors"
+                  className={t.btnGhost}
                 >
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  </svg>
+                  Cancel
+                </button>
+                <button type="submit" disabled={creating} className={t.btnPrimary}>
+                  {creating ? 'Creating…' : 'Create Ticket'}
                 </button>
               </div>
-
-              <form onSubmit={handleCreateTicket} className="space-y-5">
-                <div>
-                  <label htmlFor="department" className="block text-sm font-bold text-[#FBF676] mb-3">
-                    Department <span className="text-yellow-300">*</span>
-                  </label>
-                  <select
-                    id="department"
-                    required
-                    value={formData.department}
-                    onChange={(e) => setFormData({ ...formData, department: e.target.value as 'Admin support' | 'Technical Support' })}
-                    className="w-full px-4 py-3 border border-[#FBF676]/40 rounded-xl bg-[rgba(5,12,32,0.9)] text-white focus:outline-none focus:ring-2 focus:ring-[#FBF676]/40 focus:border-[#FBF676]/70 font-semibold"
-                  >
-                    <option value="Admin support">Admin support</option>
-                    <option value="Technical Support">Technical Support</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label htmlFor="service" className="block text-sm font-bold text-[#FBF676] mb-3">
-                    Service (Optional)
-                  </label>
-                  <select
-                    id="service"
-                    value={formData.service}
-                    onChange={(e) => setFormData({ ...formData, service: e.target.value as any })}
-                    className="w-full px-4 py-3 border border-[#FBF676]/40 rounded-xl bg-[rgba(5,12,32,0.9)] text-white focus:outline-none focus:ring-2 focus:ring-[#FBF676]/40 focus:border-[#FBF676]/70 font-semibold"
-                  >
-                    <option value="">Select a service (optional)</option>
-                    <option value="Package Activation">Package Activation</option>
-                    <option value="Downline Activation">Downline Activation</option>
-                    <option value="Authentication">Authentication</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label htmlFor="subject" className="block text-sm font-bold text-[#FBF676] mb-3">
-                    Subject <span className="text-yellow-300">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    id="subject"
-                    required
-                    value={formData.subject}
-                    onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
-                    placeholder="Enter ticket subject"
-                    className="w-full px-4 py-3 border border-[#FBF676]/40 rounded-xl bg-[rgba(5,12,32,0.9)] text-white focus:outline-none focus:ring-2 focus:ring-[#FBF676]/40 focus:border-[#FBF676]/70 font-semibold"
-                  />
-                </div>
-
-                <div>
-                  <label htmlFor="description" className="block text-sm font-bold text-[#FBF676] mb-3">
-                    Description
-                  </label>
-                  <textarea
-                    id="description"
-                    rows={5}
-                    value={formData.description}
-                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                    placeholder="Describe your issue or request..."
-                    className="w-full px-4 py-3 border border-[#FBF676]/40 rounded-xl bg-[rgba(5,12,32,0.9)] text-white focus:outline-none focus:ring-2 focus:ring-[#FBF676]/40 focus:border-[#FBF676]/70 font-semibold"
-                  />
-                </div>
-
-                <div className="flex justify-end gap-3 pt-6 border-t border-[#FBF676]/20">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setShowCreateModal(false);
-                      setFormData({
-                        department: 'Admin support',
-                        service: '',
-                        subject: '',
-                        description: '',
-                      });
-                    }}
-                    className="px-6 py-2.5 text-sm font-bold text-[#FBF676] bg-[rgba(5,12,32,0.9)] rounded-xl hover:bg-[#08152F]/70 transition-all"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="submit"
-                    disabled={creating}
-                    className="px-6 py-2.5 text-sm font-bold text-black bg-[#FBF676] rounded-xl hover:bg-[#e8e04a] disabled:opacity-50 transition-all shadow-lg shadow-[#FBF676]/25 hover:shadow-[#FBF676]/30 hover:scale-105 active:scale-95"
-                  >
-                    {creating ? 'Creating...' : 'Create Ticket'}
-                  </button>
-                </div>
-              </form>
-            </div>
+            </form>
           </div>
         </div>
       )}
-          </div>
-        </div>
+    </div>
   );
 }
-

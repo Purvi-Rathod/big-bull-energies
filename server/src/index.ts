@@ -46,7 +46,10 @@ app.get('/api/health', (req, res) => {
   });
   
 connectdb()
-    .then(() => {
+    .then(async () => {
+        const { ensureBigBullPackages } = await import("./scripts/ensureBigBullPackages");
+        await ensureBigBullPackages();
+
         // Setup cron jobs
         setupROICron();
         

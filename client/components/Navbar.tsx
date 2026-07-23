@@ -191,8 +191,7 @@ export default function Navbar() {
               >
                 <Mail className="w-3.5 h-3.5" />
               </span>
-              crownbankers.com@gmail.com
-            </a>
+              Bigbullenergies@gmail.com            </a>
 
             <Link
               href="/login"

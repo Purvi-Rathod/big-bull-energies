@@ -168,8 +168,7 @@ export default function ContactPage() {
             className="block text-sm font-medium hover:opacity-80"
             style={{ color: NAVY }}
           >
-            crownbankers.com@gmail.com
-          </a>
+            Bigbullenergies@gmail.com          </a>
 
           <p
             className="text-xs mt-1"
@@ -449,8 +448,7 @@ export default function ContactPage() {
                           href="mailto:crownbankers.com@gmail.com"
                           className="text-base font-medium hover:opacity-70 transition text-black break-all"
                         >
-                          crownbankers.com@gmail.com
-                        </a>
+                          Bigbullenergies@gmail.com                        </a>
                         <p className="text-sm mt-1 text-black/70">
                           We typically respond within 24 hours
                         </p>

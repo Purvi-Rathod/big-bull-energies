@@ -11,7 +11,8 @@ const SITE_URL =
   "https://crownbankers.com";
 const SITE_NAME = "Big Bull Energies";
 const OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions";
-const SUPPORT_WHATSAPP = "+44 7452321010";
+const SUPPORT_WHATSAPP = "+44 7452 321003";
+const SUPPORT_EMAIL = "bigbullenergies@gmail.com";
 
 let rulebookCache: string | null = null;
 let faqCache: string | null = null;
@@ -177,7 +178,7 @@ function isGreeting(text: string): boolean {
 
 function answerFromKnowledgeBase(userText: string): string {
   if (isGreeting(userText)) {
-    return `Hi! I'm the Big Bull Energies support assistant. Ask me about investments, ROI, referral bonuses, binary income, vouchers, withdrawals, packages, or anything in our platform rules. For live help, WhatsApp ${SUPPORT_WHATSAPP}.`;
+    return `Hi! I'm the Big Bull Energies support assistant. Ask me about investments, ROI, referral bonuses, binary income, vouchers, withdrawals, packages, or anything in our platform rules. For live help, WhatsApp ${SUPPORT_WHATSAPP} or email ${SUPPORT_EMAIL}.`;
   }
 
   const faq = getFaqContent();
@@ -185,7 +186,7 @@ function answerFromKnowledgeBase(userText: string): string {
   const queryTokens = tokenize(userText);
 
   if (entries.length === 0 || queryTokens.length === 0) {
-    return `I couldn't find a matching answer in our knowledge base. Please contact support on WhatsApp ${SUPPORT_WHATSAPP} or open a ticket from your dashboard.`;
+    return `I couldn't find a matching answer in our knowledge base. Please contact support on WhatsApp ${SUPPORT_WHATSAPP}, email ${SUPPORT_EMAIL}, or open a ticket from your dashboard.`;
   }
 
   let best: FaqEntry | null = null;
@@ -201,13 +202,13 @@ function answerFromKnowledgeBase(userText: string): string {
   // Require a modest match so we don't invent answers from weak overlaps
   const minScore = Math.max(2, Math.ceil(queryTokens.length * 0.35));
   if (!best || bestScore < minScore) {
-    return `I don't have a clear answer for that in our FAQ. Try asking about packages, ROI, referrals, binary income, withdrawals, or career rewards — or contact support on WhatsApp ${SUPPORT_WHATSAPP}.`;
+    return `I don't have a clear answer for that in our FAQ. Try asking about packages, ROI, referrals, binary income, withdrawals, or career rewards — or contact support on WhatsApp ${SUPPORT_WHATSAPP} or email ${SUPPORT_EMAIL}.`;
   }
 
   return best.answer;
 }
 
-const SYSTEM_PROMPT = `You are a helpful AI support assistant for Big Bull Energies. Big Bull Energies is a solar investment system that provides massive returns based on investors' network (binary MLM with ROI, referral bonuses, and binary matching bonuses). Answer questions using the official FAQ and rule book below. Prefer FAQ answers for company info, packages, ROI, referral, binary, withdrawals, support, and security. Use the rule book for detailed platform rules and calculations. Be concise, accurate, and friendly. If the answer is not in the FAQ or rule book, say so and suggest contacting support (WhatsApp ${SUPPORT_WHATSAPP}) or checking the dashboard. Do not make up rules or percentages.
+const SYSTEM_PROMPT = `You are a helpful AI support assistant for Big Bull Energies. Big Bull Energies is a wind-focused renewable energy platform with structured investor participation (binary MLM with ROI, referral bonuses, and binary matching bonuses). Answer questions using the official FAQ and rule book below. Prefer FAQ answers for company info, packages, ROI, referral, binary, withdrawals, support, and security. Use the rule book for detailed platform rules and calculations. Be concise, accurate, and friendly. If the answer is not in the FAQ or rule book, say so and suggest contacting support (WhatsApp ${SUPPORT_WHATSAPP} or email ${SUPPORT_EMAIL}) or checking the dashboard. Do not make up rules or percentages.
 
 --- OFFICIAL FAQ (Big Bull Energies – FAQ for Chatbot) ---
 

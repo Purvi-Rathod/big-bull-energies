@@ -167,7 +167,7 @@ export default function Navbar() {
 
           <div className="flex items-center gap-5 lg:gap-7">
             <a
-              href="tel:+447452321010"
+              href="tel:+447452321003"
               className="flex items-center gap-2 text-xs font-semibold transition hover:opacity-70"
               style={{ color: PRIMARY }}
             >
@@ -177,11 +177,11 @@ export default function Navbar() {
               >
                 <Phone className="w-3.5 h-3.5" />
               </span>
-              +44 7452321010
+              +44 7452 321003
             </a>
 
             <a
-              href="mailto:crownbankers.com@gmail.com"
+              href="mailto:bigbullenergies@gmail.com"
               className="hidden lg:flex items-center gap-2 text-xs font-semibold transition hover:opacity-70"
               style={{ color: PRIMARY }}
             >
@@ -191,7 +191,8 @@ export default function Navbar() {
               >
                 <Mail className="w-3.5 h-3.5" />
               </span>
-              Bigbullenergies@gmail.com            </a>
+              bigbullenergies@gmail.com
+            </a>
 
             <Link
               href="/login"
@@ -422,14 +423,14 @@ export default function Navbar() {
 
             <div className="flex items-center gap-3">
               <a
-                href="tel:+447452321010"
+                href="tel:+447452321003"
                 className="flex items-center justify-center w-8 h-8 text-white hover:text-[#F5CF0B] transition"
                 aria-label="Call us"
               >
                 <Phone className="w-4 h-4" />
               </a>
               <a
-                href="mailto:crownbankers.com@gmail.com"
+                href="mailto:bigbullenergies@gmail.com"
                 className="flex items-center justify-center w-8 h-8 text-white hover:text-[#F5CF0B] transition"
                 aria-label="Email us"
               >

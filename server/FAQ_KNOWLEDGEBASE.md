@@ -198,7 +198,7 @@ Always use secure wallets, keep private keys confidential, and avoid sharing cre
 ## Support & Contact
 
 **54. How can I contact support?**  
-You can contact support directly on our official WhatsApp number: +44 7452321010.
+You can contact support directly on our official WhatsApp number: +44 7452 321003, or email bigbullenergies@gmail.com.
 
 **55. How can I raise a support ticket?**  
 Log in to your account, click on the Support Ticket option in the left menu, then click Create Ticket, enter your issue, and submit.

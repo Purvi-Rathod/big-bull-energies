@@ -4,7 +4,7 @@
  * Floating WhatsApp button - opens direct chat with business number.
  * Works on mobile (opens WhatsApp app) and desktop (opens WhatsApp Web or app).
  */
-const WHATSAPP_NUMBER = '447452321010'; // +44 7452321010, no + or spaces for wa.me
+const WHATSAPP_NUMBER = '447452321003'; // +44 7452 321003, no + or spaces for wa.me
 const WHATSAPP_URL = `https://wa.me/${WHATSAPP_NUMBER}`;
 
 export default function WhatsAppButton() {

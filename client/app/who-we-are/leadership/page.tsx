@@ -34,7 +34,7 @@ const leaders = [
     name: "Anee Sandrova",
     title: "Relationship Manager",
     description:
-      "Anee manages relations and operations in the Netherlands, overseeing our solar plant in Groningen and coordinating renewable energy projects.",
+      "Anee manages relations and operations in the Netherlands, coordinating Big Bull Energies wind projects and partner relationships across European markets.",
     image: "/leader3.png",
   },
   {

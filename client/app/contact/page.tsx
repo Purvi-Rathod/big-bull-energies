@@ -130,11 +130,11 @@ export default function ContactPage() {
           </h3>
 
           <a
-            href="tel:+447452321010"
+            href="tel:+447452321003"
             className="block text-sm font-medium hover:opacity-80"
             style={{ color: NAVY }}
           >
-            +44 7452321010
+            +44 7452 321003
           </a>
 
           <p
@@ -164,11 +164,12 @@ export default function ContactPage() {
           </h3>
 
           <a
-            href="mailto:crownbankers.com@gmail.com"
+            href="mailto:bigbullenergies@gmail.com"
             className="block text-sm font-medium hover:opacity-80"
             style={{ color: NAVY }}
           >
-            Bigbullenergies@gmail.com          </a>
+            bigbullenergies@gmail.com
+          </a>
 
           <p
             className="text-xs mt-1"
@@ -422,10 +423,10 @@ export default function ContactPage() {
                           Call us
                         </h3>
                         <a
-                          href="tel:+447452321010"
+                          href="tel:+447452321003"
                           className="text-base font-medium hover:opacity-70 transition text-black"
                         >
-                          +44 7452321010
+                          +44 7452 321003
                         </a>
                         <p className="text-sm mt-1 text-black/70">
                           Mon - Fri: 9:00 AM - 6:00 PM GMT
@@ -445,10 +446,11 @@ export default function ContactPage() {
                           Email us
                         </h3>
                         <a
-                          href="mailto:crownbankers.com@gmail.com"
+                          href="mailto:bigbullenergies@gmail.com"
                           className="text-base font-medium hover:opacity-70 transition text-black break-all"
                         >
-                          Bigbullenergies@gmail.com                        </a>
+                          bigbullenergies@gmail.com
+                        </a>
                         <p className="text-sm mt-1 text-black/70">
                           We typically respond within 24 hours
                         </p>

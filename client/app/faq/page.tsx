@@ -70,7 +70,7 @@ const FAQS = [
   {
     question: "How can I contact support?",
     answer:
-      "You can contact our support team through the Support section in your dashboard, or reach out via our Contact page. Create a support ticket, and our team will respond as soon as possible.",
+      "You can reach us on WhatsApp at +44 7452 321003, email bigbullenergies@gmail.com, use the Contact page, or open a support ticket from your dashboard.",
     icon: Headphones,
   },
 ];

@@ -99,12 +99,31 @@
 
 :root {
   --background: #ffffff;
-  --foreground: #171717;
+  --foreground: #0b1f2a;
+
+  /* Big Bull Energies brand palette */
+  --bbe-primary: #05627c;
+  --bbe-primary-deep: #033d4d;
+  --bbe-primary-hover: #045468;
+  --bbe-accent: #3fa9c8;
+  --bbe-gold: #f5cf0b;
+  --bbe-gold-hover: #e5c00a;
+  --bbe-dark: #0b1f2a;
+  --bbe-muted: #6b7c85;
+  --bbe-soft: #e8f5f0;
+  --bbe-on-primary: #ffffff;
+  --bbe-on-primary-muted: rgba(255, 255, 255, 0.78);
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-bbe-primary: var(--bbe-primary);
+  --color-bbe-primary-deep: var(--bbe-primary-deep);
+  --color-bbe-accent: var(--bbe-accent);
+  --color-bbe-gold: var(--bbe-gold);
+  --color-bbe-dark: var(--bbe-dark);
+  --color-bbe-muted: var(--bbe-muted);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }

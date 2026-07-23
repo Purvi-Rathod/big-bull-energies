@@ -2,11 +2,26 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import { Phone, Mail, MapPin, Send } from "lucide-react";
+import { Phone, Mail, MapPin, Send, CheckCircle2, Loader2 } from "lucide-react";
 import Footer from "@/components/Footer";
+import { api } from "@/lib/api";
 
 const FONT_STACK =
   "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif";
+
+const SUPPORT_PHONE = "+44 7452 321003";
+const SUPPORT_PHONE_TEL = "+447452321003";
+const SUPPORT_EMAIL = "bigbullenergies@gmail.com";
+
+const SUBJECT_OPTIONS = [
+  { value: "general", label: "General Inquiry" },
+  { value: "partnership", label: "Partnership" },
+  { value: "services", label: "Services" },
+  { value: "investment", label: "Investment" },
+  { value: "support", label: "Support" },
+  { value: "careers", label: "Careers" },
+  { value: "other", label: "Other" },
+];
 
 export default function ContactPage() {
   const [formData, setFormData] = useState({
@@ -16,11 +31,52 @@ export default function ContactPage() {
     subject: "",
     message: "",
   });
+  const [submitting, setSubmitting] = useState(false);
+  const [successMsg, setSuccessMsg] = useState<string | null>(null);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const scrollToForm = () => {
+    const el = document.getElementById("contact-form");
+    if (!el) return;
+    const top = el.getBoundingClientRect().top + window.scrollY - 160;
+    window.scrollTo({ top, behavior: "smooth" });
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle form submission here
-    console.log("Form submitted:", formData);
+    setErrorMsg(null);
+    setSuccessMsg(null);
+    setSubmitting(true);
+    try {
+      const subjectLabel =
+        SUBJECT_OPTIONS.find((s) => s.value === formData.subject)?.label ||
+        formData.subject;
+      const res = await api.sendContactMessage({
+        name: formData.name.trim(),
+        email: formData.email.trim(),
+        phone: formData.phone.trim() || undefined,
+        subject: subjectLabel,
+        message: formData.message.trim(),
+      });
+      setSuccessMsg(
+        res.message ||
+          "Your message has been sent. We'll get back to you soon.",
+      );
+      setFormData({
+        name: "",
+        email: "",
+        phone: "",
+        subject: "",
+        message: "",
+      });
+    } catch (err: any) {
+      setErrorMsg(
+        err?.message ||
+          "Unable to send your message. Please try again or email bigbullenergies@gmail.com.",
+      );
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const handleChange = (
@@ -47,15 +103,13 @@ export default function ContactPage() {
       {/* Hero Section */}
       <section className="relative w-full py-6 md:py-10 lg:py-14">
         <div className="relative w-full min-h-[600px] md:min-h-[680px] lg:min-h-[720px] overflow-hidden">
-          {/* Background image - place your local hero image at /public/images/hero-contact.png */}
           <Image
             src="/images/hero-contact.png"
-            alt="Big Bull Energies facility with wind turbines and solar panels"
+            alt="Big Bull Energies headquarters with wind turbines"
             fill
             priority
             className="object-cover object-right"
           />
-          {/* Left-to-right fade so copy stays legible over the photo */}
           <div
             className="absolute inset-0"
             style={{
@@ -92,141 +146,124 @@ export default function ContactPage() {
                 style={{ color: NAVY, opacity: 0.75 }}
               >
                 We&apos;re here to help. Reach out to us for any questions,
-                inquiries, or to learn more about our services.
+                inquiries, or to learn more about Big Bull Energies.
               </p>
 
-              <a
-                href="#contact-form"
+              <button
+                type="button"
+                onClick={scrollToForm}
                 className="inline-flex items-center gap-2 font-bold px-7 py-4 text-sm uppercase tracking-wide rounded-full transition hover:opacity-90"
                 style={{ backgroundColor: GOLD, color: NAVY }}
               >
                 <Send className="w-4 h-4" />
                 Send a Message
-              </a>
+              </button>
             </div>
           </div>
         </div>
 
-        {/* Floating contact info card, overlapping hero + white section below */}
+        {/* Floating contact info card */}
         <div className="relative container mx-auto px-4 sm:px-6 lg:px-8">
-  <div className="max-w-7xl mx-auto -mt-16 md:-mt-20 bg-white rounded-2xl shadow-xl py-8 px-8 lg:px-12">
-    <div className="grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-gray-200">
+          <div className="max-w-7xl mx-auto -mt-16 md:-mt-20 bg-white rounded-2xl shadow-xl py-8 px-8 lg:px-12">
+            <div className="grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-gray-200">
+              <div className="flex items-center gap-5 py-6 md:py-2 md:px-8">
+                <div
+                  className="w-14 h-14 rounded-full flex items-center justify-center shrink-0"
+                  style={{ backgroundColor: "#ECFAF9" }}
+                >
+                  <Phone className="w-6 h-6" style={{ color: TEAL }} />
+                </div>
+                <div>
+                  <h3
+                    className="text-[17px] font-semibold mb-1"
+                    style={{ color: NAVY }}
+                  >
+                    Phone
+                  </h3>
+                  <a
+                    href={`tel:${SUPPORT_PHONE_TEL}`}
+                    className="block text-sm font-medium hover:opacity-80"
+                    style={{ color: NAVY }}
+                  >
+                    {SUPPORT_PHONE}
+                  </a>
+                  <p
+                    className="text-xs mt-1"
+                    style={{ color: NAVY, opacity: 0.55 }}
+                  >
+                    Mon–Fri 9:00 AM – 6:00 PM GMT
+                  </p>
+                </div>
+              </div>
 
-      {/* Phone */}
-      <div className="flex items-center gap-5 py-6 md:py-2 md:px-8">
-        <div
-          className="w-14 h-14 rounded-full flex items-center justify-center shrink-0"
-          style={{ backgroundColor: "#ECFAF9" }}
-        >
-          <Phone className="w-6 h-6" style={{ color: TEAL }} />
+              <div className="flex items-center gap-5 py-6 md:py-2 md:px-8">
+                <div
+                  className="w-14 h-14 rounded-full flex items-center justify-center shrink-0"
+                  style={{ backgroundColor: "#ECFAF9" }}
+                >
+                  <Mail className="w-6 h-6" style={{ color: TEAL }} />
+                </div>
+                <div>
+                  <h3
+                    className="text-[17px] font-semibold mb-1"
+                    style={{ color: NAVY }}
+                  >
+                    Email
+                  </h3>
+                  <a
+                    href={`mailto:${SUPPORT_EMAIL}`}
+                    className="block text-sm font-medium hover:opacity-80"
+                    style={{ color: NAVY }}
+                  >
+                    {SUPPORT_EMAIL}
+                  </a>
+                  <p
+                    className="text-xs mt-1"
+                    style={{ color: NAVY, opacity: 0.55 }}
+                  >
+                    We typically respond within 24 hours
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-5 py-6 md:py-2 md:px-8">
+                <div
+                  className="w-14 h-14 rounded-full flex items-center justify-center shrink-0"
+                  style={{ backgroundColor: "#ECFAF9" }}
+                >
+                  <MapPin className="w-6 h-6" style={{ color: TEAL }} />
+                </div>
+                <div>
+                  <h3
+                    className="text-[17px] font-semibold mb-1"
+                    style={{ color: NAVY }}
+                  >
+                    Address
+                  </h3>
+                  <p className="text-sm font-medium" style={{ color: NAVY }}>
+                    Big Bull Energies Headquarters,
+                  </p>
+                  <p
+                    className="text-xs mt-1"
+                    style={{ color: NAVY, opacity: 0.55 }}
+                  >
+                    United Kingdom
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
-
-        <div>
-          <h3
-            className="text-[17px] font-semibold mb-1"
-            style={{ color: NAVY }}
-          >
-            Phone
-          </h3>
-
-          <a
-            href="tel:+447452321003"
-            className="block text-sm font-medium hover:opacity-80"
-            style={{ color: NAVY }}
-          >
-            +44 7452 321003
-          </a>
-
-          <p
-            className="text-xs mt-1"
-            style={{ color: NAVY, opacity: 0.55 }}
-          >
-            Mon–Fri 9:00 AM – 6:00 PM GMT
-          </p>
-        </div>
-      </div>
-
-      {/* Email */}
-      <div className="flex items-center gap-5 py-6 md:py-2 md:px-8">
-        <div
-          className="w-14 h-14 rounded-full flex items-center justify-center shrink-0"
-          style={{ backgroundColor: "#ECFAF9" }}
-        >
-          <Mail className="w-6 h-6" style={{ color: TEAL }} />
-        </div>
-
-        <div>
-          <h3
-            className="text-[17px] font-semibold mb-1"
-            style={{ color: NAVY }}
-          >
-            Email
-          </h3>
-
-          <a
-            href="mailto:bigbullenergies@gmail.com"
-            className="block text-sm font-medium hover:opacity-80"
-            style={{ color: NAVY }}
-          >
-            bigbullenergies@gmail.com
-          </a>
-
-          <p
-            className="text-xs mt-1"
-            style={{ color: NAVY, opacity: 0.55 }}
-          >
-            We typically respond within 24 hours
-          </p>
-        </div>
-      </div>
-
-      {/* Address */}
-      <div className="flex items-center gap-5 py-6 md:py-2 md:px-8">
-        <div
-          className="w-14 h-14 rounded-full flex items-center justify-center shrink-0"
-          style={{ backgroundColor: "#ECFAF9" }}
-        >
-          <MapPin className="w-6 h-6" style={{ color: TEAL }} />
-        </div>
-
-        <div>
-          <h3
-            className="text-[17px] font-semibold mb-1"
-            style={{ color: NAVY }}
-          >
-            Address
-          </h3>
-
-          <p
-            className="text-sm font-medium"
-            style={{ color: NAVY }}
-          >
-            Big Bull Energies Headquarters,
-          </p>
-
-          <p
-            className="text-xs mt-1"
-            style={{ color: NAVY, opacity: 0.55 }}
-          >
-            United Kingdom
-          </p>
-        </div>
-      </div>
-
-    </div>
-  </div>
-</div>
       </section>
 
       {/* Contact Form Section */}
       <section
         id="contact-form"
-        className="relative w-full bg-white py-20 sm:py-24 md:py-28 lg:py-32"
+        className="relative w-full bg-white py-20 sm:py-24 md:py-28 lg:py-32 scroll-mt-40"
       >
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-7xl mx-auto">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-stretch">
-              {/* Left Side - Dark form card */}
               <div
                 className="rounded-2xl p-8 sm:p-10 lg:p-12 flex flex-col"
                 style={{ backgroundColor: NAVY }}
@@ -249,7 +286,10 @@ export default function ContactPage() {
                   </div>
                 </div>
 
-                <form onSubmit={handleSubmit} className="space-y-5 flex-1 flex flex-col">
+                <form
+                  onSubmit={handleSubmit}
+                  className="space-y-5 flex-1 flex flex-col"
+                >
                   <div>
                     <label
                       htmlFor="name"
@@ -328,21 +368,15 @@ export default function ContactPage() {
                       <option value="" className="text-black">
                         Select a subject
                       </option>
-                      <option value="general" className="text-black">
-                        General Inquiry
-                      </option>
-                      <option value="partnership" className="text-black">
-                        Partnership
-                      </option>
-                      <option value="services" className="text-black">
-                        Services
-                      </option>
-                      <option value="careers" className="text-black">
-                        Careers
-                      </option>
-                      <option value="other" className="text-black">
-                        Other
-                      </option>
+                      {SUBJECT_OPTIONS.map((opt) => (
+                        <option
+                          key={opt.value}
+                          value={opt.value}
+                          className="text-black"
+                        >
+                          {opt.label}
+                        </option>
+                      ))}
                     </select>
                   </div>
 
@@ -366,31 +400,52 @@ export default function ContactPage() {
                     />
                   </div>
 
+                  {successMsg && (
+                    <div className="flex items-start gap-2 rounded-lg bg-emerald-500/15 border border-emerald-400/40 px-4 py-3 text-sm text-emerald-200">
+                      <CheckCircle2 className="w-5 h-5 shrink-0 mt-0.5" />
+                      <p>{successMsg}</p>
+                    </div>
+                  )}
+                  {errorMsg && (
+                    <div className="rounded-lg bg-red-500/15 border border-red-400/40 px-4 py-3 text-sm text-red-200">
+                      {errorMsg}
+                    </div>
+                  )}
+
                   <button
                     type="submit"
-                    className="w-full font-bold px-8 py-4 text-sm uppercase tracking-wide rounded-full transition hover:opacity-90 flex items-center justify-center gap-2"
+                    disabled={submitting}
+                    className="w-full font-bold px-8 py-4 text-sm uppercase tracking-wide rounded-full transition hover:opacity-90 flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
                     style={{ backgroundColor: GOLD, color: NAVY }}
                   >
-                    <Send className="w-5 h-5" />
-                    Send Message
+                    {submitting ? (
+                      <>
+                        <Loader2 className="w-5 h-5 animate-spin" />
+                        Sending…
+                      </>
+                    ) : (
+                      <>
+                        <Send className="w-5 h-5" />
+                        Send Message
+                      </>
+                    )}
                   </button>
                 </form>
               </div>
 
-              {/* Right Side - full-bleed image card with overlay content */}
               <div className="relative rounded-2xl overflow-hidden min-h-[520px] lg:min-h-0">
-                {/* Background image - place your local image at /public/images/cta-turbines.png */}
                 <Image
                   src="/images/cta-turbines.png"
                   alt="Wind turbines on rolling hills"
                   fill
                   className="object-cover"
                 />
-                {/* Overlay for text legibility */}
                 <div
                   className="absolute inset-0"
                   style={{
-                    }}
+                    background:
+                      "linear-gradient(180deg, rgba(255,255,255,0.88) 0%, rgba(255,255,255,0.72) 55%, rgba(255,255,255,0.45) 100%)",
+                  }}
                 />
 
                 <div className="relative h-full flex flex-col p-8 sm:p-10 lg:p-10">
@@ -404,10 +459,9 @@ export default function ContactPage() {
                     style={{ backgroundColor: TEAL }}
                   />
                   <p className="text-base md:text-lg leading-relaxed mb-8 text-black/80">
-                    Whether you have a question about our services, need
-                    assistance, or want to explore partnership opportunities,
-                    we&apos;re here to help. Our team is ready to respond to
-                    your inquiry.
+                    Whether you have a question about our wind energy solutions,
+                    need assistance, or want to explore partnership
+                    opportunities, we&apos;re here to help.
                   </p>
 
                   <div className="space-y-6">
@@ -423,10 +477,10 @@ export default function ContactPage() {
                           Call us
                         </h3>
                         <a
-                          href="tel:+447452321003"
+                          href={`tel:${SUPPORT_PHONE_TEL}`}
                           className="text-base font-medium hover:opacity-70 transition text-black"
                         >
-                          +44 7452 321003
+                          {SUPPORT_PHONE}
                         </a>
                         <p className="text-sm mt-1 text-black/70">
                           Mon - Fri: 9:00 AM - 6:00 PM GMT
@@ -446,10 +500,10 @@ export default function ContactPage() {
                           Email us
                         </h3>
                         <a
-                          href="mailto:bigbullenergies@gmail.com"
+                          href={`mailto:${SUPPORT_EMAIL}`}
                           className="text-base font-medium hover:opacity-70 transition text-black break-all"
                         >
-                          bigbullenergies@gmail.com
+                          {SUPPORT_EMAIL}
                         </a>
                         <p className="text-sm mt-1 text-black/70">
                           We typically respond within 24 hours

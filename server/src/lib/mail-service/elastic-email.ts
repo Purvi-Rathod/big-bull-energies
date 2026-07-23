@@ -13,15 +13,24 @@ export interface SendEmailParams {
   subject: string;
   html: string;
   fromName?: string;
+  /** Optional Reply-To (e.g. visitor email on contact form) */
+  replyTo?: string;
 }
 
 /**
  * Send a single email with raw HTML (no template).
  */
-export async function sendEmail({ to, from, subject, html, fromName }: SendEmailParams): Promise<void> {
-  const apiKey = process.env.ELASTICMAIL_API_KEY;
+export async function sendEmail({
+  to,
+  from,
+  subject,
+  html,
+  fromName,
+  replyTo,
+}: SendEmailParams): Promise<void> {
+  const apiKey = process.env.ELASTICMAIL_API_KEY || process.env.ELASTIC_API_KEY;
   if (!apiKey) {
-    throw new Error("ELASTICMAIL_API_KEY is not set");
+    throw new Error("ELASTICMAIL_API_KEY (or ELASTIC_API_KEY) is not set");
   }
 
   const body = new URLSearchParams({
@@ -31,6 +40,7 @@ export async function sendEmail({ to, from, subject, html, fromName }: SendEmail
     subject,
     bodyHtml: html,
     ...(fromName && { fromName }),
+    ...(replyTo && { replyTo }),
   });
 
   const res = await fetch(ELASTIC_EMAIL_SEND_URL, {
@@ -74,9 +84,9 @@ export async function sendWithTemplate({
   merge,
   fromName,
 }: SendWithTemplateParams): Promise<void> {
-  const apiKey = process.env.ELASTICMAIL_API_KEY;
+  const apiKey = process.env.ELASTICMAIL_API_KEY || process.env.ELASTIC_API_KEY;
   if (!apiKey) {
-    throw new Error("ELASTICMAIL_API_KEY is not set");
+    throw new Error("ELASTICMAIL_API_KEY (or ELASTIC_API_KEY) is not set");
   }
 
   const body = new URLSearchParams({

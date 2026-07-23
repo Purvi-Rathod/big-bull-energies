@@ -18,6 +18,8 @@ export const generalLimiter = rateLimit({
   },
   standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
   legacyHeaders: false, // Disable the `X-RateLimit-*` headers
+  // app sets trust proxy=true (needed behind reverse proxies); skip this validation in local/dev
+  validate: { trustProxy: false },
 });
 
 /**
@@ -35,6 +37,7 @@ export const authLimiter = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
   skipSuccessfulRequests: false, // Count all attempts for security
+  validate: { trustProxy: false },
 });
 
 /**

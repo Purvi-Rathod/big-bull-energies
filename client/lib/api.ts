@@ -646,6 +646,20 @@ class ApiClient {
     });
   }
 
+  /** Public contact form (website Contact Us page) */
+  async sendContactMessage(data: {
+    name: string;
+    email: string;
+    phone?: string;
+    subject: string;
+    message: string;
+  }) {
+    return this.request<null>('/support/contact', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  }
+
   async updateUserStatus(userId: string, status: 'active' | 'inactive' | 'suspended' | 'blocked' | 'suspected') {
     return this.request<{ userId: string; name: string; email: string; status: string }>(`/admin/users/${userId}/status`, {
       method: 'PUT',

@@ -150,18 +150,19 @@ export default function Navbar() {
         className={`bg-white border-b border-[#e6eef1] transition-all duration-300 ease-out overflow-hidden ${
           isScrolled
             ? "-translate-y-full opacity-0 pointer-events-none max-h-0"
-            : "translate-y-0 opacity-100 max-h-[70px]"
+            : "translate-y-0 opacity-100 max-h-[100px]"
         }`}
       >
-        <div className="hidden md:flex container mx-auto px-4 lg:px-8 h-[70px] items-center justify-between">
+        <div className="hidden md:flex container mx-auto px-4 lg:px-8 h-[100px] items-center justify-between">
           <Link href="/" className="flex items-center shrink-0">
             <Image
-              src="/image.png"
+              src="/logo.png"
               alt="Big Bull Energies"
-              width={180}
-              height={56}
-              className="h-14 w-auto object-contain"
+              width={280}
+              height={96}
+              className="h-[88px] w-auto object-contain"
               priority
+              quality={95}
             />
           </Link>
 
@@ -204,15 +205,16 @@ export default function Navbar() {
           </div>
         </div>
 
-        <div className="md:hidden flex container mx-auto px-3 sm:px-4 h-12 items-center justify-between">
+        <div className="md:hidden flex container mx-auto px-3 sm:px-4 h-16 items-center justify-between">
           <Link href="/" className="flex items-center">
             <Image
-              src="/image.png"
+              src="/logo.png"
               alt="Big Bull Energies"
-              width={120}
-              height={40}
-              className="h-8 w-auto object-contain"
+              width={180}
+              height={60}
+              className="h-12 w-auto object-contain"
               priority
+              quality={95}
             />
           </Link>
           <Link
@@ -295,7 +297,7 @@ export default function Navbar() {
                   {isOpen && (
                     <div
                       className="fixed left-0 right-0 z-50 border-t border-[#e6eef1] bg-white shadow-[0_20px_50px_rgba(5,98,124,0.14)]"
-                      style={{ top: isScrolled ? "56px" : "126px" }}
+                      style={{ top: isScrolled ? "56px" : "156px" }}
                       onMouseEnter={clearCloseTimeout}
                       onMouseLeave={scheduleClose}
                     >

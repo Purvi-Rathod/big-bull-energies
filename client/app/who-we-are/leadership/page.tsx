@@ -83,7 +83,7 @@ export default function LeadershipPage() {
 
   return (
     <main
-      className="min-h-screen w-full overflow-x-hidden pt-24 sm:pt-28 md:pt-32 lg:pt-[126px]"
+      className="min-h-screen w-full overflow-x-hidden pt-24 sm:pt-28 md:pt-32 lg:pt-[156px]"
       style={{ fontFamily: FONT_STACK }}
     >
       {/* Hero */}

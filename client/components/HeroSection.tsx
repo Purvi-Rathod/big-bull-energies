@@ -105,7 +105,7 @@ export default function HeroSection() {
       ref={sectionRef}
       onMouseMove={handleMouseMove}
       onMouseLeave={() => setParallax({ x: 0, y: 0 })}
-      className="relative w-full overflow-hidden flex flex-col justify-end min-h-[100svh] min-h-[100dvh] pt-24 sm:pt-28 md:pt-32 lg:pt-[7.5rem]"
+      className="relative w-full overflow-hidden flex flex-col justify-end min-h-[100svh] min-h-[100dvh] pt-24 sm:pt-28 md:pt-32 lg:pt-[9.75rem]"
     >
       {/* Background */}
       <div className="absolute inset-0 z-0 overflow-hidden">

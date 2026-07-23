@@ -26,10 +26,11 @@ export default function Footer() {
               <Image
                 src="/image.png"
                 alt="Big Bull Energies Logo"
-                width={200}
-                height={100}
+                width={280}
+                height={140}
                 className="object-contain"
-                style={{ height: "auto", maxHeight: "100px" }}
+                style={{ height: "auto", maxHeight: "140px" }}
+                quality={95}
               />
             </Link>
           </div>

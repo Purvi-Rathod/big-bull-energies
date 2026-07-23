@@ -14,10 +14,11 @@ export default function PublicHeader() {
           <Image
             src="/image.png"
             alt="Big Bull Energies Logo"
-            width={120}
-            height={40}
-            className="h-10 w-auto"
+            width={180}
+            height={60}
+            className="h-14 w-auto"
             priority
+            quality={95}
           />
         </Link>
 

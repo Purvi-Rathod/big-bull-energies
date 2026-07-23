@@ -248,7 +248,7 @@ export default function GalleryPage() {
 
   return (
     <main
-      className="min-h-screen w-full overflow-x-hidden pt-24 sm:pt-28 md:pt-32 lg:pt-[126px] bg-white"
+      className="min-h-screen w-full overflow-x-hidden pt-24 sm:pt-28 md:pt-32 lg:pt-[156px] bg-white"
       style={{ fontFamily: FONT_STACK }}
     >
       {/* Category Filter */}

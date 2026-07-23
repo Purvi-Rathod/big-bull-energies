@@ -173,7 +173,7 @@ export default function ProjectsPage() {
   return (
     <main className="min-h-screen w-full overflow-x-hidden bg-white">
       {/* Hero */}
-      <section className="relative w-full min-h-[100svh] min-h-[100dvh] flex flex-col justify-end overflow-hidden pt-24 sm:pt-28 lg:pt-[126px]">
+      <section className="relative w-full min-h-[100svh] min-h-[100dvh] flex flex-col justify-end overflow-hidden pt-24 sm:pt-28 lg:pt-[156px]">
         <div className="absolute inset-0 z-0">
           <Image
             src="/hero-solar.webp"

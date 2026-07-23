@@ -205,10 +205,11 @@ function LoginContent() {
           <Image
             src="/image.png"
             alt="Big Bull Energies Logo"
-            width={168}
-            height={56}
-            className="h-11 w-auto"
+            width={240}
+            height={80}
+            className="h-16 w-auto"
             priority
+            quality={95}
           />
         </Link>
 
@@ -293,10 +294,11 @@ function LoginContent() {
               <Image
                 src="/image.png"
                 alt="Big Bull Energies Logo"
-                width={150}
-                height={50}
-                className="h-10 w-auto"
+                width={220}
+                height={72}
+                className="h-14 w-auto"
                 priority
+                quality={95}
               />
             </Link>
           </div>

@@ -18,6 +18,7 @@ import {
   useMotionValue,
   useSpring,
   useTransform,
+  type Variants,
 } from "framer-motion";
 import Footer from "@/components/Footer";
 
@@ -28,99 +29,109 @@ const MUTED = "#6b7c85";
 const ACCENT = "#3FA9C8";
 const FONT_HEADING = "var(--font-font4), sans-serif";
 
+const fadeUp: Variants = {
+  hidden: { opacity: 0, y: 28 },
+  show: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.7, ease: [0.22, 1, 0.36, 1] },
+  },
+};
+
+const stagger: Variants = {
+  hidden: {},
+  show: { transition: { staggerChildren: 0.1 } },
+};
+
 const HERO_FEATURES = [
   {
     icon: Leaf,
-    title: "Clean & Renewable",
-    desc: "Zero emissions power.",
+    title: "Zero-Fuel Power",
+    desc: "Clean electricity from the wind.",
   },
   {
     icon: Zap,
-    title: "Cost Effective",
-    desc: "Lower operating costs.",
+    title: "Grid-Ready Output",
+    desc: "Reliable renewable generation.",
   },
   {
     icon: Wind,
-    title: "Reliable Performance",
-    desc: "Built for the long run.",
+    title: "Modern Turbines",
+    desc: "High-efficiency wind systems.",
   },
   {
     icon: ShieldCheck,
-    title: "Sustainable Impact",
-    desc: "Powering a better future.",
+    title: "Long-Term Value",
+    desc: "Built for lasting impact.",
   },
 ];
 
 const INTRO_PILLARS = [
   {
     icon: Wind,
-    title: "Renewable",
-    desc: "Naturally replenished resource with no fuel cost.",
+    title: "Wind-first strategy",
+    desc: "Utility-scale wind sits at the centre of Big Bull Energies’ renewable portfolio.",
   },
   {
     icon: Zap,
-    title: "Efficient",
-    desc: "Modern turbines that maximize every gust of wind.",
+    title: "Investor-aligned growth",
+    desc: "Clean generation that underpins structured participation programs on our platform.",
   },
   {
     icon: ShieldCheck,
-    title: "Sustainable",
-    desc: "Clean generation that strengthens energy security.",
+    title: "Global standards",
+    desc: "Operated under registered entities in the United Kingdom and New Zealand.",
   },
 ];
 
 const PROCESS_STEPS = [
-  "Wind flows over the turbine blades, creating lift and causing them to rotate.",
-  "The rotating blades spin a shaft connected to a gearbox that increases rotational speed.",
-  "The gearbox drives a generator that converts mechanical energy into electrical energy.",
-  "The electrical output is transformed to high voltage through a transformer.",
-  "Electricity is transmitted via transmission lines to the power grid.",
-  "Wind farms are connected to the grid to provide clean energy to consumers.",
+  "Steady wind flows across aerodynamically designed blades, creating lift that turns the rotor.",
+  "The rotor drives a shaft and gearbox (or a direct-drive system) to reach generator speed.",
+  "The generator converts mechanical motion into electricity inside the nacelle.",
+  "On-site transformers step voltage up for efficient transfer across the wind farm network.",
+  "A collection system moves power to the substation for grid-quality conditioning.",
+  "Electricity is delivered to the transmission network, supplying homes, businesses, and markets.",
 ];
 
 const WHY_POINTS = [
-  "Abundant and naturally replenished",
-  "Strengthens energy independence",
-  "Clean, reliable and sustainable power",
+  {
+    title: "Abundant & renewable",
+    desc: "Wind is a naturally replenished resource with no fuel cost and no combustion emissions at the point of generation.",
+  },
+  {
+    title: "Scalable clean capacity",
+    desc: "Land-based wind farms can be expanded in phases as demand grows, pairing well with storage and hybrid solar assets.",
+  },
+  {
+    title: "Community & climate impact",
+    desc: "Projects support local energy security while advancing Big Bull Energies’ mission for a cleaner global energy mix.",
+  },
 ];
 
 const STATS = [
-  {
-    value: 121,
-    suffix: "",
-    label: "Wind turbines installed",
-    icon: Wind,
-  },
-  {
-    value: 20,
-    suffix: "",
-    label: "Operational wind projects",
-    icon: Target,
-  },
-  {
-    value: 6,
-    suffix: "M",
-    label: "Megawatts of capacity under management",
-    icon: Zap,
-  },
+  { value: 2, suffix: "", label: "Core renewable generation hubs in operation" },
+  { value: 125, suffix: "", label: "Average MWh of clean electricity per day" },
+  { value: 7000, suffix: "+", label: "Households & businesses powered daily" },
 ];
 
 function AnimatedStat({
   value,
   suffix,
   label,
-  icon: Icon,
 }: {
   value: number;
   suffix: string;
   label: string;
-  icon: typeof Wind;
 }) {
   const ref = useRef<HTMLDivElement>(null);
   const inView = useInView(ref, { once: true, amount: 0.5 });
   const motionVal = useMotionValue(0);
-  const spring = useSpring(motionVal, { stiffness: 55, damping: 22 });
-  const display = useTransform(spring, (v) => `${Math.round(v)}${suffix}`);
+  const spring = useSpring(motionVal, { stiffness: 60, damping: 20 });
+  const display = useTransform(spring, (v) =>
+    value >= 1000
+      ? `${Math.round(v).toLocaleString()}${suffix}`
+      : `${Math.round(v)}${suffix}`,
+  );
   const [text, setText] = useState(`0${suffix}`);
 
   useEffect(() => {
@@ -133,24 +144,22 @@ function AnimatedStat({
   }, [display]);
 
   return (
-    <div ref={ref} className="flex items-start gap-4 sm:gap-5 py-5 border-b border-[#d8e2e6] last:border-b-0">
+    <div ref={ref} className="flex flex-col gap-2 sm:gap-3 min-w-0">
       <div
-        className="shrink-0 w-11 h-11 rounded-full flex items-center justify-center"
-        style={{ backgroundColor: "rgba(5,98,124,0.1)" }}
+        className="w-10 h-10 rounded-full flex items-center justify-center"
+        style={{ backgroundColor: "rgba(63,169,200,0.18)" }}
       >
-        <Icon className="w-5 h-5" style={{ color: PRIMARY }} strokeWidth={1.75} />
+        <Wind className="w-5 h-5" style={{ color: "#3FA9C8" }} />
       </div>
-      <div className="min-w-0">
-        <p
-          className="text-3xl sm:text-4xl lg:text-[2.75rem] font-bold tabular-nums leading-none mb-1.5"
-          style={{ fontFamily: FONT_HEADING, color: DARK }}
-        >
-          {text}
-        </p>
-        <p className="text-sm sm:text-[15px] leading-snug" style={{ color: MUTED }}>
-          {label}
-        </p>
-      </div>
+      <p
+        className="text-4xl sm:text-5xl lg:text-[3.25rem] font-bold tabular-nums leading-none text-white"
+        style={{ fontFamily: FONT_HEADING }}
+      >
+        {text}
+      </p>
+      <p className="text-sm sm:text-[15px] text-white/70 leading-snug max-w-[220px]">
+        {label}
+      </p>
     </div>
   );
 }
@@ -158,83 +167,101 @@ function AnimatedStat({
 export default function WindPage() {
   return (
     <main className="min-h-screen w-full overflow-x-hidden bg-white">
-      {/* Hero — light entrance motion only */}
       <section className="relative w-full min-h-[100svh] min-h-[100dvh] flex flex-col justify-end overflow-hidden pt-24 sm:pt-28 lg:pt-[126px]">
-        <div className="absolute inset-0 z-0">
+        <motion.div
+          className="absolute inset-0 z-0"
+          initial={{ scale: 1.08 }}
+          animate={{ scale: 1 }}
+          transition={{ duration: 8, ease: "easeOut" }}
+        >
           <Image
             src="/wind-hero.png"
-            alt="Wind farm at sunrise"
+            alt="Big Bull Energies wind turbines at sunrise"
             fill
             priority
             className="object-cover object-center"
             sizes="100vw"
             quality={90}
           />
-        </div>
+        </motion.div>
 
         <div
           className="absolute inset-0 z-[1] pointer-events-none"
           style={{
             background:
-              "linear-gradient(90deg, rgba(8,24,40,0.82) 0%, rgba(8,24,40,0.55) 38%, rgba(8,24,40,0.2) 65%, transparent 100%)",
+              "linear-gradient(90deg, rgba(8,24,40,0.82) 0%, rgba(8,24,40,0.5) 42%, rgba(8,24,40,0.18) 70%, transparent 100%)",
           }}
         />
         <div
           className="absolute inset-0 z-[1] pointer-events-none"
           style={{
             background:
-              "linear-gradient(to top, rgba(8,24,40,0.9) 0%, rgba(8,24,40,0.3) 42%, transparent 68%)",
+              "linear-gradient(to top, rgba(8,24,40,0.92) 0%, rgba(8,24,40,0.35) 38%, transparent 62%)",
           }}
         />
 
         <div className="relative z-10 container mx-auto px-4 sm:px-6 lg:px-8 flex-1 flex flex-col justify-center pb-6 sm:pb-8">
           <div className="max-w-[1220px] mx-auto w-full">
             <motion.div
-              className="max-w-xl lg:max-w-[560px]"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+              className="max-w-xl lg:max-w-[580px]"
+              variants={stagger}
+              initial="hidden"
+              animate="show"
             >
-              <p
+              <motion.p
+                variants={fadeUp}
                 className="text-[11px] sm:text-xs font-bold uppercase tracking-[0.2em] mb-4 sm:mb-5"
                 style={{ color: "#7DD3E8" }}
               >
-                Clean Energy. Limitless Future.
-              </p>
+                Big Bull Energies · Wind Power
+              </motion.p>
 
-              <h1
-                className="text-[2.1rem] sm:text-5xl md:text-[3.15rem] lg:text-[3.4rem] font-bold leading-[1.1] mb-4 sm:mb-5 text-white"
+              <motion.h1
+                variants={fadeUp}
+                className="text-[2.15rem] sm:text-5xl md:text-[3.25rem] lg:text-[3.6rem] font-bold leading-[1.08] mb-4 sm:mb-5 text-white"
                 style={{ fontFamily: FONT_HEADING }}
               >
-                Affordable,{" "}
-                <span style={{ color: ACCENT }}>clean energy</span> powered by
-                nature.
-              </h1>
+                Powering progress.{" "}
+                <span
+                  className="italic font-semibold"
+                  style={{ color: ACCENT }}
+                >
+                  By wind.
+                </span>
+              </motion.h1>
 
-              <p className="text-sm sm:text-[15px] md:text-base leading-relaxed text-white/85 max-w-md mb-7 sm:mb-8">
-                Smart wind energy solutions that deliver reliable clean power,
-                competitive returns, and lasting impact for communities and the
-                grid.
-              </p>
-
-              <Link
-                href="#solutions"
-                className="gas-cta-gold group inline-flex items-center gap-2.5 font-bold px-6 py-3.5 text-xs sm:text-sm uppercase tracking-[0.06em] rounded-lg transition-all duration-300"
-                style={{ backgroundColor: GOLD, color: "#1a1a1a" }}
+              <motion.p
+                variants={fadeUp}
+                className="text-sm sm:text-[15px] md:text-base leading-relaxed text-white/85 max-w-md mb-7 sm:mb-8"
               >
-                Explore Wind Solutions
-                <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
-              </Link>
+                Big Bull Energies develops and operates wind energy solutions —
+                from modern turbine systems to grid-connected farms — delivering
+                clean power and long-term renewable value.
+              </motion.p>
+
+              <motion.div variants={fadeUp}>
+                <Link
+                  href="#solutions"
+                  className="gas-cta-gold group inline-flex items-center gap-2.5 font-bold px-6 py-3.5 text-xs sm:text-sm uppercase tracking-[0.06em] rounded-lg transition-all duration-300"
+                  style={{ backgroundColor: GOLD, color: "#1a1a1a" }}
+                >
+                  Explore Wind Solutions
+                  <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
+                </Link>
+              </motion.div>
             </motion.div>
           </div>
         </div>
 
-        <div
+        <motion.div
           className="relative z-10 border-t border-white/10"
           style={{
             background: "rgba(8,24,40,0.55)",
             backdropFilter: "blur(14px)",
           }}
+          initial={{ opacity: 0, y: 24 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.45, duration: 0.7 }}
         >
           <div className="container mx-auto px-4 sm:px-6 lg:px-8">
             <div className="max-w-[1220px] mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-0 py-5 sm:py-6">
@@ -262,61 +289,59 @@ export default function WindPage() {
               ))}
             </div>
           </div>
-        </div>
+        </motion.div>
       </section>
 
-      {/* Investment / intro — no motion */}
       <section
         id="solutions"
-        className="relative w-full bg-white py-14 sm:py-16 md:py-20 lg:py-24 overflow-hidden"
+        className="relative w-full bg-white py-14 sm:py-16 md:py-20 lg:py-24"
       >
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="max-w-[1220px] mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-14 xl:gap-16 items-center">
-            <div>
-              <div
-                className="flex items-center gap-2.5 flex-wrap text-[11px] sm:text-xs font-semibold uppercase tracking-[0.14em] mb-5 sm:mb-6"
+          <div className="max-w-[1220px] mx-auto grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-14 xl:gap-16 items-center">
+            <motion.div
+              variants={stagger}
+              initial="hidden"
+              whileInView="show"
+              viewport={{ once: true, amount: 0.25 }}
+            >
+              <motion.div
+                variants={fadeUp}
+                className="flex items-center gap-2 flex-wrap text-[11px] sm:text-xs font-semibold uppercase tracking-[0.14em] mb-5 sm:mb-6"
                 style={{ color: MUTED }}
               >
-                <span style={{ color: PRIMARY }}>Energy Technologies</span>
-                <span className="opacity-40">|</span>
-                <span>Wind Energy</span>
-              </div>
+                <span>Energy Technologies</span>
+                <span className="opacity-40">/</span>
+                <span style={{ color: PRIMARY }}>Wind Energy</span>
+              </motion.div>
 
-              <h2
+              <motion.h2
+                variants={fadeUp}
                 className="text-[1.85rem] sm:text-4xl lg:text-[2.65rem] font-bold leading-[1.15] mb-5"
                 style={{ fontFamily: FONT_HEADING, color: DARK }}
               >
-                A core component of Big Bull Energies&apos; investment
-                portfolio.
-              </h2>
+                Wind is the core of{" "}
+                <span style={{ color: PRIMARY }}>Big Bull Energies</span>.
+              </motion.h2>
 
-              <p
-                className="text-sm sm:text-[15px] leading-[1.75] mb-4 max-w-lg"
-                style={{ color: MUTED }}
-              >
-                Land-based wind energy is a carbon-free, cost-competitive
-                resource that creates jobs and strengthens energy security.
-                Backed by growing customer demand, it&apos;s part of the energy
-                mix we need to power economies.
-              </p>
-
-              <p
+              <motion.p
+                variants={fadeUp}
                 className="text-sm sm:text-[15px] leading-[1.75] mb-8 sm:mb-10 max-w-lg"
                 style={{ color: MUTED }}
               >
-                From utility-scale farms to contracted projects, our wind
-                investments deliver clean megawatts with long-term value for
-                investors and communities.
-              </p>
+                We specialize in wind power technologies — planning, developing,
+                and operating land-based wind assets that convert natural airflow
+                into dependable clean electricity for grids and communities.
+              </motion.p>
 
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 sm:gap-4">
+              <div className="space-y-5 sm:space-y-6">
                 {INTRO_PILLARS.map(({ icon: Icon, title, desc }) => (
-                  <div
+                  <motion.div
                     key={title}
-                    className="flex sm:flex-col items-center sm:items-start gap-3"
+                    variants={fadeUp}
+                    className="flex items-start gap-3.5"
                   >
                     <span
-                      className="shrink-0 w-11 h-11 rounded-full flex items-center justify-center"
+                      className="shrink-0 w-10 h-10 rounded-full flex items-center justify-center"
                       style={{ backgroundColor: "rgba(5,98,124,0.1)" }}
                     >
                       <Icon
@@ -333,187 +358,242 @@ export default function WindPage() {
                         {title}
                       </p>
                       <p
-                        className="text-xs sm:text-[13px] leading-relaxed"
+                        className="text-sm leading-relaxed"
                         style={{ color: MUTED }}
                       >
                         {desc}
                       </p>
                     </div>
-                  </div>
+                  </motion.div>
                 ))}
               </div>
-            </div>
+            </motion.div>
 
-            <div className="relative w-full max-w-[420px] sm:max-w-[460px] mx-auto lg:max-w-none lg:justify-self-end">
-              <div className="relative w-full aspect-square">
-                <div className="absolute inset-0 rounded-full overflow-hidden shadow-[0_28px_64px_rgba(5,98,124,0.18)]">
-                  <Image
-                    src="/wind-rounded-image1.webp"
-                    alt="Wind turbines and clean energy landscape"
-                    fill
-                    className="object-cover"
-                    sizes="(max-width: 1024px) 90vw, 460px"
-                  />
-                </div>
-
-                <div
-                  className="absolute bottom-3 right-0 sm:bottom-6 sm:right-2 z-10 w-[44%] max-w-[190px] rounded-2xl px-4 py-4 text-center"
-                  style={{
-                    background:
-                      "linear-gradient(145deg, #05627C 0%, #0A4A5C 100%)",
-                    boxShadow: "0 16px 40px rgba(5,98,124,0.35)",
-                  }}
-                >
-                  <Wind className="w-6 h-6 mx-auto mb-2" style={{ color: GOLD }} />
-                  <p className="text-[10px] sm:text-[11px] leading-snug text-white/95 font-medium">
-                    Building a cleaner future, together.
-                  </p>
-                </div>
+            <motion.div
+              className="relative w-full"
+              initial={{ opacity: 0, x: 40 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true, amount: 0.3 }}
+              transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+            >
+              <div
+                className="relative w-full overflow-hidden aspect-[4/5] sm:aspect-[5/6]"
+                style={{
+                  borderRadius: "1.25rem 2.5rem 1.25rem 2.5rem",
+                  boxShadow: "0 28px 64px rgba(5,98,124,0.14)",
+                }}
+              >
+                <Image
+                  src="/wind-rounded-image1.webp"
+                  alt="Big Bull Energies wind turbines across open landscape"
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 1024px) 100vw, 50vw"
+                  priority
+                />
               </div>
-            </div>
+            </motion.div>
           </div>
         </div>
       </section>
 
-      {/* Track record — count-up motion only */}
-      <section className="relative w-full bg-[#F4F6F7] py-14 sm:py-16 md:py-20 lg:py-24">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+      <section className="relative w-full overflow-hidden min-h-[420px] sm:min-h-[460px] lg:min-h-[480px]">
+        <div className="absolute inset-0 z-0">
+          <Image
+            src="/images/cta-turbines.png"
+            alt=""
+            fill
+            className="object-cover object-[72%_center] sm:object-[68%_center] lg:object-right"
+            sizes="100vw"
+            aria-hidden
+          />
+          <div
+            className="absolute inset-0"
+            style={{
+              background:
+                "linear-gradient(90deg, rgba(8,20,32,0.97) 0%, rgba(8,20,32,0.92) 28%, rgba(8,20,32,0.72) 48%, rgba(8,20,32,0.35) 68%, rgba(8,20,32,0.15) 85%, transparent 100%)",
+            }}
+          />
+          <div
+            className="absolute inset-0 sm:hidden"
+            style={{
+              background:
+                "linear-gradient(180deg, rgba(8,20,32,0.88) 0%, rgba(8,20,32,0.75) 55%, rgba(8,20,32,0.55) 100%)",
+            }}
+          />
+        </div>
+
+        <motion.div
+          className="relative z-10 container mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-14 lg:py-16"
+          initial={{ opacity: 0, y: 28 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.3 }}
+          transition={{ duration: 0.7 }}
+        >
           <div className="max-w-[1220px] mx-auto">
-            <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-8 sm:mb-10">
+            <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-9 sm:mb-11 max-w-3xl lg:max-w-4xl">
               <h2
-                className="text-2xl sm:text-3xl md:text-4xl font-bold max-w-md"
-                style={{ fontFamily: FONT_HEADING, color: DARK }}
+                className="text-2xl sm:text-3xl lg:text-[2rem] font-bold leading-snug text-white max-w-md"
+                style={{ fontFamily: FONT_HEADING }}
               >
-                Our proven track record in wind energy
+                Clean capacity that{" "}
+                <span style={{ color: ACCENT }}>powers real demand</span>
               </h2>
               <Link
                 href="/projects"
-                className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.08em] hover:opacity-80 transition"
-                style={{ color: PRIMARY }}
+                className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-[0.08em] shrink-0 hover:opacity-80 transition"
+                style={{ color: "#7DD3E8" }}
               >
-                View All Wind Projects
+                View Our Projects
                 <ArrowRight className="w-3.5 h-3.5" />
               </Link>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-[1.05fr_0.95fr] gap-10 lg:gap-12 items-center">
-              <div>
-                {STATS.map((stat) => (
-                  <AnimatedStat key={stat.label} {...stat} />
-                ))}
-              </div>
-
-              <div className="relative w-full aspect-[5/4] sm:aspect-[4/3]">
-                <Image
-                  src="/wind1.svg"
-                  alt="Wind energy infrastructure illustration"
-                  fill
-                  className="object-contain"
-                  sizes="(max-width: 1024px) 100vw, 45vw"
-                />
-              </div>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 sm:gap-6 lg:gap-10 max-w-3xl lg:max-w-4xl">
+              {STATS.map((stat) => (
+                <AnimatedStat key={stat.label} {...stat} />
+              ))}
             </div>
           </div>
-        </div>
+        </motion.div>
       </section>
 
-      {/* How wind works — static */}
       <section className="relative w-full bg-white py-14 sm:py-16 md:py-20 lg:py-24">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-[1220px] mx-auto">
-            <h2
+            <motion.h2
               className="text-2xl sm:text-3xl md:text-4xl lg:text-[2.5rem] font-bold text-center mb-10 sm:mb-12 lg:mb-14"
               style={{ fontFamily: FONT_HEADING, color: DARK }}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
             >
-              How wind energy works
-            </h2>
+              How Big Bull wind energy works
+            </motion.h2>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-14 xl:gap-16 items-center">
-              <ol className="flex flex-col gap-3.5 sm:gap-4 order-2 lg:order-1">
+              <motion.ol
+                className="flex flex-col gap-4 sm:gap-5 order-2 lg:order-1"
+                variants={stagger}
+                initial="hidden"
+                whileInView="show"
+                viewport={{ once: true, amount: 0.2 }}
+              >
                 {PROCESS_STEPS.map((text, i) => (
-                  <li key={i} className="flex items-start gap-3.5 sm:gap-4">
-                    <span
-                      className="shrink-0 w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center text-sm font-bold text-white"
+                  <motion.li
+                    key={i}
+                    variants={fadeUp}
+                    className="flex items-start gap-3.5 sm:gap-4"
+                  >
+                    <motion.span
+                      className="shrink-0 w-10 h-10 sm:w-11 sm:h-11 rounded-full flex items-center justify-center text-sm sm:text-base font-bold text-white"
                       style={{ backgroundColor: PRIMARY }}
+                      whileHover={{ scale: 1.08 }}
+                      transition={{
+                        type: "spring",
+                        stiffness: 320,
+                        damping: 18,
+                      }}
                     >
                       {i + 1}
-                    </span>
+                    </motion.span>
                     <p
-                      className="text-sm sm:text-[15px] leading-relaxed pt-1.5"
+                      className="text-sm sm:text-[15px] md:text-base leading-relaxed pt-2"
                       style={{ color: MUTED }}
                     >
                       {text}
                     </p>
-                  </li>
+                  </motion.li>
                 ))}
-              </ol>
+              </motion.ol>
 
-              <div className="relative w-full aspect-square sm:aspect-[5/4] lg:aspect-square order-1 lg:order-2">
+              <motion.div
+                className="relative w-full aspect-square sm:aspect-[5/4] lg:aspect-square order-1 lg:order-2"
+                initial={{ opacity: 0, scale: 0.96 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true, amount: 0.3 }}
+                transition={{ duration: 0.75 }}
+              >
                 <Image
                   src="/img5.webp"
-                  alt="How wind energy works diagram"
+                  alt="How wind turbines generate electricity"
                   fill
                   className="object-contain"
                   sizes="(max-width: 1024px) 100vw, 50vw"
                 />
-              </div>
+              </motion.div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Why wind — static */}
       <section className="relative w-full bg-[#F7F9FA] py-14 sm:py-16 md:py-20 lg:py-24">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-[1220px] mx-auto grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-14 xl:gap-16 items-center">
-            <div>
-              <h2
-                className="text-2xl sm:text-3xl md:text-4xl lg:text-[2.5rem] font-bold mb-4 sm:mb-5"
+            <motion.div
+              variants={stagger}
+              initial="hidden"
+              whileInView="show"
+              viewport={{ once: true, amount: 0.25 }}
+            >
+              <motion.h2
+                variants={fadeUp}
+                className="text-2xl sm:text-3xl md:text-4xl lg:text-[2.5rem] font-bold mb-7 sm:mb-8"
                 style={{ fontFamily: FONT_HEADING, color: DARK }}
               >
                 Why <span style={{ color: PRIMARY }}>wind energy</span>
-              </h2>
+              </motion.h2>
 
-              <p
-                className="text-sm sm:text-[15px] leading-[1.75] mb-6 sm:mb-7 max-w-lg"
-                style={{ color: MUTED }}
-              >
-                Wind energy is one of the most cost-effective renewable sources
-                available today. Key benefits include:
-              </p>
-
-              <div className="space-y-4 sm:space-y-5">
-                {WHY_POINTS.map((point) => (
-                  <div key={point} className="flex items-start gap-3">
+              <div className="space-y-6 sm:space-y-7">
+                {WHY_POINTS.map(({ title, desc }) => (
+                  <motion.div
+                    key={title}
+                    variants={fadeUp}
+                    className="flex items-start gap-3.5"
+                  >
                     <CheckCircle2
-                      className="w-5 h-5 sm:w-6 sm:h-6 shrink-0 mt-0.5"
+                      className="w-6 h-6 shrink-0 mt-0.5"
                       style={{ color: PRIMARY }}
                     />
-                    <p
-                      className="text-sm sm:text-[15px] md:text-base leading-relaxed"
-                      style={{ color: MUTED }}
-                    >
-                      {point}
-                    </p>
-                  </div>
+                    <div>
+                      <p
+                        className="text-sm font-bold mb-1"
+                        style={{ color: DARK }}
+                      >
+                        {title}
+                      </p>
+                      <p
+                        className="text-sm sm:text-[15px] md:text-base leading-[1.75]"
+                        style={{ color: MUTED }}
+                      >
+                        {desc}
+                      </p>
+                    </div>
+                  </motion.div>
                 ))}
               </div>
-            </div>
+            </motion.div>
 
-            <div className="relative w-full aspect-[5/4] sm:aspect-[4/3]">
+            <motion.div
+              className="relative w-full aspect-[5/4] sm:aspect-[4/3] lg:aspect-[5/4]"
+              initial={{ opacity: 0, x: 30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true, amount: 0.3 }}
+              transition={{ duration: 0.7 }}
+            >
               <Image
                 src="/wind1.svg"
-                alt="Wind energy benefits illustration"
+                alt="Wind energy benefits for communities and the grid"
                 fill
                 className="object-contain"
                 sizes="(max-width: 1024px) 100vw, 50vw"
               />
-            </div>
+            </motion.div>
           </div>
         </div>
       </section>
 
-      {/* CTA — subtle fade-in once */}
       <section className="relative w-full bg-white py-10 sm:py-12 lg:py-16">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
@@ -523,23 +603,23 @@ export default function WindPage() {
                 "linear-gradient(135deg, #05627C 0%, #0A4A5C 55%, #083D4A 100%)",
               boxShadow: "0 20px 50px rgba(5,98,124,0.28)",
             }}
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 28 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, amount: 0.4 }}
-            transition={{ duration: 0.55 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.65 }}
           >
             <div
               className="shrink-0 w-14 h-14 sm:w-16 sm:h-16 rounded-full flex items-center justify-center"
               style={{ backgroundColor: "rgba(255,255,255,0.12)" }}
             >
-              <Leaf className="w-7 h-7" style={{ color: GOLD }} />
+              <Target className="w-7 h-7" style={{ color: GOLD }} />
             </div>
 
             <h2
               className="flex-1 text-center sm:text-left text-xl sm:text-2xl lg:text-[1.75rem] font-bold text-white leading-snug"
               style={{ fontFamily: FONT_HEADING }}
             >
-              Ready to explore wind energy solutions?
+              Ready to explore Big Bull wind solutions?
             </h2>
 
             <Link

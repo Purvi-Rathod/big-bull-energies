@@ -45,47 +45,20 @@ export default function Footer() {
             <ul className="space-y-3 flex-1">
               <li>
                 <Link
-                  href="/energy-technologies/natural-gas"
-                  className="text-sm transition hover:opacity-80"
-                  style={{ color: "#FFFFFF", opacity: 1 }}
-                >
-                  Natural Gas
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/energy-technologies/solar"
-                  className="text-sm transition hover:opacity-80"
-                  style={{ color: "#FFFFFF", opacity: 1 }}
-                >
-                  Solar
-                </Link>
-              </li>
-              <li>
-                <Link
                   href="/energy-technologies/wind"
                   className="text-sm transition hover:opacity-80"
                   style={{ color: "#FFFFFF", opacity: 1 }}
                 >
-                  Land-based Wind
+                  Wind Energy
                 </Link>
               </li>
               <li>
                 <Link
-                  href="/energy-technologies/storage"
+                  href="/energy-technologies/turbines"
                   className="text-sm transition hover:opacity-80"
                   style={{ color: "#FFFFFF", opacity: 1 }}
                 >
-                  Storage
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/energy-technologies/transmission"
-                  className="text-sm transition hover:opacity-80"
-                  style={{ color: "#FFFFFF", opacity: 1 }}
-                >
-                  Transmission
+                  Turbine Systems
                 </Link>
               </li>
               <li>
@@ -94,7 +67,34 @@ export default function Footer() {
                   className="text-sm transition hover:opacity-80"
                   style={{ color: "#FFFFFF", opacity: 1 }}
                 >
-                  Geothermal
+                  Wind Farm Operations
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/energy-technologies/storage"
+                  className="text-sm transition hover:opacity-80"
+                  style={{ color: "#FFFFFF", opacity: 1 }}
+                >
+                  Energy Storage
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/energy-technologies/transmission"
+                  className="text-sm transition hover:opacity-80"
+                  style={{ color: "#FFFFFF", opacity: 1 }}
+                >
+                  Grid Connection
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/energy-technologies/solar"
+                  className="text-sm transition hover:opacity-80"
+                  style={{ color: "#FFFFFF", opacity: 1 }}
+                >
+                  Hybrid Solar
                 </Link>
               </li>
             </ul>

@@ -7,10 +7,10 @@ import {
   Activity,
   ArrowRight,
   CheckCircle2,
-  Leaf,
   Network,
   ShieldCheck,
   TowerControl,
+  Wind,
   Zap,
 } from "lucide-react";
 import {
@@ -31,78 +31,78 @@ const FONT_HEADING = "var(--font-font4), sans-serif";
 
 const HERO_FEATURES = [
   {
-    icon: ShieldCheck,
-    title: "Reliable Delivery",
-    desc: "Power where it's needed.",
+    icon: Wind,
+    title: "Wind to Grid",
+    desc: "Connecting farms to markets.",
   },
   {
     icon: Zap,
-    title: "Efficient Network",
-    desc: "Minimizing losses.",
+    title: "Efficient Transfer",
+    desc: "Moving clean power with less loss.",
   },
   {
     icon: Activity,
-    title: "Smart Monitoring",
-    desc: "Real-time infrastructure.",
+    title: "Live Oversight",
+    desc: "Monitoring interconnection paths.",
   },
   {
-    icon: Leaf,
-    title: "Sustainable Future",
-    desc: "Building for generations.",
+    icon: ShieldCheck,
+    title: "Market Access",
+    desc: "Reliable delivery for buyers.",
   },
 ];
 
 const INTRO_PILLARS = [
   {
     icon: Network,
-    title: "Connect",
-    desc: "Link generation to the wider grid.",
+    title: "Interconnect",
+    desc: "Link Big Bull wind assets to the wider grid.",
   },
   {
     icon: Zap,
     title: "Deliver",
-    desc: "Move power safely across every mile.",
+    desc: "Move farm output safely from substation to market.",
   },
   {
     icon: ShieldCheck,
-    title: "Empower",
-    desc: "Strengthen communities with reliable supply.",
+    title: "Enable",
+    desc: "Give communities and offtakers dependable renewable supply.",
   },
 ];
 
 const PROCESS_STEPS = [
-  "Electricity is generated at power plants and stepped up to high voltage.",
-  "High-voltage transmission lines carry electricity over long distances.",
-  "Substations step down voltage for distribution to local areas.",
-  "Distribution lines deliver electricity to homes and businesses.",
-  "Smart grid technologies monitor and optimize power flow.",
-  "Transmission infrastructure enables reliability and renewable integration.",
+  "Wind turbines generate electricity that is collected across the farm network.",
+  "On-site transformers and the substation step voltage up for grid connection.",
+  "Interconnection lines carry Big Bull wind power toward the transmission system.",
+  "Grid substations condition and route energy into regional networks.",
+  "Monitoring systems track flow, availability, and interconnection performance.",
+  "Clean power reaches markets and demand centres from Big Bull wind assets.",
 ];
 
 const WHY_POINTS = [
-  "Delivers renewable energy from remote generation sites",
-  "Improves grid reliability and reduces congestion",
-  "Supports economic development and energy access",
-  "Builds a stronger, more flexible power system",
+  "Moves remote wind generation to the markets that need it",
+  "Improves delivery reliability for Big Bull Energies wind farms",
+  "Supports renewable growth without stranded turbine capacity",
+  "Builds a clearer path from wind resource to customer demand",
 ];
 
 const STATS = [
   {
-    value: 15,
-    suffix: "+",
-    label: "Transmission projects developed",
-    icon: TowerControl,
+    value: 2,
+    suffix: "",
+    label: "Core wind hubs planned for grid connection",
+    icon: Wind,
   },
   {
-    value: 500,
-    suffix: "+",
-    label: "Miles of transmission lines",
+    value: 1,
+    suffix: "",
+    label: "Focus: farm-to-market interconnection for wind",
     icon: Network,
   },
   {
-    value: 10,
-    suffix: "+",
-    label: "GW of capacity in development",
+    value: 125,
+    suffix: "",
+    label: "Average MWh/day of clean power to move to grid",
     icon: Zap,
   },
 ];
@@ -163,12 +163,11 @@ function AnimatedStat({
 export default function TransmissionPage() {
   return (
     <main className="min-h-screen w-full overflow-x-hidden bg-white">
-      {/* Hero */}
       <section className="relative w-full min-h-[100svh] min-h-[100dvh] flex flex-col justify-end overflow-hidden pt-24 sm:pt-28 lg:pt-[126px]">
         <div className="absolute inset-0 z-0">
           <Image
             src="/Transmission-hero.webp"
-            alt="High-voltage transmission towers at sunset"
+            alt="Grid connection infrastructure for Big Bull Energies wind farms"
             fill
             priority
             className="object-cover object-center"
@@ -204,20 +203,21 @@ export default function TransmissionPage() {
                 className="text-[11px] sm:text-xs font-bold uppercase tracking-[0.2em] mb-4 sm:mb-5"
                 style={{ color: "#7DD3E8" }}
               >
-                Powering Connections
+                Big Bull Energies · Grid Connection
               </p>
 
               <h1
                 className="text-[2.1rem] sm:text-5xl md:text-[3.15rem] lg:text-[3.4rem] font-bold leading-[1.1] mb-4 sm:mb-5 text-white"
                 style={{ fontFamily: FONT_HEADING }}
               >
-                Reliable transmission.{" "}
-                <span style={{ color: ACCENT }}>Stronger</span> communities.
+                Wind farms{" "}
+                <span style={{ color: ACCENT }}>connected</span> to markets.
               </h1>
 
               <p className="text-sm sm:text-[15px] md:text-base leading-relaxed text-white/85 max-w-md mb-7 sm:mb-8">
-                Efficient transmission infrastructure that delivers electricity
-                safely, reliably and sustainably across every mile.
+                Grid connection infrastructure that carries Big Bull Energies
+                wind power from farm substations into regional networks and
+                energy markets.
               </p>
 
               <Link
@@ -225,7 +225,7 @@ export default function TransmissionPage() {
                 className="gas-cta-gold group inline-flex items-center gap-2.5 font-bold px-6 py-3.5 text-xs sm:text-sm uppercase tracking-[0.06em] rounded-lg transition-all duration-300"
                 style={{ backgroundColor: GOLD, color: "#1a1a1a" }}
               >
-                Explore Transmission Solutions
+                Explore Grid Connection
                 <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
               </Link>
             </motion.div>
@@ -268,7 +268,6 @@ export default function TransmissionPage() {
         </div>
       </section>
 
-      {/* Intro */}
       <section
         id="solutions"
         className="relative w-full bg-white py-14 sm:py-16 md:py-20 lg:py-24 overflow-hidden"
@@ -282,23 +281,25 @@ export default function TransmissionPage() {
               >
                 <span style={{ color: PRIMARY }}>Energy Technologies</span>
                 <span className="opacity-40">&gt;</span>
-                <span>Transmission</span>
+                <span>Grid Connection</span>
               </div>
 
               <h2
                 className="text-[1.85rem] sm:text-4xl lg:text-[2.65rem] font-bold leading-[1.15] mb-5"
                 style={{ fontFamily: FONT_HEADING, color: DARK }}
               >
-                A core component of Big Bull Energies&apos; energy mix.
+                Connecting Big Bull wind to the{" "}
+                <span style={{ color: PRIMARY }}>grid.</span>
               </h2>
 
               <p
                 className="text-sm sm:text-[15px] leading-[1.75] mb-8 sm:mb-10 max-w-lg"
                 style={{ color: MUTED }}
               >
-                Transmission infrastructure connects energy generation
-                facilities to the power grid, enabling reliable delivery of
-                electricity to homes, businesses, and communities.
+                Grid connection is how Big Bull Energies wind farms reach buyers.
+                From collection systems and substations to interconnection
+                pathways, every link is designed to move clean power safely and
+                efficiently into the market.
               </p>
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 sm:gap-4">
@@ -340,7 +341,7 @@ export default function TransmissionPage() {
               <div className="relative w-full aspect-[4/3] rounded-2xl sm:rounded-3xl overflow-hidden shadow-[0_28px_64px_rgba(5,98,124,0.16)]">
                 <Image
                   src="/img3.webp"
-                  alt="Transmission lines across open landscape"
+                  alt="Grid connection lines serving Big Bull wind farms"
                   fill
                   className="object-cover"
                   sizes="(max-width: 1024px) 90vw, 520px"
@@ -357,7 +358,7 @@ export default function TransmissionPage() {
               >
                 <Zap className="w-6 h-6 mx-auto mb-2" style={{ color: GOLD }} />
                 <p className="text-[10px] sm:text-[11px] leading-snug text-white/95 font-medium">
-                  Building a stronger grid for a better tomorrow.
+                  From turbine to market.
                 </p>
               </div>
             </div>
@@ -365,7 +366,6 @@ export default function TransmissionPage() {
         </div>
       </section>
 
-      {/* Track record */}
       <section className="relative w-full bg-[#F4F6F7] py-14 sm:py-16 md:py-20 lg:py-24">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-[1220px] mx-auto">
@@ -374,7 +374,7 @@ export default function TransmissionPage() {
                 className="text-2xl sm:text-3xl md:text-4xl font-bold max-w-md"
                 style={{ fontFamily: FONT_HEADING, color: DARK }}
               >
-                Our proven track record in transmission
+                Grid connection for our wind assets
               </h2>
               <Link
                 href="/projects"
@@ -396,7 +396,7 @@ export default function TransmissionPage() {
               <div className="relative w-full aspect-[5/4] sm:aspect-[4/3]">
                 <Image
                   src="/Transmission1.svg"
-                  alt="Transmission infrastructure illustration"
+                  alt="Grid connection infrastructure for wind farms"
                   fill
                   className="object-contain"
                   sizes="(max-width: 1024px) 100vw, 45vw"
@@ -407,7 +407,6 @@ export default function TransmissionPage() {
         </div>
       </section>
 
-      {/* How it works */}
       <section className="relative w-full bg-white py-14 sm:py-16 md:py-20 lg:py-24">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-[1220px] mx-auto">
@@ -415,7 +414,7 @@ export default function TransmissionPage() {
               className="text-2xl sm:text-3xl md:text-4xl lg:text-[2.5rem] font-bold text-center mb-10 sm:mb-12 lg:mb-14"
               style={{ fontFamily: FONT_HEADING, color: DARK }}
             >
-              How transmission works
+              How wind farm grid connection works
             </h2>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-14 xl:gap-16 items-center">
@@ -441,7 +440,7 @@ export default function TransmissionPage() {
               <div className="relative w-full aspect-[4/3] sm:aspect-[5/4] order-1 lg:order-2 rounded-2xl sm:rounded-3xl overflow-hidden shadow-[0_24px_56px_rgba(5,98,124,0.14)]">
                 <Image
                   src="/img6.webp"
-                  alt="Power lines against a sunset sky"
+                  alt="Power lines connecting wind farms to the grid"
                   fill
                   className="object-cover"
                   sizes="(max-width: 1024px) 100vw, 50vw"
@@ -452,7 +451,6 @@ export default function TransmissionPage() {
         </div>
       </section>
 
-      {/* Why transmission */}
       <section className="relative w-full bg-[#F7F9FA] py-14 sm:py-16 md:py-20 lg:py-24">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-[1220px] mx-auto grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-14 xl:gap-16 items-center">
@@ -461,15 +459,15 @@ export default function TransmissionPage() {
                 className="text-2xl sm:text-3xl md:text-4xl lg:text-[2.5rem] font-bold mb-4 sm:mb-5"
                 style={{ fontFamily: FONT_HEADING, color: DARK }}
               >
-                Why <span style={{ color: PRIMARY }}>transmission</span>
+                Why <span style={{ color: PRIMARY }}>grid connection</span>
               </h2>
 
               <p
                 className="text-sm sm:text-[15px] leading-[1.75] mb-6 sm:mb-7 max-w-lg"
                 style={{ color: MUTED }}
               >
-                Transmission infrastructure is essential for a modern, reliable
-                power grid. Key benefits include:
+                Without a strong path to the grid, wind capacity stays stranded.
+                Big Bull Energies treats interconnection as core to wind value:
               </p>
 
               <div className="space-y-4 sm:space-y-5">
@@ -493,7 +491,7 @@ export default function TransmissionPage() {
             <div className="relative w-full aspect-[5/4] sm:aspect-[4/3]">
               <Image
                 src="/Transmission1.svg"
-                alt="Transmission benefits illustration"
+                alt="Grid connection benefits for Big Bull wind farms"
                 fill
                 className="object-contain"
                 sizes="(max-width: 1024px) 100vw, 50vw"
@@ -503,7 +501,6 @@ export default function TransmissionPage() {
         </div>
       </section>
 
-      {/* CTA */}
       <section className="relative w-full bg-white py-10 sm:py-12 lg:py-16">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
@@ -537,8 +534,7 @@ export default function TransmissionPage() {
               className="relative flex-1 text-center sm:text-left text-xl sm:text-2xl lg:text-[1.75rem] font-bold text-white leading-snug"
               style={{ fontFamily: FONT_HEADING }}
             >
-              Ready to explore{" "}
-              <span style={{ color: ACCENT }}>transmission</span> solutions?
+              Ready to connect Big Bull wind to the grid?
             </h2>
 
             <Link

@@ -7,7 +7,6 @@ import {
   Building2,
   Compass,
   FileText,
-  Flame,
   HelpCircle,
   Leaf,
   Lock,
@@ -19,7 +18,8 @@ import {
   Wind,
   Zap,
   Battery,
-  Mountain,
+  Cog,
+  Activity,
 } from "lucide-react";
 import { motion } from "framer-motion";
 import Footer from "@/components/Footer";
@@ -65,26 +65,30 @@ const SECTIONS: SitemapSection[] = [
     icon: Zap,
     links: [
       {
-        title: "Natural Gas",
-        href: "/energy-technologies/natural-gas",
-        icon: Flame,
-      },
-      { title: "Solar", href: "/energy-technologies/solar", icon: Sun },
-      {
-        title: "Land-based Wind",
+        title: "Wind Energy",
         href: "/energy-technologies/wind",
         icon: Wind,
       },
-      { title: "Storage", href: "/energy-technologies/storage", icon: Battery },
       {
-        title: "Transmission",
+        title: "Turbine Systems",
+        href: "/energy-technologies/turbines",
+        icon: Cog,
+      },
+      {
+        title: "Wind Farm Operations",
+        href: "/energy-technologies/geothermal",
+        icon: Activity,
+      },
+      { title: "Energy Storage", href: "/energy-technologies/storage", icon: Battery },
+      {
+        title: "Grid Connection",
         href: "/energy-technologies/transmission",
         icon: Network,
       },
       {
-        title: "Geothermal",
-        href: "/energy-technologies/geothermal",
-        icon: Mountain,
+        title: "Hybrid Solar",
+        href: "/energy-technologies/solar",
+        icon: Sun,
       },
     ],
   },

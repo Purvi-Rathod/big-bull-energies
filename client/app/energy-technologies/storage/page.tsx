@@ -9,10 +9,8 @@ import {
   BatteryCharging,
   CheckCircle2,
   Gauge,
-  Globe2,
-  Leaf,
   ShieldCheck,
-  Sun,
+  Wind,
   Zap,
 } from "lucide-react";
 import {
@@ -33,106 +31,105 @@ const FONT_HEADING = "var(--font-font4), sans-serif";
 
 const HERO_FEATURES = [
   {
-    icon: ShieldCheck,
-    title: "Grid Reliability",
-    desc: "Stabilizing power when it matters most.",
-  },
-  {
-    icon: Gauge,
-    title: "Peak Performance",
-    desc: "Store energy, use it when demand peaks.",
+    icon: Wind,
+    title: "Firms Wind Output",
+    desc: "Smooth intermittent generation.",
   },
   {
     icon: BatteryCharging,
-    title: "Scalable Solutions",
-    desc: "Built to scale with your energy needs.",
+    title: "Store Surplus",
+    desc: "Capture wind when it is strongest.",
   },
   {
-    icon: Leaf,
-    title: "Clean Tomorrow",
-    desc: "Enabling a sustainable, low-carbon future.",
+    icon: Gauge,
+    title: "Dispatch When Needed",
+    desc: "Release power at peak demand.",
+  },
+  {
+    icon: ShieldCheck,
+    title: "Grid Confidence",
+    desc: "More reliable renewable supply.",
   },
 ];
 
 const INTRO_PILLARS = [
   {
     icon: Battery,
-    title: "Store",
-    desc: "Capture energy when it's abundant.",
+    title: "Capture",
+    desc: "Store excess wind energy during high-output periods.",
   },
   {
     icon: Zap,
-    title: "Manage",
-    desc: "Optimize and balance power intelligently.",
+    title: "Balance",
+    desc: "Manage charge and discharge around wind variability.",
   },
   {
     icon: ShieldCheck,
     title: "Deliver",
-    desc: "Provide reliable energy when it's needed most.",
+    desc: "Supply steadier power when the wind eases.",
   },
 ];
 
 const PROCESS_STEPS = [
   {
     num: "01",
-    text: "Energy is generated from renewable sources like solar or wind.",
+    text: "Big Bull wind farms generate clean electricity when wind conditions are strong.",
   },
   {
     num: "02",
-    text: "Excess energy is stored in battery systems during peak generation.",
+    text: "Surplus output that the grid cannot take immediately is directed into battery storage.",
   },
   {
     num: "03",
-    text: "Smart systems manage charge and discharge for grid balance.",
+    text: "Smart controls manage charge and discharge to firm intermittent wind profiles.",
   },
   {
     num: "04",
-    text: "Stored energy is released when demand exceeds generation.",
+    text: "Stored energy is released when demand rises or wind output dips.",
   },
   {
     num: "05",
-    text: "Reliable power reaches homes, businesses, and the wider grid.",
+    text: "Markets and communities receive more dependable renewable power from the portfolio.",
   },
 ];
 
 const FLOW_STEPS = [
-  { icon: Sun, label: "Energy Source" },
+  { icon: Wind, label: "Wind Generation" },
   { icon: Battery, label: "Energy Storage" },
-  { icon: Gauge, label: "Smart Management" },
-  { icon: Zap, label: "Reliable Power" },
+  { icon: Gauge, label: "Smart Dispatch" },
+  { icon: Zap, label: "Firmed Power" },
 ];
 
 const WHY_POINTS = [
-  "Grid stability and frequency regulation",
-  "Higher utilization of renewable generation",
-  "Peak demand reduction and load shifting",
-  "A faster, more sustainable energy transition",
+  "Firms intermittent wind so output better matches market and grid needs",
+  "Reduces curtailment by capturing surplus wind generation",
+  "Supports peak demand with stored clean energy when wind output dips",
+  "Strengthens Big Bull Energies’ wind-led renewable portfolio",
 ];
 
 const STATS = [
   {
-    value: 75,
-    suffix: "+",
-    label: "Storage projects worldwide",
+    value: 2,
+    suffix: "",
+    label: "Wind hubs paired with storage planning",
+    icon: Wind,
+  },
+  {
+    value: 4,
+    suffix: "+ hr",
+    label: "Typical discharge window for firming wind",
     icon: Battery,
   },
   {
-    value: 2.5,
-    suffix: "+ GWh",
-    label: "Energy storage deployed",
+    value: 1,
+    suffix: "",
+    label: "Integrated strategy: wind first, storage support",
     icon: Zap,
-    decimals: 1,
   },
   {
-    value: 15,
-    suffix: "+",
-    label: "Countries served",
-    icon: Globe2,
-  },
-  {
-    value: 98,
-    suffix: "%",
-    label: "System reliability achieved",
+    value: 24,
+    suffix: "/7",
+    label: "Monitoring of storage with wind assets",
     icon: ShieldCheck,
   },
 ];
@@ -193,12 +190,11 @@ function AnimatedStat({
 export default function StoragePage() {
   return (
     <main className="min-h-screen w-full overflow-x-hidden bg-white">
-      {/* Hero — light entrance motion only */}
       <section className="relative w-full min-h-[100svh] min-h-[100dvh] flex flex-col justify-end overflow-hidden pt-24 sm:pt-28 lg:pt-[126px]">
         <div className="absolute inset-0 z-0">
           <Image
             src="/storage-hero.png"
-            alt="Battery energy storage facility"
+            alt="Energy storage supporting Big Bull Energies wind farms"
             fill
             priority
             className="object-cover object-center"
@@ -230,17 +226,25 @@ export default function StoragePage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
             >
+              <p
+                className="text-[11px] sm:text-xs font-bold uppercase tracking-[0.2em] mb-4 sm:mb-5"
+                style={{ color: "#7DD3E8" }}
+              >
+                Big Bull Energies · Energy Storage for Wind
+              </p>
+
               <h1
                 className="text-[2.15rem] sm:text-5xl md:text-[3.15rem] lg:text-[3.45rem] font-bold leading-[1.1] mb-4 sm:mb-5 text-white"
                 style={{ fontFamily: FONT_HEADING }}
               >
-                Smarter storage{" "}
-                <span style={{ color: ACCENT }}>Stronger future.</span>
+                Storage that{" "}
+                <span style={{ color: ACCENT }}>firms the wind.</span>
               </h1>
 
               <p className="text-sm sm:text-[15px] md:text-base leading-relaxed text-white/85 max-w-md mb-7 sm:mb-8">
-                Advanced battery energy storage solutions that power reliability,
-                balance the grid and accelerate the clean energy transition.
+                Battery systems designed to firm Big Bull Energies wind output —
+                capturing surplus generation and releasing clean power when the
+                grid needs it most.
               </p>
 
               <Link
@@ -248,7 +252,7 @@ export default function StoragePage() {
                 className="gas-cta-gold group inline-flex items-center gap-2.5 font-bold px-6 py-3.5 text-xs sm:text-sm uppercase tracking-[0.06em] rounded-lg transition-all duration-300"
                 style={{ backgroundColor: GOLD, color: "#1a1a1a" }}
               >
-                Explore Storage Solutions
+                Explore Storage for Wind
                 <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
               </Link>
             </motion.div>
@@ -291,7 +295,6 @@ export default function StoragePage() {
         </div>
       </section>
 
-      {/* Intelligent storage — static */}
       <section
         id="solutions"
         className="relative w-full bg-white py-14 sm:py-16 md:py-20 lg:py-24 overflow-hidden"
@@ -305,23 +308,24 @@ export default function StoragePage() {
               >
                 <span style={{ color: PRIMARY }}>Energy Technologies</span>
                 <span className="opacity-40">/</span>
-                <span>Storage</span>
+                <span>Energy Storage for Wind</span>
               </div>
 
               <h2
                 className="text-[1.85rem] sm:text-4xl lg:text-[2.65rem] font-bold leading-[1.15] mb-5"
                 style={{ fontFamily: FONT_HEADING, color: DARK }}
               >
-                Intelligent storage for a resilient grid.
+                Batteries that back Big Bull{" "}
+                <span style={{ color: PRIMARY }}>wind.</span>
               </h2>
 
               <p
                 className="text-sm sm:text-[15px] leading-[1.75] mb-8 sm:mb-10 max-w-lg"
                 style={{ color: MUTED }}
               >
-                Battery systems capture surplus renewable energy and release it
-                when the grid needs it most — improving reliability, cutting
-                curtailment, and unlocking cleaner power at scale.
+                Energy storage is not a standalone story for Big Bull Energies —
+                it is how we firm intermittent wind, cut curtailment, and deliver
+                cleaner power with greater confidence to grids and participants.
               </p>
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 sm:gap-4">
@@ -363,7 +367,7 @@ export default function StoragePage() {
               <div className="relative w-full aspect-[4/3] rounded-2xl sm:rounded-3xl overflow-hidden shadow-[0_28px_64px_rgba(5,98,124,0.16)]">
                 <Image
                   src="/img4.webp"
-                  alt="Battery storage site with transmission infrastructure"
+                  alt="Battery storage paired with Big Bull wind infrastructure"
                   fill
                   className="object-cover"
                   sizes="(max-width: 1024px) 90vw, 520px"
@@ -374,7 +378,6 @@ export default function StoragePage() {
         </div>
       </section>
 
-      {/* Portfolio — count-up motion only */}
       <section className="relative w-full bg-[#F4F6F7] py-14 sm:py-16 md:py-20 lg:py-24 overflow-hidden">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-[1220px] mx-auto">
@@ -383,7 +386,7 @@ export default function StoragePage() {
                 className="text-2xl sm:text-3xl md:text-4xl font-bold max-w-md"
                 style={{ fontFamily: FONT_HEADING, color: DARK }}
               >
-                Our storage portfolio
+                Storage aligned to our wind portfolio
               </h2>
               <Link
                 href="/projects"
@@ -405,7 +408,7 @@ export default function StoragePage() {
               <div className="relative w-full aspect-[5/4] sm:aspect-[4/3]">
                 <Image
                   src="/Storage1.svg"
-                  alt="Global storage portfolio illustration"
+                  alt="Energy storage supporting wind generation"
                   fill
                   className="object-contain"
                   sizes="(max-width: 1024px) 100vw, 40vw"
@@ -416,7 +419,6 @@ export default function StoragePage() {
         </div>
       </section>
 
-      {/* How storage works — static */}
       <section className="relative w-full bg-white py-14 sm:py-16 md:py-20 lg:py-24">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-[1220px] mx-auto">
@@ -424,7 +426,7 @@ export default function StoragePage() {
               className="text-2xl sm:text-3xl md:text-4xl lg:text-[2.5rem] font-bold text-center mb-10 sm:mb-12 lg:mb-14"
               style={{ fontFamily: FONT_HEADING, color: DARK }}
             >
-              How energy storage works
+              How storage firms Big Bull wind
             </h2>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-14 xl:gap-16 items-center">
@@ -451,7 +453,7 @@ export default function StoragePage() {
                 <div className="relative w-full aspect-[5/4] sm:aspect-[4/3] mb-6 sm:mb-8">
                   <Image
                     src="/image copy.png"
-                    alt="How energy storage works diagram"
+                    alt="How energy storage firms wind generation"
                     fill
                     className="object-contain"
                     sizes="(max-width: 1024px) 100vw, 50vw"
@@ -495,7 +497,6 @@ export default function StoragePage() {
         </div>
       </section>
 
-      {/* Why storage — static */}
       <section className="relative w-full bg-[#F7F9FA] py-14 sm:py-16 md:py-20 lg:py-24">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-[1220px] mx-auto grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-14 xl:gap-16 items-center">
@@ -504,15 +505,16 @@ export default function StoragePage() {
                 className="text-2xl sm:text-3xl md:text-4xl lg:text-[2.5rem] font-bold mb-4 sm:mb-5"
                 style={{ fontFamily: FONT_HEADING, color: DARK }}
               >
-                Why storage matters
+                Why storage for{" "}
+                <span style={{ color: PRIMARY }}>wind</span>
               </h2>
 
               <p
                 className="text-sm sm:text-[15px] leading-[1.75] mb-6 sm:mb-7 max-w-lg"
                 style={{ color: MUTED }}
               >
-                Energy storage is the backbone of a flexible, resilient grid —
-                turning intermittent renewables into dependable power.
+                For a wind-first platform, storage is the bridge between variable
+                generation and dependable delivery.
               </p>
 
               <div className="space-y-4 sm:space-y-5">
@@ -536,7 +538,7 @@ export default function StoragePage() {
             <div className="relative w-full aspect-[5/4] sm:aspect-[4/3] rounded-2xl sm:rounded-3xl overflow-hidden shadow-[0_24px_56px_rgba(5,98,124,0.14)]">
               <Image
                 src="/img6.webp"
-                alt="Storage containers with renewable energy landscape"
+                alt="Storage containers supporting renewable wind energy"
                 fill
                 className="object-cover"
                 sizes="(max-width: 1024px) 100vw, 50vw"
@@ -546,7 +548,6 @@ export default function StoragePage() {
         </div>
       </section>
 
-      {/* CTA — subtle fade-in once */}
       <section className="relative w-full bg-white py-10 sm:py-12 lg:py-16">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
@@ -580,7 +581,7 @@ export default function StoragePage() {
               className="relative flex-1 text-center sm:text-left text-xl sm:text-2xl lg:text-[1.75rem] font-bold text-white leading-snug"
               style={{ fontFamily: FONT_HEADING }}
             >
-              Ready to build a smarter energy future?
+              Ready to firm Big Bull wind with storage?
             </h2>
 
             <Link

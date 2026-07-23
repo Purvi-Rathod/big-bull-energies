@@ -24,9 +24,9 @@ const featuredArticle = {
   date: "JAN 15, 2025",
   category: "NEWS",
   headline:
-    "With Invenergy's Support, Prysmian Doubles Down on U.S. Manufacturing and Domestic Energy Supply Chains",
+    "Big Bull Energies Advances Wind-Led Clean Power Strategy Across Global Markets",
   excerpt:
-    "Big Bull Energies announces the launch of its innovative binary investment platform, combining network marketing excellence with sustainable energy investments.",
+    "Big Bull Energies deepens its focus on wind energy technologies, turbine systems, and renewable investment programs that connect clean generation with long-term platform growth.",
   image: "/images/leadership-Hero.png",
 };
 

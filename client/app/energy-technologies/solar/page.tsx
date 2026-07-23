@@ -5,10 +5,10 @@ import Image from "next/image";
 import Link from "next/link";
 import {
   ArrowRight,
-  Briefcase,
   CheckCircle2,
   Leaf,
   Sun,
+  Wind,
   Zap,
 } from "lucide-react";
 import {
@@ -44,65 +44,64 @@ const stagger: Variants = {
 
 const HERO_FEATURES = [
   {
+    icon: Wind,
+    title: "Wind-Led Portfolio",
+    desc: "Solar complements core wind assets.",
+  },
+  {
     icon: Sun,
-    title: "Clean Energy",
-    desc: "Zero-emission power from the sun.",
+    title: "Daytime Balance",
+    desc: "Adds generation when the sun is strong.",
   },
   {
     icon: Zap,
-    title: "Cost Effective",
-    desc: "Stable, competitive energy pricing.",
+    title: "Hybrid Value",
+    desc: "Diversifies clean output profiles.",
   },
   {
     icon: Leaf,
-    title: "Reliable Performance",
-    desc: "Proven technology, durable assets.",
-  },
-  {
-    icon: Briefcase,
-    title: "Sustainable Future",
-    desc: "Long-term returns with impact.",
+    title: "Shared Mission",
+    desc: "More renewables, same Big Bull focus.",
   },
 ];
 
 const INTRO_PILLARS = [
   {
+    icon: Wind,
+    title: "Wind first",
+    desc: "Solar supports — never replaces — Big Bull’s wind-led strategy.",
+  },
+  {
     icon: Sun,
-    title: "Renewable",
-    desc: "Unlimited solar resource powering clean generation.",
+    title: "Daylight complement",
+    desc: "Hybrid solar fills generation windows that wind alone may miss.",
   },
   {
     icon: Zap,
-    title: "Efficient",
-    desc: "Modern panels that maximize every ray of sunlight.",
-  },
-  {
-    icon: Leaf,
-    title: "Sustainable",
-    desc: "Lower carbon footprint with lasting community value.",
+    title: "Portfolio strength",
+    desc: "Combined renewables improve flexibility for grids and investors.",
   },
 ];
 
 const PROCESS_STEPS = [
-  "Sunlight hits the solar panels.",
-  "Direct current (DC) flows from the panels to an inverter that turns it into alternating current (AC).",
-  "Transformer increases voltage of electricity.",
-  "Electricity travels through transmission lines.",
-  "Transformer decreases voltage of electricity.",
-  "Electricity travels through collection lines.",
-  "Electricity is delivered to customers.",
+  "Sunlight strikes panels on hybrid sites aligned with Big Bull wind assets.",
+  "Panels produce DC electricity that inverters convert to grid-ready AC.",
+  "On-site transformers step voltage up for collection and interconnection.",
+  "Output is coordinated with nearby wind generation for a blended renewable profile.",
+  "Power moves through shared or adjacent grid connection infrastructure.",
+  "Clean electricity reaches markets alongside Big Bull’s core wind supply.",
 ];
 
 const STATS = [
-  { value: 2, suffix: "", label: "Solar plants operational" },
-  { value: 500, suffix: "+", label: "Megawatts of solar capacity" },
-  { value: 50, suffix: "+", label: "Projects in our investment portfolio" },
+  { value: 2, suffix: "", label: "Renewable hubs where hybrid solar can complement wind" },
+  { value: 1, suffix: "", label: "Integrated strategy: wind primary, solar supportive" },
+  { value: 24, suffix: "/7", label: "Portfolio focus on clean generation year-round" },
 ];
 
 const WHY_POINTS = [
-  "A stable fuel price throughout a project's lifespan",
-  "Strengthened energy independence",
-  "Carbon-free energy",
+  "Complements wind with daytime solar production for a fuller renewable mix",
+  "Supports energy independence without shifting away from wind-first priorities",
+  "Delivers carbon-free generation that strengthens Big Bull Energies’ brand mission",
 ];
 
 function AnimatedStat({
@@ -156,7 +155,6 @@ function AnimatedStat({
 export default function SolarPage() {
   return (
     <main className="min-h-screen w-full overflow-x-hidden bg-white">
-      {/* ── Hero ── */}
       <section className="relative w-full min-h-[100svh] min-h-[100dvh] flex flex-col justify-end overflow-hidden pt-24 sm:pt-28 lg:pt-[126px]">
         <motion.div
           className="absolute inset-0 z-0"
@@ -166,7 +164,7 @@ export default function SolarPage() {
         >
           <Image
             src="/hero-solar.webp"
-            alt="Solar farm at sunset"
+            alt="Hybrid solar supporting Big Bull Energies wind portfolio"
             fill
             priority
             className="object-cover object-center"
@@ -198,23 +196,30 @@ export default function SolarPage() {
               initial="hidden"
               animate="show"
             >
+              <motion.p
+                variants={fadeUp}
+                className="text-[11px] sm:text-xs font-bold uppercase tracking-[0.2em] mb-4 sm:mb-5"
+                style={{ color: "#7DD3E8" }}
+              >
+                Big Bull Energies · Hybrid Solar
+              </motion.p>
+
               <motion.h1
                 variants={fadeUp}
                 className="text-[2.1rem] sm:text-5xl md:text-[3.25rem] lg:text-[3.5rem] font-bold leading-[1.1] mb-4 sm:mb-5 text-white"
                 style={{ fontFamily: FONT_HEADING }}
               >
-                Affordable,{" "}
-                <span style={{ color: ACCENT }}>clean</span> energy powered by
-                the sun.
+                Solar that{" "}
+                <span style={{ color: ACCENT }}>complements wind.</span>
               </motion.h1>
 
               <motion.p
                 variants={fadeUp}
                 className="text-sm sm:text-[15px] md:text-base leading-relaxed text-white/85 max-w-md mb-7 sm:mb-8"
               >
-                Sustainable solar solutions that deliver reliable clean power,
-                strong investor returns, and a clearer path to a low-carbon
-                future.
+                Hybrid solar solutions from Big Bull Energies — clean daytime
+                generation designed to support our wind-led renewable portfolio,
+                not replace it.
               </motion.p>
 
               <motion.div variants={fadeUp}>
@@ -223,7 +228,7 @@ export default function SolarPage() {
                   className="gas-cta-gold group inline-flex items-center gap-2.5 font-bold px-6 py-3.5 text-xs sm:text-sm uppercase tracking-[0.06em] rounded-lg transition-all duration-300"
                   style={{ backgroundColor: GOLD, color: "#1a1a1a" }}
                 >
-                  Explore Solar Solutions
+                  Explore Hybrid Solar
                   <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
                 </Link>
               </motion.div>
@@ -270,7 +275,6 @@ export default function SolarPage() {
         </motion.div>
       </section>
 
-      {/* ── About Solar ── */}
       <section
         id="solutions"
         className="relative w-full bg-white py-14 sm:py-16 md:py-20 lg:py-24 overflow-hidden"
@@ -291,7 +295,7 @@ export default function SolarPage() {
                 <Sun className="w-3.5 h-3.5" style={{ color: GOLD }} />
                 <span>Energy Technologies</span>
                 <span className="opacity-40">&gt;</span>
-                <span style={{ color: PRIMARY }}>Solar</span>
+                <span style={{ color: PRIMARY }}>Hybrid Solar</span>
               </motion.div>
 
               <motion.h2
@@ -299,8 +303,8 @@ export default function SolarPage() {
                 className="text-[1.85rem] sm:text-4xl lg:text-[2.65rem] font-bold leading-[1.15] mb-5"
                 style={{ fontFamily: FONT_HEADING, color: DARK }}
               >
-                A core component of Big Bull Energies&apos;{" "}
-                <span style={{ color: PRIMARY }}>investment portfolio.</span>
+                Hybrid solar for a{" "}
+                <span style={{ color: PRIMARY }}>wind-led portfolio.</span>
               </motion.h2>
 
               <motion.p
@@ -308,10 +312,10 @@ export default function SolarPage() {
                 className="text-sm sm:text-[15px] leading-[1.75] mb-4 max-w-lg"
                 style={{ color: MUTED }}
               >
-                Solar energy harnesses the power of the sun to generate clean,
-                renewable electricity. Big Bull Energies invests in solar
-                projects that provide sustainable energy solutions and reduce
-                carbon emissions.
+                Big Bull Energies puts wind at the centre. Hybrid solar adds
+                complementary daytime generation so the portfolio can deliver a
+                broader clean-energy profile without losing its wind-first
+                identity.
               </motion.p>
 
               <motion.p
@@ -319,9 +323,9 @@ export default function SolarPage() {
                 className="text-sm sm:text-[15px] leading-[1.75] mb-8 sm:mb-10 max-w-lg"
                 style={{ color: MUTED }}
               >
-                Our portfolio generates returns for investors while supporting
-                the transition to a cleaner energy future — from utility-scale
-                plants to community-focused deployments.
+                From co-located concepts to supporting solar capacity, every
+                deployment is framed around strengthening — not competing with —
+                our core wind assets.
               </motion.p>
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 sm:gap-4">
@@ -360,7 +364,6 @@ export default function SolarPage() {
               </div>
             </motion.div>
 
-            {/* Circular image composition */}
             <motion.div
               className="relative w-full max-w-[420px] sm:max-w-[460px] mx-auto lg:max-w-none lg:justify-self-end"
               initial={{ opacity: 0, scale: 0.94 }}
@@ -368,7 +371,6 @@ export default function SolarPage() {
               viewport={{ once: true, amount: 0.3 }}
               transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
             >
-              {/* Dot pattern */}
               <div
                 className="pointer-events-none absolute -right-2 top-6 hidden sm:grid grid-cols-6 gap-2.5 opacity-40"
                 aria-hidden
@@ -386,7 +388,7 @@ export default function SolarPage() {
                 <div className="absolute inset-0 rounded-full overflow-hidden shadow-[0_28px_64px_rgba(5,98,124,0.18)]">
                   <Image
                     src="/img4.webp"
-                    alt="Solar panels in the landscape"
+                    alt="Solar panels supporting Big Bull Energies hybrid strategy"
                     fill
                     className="object-cover"
                     sizes="(max-width: 1024px) 90vw, 460px"
@@ -403,7 +405,7 @@ export default function SolarPage() {
                 >
                   <Leaf className="w-6 h-6 mb-2" style={{ color: GOLD }} />
                   <p className="text-[10px] sm:text-[11px] leading-snug text-white/95 font-medium">
-                    Building a cleaner tomorrow, together.
+                    Wind-led. Solar-supported.
                   </p>
                 </div>
               </div>
@@ -412,7 +414,6 @@ export default function SolarPage() {
         </div>
       </section>
 
-      {/* ── Portfolio stats ── */}
       <section className="relative w-full bg-[#F4F6F7] py-14 sm:py-16 md:py-20 lg:py-24">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-[1220px] mx-auto">
@@ -427,7 +428,7 @@ export default function SolarPage() {
                 className="text-2xl sm:text-3xl md:text-4xl font-bold"
                 style={{ fontFamily: FONT_HEADING, color: DARK }}
               >
-                Our solar investment portfolio
+                Hybrid solar in our wind portfolio
               </h2>
               <Link
                 href="/projects"
@@ -446,9 +447,9 @@ export default function SolarPage() {
 
             <div className="grid grid-cols-1 lg:grid-cols-[1.1fr_0.9fr] gap-10 lg:gap-12 items-center">
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 sm:gap-6">
-                <AnimatedStat {...STATS[0]} icon={Sun} />
-                <AnimatedStat {...STATS[1]} icon={Zap} />
-                <AnimatedStat {...STATS[2]} icon={Briefcase} />
+                <AnimatedStat {...STATS[0]} icon={Wind} />
+                <AnimatedStat {...STATS[1]} icon={Sun} />
+                <AnimatedStat {...STATS[2]} icon={Zap} />
               </div>
 
               <motion.div
@@ -460,7 +461,7 @@ export default function SolarPage() {
               >
                 <Image
                   src="/solar3.svg"
-                  alt="Solar farm illustration"
+                  alt="Hybrid solar supporting Big Bull wind assets"
                   fill
                   className="object-contain"
                   sizes="(max-width: 1024px) 100vw, 45vw"
@@ -471,7 +472,6 @@ export default function SolarPage() {
         </div>
       </section>
 
-      {/* ── How solar works ── */}
       <section className="relative w-full bg-white py-14 sm:py-16 md:py-20 lg:py-24">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-[1220px] mx-auto">
@@ -483,7 +483,7 @@ export default function SolarPage() {
               viewport={{ once: true }}
               transition={{ duration: 0.6 }}
             >
-              How solar energy works
+              How hybrid solar works with wind
             </motion.h2>
             <motion.p
               className="text-center text-sm sm:text-[15px] max-w-2xl mx-auto mb-10 sm:mb-12 lg:mb-14"
@@ -492,8 +492,8 @@ export default function SolarPage() {
               whileInView={{ opacity: 1 }}
               viewport={{ once: true }}
             >
-              Solar technology is simple, scalable and reliable, and provides
-              great flexibility for the future of the grid.
+              Simple solar technology, positioned to complement Big Bull Energies
+              wind generation across the day.
             </motion.p>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-14 xl:gap-16 items-center">
@@ -541,7 +541,7 @@ export default function SolarPage() {
               >
                 <Image
                   src="/solar2.webp"
-                  alt="How solar energy works diagram"
+                  alt="How hybrid solar works with wind generation"
                   fill
                   className="object-contain"
                   sizes="(max-width: 1024px) 100vw, 50vw"
@@ -552,7 +552,6 @@ export default function SolarPage() {
         </div>
       </section>
 
-      {/* ── Why solar ── */}
       <section className="relative w-full bg-[#F7F9FA] py-14 sm:py-16 md:py-20 lg:py-24">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-[1220px] mx-auto grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-14 xl:gap-16 items-center">
@@ -567,7 +566,7 @@ export default function SolarPage() {
                 className="text-2xl sm:text-3xl md:text-4xl lg:text-[2.5rem] font-bold mb-4 sm:mb-5"
                 style={{ fontFamily: FONT_HEADING, color: DARK }}
               >
-                Why <span style={{ color: PRIMARY }}>solar</span>
+                Why <span style={{ color: PRIMARY }}>hybrid solar</span>
               </motion.h2>
 
               <motion.p
@@ -575,8 +574,8 @@ export default function SolarPage() {
                 className="text-sm sm:text-[15px] leading-[1.75] mb-6 sm:mb-7 max-w-lg"
                 style={{ color: MUTED }}
               >
-                Solar provides many advantages because of its accessibility
-                around the world. Solar&apos;s benefits include:
+                Hybrid solar strengthens Big Bull Energies by pairing daylight
+                generation with our core wind strategy:
               </motion.p>
 
               <div className="space-y-4 sm:space-y-5">
@@ -610,7 +609,7 @@ export default function SolarPage() {
             >
               <Image
                 src="/soloar1.svg"
-                alt="Solar farm illustration"
+                alt="Hybrid solar benefits for Big Bull Energies"
                 fill
                 className="object-contain"
                 sizes="(max-width: 1024px) 100vw, 50vw"
@@ -620,7 +619,6 @@ export default function SolarPage() {
         </div>
       </section>
 
-      {/* ── CTA ── */}
       <section className="relative w-full bg-white py-10 sm:py-12 lg:py-16">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
@@ -639,14 +637,14 @@ export default function SolarPage() {
               className="shrink-0 w-14 h-14 sm:w-16 sm:h-16 rounded-full flex items-center justify-center"
               style={{ backgroundColor: "rgba(255,255,255,0.12)" }}
             >
-              <Leaf className="w-7 h-7" style={{ color: GOLD }} />
+              <Sun className="w-7 h-7" style={{ color: GOLD }} />
             </div>
 
             <h2
               className="flex-1 text-center sm:text-left text-xl sm:text-2xl lg:text-[1.75rem] font-bold text-white leading-snug"
               style={{ fontFamily: FONT_HEADING }}
             >
-              Ready to explore solar solutions?
+              Ready to explore hybrid solar with Big Bull wind?
             </h2>
 
             <Link

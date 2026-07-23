@@ -6,9 +6,9 @@ import Link from "next/link";
 import {
   ArrowRight,
   Battery,
-  Flame,
+  Cog,
   Globe2,
-  Mountain,
+  Activity,
   Network,
   Sun,
   Wind,
@@ -32,82 +32,82 @@ const FONT_HEADING = "var(--font-font4), sans-serif";
 
 const PROJECT_TYPES = [
   {
-    icon: Sun,
-    title: "Solar",
-    description:
-      "Utility-scale solar farms delivering clean electricity to communities and businesses.",
-    count: "150+",
-    href: "/energy-technologies/solar",
-    image: "/hero-solar.webp",
-  },
-  {
     icon: Wind,
-    title: "Wind",
+    title: "Wind Energy",
     description:
-      "Land-based wind projects harnessing reliable, renewable generation.",
-    count: "80+",
+      "Land-based wind farms delivering clean electricity as the core of Big Bull Energies.",
+    count: "Core",
     href: "/energy-technologies/wind",
     image: "/wind-hero.png",
   },
   {
-    icon: Battery,
-    title: "Storage",
+    icon: Cog,
+    title: "Turbine Systems",
     description:
-      "Battery systems that balance the grid and unlock more renewables.",
-    count: "45+",
+      "Modern turbine platforms optimized for capture, reliability, and long service life.",
+    count: "Tech",
+    href: "/energy-technologies/turbines",
+    image: "/images/cta-turbines.png",
+  },
+  {
+    icon: Battery,
+    title: "Energy Storage",
+    description:
+      "Battery systems that firm wind output and balance grid demand.",
+    count: "Support",
     href: "/energy-technologies/storage",
     image: "/storage-hero.png",
   },
   {
-    icon: Flame,
-    title: "Natural Gas",
-    description:
-      "Efficient natural gas facilities supporting a flexible energy mix.",
-    count: "30+",
-    href: "/energy-technologies/natural-gas",
-    image: "/hero-gas.webp",
-  },
-  {
     icon: Network,
-    title: "Transmission",
+    title: "Grid Connection",
     description:
-      "Infrastructure connecting generation assets to the power grid.",
-    count: "25+",
+      "Infrastructure connecting Big Bull wind assets to power markets.",
+    count: "Grid",
     href: "/energy-technologies/transmission",
     image: "/Transmission-hero.webp",
   },
   {
-    icon: Mountain,
-    title: "Geothermal",
+    icon: Sun,
+    title: "Hybrid Solar",
     description:
-      "Baseload geothermal projects powered by the Earth's natural heat.",
-    count: "5+",
+      "Solar capacity that complements our wind-led renewable portfolio.",
+    count: "Hybrid",
+    href: "/energy-technologies/solar",
+    image: "/hero-solar.webp",
+  },
+  {
+    icon: Activity,
+    title: "Wind Operations",
+    description:
+      "SCADA monitoring, O&M, and uptime programs across wind farm sites.",
+    count: "O&M",
     href: "/energy-technologies/geothermal",
-    image: "/Geothermal-hero.webp",
+    image: "/images/cta-turbines.png",
   },
 ];
 
 const FEATURED = [
   {
-    name: "Solar Farm Initiative",
-    location: "Multiple Locations",
-    capacity: "500 MW",
-    type: "Solar",
-    status: "Operating" as const,
-    href: "/energy-technologies/solar",
-  },
-  {
     name: "Wind Energy Complex",
-    location: "Coastal Regions",
-    capacity: "300 MW",
+    location: "Coastal & inland sites",
+    capacity: "Core portfolio",
     type: "Wind",
-    status: "In Development" as const,
+    status: "Operating" as const,
     href: "/energy-technologies/wind",
   },
   {
-    name: "Energy Storage Network",
-    location: "Strategic Locations",
-    capacity: "200 MWh",
+    name: "Turbine Deployment Program",
+    location: "Multiple wind regimes",
+    capacity: "Utility-scale",
+    type: "Turbines",
+    status: "In Development" as const,
+    href: "/energy-technologies/turbines",
+  },
+  {
+    name: "Wind Storage Network",
+    location: "Strategic grid nodes",
+    capacity: "Firmed output",
     type: "Storage",
     status: "Operating" as const,
     href: "/energy-technologies/storage",

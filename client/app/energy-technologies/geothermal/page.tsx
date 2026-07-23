@@ -4,14 +4,14 @@ import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import {
+  Activity,
   ArrowRight,
   CheckCircle2,
-  Clock,
-  Flame,
-  Leaf,
-  Mountain,
+  Gauge,
   ShieldCheck,
-  Zap,
+  Target,
+  Wind,
+  Wrench,
 } from "lucide-react";
 import {
   motion,
@@ -19,6 +19,7 @@ import {
   useMotionValue,
   useSpring,
   useTransform,
+  type Variants,
 } from "framer-motion";
 import Footer from "@/components/Footer";
 
@@ -29,80 +30,103 @@ const MUTED = "#6b7c85";
 const ACCENT = "#3FA9C8";
 const FONT_HEADING = "var(--font-font4), sans-serif";
 
+const fadeUp: Variants = {
+  hidden: { opacity: 0, y: 28 },
+  show: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.7, ease: [0.22, 1, 0.36, 1] },
+  },
+};
+
+const stagger: Variants = {
+  hidden: {},
+  show: { transition: { staggerChildren: 0.1 } },
+};
+
 const HERO_FEATURES = [
   {
-    icon: Flame,
-    title: "Always On",
-    desc: "Baseload power, day and night.",
+    icon: Wind,
+    title: "Site Operations",
+    desc: "Hands-on control of every turbine.",
   },
   {
-    icon: Leaf,
-    title: "Low Carbon",
-    desc: "Clean heat from beneath the Earth.",
+    icon: Activity,
+    title: "SCADA Monitoring",
+    desc: "Live visibility across the farm.",
+  },
+  {
+    icon: Wrench,
+    title: "Proactive O&M",
+    desc: "Maintenance that protects output.",
   },
   {
     icon: ShieldCheck,
-    title: "Reliable Output",
-    desc: "Stable generation, weather or not.",
-  },
-  {
-    icon: Clock,
-    title: "Long Lifespan",
-    desc: "Decades of sustainable performance.",
+    title: "High Availability",
+    desc: "Uptime that earns investor trust.",
   },
 ];
 
 const INTRO_PILLARS = [
   {
-    icon: Flame,
-    title: "Renewable",
-    desc: "Earth's heat, naturally replenished.",
+    icon: Wind,
+    title: "Farm-wide control",
+    desc: "Day-to-day operations that keep Big Bull wind assets performing.",
   },
   {
-    icon: Zap,
-    title: "Dependable",
-    desc: "True baseload power for the grid.",
+    icon: Activity,
+    title: "SCADA insight",
+    desc: "Real-time telemetry for turbines, substations, and collection systems.",
   },
   {
-    icon: Mountain,
-    title: "Sustainable",
-    desc: "Minimal footprint, lasting impact.",
+    icon: Gauge,
+    title: "Availability focus",
+    desc: "Targets, alarms, and response plans that protect generation.",
   },
 ];
 
 const PROCESS_STEPS = [
-  "Hot water or steam is extracted from underground reservoirs through production wells.",
-  "The geothermal fluid is brought to the surface and separated into steam and water.",
-  "Steam drives turbines connected to generators that produce electricity.",
-  "Used geothermal fluid is reinjected into the reservoir through injection wells.",
-  "Electrical output is stepped up through transformers for transmission.",
-  "Clean electricity is delivered to the grid for homes and industry.",
+  "Operations teams oversee turbines, access roads, and on-site systems across the wind farm.",
+  "SCADA platforms stream live turbine and substation data for continuous monitoring.",
+  "Alarms and performance trends trigger rapid diagnostics and dispatch decisions.",
+  "Scheduled and condition-based O&M keeps blades, nacelles, and electrics in service.",
+  "Availability and output are tracked against targets to protect daily generation.",
+  "Insights feed planning, investor reporting, and continuous improvement cycles.",
 ];
 
 const WHY_POINTS = [
-  "Renewable heat with a minimal carbon footprint",
-  "Reliable baseload power available 24/7",
-  "Long operational life with low operating costs",
+  {
+    title: "Protects wind generation",
+    desc: "Disciplined operations turn installed capacity into consistent clean megawatt-hours.",
+  },
+  {
+    title: "Faster issue response",
+    desc: "SCADA visibility and clear O&M playbooks reduce downtime when turbines need attention.",
+  },
+  {
+    title: "Investor-ready performance",
+    desc: "Availability reporting and site discipline support Big Bull Energies’ wind-led portfolio.",
+  },
 ];
 
 const STATS = [
   {
-    value: 5,
-    suffix: "+",
-    label: "Geothermal projects in development",
-    icon: Mountain,
+    value: 24,
+    suffix: "/7",
+    label: "Monitoring coverage for wind farm assets",
+    icon: Activity,
   },
   {
-    value: 500,
-    suffix: "+",
-    label: "Megawatts of geothermal capacity planned",
-    icon: Zap,
+    value: 97,
+    suffix: "%+",
+    label: "Target turbine availability across sites",
+    icon: Gauge,
   },
   {
-    value: 100,
-    suffix: "+",
-    label: "Years of sustainable energy potential",
-    icon: Clock,
+    value: 2,
+    suffix: "",
+    label: "Core wind hubs under active operations",
+    icon: Wind,
   },
 ];
 
@@ -115,7 +139,7 @@ function AnimatedStat({
   value: number;
   suffix: string;
   label: string;
-  icon: typeof Mountain;
+  icon: typeof Wind;
 }) {
   const ref = useRef<HTMLDivElement>(null);
   const inView = useInView(ref, { once: true, amount: 0.5 });
@@ -159,22 +183,26 @@ function AnimatedStat({
   );
 }
 
-export default function GeothermalPage() {
+export default function WindFarmOperationsPage() {
   return (
     <main className="min-h-screen w-full overflow-x-hidden bg-white">
-      {/* Hero */}
       <section className="relative w-full min-h-[100svh] min-h-[100dvh] flex flex-col justify-end overflow-hidden pt-24 sm:pt-28 lg:pt-[126px]">
-        <div className="absolute inset-0 z-0">
+        <motion.div
+          className="absolute inset-0 z-0"
+          initial={{ scale: 1.08 }}
+          animate={{ scale: 1 }}
+          transition={{ duration: 8, ease: "easeOut" }}
+        >
           <Image
-            src="/Geothermal-hero.webp"
-            alt="Geothermal energy landscape"
+            src="/wind-hero.png"
+            alt="Big Bull Energies wind farm operations"
             fill
             priority
             className="object-cover object-center"
             sizes="100vw"
             quality={90}
           />
-        </div>
+        </motion.div>
 
         <div
           className="absolute inset-0 z-[1] pointer-events-none"
@@ -194,49 +222,60 @@ export default function GeothermalPage() {
         <div className="relative z-10 container mx-auto px-4 sm:px-6 lg:px-8 flex-1 flex flex-col justify-center pb-6 sm:pb-8">
           <div className="max-w-[1220px] mx-auto w-full">
             <motion.div
-              className="max-w-xl lg:max-w-[560px]"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+              className="max-w-xl lg:max-w-[580px]"
+              variants={stagger}
+              initial="hidden"
+              animate="show"
             >
-              <p
+              <motion.p
+                variants={fadeUp}
                 className="text-[11px] sm:text-xs font-bold uppercase tracking-[0.2em] mb-4 sm:mb-5"
                 style={{ color: "#7DD3E8" }}
               >
-                Power From The Earth.
-              </p>
+                Big Bull Energies · Wind Farm Operations
+              </motion.p>
 
-              <h1
+              <motion.h1
+                variants={fadeUp}
                 className="text-[2.1rem] sm:text-5xl md:text-[3.15rem] lg:text-[3.4rem] font-bold leading-[1.1] mb-4 sm:mb-5 text-white"
                 style={{ fontFamily: FONT_HEADING }}
               >
-                Steady heat.{" "}
-                <span style={{ color: ACCENT }}>Clean power.</span>
-              </h1>
+                Keep every turbine{" "}
+                <span style={{ color: ACCENT }}>earning.</span>
+              </motion.h1>
 
-              <p className="text-sm sm:text-[15px] md:text-base leading-relaxed text-white/85 max-w-md mb-7 sm:mb-8">
-                Geothermal solutions that harness the Earth&apos;s natural heat
-                for reliable, renewable electricity with lasting grid value.
-              </p>
-
-              <Link
-                href="#solutions"
-                className="gas-cta-gold group inline-flex items-center gap-2.5 font-bold px-6 py-3.5 text-xs sm:text-sm uppercase tracking-[0.06em] rounded-lg transition-all duration-300"
-                style={{ backgroundColor: GOLD, color: "#1a1a1a" }}
+              <motion.p
+                variants={fadeUp}
+                className="text-sm sm:text-[15px] md:text-base leading-relaxed text-white/85 max-w-md mb-7 sm:mb-8"
               >
-                Explore Geothermal Solutions
-                <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
-              </Link>
+                Big Bull Energies runs wind farm operations with SCADA monitoring,
+                disciplined O&amp;M, and availability targets that protect clean
+                generation day after day.
+              </motion.p>
+
+              <motion.div variants={fadeUp}>
+                <Link
+                  href="#solutions"
+                  className="gas-cta-gold group inline-flex items-center gap-2.5 font-bold px-6 py-3.5 text-xs sm:text-sm uppercase tracking-[0.06em] rounded-lg transition-all duration-300"
+                  style={{ backgroundColor: GOLD, color: "#1a1a1a" }}
+                >
+                  Explore Operations
+                  <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
+                </Link>
+              </motion.div>
             </motion.div>
           </div>
         </div>
 
-        <div
+        <motion.div
           className="relative z-10 border-t border-white/10"
           style={{
             background: "rgba(8,24,40,0.55)",
             backdropFilter: "blur(14px)",
           }}
+          initial={{ opacity: 0, y: 24 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.45, duration: 0.7 }}
         >
           <div className="container mx-auto px-4 sm:px-6 lg:px-8">
             <div className="max-w-[1220px] mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-0 py-5 sm:py-6">
@@ -264,56 +303,64 @@ export default function GeothermalPage() {
               ))}
             </div>
           </div>
-        </div>
+        </motion.div>
       </section>
 
-      {/* Intro */}
       <section
         id="solutions"
         className="relative w-full bg-white py-14 sm:py-16 md:py-20 lg:py-24 overflow-hidden"
       >
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-[1220px] mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-14 xl:gap-16 items-center">
-            <div>
-              <div
+            <motion.div
+              variants={stagger}
+              initial="hidden"
+              whileInView="show"
+              viewport={{ once: true, amount: 0.25 }}
+            >
+              <motion.div
+                variants={fadeUp}
                 className="flex items-center gap-2.5 flex-wrap text-[11px] sm:text-xs font-semibold uppercase tracking-[0.14em] mb-5 sm:mb-6"
                 style={{ color: MUTED }}
               >
                 <span style={{ color: PRIMARY }}>Energy Technologies</span>
                 <span className="opacity-40">|</span>
-                <span>Geothermal</span>
-              </div>
+                <span>Wind Farm Operations</span>
+              </motion.div>
 
-              <h2
+              <motion.h2
+                variants={fadeUp}
                 className="text-[1.85rem] sm:text-4xl lg:text-[2.65rem] font-bold leading-[1.15] mb-5"
                 style={{ fontFamily: FONT_HEADING, color: DARK }}
               >
-                A core component of Big Bull Energies&apos; investment
-                portfolio.
-              </h2>
+                Operations that keep{" "}
+                <span style={{ color: PRIMARY }}>Big Bull wind</span> performing.
+              </motion.h2>
 
-              <p
+              <motion.p
+                variants={fadeUp}
                 className="text-sm sm:text-[15px] leading-[1.75] mb-4 max-w-lg"
                 style={{ color: MUTED }}
               >
-                Geothermal energy harnesses the Earth&apos;s natural heat to
-                generate clean, renewable electricity — a sustainable source
-                with reliable output and minimal environmental impact.
-              </p>
+                Wind Farm Operations is how Big Bull Energies turns turbines into
+                dependable clean power — coordinating site teams, SCADA systems,
+                and O&amp;M so assets stay available when the wind is there.
+              </motion.p>
 
-              <p
+              <motion.p
+                variants={fadeUp}
                 className="text-sm sm:text-[15px] leading-[1.75] mb-8 sm:mb-10 max-w-lg"
                 style={{ color: MUTED }}
               >
-                From early-stage development to long-term generation, our
-                geothermal investments deliver baseload megawatts that
-                strengthen the grid for decades.
-              </p>
+                From monitoring rooms to field response, every process is built
+                around availability, safety, and long-term portfolio value.
+              </motion.p>
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 sm:gap-4">
                 {INTRO_PILLARS.map(({ icon: Icon, title, desc }) => (
-                  <div
+                  <motion.div
                     key={title}
+                    variants={fadeUp}
                     className="flex sm:flex-col items-center sm:items-start gap-3"
                   >
                     <span
@@ -340,17 +387,23 @@ export default function GeothermalPage() {
                         {desc}
                       </p>
                     </div>
-                  </div>
+                  </motion.div>
                 ))}
               </div>
-            </div>
+            </motion.div>
 
-            <div className="relative w-full max-w-[420px] sm:max-w-[460px] mx-auto lg:max-w-none lg:justify-self-end">
+            <motion.div
+              className="relative w-full max-w-[420px] sm:max-w-[460px] mx-auto lg:max-w-none lg:justify-self-end"
+              initial={{ opacity: 0, scale: 0.94 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true, amount: 0.3 }}
+              transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+            >
               <div className="relative w-full aspect-square">
                 <div className="absolute inset-0 rounded-full overflow-hidden shadow-[0_28px_64px_rgba(5,98,124,0.18)]">
                   <Image
-                    src="/geothermal1.webp"
-                    alt="Geothermal power plant"
+                    src="/hero.png"
+                    alt="Big Bull Energies wind turbines under active operations"
                     fill
                     className="object-cover"
                     sizes="(max-width: 1024px) 90vw, 460px"
@@ -365,18 +418,17 @@ export default function GeothermalPage() {
                     boxShadow: "0 16px 40px rgba(5,98,124,0.35)",
                   }}
                 >
-                  <Flame className="w-6 h-6 mx-auto mb-2" style={{ color: GOLD }} />
+                  <Activity className="w-6 h-6 mx-auto mb-2" style={{ color: GOLD }} />
                   <p className="text-[10px] sm:text-[11px] leading-snug text-white/95 font-medium">
-                    Clean heat. Enduring power.
+                    Live monitoring. Lasting uptime.
                   </p>
                 </div>
               </div>
-            </div>
+            </motion.div>
           </div>
         </div>
       </section>
 
-      {/* Track record */}
       <section className="relative w-full bg-[#F4F6F7] py-14 sm:py-16 md:py-20 lg:py-24">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-[1220px] mx-auto">
@@ -385,7 +437,7 @@ export default function GeothermalPage() {
                 className="text-2xl sm:text-3xl md:text-4xl font-bold max-w-md"
                 style={{ fontFamily: FONT_HEADING, color: DARK }}
               >
-                Our proven track record in geothermal
+                Operations metrics that matter for wind
               </h2>
               <Link
                 href="/projects"
@@ -406,10 +458,10 @@ export default function GeothermalPage() {
 
               <div className="relative w-full aspect-[5/4] sm:aspect-[4/3]">
                 <Image
-                  src="/gas1.svg"
-                  alt="Geothermal energy infrastructure illustration"
+                  src="/images/cta-turbines.png"
+                  alt="Big Bull Energies turbines under operations oversight"
                   fill
-                  className="object-contain"
+                  className="object-cover rounded-2xl"
                   sizes="(max-width: 1024px) 100vw, 45vw"
                 />
               </div>
@@ -418,21 +470,34 @@ export default function GeothermalPage() {
         </div>
       </section>
 
-      {/* How it works */}
       <section className="relative w-full bg-white py-14 sm:py-16 md:py-20 lg:py-24">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-[1220px] mx-auto">
-            <h2
+            <motion.h2
               className="text-2xl sm:text-3xl md:text-4xl lg:text-[2.5rem] font-bold text-center mb-10 sm:mb-12 lg:mb-14"
               style={{ fontFamily: FONT_HEADING, color: DARK }}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
             >
-              How geothermal energy works
-            </h2>
+              How Big Bull wind farm operations work
+            </motion.h2>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-14 xl:gap-16 items-center">
-              <ol className="flex flex-col gap-3.5 sm:gap-4 order-2 lg:order-1">
+              <motion.ol
+                className="flex flex-col gap-3.5 sm:gap-4 order-2 lg:order-1"
+                variants={stagger}
+                initial="hidden"
+                whileInView="show"
+                viewport={{ once: true, amount: 0.2 }}
+              >
                 {PROCESS_STEPS.map((text, i) => (
-                  <li key={i} className="flex items-start gap-3.5 sm:gap-4">
+                  <motion.li
+                    key={i}
+                    variants={fadeUp}
+                    className="flex items-start gap-3.5 sm:gap-4"
+                  >
                     <span
                       className="shrink-0 w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center text-sm font-bold text-white"
                       style={{ backgroundColor: PRIMARY }}
@@ -445,76 +510,107 @@ export default function GeothermalPage() {
                     >
                       {text}
                     </p>
-                  </li>
+                  </motion.li>
                 ))}
-              </ol>
+              </motion.ol>
 
-              <div className="relative w-full aspect-square sm:aspect-[5/4] lg:aspect-square order-1 lg:order-2 rounded-2xl sm:rounded-3xl overflow-hidden">
+              <motion.div
+                className="relative w-full aspect-square sm:aspect-[5/4] lg:aspect-square order-1 lg:order-2 rounded-2xl sm:rounded-3xl overflow-hidden"
+                initial={{ opacity: 0, scale: 0.96 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true, amount: 0.3 }}
+                transition={{ duration: 0.75 }}
+              >
                 <Image
-                  src="/geothermal1.webp"
-                  alt="How geothermal energy works"
+                  src="/images/cta-turbines.png"
+                  alt="How Big Bull Energies operates wind farms"
                   fill
                   className="object-cover"
                   sizes="(max-width: 1024px) 100vw, 50vw"
                 />
-              </div>
+              </motion.div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Why geothermal */}
       <section className="relative w-full bg-[#F7F9FA] py-14 sm:py-16 md:py-20 lg:py-24">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-[1220px] mx-auto grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-14 xl:gap-16 items-center">
-            <div>
-              <h2
+            <motion.div
+              variants={stagger}
+              initial="hidden"
+              whileInView="show"
+              viewport={{ once: true, amount: 0.25 }}
+            >
+              <motion.h2
+                variants={fadeUp}
                 className="text-2xl sm:text-3xl md:text-4xl lg:text-[2.5rem] font-bold mb-4 sm:mb-5"
                 style={{ fontFamily: FONT_HEADING, color: DARK }}
               >
-                Why <span style={{ color: PRIMARY }}>geothermal</span>
-              </h2>
+                Why{" "}
+                <span style={{ color: PRIMARY }}>Wind Farm Operations</span>
+              </motion.h2>
 
-              <p
+              <motion.p
+                variants={fadeUp}
                 className="text-sm sm:text-[15px] leading-[1.75] mb-6 sm:mb-7 max-w-lg"
                 style={{ color: MUTED }}
               >
-                Geothermal offers unique advantages as a renewable energy source.
-                Key benefits include:
-              </p>
+                Strong operations turn wind resources into bankable performance.
+                Big Bull Energies focuses on the fundamentals that protect
+                availability and output.
+              </motion.p>
 
-              <div className="space-y-4 sm:space-y-5">
-                {WHY_POINTS.map((point) => (
-                  <div key={point} className="flex items-start gap-3">
+              <div className="space-y-5 sm:space-y-6">
+                {WHY_POINTS.map(({ title, desc }) => (
+                  <motion.div
+                    key={title}
+                    variants={fadeUp}
+                    className="flex items-start gap-3.5"
+                  >
                     <CheckCircle2
                       className="w-5 h-5 sm:w-6 sm:h-6 shrink-0 mt-0.5"
                       style={{ color: PRIMARY }}
                     />
-                    <p
-                      className="text-sm sm:text-[15px] md:text-base leading-relaxed"
-                      style={{ color: MUTED }}
-                    >
-                      {point}
-                    </p>
-                  </div>
+                    <div>
+                      <p
+                        className="text-sm font-bold mb-1"
+                        style={{ color: DARK }}
+                      >
+                        {title}
+                      </p>
+                      <p
+                        className="text-sm sm:text-[15px] leading-[1.75]"
+                        style={{ color: MUTED }}
+                      >
+                        {desc}
+                      </p>
+                    </div>
+                  </motion.div>
                 ))}
               </div>
-            </div>
+            </motion.div>
 
-            <div className="relative w-full aspect-[5/4] sm:aspect-[4/3]">
+            <motion.div
+              className="relative w-full aspect-[5/4] sm:aspect-[4/3]"
+              initial={{ opacity: 0, x: 30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true, amount: 0.3 }}
+              transition={{ duration: 0.7 }}
+            >
               <Image
-                src="/gas3.svg"
-                alt="Geothermal energy benefits illustration"
+                src="/wind1.svg"
+                alt="Wind farm operations benefits for Big Bull Energies"
                 fill
                 className="object-contain"
                 sizes="(max-width: 1024px) 100vw, 50vw"
               />
-            </div>
+            </motion.div>
           </div>
         </div>
       </section>
 
-      {/* CTA */}
       <section className="relative w-full bg-white py-10 sm:py-12 lg:py-16">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
@@ -533,14 +629,14 @@ export default function GeothermalPage() {
               className="shrink-0 w-14 h-14 sm:w-16 sm:h-16 rounded-full flex items-center justify-center"
               style={{ backgroundColor: "rgba(255,255,255,0.12)" }}
             >
-              <Flame className="w-7 h-7" style={{ color: GOLD }} />
+              <Target className="w-7 h-7" style={{ color: GOLD }} />
             </div>
 
             <h2
               className="flex-1 text-center sm:text-left text-xl sm:text-2xl lg:text-[1.75rem] font-bold text-white leading-snug"
               style={{ fontFamily: FONT_HEADING }}
             >
-              Ready to explore geothermal solutions?
+              Ready to discuss Wind Farm Operations?
             </h2>
 
             <Link
